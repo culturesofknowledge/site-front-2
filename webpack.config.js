@@ -1,5 +1,6 @@
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const webpack = require("webpack");
 
 const STATIC_DIR = path.resolve(__dirname, "site_front_2/flaskapp/static/");
 const JS_DIR = `${STATIC_DIR}/js`;
@@ -8,6 +9,11 @@ const BUILD_DIR = `${STATIC_DIR}/dist`;
 config = {
     entry: {
         core: `${JS_DIR}/emfr/core/index.js`,
+        styles: [
+            `${JS_DIR}/emfr/main.css`,
+            `${JS_DIR}/emfr/app-missing.css`,
+            `${JS_DIR}/emfr/app-ext.css`
+        ]
     },
     output: {
         path: BUILD_DIR,
@@ -37,6 +43,7 @@ config = {
                     MiniCssExtractPlugin.loader,
                     // 'style-loader',
                     'css-loader',
+                    'sass-loader',
                     'postcss-loader',
                 ]
             },
@@ -46,6 +53,10 @@ config = {
         new MiniCssExtractPlugin({
             filename: "[name].bundle.css",
             chunkFilename: "[name].[id].css",
+        }),
+        new webpack.ProvidePlugin({
+            $: "jquery",
+            jQuery: "jquery",
         }),
     ],
 }

@@ -1,0 +1,87 @@
+textarea {
+    border: #efc319 2px solid;
+}
+
+
+#back-top a {
+    color: #fff;
+}
+
+#back-top  {
+    background: #333333;
+    display: block;
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 99999;
+    cursor: pointer;
+    display: none;
+    color: #f9f9f9;
+    font-size: 0.6875rem;
+    width: 3.125rem;
+    height: 3.125rem;
+    line-height: 3.125rem;
+    text-align: center;
+    text-transform: uppercase;
+    border-radius: 3.125rem;
+    transition: color 300ms ease-out;
+}
+
+@media only screen and (min-width: 64.063em) {  /* min-width 1025px, large screens */
+    .side {
+        margin-top: 200px;
+        border-top: 1px solid #efc319;
+        border-bottom: 1px solid #efc319;
+        padding-top: 15px;
+    }
+}
+
+.side-nav li a:not(.button) {
+    padding: 0.0375rem 0.875rem;
+}
+
+.content pre {
+    font-family: inherit;
+    white-space: pre-wrap;       /* CSS 3 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+.content .content ul {
+    list-style:none;
+}
+
+.top-bar-section ul li > a {
+    color: #35495e !important;
+    font-family:"Arvo", serif;
+    font-weight: bold;
+    font-size:1em;
+}
+
+.worklegend .workicon {
+    margin: 0 -3px 0 -11px;
+}
+.worklegend {
+    font-size: 22px !important;
+    padding-top:5px
+}
+
+#circle-search input:focus::-webkit-input-placeholder {
+    color: #888;
+}
+
+ul.pagination li {
+    width: 60px;
+    border-radius: 2px;
+    text-align: center;
+}
+@media only screen and (max-width: 40.063em) {
+    #main .column {
+        border-top: 3px solid #efc319;
+    }
+    .side {
+        border-top: 5px solid #efc319;
+    }
+}

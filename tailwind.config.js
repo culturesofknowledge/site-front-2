@@ -11,6 +11,9 @@ module.exports = {
             },
         },
     },
+    corePlugins: {
+        preflight: false,
+    },
     // plugins: [require("daisyui")],
     // corePlugins: {
     //   preflight: false,

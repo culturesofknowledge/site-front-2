@@ -2,16 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-.aaa {
-    background-color: red;
-}
-
-.color-success {
-    background-color: #38c172;
-    color: #232323;
-}
-
-.color-error {
-    background-color: #e3342f;
-    color: #c1c1c1;
-}
+/*@import "style-cofk.css";*/
+@import "foundation-sites/scss/foundation.scss";
+/*@import "app-ext.css";*/

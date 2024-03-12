@@ -13,3 +13,9 @@ __pycache__/
 
 # generated from Gradle or Maven project
 .idea/libraries/
+
+
+
+# nodejs
+node_modules/
+site_front_2/flaskapp/static/dist/

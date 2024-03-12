@@ -1,6 +1,25 @@
 {% extends "base.html" %}
 
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='dist/core.bundle.css') }}">
+<script src="{{ url_for('static', filename='dist/core.bundle.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 <h1>XXXXXXXXXXXXXXXXX</h1>
 <h1>xkxkxkxkxkx</h1>
+
+
+<div class="bg-lime-300">
+    zzzzzz
+</div>
+
+
+<script>
+    window.onload = function () {
+        console.log('xx')
+        // emfr.core.debugHi();
+    }
+</script>
+
 {% endblock %}

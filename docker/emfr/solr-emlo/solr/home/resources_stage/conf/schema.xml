@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<schema name="resources" version="1.2">
+
+    <types>
+        <!-- field type definitions. The "name" attribute is
+        just a label to be used by field definitions.  The "class"
+        attribute and any other attributes determine the real
+        behavior of the fieldType.
+         Class names starting with "solr" refer to java classes in the
+        org.apache.solr.analysis package.
+        -->
+
+        <!-- The StrField type is not analyzed, but indexed/stored verbatim.
+        - StrField and TextField support an optional compressThreshold which
+        limits compression (if enabled in the derived fields) to values which
+        exceed a certain size (in characters).
+        -->
+        <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
+
+        <!--
+        Default numeric field types. For faster range queries, consider the tint/tfloat/tlong/tdouble types.
+        -->
+        <fieldType name="long" class="solr.TrieLongField" precisionStep="0" omitNorms="true" positionIncrementGap="0"/>
+
+        <!-- A Trie based date field for faster date range queries and date faceting. -->
+        <fieldType name="tdate" class="solr.TrieDateField" omitNorms="true" precisionStep="6" positionIncrementGap="0"/>
+
+
+        <!-- A text field that uses WordDelimiterFilter to enable splitting and matching of
+        words on case-change, alpha numeric boundaries, and non-alphanumeric chars,
+        so that a query of "wifi" or "wi fi" could match a document containing "Wi-Fi".
+        Synonyms and stopwords are customized by external files, and stemming is enabled.
+        -->
+        <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
+            <analyzer type="index">
+                <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+                <!-- Case insensitive stop word removal.
+                  add enablePositionIncrements=true in both the index and query
+                  analyzers to leave a 'gap' for more accurate phrase queries.
+                -->
+                <filter class="solr.StopFilterFactory"
+                        ignoreCase="true"
+                        words="stopwords.txt"
+                />
+                <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="0" splitOnCaseChange="1"/>
+                <filter class="solr.LowerCaseFilterFactory"/>
+            </analyzer>
+            <analyzer type="query">
+                <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+                <filter class="solr.StopFilterFactory"
+                        ignoreCase="true"
+                        words="stopwords.txt"
+                />
+                <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="0" catenateNumbers="0" catenateAll="0" splitOnCaseChange="1"/>
+                <filter class="solr.LowerCaseFilterFactory"/>
+            </analyzer>
+        </fieldType>
+
+        <fieldType name="uuid" class="solr.UUIDField" indexed="true" />
+
+    </types>
+
+    <fields>
+
+        <!--          -->
+        <!-- required -->
+        <!--          -->
+        <field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>
+        <field name="id"  type="string"  indexed="true"  stored="true"  required="true"  />
+        <field name="uuid"  type="uuid"  indexed="true"  stored="true"  required="true"  />
+        <field name="uri"  type="string"  indexed="true"  stored="true"  required="true"  />
+
+
+		<field name="uuid_related"  type="uuid"  indexed="true" stored="true"  multiValued="true" />
+
+        <field name="dcterms_identifier-uuid_"  type="string"  indexed="true"  stored="true"  required="true"  />
+        <field name="dcterms_identifier-uri_"  type="string"  indexed="true"  stored="true"  required="true"  />
+        <field name="dcterms_identifier-edit_"  type="string"  indexed="true"  stored="true"  required="true"  /> <!-- resource_id -->
+
+
+        <!--          -->
+        <!-- optional -->
+        <!--          -->
+        <field name="ox_titleOfResource"  type="text"  indexed="true"  stored="true"  required="true"  /> <!-- resource_name -->
+        <field name="rdf_type"  type="string"  indexed="false"  stored="true"  />
+        <field name="ox_detailsOfResource"  type="text"  indexed="true"  stored="true"  /> <!-- resource_details -->
+        <field name="dcterms_relation"  type="text"  indexed="true"  stored="true"  /> <!-- resource_url -->
+        <field name="ox_internalAdded"  type="tdate"  indexed="true"  stored="true"  />
+        <field name="ox_internalCreated"  type="tdate"  indexed="true"  stored="true"  /> <!-- creation_timestamp -->
+        <field name="ox_internalModified"  type="tdate"  indexed="true"  stored="true"  /> <!-- change_timestamp -->
+        <field name="ox_internalModifiedByUser"  type="string"  indexed="false"  stored="true"  /> <!-- change_user -->
+
+
+        <!--                      -->
+        <!-- Links from resources -->
+        <!--                      -->
+
+        <field name="rdfs_seeAlso-work"  type="string"  indexed="true"  stored="true"  multiValued="true"  /> <!-- type-is_related_to -->
+        <field name="rdfs_seeAlso-person"  type="string"  indexed="true"  stored="true"  multiValued="true"  /> <!-- type-is_related_to -->
+        <field name="rdfs_seeAlso-location"  type="string"  indexed="true"  stored="true"  multiValued="true"  /> <!-- type-is_related_to -->
+        <field name="rdfs_seeAlso-institution"  type="string"  indexed="true"  stored="true"  multiValued="true"  /> <!-- type-is_related_to -->
+
+
+        <!--            -->
+        <!-- additional -->
+        <!--            -->
+
+        <field name="timestamp_indexed"  type="tdate"  indexed="true"  stored="true"  multiValued="false"  default="NOW"  />
+        <field name="object_type"  type="string"  indexed="true"  stored="true"  required="true"  default="resource"  />
+        <field name="default_search_field"  type="text"  indexed="true"  stored="false"  multiValued="true"  />
+
+    </fields>
+
+
+    <uniqueKey>dcterms_identifier-uuid_</uniqueKey> <!-- Field to use to determine and enforce document uniqueness. this field is marked with required="false", it will be a required field -->
+    <defaultSearchField>default_search_field</defaultSearchField> <!-- field for the QueryParser to use when an explicit fieldname is absent -->
+    <solrQueryParser defaultOperator="OR"/> <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
+
+
+    <copyField source="dcterms_identifier-uuid_" dest="id"/>
+    <copyField source="ox_titleOfResource" dest="default_search_field"/>
+    <copyField source="ox_detailsOfResource" dest="default_search_field"/>
+    <copyField source="uuid" dest="default_search_field"/>
+
+
+</schema>

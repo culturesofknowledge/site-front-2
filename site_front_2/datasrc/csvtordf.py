@@ -9,7 +9,7 @@ Also see "relationships.py"
 '''
 
 # sys.path.append( '../../../pylons/web/web/lib' )
-from site_front_2 import fieldmap
+from site_front_2.datasrc import fieldmap
 # The 'fieldmap' module passes back the fieldname as a string.
 # By using functions from 'fieldmap', we can restrict fieldnames to being hard-coded in only
 # ONE place, allowing much easier changes if a better ontology is found. (SB, 13 July 2011)

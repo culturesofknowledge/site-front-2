@@ -1,0 +1,13 @@
+solr:
+  build: ./solr-emlo
+  #restart: no
+
+  environment:
+    - SOLR_LOG_LEVEL=INFO
+
+  ports:
+    - "8983:8983"
+
+  volumes:
+    - ./solr-emlo/solr/home:/opt/solr/server/solr/home
+    - ./data-solr/:/data-solr/

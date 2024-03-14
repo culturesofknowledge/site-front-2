@@ -9,6 +9,8 @@ classifiers = [
 ]
 dependencies = [
     'Flask~=3.0',
+    'pysolr~=3.8.1',
+    'solrpy==0.9.9',  # KTODO tobe replaced with pysolr
 ]
 
 [[project.authors]]

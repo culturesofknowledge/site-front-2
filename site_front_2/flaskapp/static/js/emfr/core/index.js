@@ -10,7 +10,7 @@
 // import $ from 'jquery'
 // import jQuery from 'jquery'
 // export const jQuery = require('jquery')
-import 'jquery'
+// import 'jquery'
 
 // for foundation-sites 5
 // import 'foundation-sites/css/foundation.css'

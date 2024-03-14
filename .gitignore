@@ -19,3 +19,16 @@ __pycache__/
 # nodejs
 node_modules/
 site_front_2/flaskapp/static/dist/
+
+
+# py
+site_front_2/_playground/
+
+
+# data
+#data/*.csv
+data/**/*.csv
+data/**/*.csv.bak
+
+# docker
+docker/emfr/data-solr

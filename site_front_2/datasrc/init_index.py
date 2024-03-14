@@ -8,8 +8,8 @@ import time
 
 import solr
 
-from site_front_2 import solrconfig, fieldmap, app_paths
-from site_front_2.datasrc import csvtordf
+from site_front_2 import app_paths
+from site_front_2.datasrc import csvtordf, fieldmap, solrconfig
 
 lat_min = decimal.Decimal("-90")
 lat_max = decimal.Decimal("90")

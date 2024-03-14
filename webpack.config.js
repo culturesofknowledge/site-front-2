@@ -9,11 +9,11 @@ const BUILD_DIR = `${STATIC_DIR}/dist`;
 config = {
     entry: {
         core: `${JS_DIR}/emfr/core/index.js`,
-        styles: [
-            `${JS_DIR}/emfr/main.css`,
-            `${JS_DIR}/emfr/app-missing.css`,
-            `${JS_DIR}/emfr/app-ext.css`
-        ]
+        // styles: [
+        //     `${JS_DIR}/emfr/main.css`,
+        //     `${JS_DIR}/emfr/app-missing.css`,
+        //     `${JS_DIR}/emfr/app-ext.css`
+        // ]
     },
     output: {
         path: BUILD_DIR,
@@ -55,8 +55,8 @@ config = {
             chunkFilename: "[name].[id].css",
         }),
         new webpack.ProvidePlugin({
-            $: "jquery",
-            jQuery: "jquery",
+            // $: "jquery",
+            // jQuery: "jquery",
         }),
     ],
 }

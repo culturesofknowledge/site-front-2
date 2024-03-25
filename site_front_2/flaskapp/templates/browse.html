@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block head %}
+	<style>
+		.browseby {
+			margin-left: 100px;
+		}
+		.browseby h3 {
+			display: inline-block;
+
+		}
+
+		ul.alphabet li, ul.numbers li {
+			background-color: #ddd;
+			margin-left: 4px;
+		}
+		.pagination-centered ul.pagination li {
+			margin-bottom: 5px;
+		}
+
+		ul.pagination li a {
+			color:black;
+		}
+
+		@media only screen and (max-width: 40em) {
+			.people th:nth-child(3), .people td:nth-child(3),
+			.locations th:nth-child(3), .locations td:nth-child(3) ,
+			.organisations th:nth-child(3), .organisations td:nth-child(3) {
+				display:none;
+			}
+			.people th:nth-child(4), .people td:nth-child(4),
+			.locations th:nth-child(4), .locations td:nth-child(4),
+			.organisations th:nth-child(4), .organisations td:nth-child(4) {
+				display:none;
+			}
+			.people th:nth-child(5), .people td:nth-child(5),
+			.locations th:nth-child(5), .locations td:nth-child(5) ,
+			.organisations th:nth-child(5), .organisations td:nth-child(5) {
+				display:none;
+			}
+		}
+
+		@media only screen and (max-width: 64em) {
+		}
+
+	</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+{% endblock %}

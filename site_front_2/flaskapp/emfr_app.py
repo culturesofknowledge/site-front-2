@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def root():
-    return render_template('home.html')
+    return render_template('home.jinja2')
 
 
 @app.context_processor

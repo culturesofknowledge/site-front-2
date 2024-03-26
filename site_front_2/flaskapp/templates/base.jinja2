@@ -38,9 +38,9 @@
         <section class="top-bar-section yellow-bg">
             <!-- Left Nav Section -->
             <ul class="left yellow-bg">
-                <li><a href="${items['url']}">Home</a></li>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
                 <li><a href="${items['url']}">Search+</a></li>
-                <li><a href="${items['url']}">Browse</a></li>
+                <li><a href="{{ url_for('browse.home') }}">Browse</a></li>
                 <li><a href="{{ COLLECTIONS_URL }}">Collections</a></li>
                 <li><a href="{{ CONTRIBUTE_URL }}">Contribute</a></li>
                 <li><a href="{{ ABOUT_URL }}">About</a></li>

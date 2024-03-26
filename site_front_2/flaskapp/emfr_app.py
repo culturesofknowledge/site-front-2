@@ -1,12 +1,13 @@
 from flask import Flask, render_template
 
 from site_front_2 import settings
+from site_front_2.flaskapp.views import browse
 
 app = Flask(__name__)
 
 
 @app.route("/")
-def root():
+def home():
     return render_template('home.jinja2')
 
 
@@ -17,6 +18,9 @@ def inject_global_template_vars():
         CONTRIBUTE_URL=settings.CONTRIBUTE_URL,
         ABOUT_URL=settings.ABOUT_URL,
     )
+
+
+app.register_blueprint(browse.bp, url_prefix='/browse')
 
 
 def main():

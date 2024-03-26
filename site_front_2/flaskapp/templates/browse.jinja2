@@ -1,53 +1,92 @@
 {% extends "base.jinja2" %}
 
 {% block head %}
-	<style>
-		.browseby {
-			margin-left: 100px;
-		}
-		.browseby h3 {
-			display: inline-block;
+    <style>
+{#    KTODO cleanup styles, check which should be remove #}
+        .browseby {
+            margin-left: 100px;
+        }
 
-		}
+        .browseby h3 {
+            display: inline-block;
 
-		ul.alphabet li, ul.numbers li {
-			background-color: #ddd;
-			margin-left: 4px;
-		}
-		.pagination-centered ul.pagination li {
-			margin-bottom: 5px;
-		}
+        }
 
-		ul.pagination li a {
-			color:black;
-		}
+        ul.alphabet li, ul.numbers li {
+            background-color: #ddd;
+            margin-left: 4px;
+        }
 
-		@media only screen and (max-width: 40em) {
-			.people th:nth-child(3), .people td:nth-child(3),
-			.locations th:nth-child(3), .locations td:nth-child(3) ,
-			.organisations th:nth-child(3), .organisations td:nth-child(3) {
-				display:none;
-			}
-			.people th:nth-child(4), .people td:nth-child(4),
-			.locations th:nth-child(4), .locations td:nth-child(4),
-			.organisations th:nth-child(4), .organisations td:nth-child(4) {
-				display:none;
-			}
-			.people th:nth-child(5), .people td:nth-child(5),
-			.locations th:nth-child(5), .locations td:nth-child(5) ,
-			.organisations th:nth-child(5), .organisations td:nth-child(5) {
-				display:none;
-			}
-		}
+        .pagination-centered ul.pagination li {
+            margin-bottom: 5px;
+        }
 
-		@media only screen and (max-width: 64em) {
-		}
+        ul.pagination li a {
+            color: black;
+        }
 
-	</style>
+        @media only screen and (max-width: 40em) {
+            .people th:nth-child(3), .people td:nth-child(3),
+            .locations th:nth-child(3), .locations td:nth-child(3),
+            .organisations th:nth-child(3), .organisations td:nth-child(3) {
+                display: none;
+            }
+
+            .people th:nth-child(4), .people td:nth-child(4),
+            .locations th:nth-child(4), .locations td:nth-child(4),
+            .organisations th:nth-child(4), .organisations td:nth-child(4) {
+                display: none;
+            }
+
+            .people th:nth-child(5), .people td:nth-child(5),
+            .locations th:nth-child(5), .locations td:nth-child(5),
+            .organisations th:nth-child(5), .organisations td:nth-child(5) {
+                display: none;
+            }
+        }
+
+        @media only screen and (max-width: 64em) {
+        }
+
+    </style>
 
 {% endblock %}
 
 
 {% block content %}
+
+    <br><br>
+    <div class="panel">
+        <div class="row">
+            <div class="columns hide-for-small hide-for-medium large-2"><!-- space -->
+            </div>
+
+            <div class="columns small-12 large-10 browseby">
+                <ul class="small-block-grid-3 medium-block-grid-6 large-block-grid-6">
+
+                    <li><h3>Browse by</h3></li>
+
+                    {% for data in browse_pages %}
+                        {% set is_active = cur_browse_name == data['name'] %}
+                        {% set active_class =  'active' if is_active else '' %}
+                        {% set url =  '#' if is_active else data['url'] %}
+
+                        <li class="stats-text text-center {{ active_class }}">
+                            <a href="{{ url }}">
+                                <img src="{{ data['image_url'] }}" alt="{{ data['name'] }} icon" class="stats-icon"/>
+                                <div>{{ data['name'] }}</div>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+    </div>
+
+
+
 
 {% endblock %}

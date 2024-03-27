@@ -1,18 +1,17 @@
+import json
+
 from flask import Blueprint, render_template, redirect, url_for
+
+from site_front_2.datasrc import solr_serv
 
 bp = Blueprint('browse', __name__)
 
-
-@bp.route('/')
-def home():
-    return redirect(url_for('browse.people'))
+BROWSE_NAME_PEOPLE = 'People'
 
 
-@bp.route('/people')
-def people():
+def create_browse_pages_data():
     browse_pages = [
-        {'name': 'People',
-         'url': url_for('browse.people'),
+        {'name': BROWSE_NAME_PEOPLE, 'url': url_for('browse.people'),
          'image_url': url_for('static', filename='img/icon-stats-people.png')},
         {'name': 'Locations', 'url': url_for('browse.locations'),
          'image_url': url_for('static', filename='img/icon-stats-locations.png')},
@@ -23,10 +22,31 @@ def people():
         {'name': 'Years', 'url': url_for('browse.years'),
          'image_url': url_for('static', filename='img/icon-stats-calendar.png')}
     ]
+    return browse_pages
+
+
+def get_people_rows():
+    sol = solr_serv.conn('people')
+    sol_response = sol.search("*:*", rows=1000)
+    return sol_response
+
+
+@bp.route('/')
+def home():
+    return redirect(url_for('browse.people'))
+
+
+@bp.route('/people')
+def people():
+    rows = list(get_people_rows())
+    for row in rows:
+        print(json.dumps(row, indent=4))
     return render_template(
         'browse.jinja2',
-        cur_browse_name='People',
-        browse_pages=browse_pages)
+        cur_browse_name=BROWSE_NAME_PEOPLE,
+        browse_pages=create_browse_pages_data(),
+        rows=rows,
+    )
 
 
 @bp.route('/locations')

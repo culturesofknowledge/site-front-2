@@ -18,3 +18,7 @@ def conn__OLD(object):
 def conn(object):
     sol = pysolr.Solr(solrconfig.solr_urls[object])
     return sol
+
+
+def true_false(value) -> str:
+    return 'true' if value else 'false'

@@ -14,7 +14,7 @@
 
         ul.alphabet li, ul.numbers li {
             background-color: #ddd;
-            margin-left: 4px;
+            margin-left: 0px;
         }
 
         .pagination-centered ul.pagination li {
@@ -67,7 +67,7 @@
                     <li><h3>Browse by</h3></li>
 
                     {% for data in browse_pages %}
-                        {% set is_active = cur_browse_name == data['name'] %}
+                        {% set is_active = cur_browse_page['name'] == data['name'] %}
                         {% set active_class =  'active' if is_active else '' %}
                         {% set url =  '#' if is_active else data['url'] %}
 
@@ -84,263 +84,277 @@
     </div>
 
     <div class="row">
-        {#    KTODO this it  checkboxes select for letter logic #}
-        {#    KTODO replace following logic with react #}
-        {#        {% if shopping_basket_enabled %}#}
-        {#            {% set shopping_item_count = 0 %}#}
-        {#            {% if shopping_items|length > 0 %}#}
-        {#                {% set shopping_list = shopping_items.split(',') %}#}
-        {#                {% set shopping_item_count = shopping_list|length %}#}
-        {#            {% endif %}#}
+        <form action="{{ cur_browse_page['url'] }}" method="get">
+            {#    KTODO this it  checkboxes select for letter logic #}
+            {#    KTODO replace following logic with react #}
+            {#        {% if shopping_basket_enabled %}#}
+            {#            {% set shopping_item_count = 0 %}#}
+            {#            {% if shopping_items|length > 0 %}#}
+            {#                {% set shopping_list = shopping_items.split(',') %}#}
+            {#                {% set shopping_item_count = shopping_list|length %}#}
+            {#            {% endif %}#}
 
-        {#                 ##======================================================================================#}
-        {#                 ## Write scripts to add items to the shopping list by ticking the checkboxes beside the#}
-        {#                 ## main list of names for the current letter, or remove them by unticking either the#}
-        {#                 ## same checkboxes (providing you are browsing the right letter), or the checkboxes #}
-        {#                 ## that appear next to the 'shopping list' that you have built up.#}
-        {#                 ##======================================================================================#}
-        {#            <script type="text/javascript">#}
-        {#                var sb = { // shopping basket#}
-        {#                    curr_items: {{shopping_item_count}},#}
-        {#                    max_items: {{max_shopping_items}},#}
-        {##}
-        {#                    removeUuid: function (uuid, q) {#}
-        {#                        // removeUuid_from_search#}
-        {#                        if (q.indexOf(',' + uuid) > 0) {#}
-        {#                            q = q.replace(',' + uuid, '');#}
-        {#                        } else if (q.indexOf(uuid + ',') > 0) {#}
-        {#                            q = q.replace(uuid + ',', '');#}
-        {#                        } else {#}
-        {#                            q = q.replace(uuid, '');#}
-        {#                        }#}
-        {#                        return q;#}
-        {#                    },#}
-        {##}
-        {#                    removeItem: function (uuid) { // remove uuid from current window location#}
-        {##}
-        {#                        var query_string = window.location.search;#}
-        {#                        query_string = query_string.toLowerCase(); // eliminate problems with %3A vs. %3a#}
-        {#                        var orig_query_string = query_string;#}
-        {##}
-        {#                        query_string = sb.removeUuid(uuid, query_string);#}
-        {##}
-        {#                        if (orig_query_string == query_string) {  // failed to change#}
-        {#                            uuid = uuid.replace(':', '%3a');       // try again with URL-encoding#}
-        {#                            query_string = sb.removeUuid(uuid, query_string);#}
-        {#                        }#}
-        {#                        window.location.search = query_string;#}
-        {#                    },#}
-        {##}
-        {#                    updateBasket: function (chkbox) {#}
-        {#                        if (chkbox.checked) { // they are just adding it now#}
-        {#                            if (sb.curr_items >= sb.max_items) {#}
-        {#                                alert('Sorry, you have already made the maximum number of selections.');#}
-        {#                                chkbox.checked = false;#}
-        {#                            } else { // add the uuid to the current window location#}
-        {#                                var uuid = chkbox.value,#}
-        {#                                    query_string = window.location.search,#}
-        {#                                    shopping_start = 'shopping_basket=',#}
-        {#                                    new_start;#}
-        {#                                if (sb.curr_items === 0) {#}
-        {#                                    if (query_string.indexOf(shopping_start) === -1) {#}
-        {#                                        query_string = query_string + '&' + shopping_start;#}
-        {#                                        query_string = query_string + uuid;#}
-        {#                                    } else {#}
-        {#                                        new_start = shopping_start + uuid;#}
-        {#                                        query_string = query_string.replace(shopping_start, new_start);#}
-        {#                                    }#}
-        {#                                } else {#}
-        {#                                    new_start = shopping_start + uuid + ',';#}
-        {#                                    query_string = query_string.replace(shopping_start, new_start);#}
-        {#                                }#}
-        {#                                window.location.search = query_string;#}
-        {#                            }#}
-        {#                        } else {  // remove the uuid from the current window location#}
-        {#                            sb.removeItem(chkbox.value)#}
-        {#                        }#}
-        {#                    }#}
-        {#                }#}
-        {#            </script>#}
-        {#        {% endif %}#}
+            {#                 ##======================================================================================#}
+            {#                 ## Write scripts to add items to the shopping list by ticking the checkboxes beside the#}
+            {#                 ## main list of names for the current letter, or remove them by unticking either the#}
+            {#                 ## same checkboxes (providing you are browsing the right letter), or the checkboxes #}
+            {#                 ## that appear next to the 'shopping list' that you have built up.#}
+            {#                 ##======================================================================================#}
+            {#            <script type="text/javascript">#}
+            {#                var sb = { // shopping basket#}
+            {#                    curr_items: {{shopping_item_count}},#}
+            {#                    max_items: {{max_shopping_items}},#}
+            {##}
+            {#                    removeUuid: function (uuid, q) {#}
+            {#                        // removeUuid_from_search#}
+            {#                        if (q.indexOf(',' + uuid) > 0) {#}
+            {#                            q = q.replace(',' + uuid, '');#}
+            {#                        } else if (q.indexOf(uuid + ',') > 0) {#}
+            {#                            q = q.replace(uuid + ',', '');#}
+            {#                        } else {#}
+            {#                            q = q.replace(uuid, '');#}
+            {#                        }#}
+            {#                        return q;#}
+            {#                    },#}
+            {##}
+            {#                    removeItem: function (uuid) { // remove uuid from current window location#}
+            {##}
+            {#                        var query_string = window.location.search;#}
+            {#                        query_string = query_string.toLowerCase(); // eliminate problems with %3A vs. %3a#}
+            {#                        var orig_query_string = query_string;#}
+            {##}
+            {#                        query_string = sb.removeUuid(uuid, query_string);#}
+            {##}
+            {#                        if (orig_query_string == query_string) {  // failed to change#}
+            {#                            uuid = uuid.replace(':', '%3a');       // try again with URL-encoding#}
+            {#                            query_string = sb.removeUuid(uuid, query_string);#}
+            {#                        }#}
+            {#                        window.location.search = query_string;#}
+            {#                    },#}
+            {##}
+            {#                    updateBasket: function (chkbox) {#}
+            {#                        if (chkbox.checked) { // they are just adding it now#}
+            {#                            if (sb.curr_items >= sb.max_items) {#}
+            {#                                alert('Sorry, you have already made the maximum number of selections.');#}
+            {#                                chkbox.checked = false;#}
+            {#                            } else { // add the uuid to the current window location#}
+            {#                                var uuid = chkbox.value,#}
+            {#                                    query_string = window.location.search,#}
+            {#                                    shopping_start = 'shopping_basket=',#}
+            {#                                    new_start;#}
+            {#                                if (sb.curr_items === 0) {#}
+            {#                                    if (query_string.indexOf(shopping_start) === -1) {#}
+            {#                                        query_string = query_string + '&' + shopping_start;#}
+            {#                                        query_string = query_string + uuid;#}
+            {#                                    } else {#}
+            {#                                        new_start = shopping_start + uuid;#}
+            {#                                        query_string = query_string.replace(shopping_start, new_start);#}
+            {#                                    }#}
+            {#                                } else {#}
+            {#                                    new_start = shopping_start + uuid + ',';#}
+            {#                                    query_string = query_string.replace(shopping_start, new_start);#}
+            {#                                }#}
+            {#                                window.location.search = query_string;#}
+            {#                            }#}
+            {#                        } else {  // remove the uuid from the current window location#}
+            {#                            sb.removeItem(chkbox.value)#}
+            {#                        }#}
+            {#                    }#}
+            {#                }#}
+            {#            </script>#}
+            {#        {% endif %}#}
 
-        {#        {% if shopping_items != '' %}#}
-        {#            <div class="small-12 large-3 columns side" style="margin-top:228px;">#}
-        {#                {% if object_type == '' %}#}
-        {#                    {% set shopping_basket_enabled = False %}#}
-        {#                {% else %}#}
-        {#                    {% set main_displayable_fieldname = h.get_main_displayable_fieldname(object_type) %}#}
-        {#                    <div class="shoppingcart">#}
-        {#                        {% if shopping_items == '' %}#}
-        {#                            <p>Nothing selected</p>#}
-        {#                        {% endif %}#}
-        {#                        {% set deliver_the_shopping_href = '/forms/advanced?browsing=' + c.browsing + '&letter=' + c.current_letter.lower() + shopping_querystring %}#}
-        {#                        {% if shopping_item_count > 0 %}#}
-        {#                            {% set all_labels = [] %}#}
-        {#                            {% set selection_type_desc = c.browsing %}#}
-        {#                            {% if shopping_item_count == 1 %}#}
-        {#                                {% if selection_type_desc == 'institutions' %}#}
-        {#                                    {% set selection_type_desc = 'repository' %}#}
-        {#                                {% elif selection_type_desc == 'people' %}#}
-        {#                                    {% set selection_type_desc = 'person' %}#}
-        {#                                {% else %}#}
-        {#                                    {% set selection_type_desc = selection_type_desc[0:-1] %}#}
-        {#                                {% endif %}#}
-        {#                            {% else %}#}
-        {#                                {% if selection_type_desc == 'institutions' %}#}
-        {#                                    {% set selection_type_desc = 'repositories' %}#}
-        {#                                {% endif %}#}
-        {#                            {% endif %}#}
-        {#                            <h3 style="padding-bottom:0px;">Current selection:</h3>#}
-        {#                        {% endif %}#}
-        {#                        {% set shopping_list = shopping_list[::-1] %}#}
-        {#                        {% for i in range(max_shopping_items) %}#}
-        {#                            {% set results = {} %}#}
-        {#                            {% set item_uuid = '' %}#}
-        {#                            {% set item_label = '' %}#}
-        {#                            {% if shopping_item_count > i %}#}
-        {#                                {% set item_uuid = shopping_list[i] %}#}
-        {#                                {% set results = h.get_records_from_solr([item_uuid], [main_displayable_fieldname]) %}#}
-        {#                                {% if item_uuid in results %}#}
-        {#                                    {% set column_dict = results[item_uuid] %}#}
-        {#                                    {% if main_displayable_fieldname in column_dict %}#}
-        {#                                        {% set item_label = column_dict[main_displayable_fieldname] %}#}
-        {#                                    {% endif %}#}
-        {#                                {% endif %}#}
-        {#                            {% endif %}#}
-        {#                            {% if item_label != '' %}#}
-        {#                                {% set all_labels = all_labels.append(item_label.replace('"', '').replace("'", "\\'")) %}#}
-        {#                                {% if i > 0 %}#}
-        {#                                    <br/>#}
-        {#                                {% endif %}#}
-        {#                                <input type="checkbox" name="selection{{ i+1}}" title="Remove item from your selection"#}
-        {#                                       CHECKED onclick="sb.removeItem( '{{ item_uuid }}' )"/>#}
-        {#                                <label for="selection{{ i+1}}"><span#}
-        {#                                        onclick="sb.removeItem( '{{ item_uuid }}' )">{{ item_label }}</span></label>#}
-        {#                            {% endif %}#}
-        {#                        {% endfor %}#}
-        {#                        {% if shopping_item_count > 0 %}#}
-        {#                            <br/><br/>#}
-        {#                            <a class="button" name="deliver_the_shopping" id="deliver_the_shopping" title="Show Letters"#}
-        {#                               href="{{ deliver_the_shopping_href }}">Show Letters</a>#}
-        {#                            <script type="text/javascript">#}
-        {#                                document.title = "{{'EMLO selection: ' + '; '.join(all_labels)}}"#}
-        {#                            </script>#}
-        {#                        {% endif %}#}
-        {#                    </div>#}
-        {#                {% endif %}#}
-        {#            </div>#}
-        {#        {% endif %}#}
+            {#        {% if shopping_items != '' %}#}
+            {#            <div class="small-12 large-3 columns side" style="margin-top:228px;">#}
+            {#                {% if object_type == '' %}#}
+            {#                    {% set shopping_basket_enabled = False %}#}
+            {#                {% else %}#}
+            {#                    {% set main_displayable_fieldname = h.get_main_displayable_fieldname(object_type) %}#}
+            {#                    <div class="shoppingcart">#}
+            {#                        {% if shopping_items == '' %}#}
+            {#                            <p>Nothing selected</p>#}
+            {#                        {% endif %}#}
+            {#                        {% set deliver_the_shopping_href = '/forms/advanced?browsing=' + c.browsing + '&letter=' + c.current_letter.lower() + shopping_querystring %}#}
+            {#                        {% if shopping_item_count > 0 %}#}
+            {#                            {% set all_labels = [] %}#}
+            {#                            {% set selection_type_desc = c.browsing %}#}
+            {#                            {% if shopping_item_count == 1 %}#}
+            {#                                {% if selection_type_desc == 'institutions' %}#}
+            {#                                    {% set selection_type_desc = 'repository' %}#}
+            {#                                {% elif selection_type_desc == 'people' %}#}
+            {#                                    {% set selection_type_desc = 'person' %}#}
+            {#                                {% else %}#}
+            {#                                    {% set selection_type_desc = selection_type_desc[0:-1] %}#}
+            {#                                {% endif %}#}
+            {#                            {% else %}#}
+            {#                                {% if selection_type_desc == 'institutions' %}#}
+            {#                                    {% set selection_type_desc = 'repositories' %}#}
+            {#                                {% endif %}#}
+            {#                            {% endif %}#}
+            {#                            <h3 style="padding-bottom:0px;">Current selection:</h3>#}
+            {#                        {% endif %}#}
+            {#                        {% set shopping_list = shopping_list[::-1] %}#}
+            {#                        {% for i in range(max_shopping_items) %}#}
+            {#                            {% set results = {} %}#}
+            {#                            {% set item_uuid = '' %}#}
+            {#                            {% set item_label = '' %}#}
+            {#                            {% if shopping_item_count > i %}#}
+            {#                                {% set item_uuid = shopping_list[i] %}#}
+            {#                                {% set results = h.get_records_from_solr([item_uuid], [main_displayable_fieldname]) %}#}
+            {#                                {% if item_uuid in results %}#}
+            {#                                    {% set column_dict = results[item_uuid] %}#}
+            {#                                    {% if main_displayable_fieldname in column_dict %}#}
+            {#                                        {% set item_label = column_dict[main_displayable_fieldname] %}#}
+            {#                                    {% endif %}#}
+            {#                                {% endif %}#}
+            {#                            {% endif %}#}
+            {#                            {% if item_label != '' %}#}
+            {#                                {% set all_labels = all_labels.append(item_label.replace('"', '').replace("'", "\\'")) %}#}
+            {#                                {% if i > 0 %}#}
+            {#                                    <br/>#}
+            {#                                {% endif %}#}
+            {#                                <input type="checkbox" name="selection{{ i+1}}" title="Remove item from your selection"#}
+            {#                                       CHECKED onclick="sb.removeItem( '{{ item_uuid }}' )"/>#}
+            {#                                <label for="selection{{ i+1}}"><span#}
+            {#                                        onclick="sb.removeItem( '{{ item_uuid }}' )">{{ item_label }}</span></label>#}
+            {#                            {% endif %}#}
+            {#                        {% endfor %}#}
+            {#                        {% if shopping_item_count > 0 %}#}
+            {#                            <br/><br/>#}
+            {#                            <a class="button" name="deliver_the_shopping" id="deliver_the_shopping" title="Show Letters"#}
+            {#                               href="{{ deliver_the_shopping_href }}">Show Letters</a>#}
+            {#                            <script type="text/javascript">#}
+            {#                                document.title = "{{'EMLO selection: ' + '; '.join(all_labels)}}"#}
+            {#                            </script>#}
+            {#                        {% endif %}#}
+            {#                    </div>#}
+            {#                {% endif %}#}
+            {#            </div>#}
+            {#        {% endif %}#}
 
 
-        <div class="small-12 columns">
-            <h2>{{ cur_browse_name }}</h2>
+            <div class="small-12 columns">
+                <h2>{{ cur_browse_page['name'] }}</h2>
 
-            <table>
+                {% set alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
+                <input id="selected_letter" type="hidden" name="letter" value="" />
 
-                {#            {#}
-                {#    "ox_totalWorksMentioningAgent": 0,#}
-                {#    "object_type": "person",#}
-                {#    "ox_titlesRolesOccupations": "first marquess of Hertford and second duke of Somerset; politician; royalist army officer",#}
-                {#    "ox_totalWorksAddressedToAgent": 2,#}
-                {#    "ox_internalAdded": "2023-12-01T17:08:47Z",#}
-                {#    "date_of_birth_sort": "1587-12-31T00:00:00Z",#}
-                {#    "rdfs_seeAlso-resource": [#}
-                {#        "http://localhost/resource/a68cb884-a3d7-415a-ada0-23690cf3fea2",#}
-                {#        "http://localhost/resource/c75ad224-26ec-4c37-8aab-72ce4fada7b6"#}
-                {#    ],#}
-                {#    "rdf_type": "http://xmlns.com/foaf/0.1/Agent",#}
-                {#    "uuid_related": [#}
-                {#        "3cba98c8-9778-4b8a-bd09-a9a06223e600",#}
-                {#        "64121921-384d-43fc-aaeb-e19f15a697ab",#}
-                {#        "a68cb884-a3d7-415a-ada0-23690cf3fea2",#}
-                {#        "c75ad224-26ec-4c37-8aab-72ce4fada7b6",#}
-                {#        "d6326c7f-a716-41fc-8400-6236982866f5",#}
-                {#        "0349455f-99e3-4219-9630-67c0b1fce709",#}
-                {#        "5fb31e34-f984-4e71-83ce-52fe018bd542",#}
-                {#        "130c4a46-955e-44ab-b0a1-c0ad77120f5b"#}
-                {#    ],#}
-                {#    "bio_Death-ox_year": 1660,#}
-                {#    "uuid": "e2f45de7-7311-45ad-b652-ae831c0ad4b9",#}
-                {#    "rel_siblingOf-person": [#}
-                {#        "http://localhost/person/3cba98c8-9778-4b8a-bd09-a9a06223e600"#}
-                {#    ],#}
-                {#    "bio_Birth-ox_year": 1587,#}
-                {#    "foaf_gender": "male",#}
-                {#    "rel_spouseOf-person": [#}
-                {#        "http://localhost/person/64121921-384d-43fc-aaeb-e19f15a697ab"#}
-                {#    ],#}
-                {#    "dcterms_identifier-edit_": "edit_cofk_union_person-cofk_import_selden_people-person_id:000000316",#}
-                {#    "frbr_creatorOf-work": [#}
-                {#        "http://localhost/work/5fb31e34-f984-4e71-83ce-52fe018bd542",#}
-                {#        "http://localhost/work/130c4a46-955e-44ab-b0a1-c0ad77120f5b"#}
-                {#    ],#}
-                {#    "dcterms_identifier-uri_": "uri_http://localhost/person/e2f45de7-7311-45ad-b652-ae831c0ad4b9",#}
-                {#    "ox_totalWorksByAgent": 2,#}
-                {#    "mail_recipientOf-work": [#}
-                {#        "http://localhost/work/d6326c7f-a716-41fc-8400-6236982866f5",#}
-                {#        "http://localhost/work/0349455f-99e3-4219-9630-67c0b1fce709"#}
-                {#    ],#}
-                {#    "ox_internalModifiedByUser": "Kim McLean-Fiander",#}
-                {#    "ox_internalModified": "2016-06-21T11:15:18Z",#}
-                {#    "uri": "//emlo.bodleian.ox.ac.uk/e2f45de7-7311-45ad-b652-ae831c0ad4b9",#}
-                {#    "foaf_name": "Seymour, William, 1587-1660",#}
-                {#    "browse": "Seymour, William, 1587-1660",#}
-                {#    "name-strict": "Seymour, William, 1587-1660",#}
-                {#    "foaf_name-firstletter": "Seymour, William, 1587-1660",#}
-                {#    "date_of_death_sort": "1660-12-31T00:00:00Z",#}
-                {#    "dcterms_identifier-uuid_": "uuid_e2f45de7-7311-45ad-b652-ae831c0ad4b9",#}
-                {#    "id": "uuid_e2f45de7-7311-45ad-b652-ae831c0ad4b9",#}
-                {#    "ox_internalCreated": "2011-10-18T17:42:32Z",#}
-                {#    "dcterms_identifier-editi_": "editi_700316",#}
-                {#    "_version_": 1784100189696425985,#}
-                {#    "timestamp_indexed": "2023-12-01T17:08:48.789Z",#}
-                {#    "ox_isOrganisation": false#}
-                {#}#}
-                <thead>
-                <tr>
-                    <th></th>
-                    <th> Name</th>
-                    <th> Letters Written</th>
-                    <th> Letters Received</th>
-                    <th> Letters Mentioning</th>
-                    <th> Further details</th>
-                </tr>
+                <div class="pagination-centered">
+                    <ul class="alphabet pagination">
+                        {% for letter in alpha %}
+                            {% set is_active = cur_letter == letter %}
+                            {% set active_class = 'current' if is_active else '' %}
+                            {% set url = '#' if is_active else '{}?letter={}'.format(cur_browse_page['url'], letter) %}
+                            <li class="{{ active_class }}"><a href="{{ url }}">{{ letter }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
 
-                </thead>
+                <table>
 
-                <tbody>
-                {% for row in rows %}
+                    {#            {#}
+                    {#    "ox_totalWorksMentioningAgent": 0,#}
+                    {#    "object_type": "person",#}
+                    {#    "ox_titlesRolesOccupations": "first marquess of Hertford and second duke of Somerset; politician; royalist army officer",#}
+                    {#    "ox_totalWorksAddressedToAgent": 2,#}
+                    {#    "ox_internalAdded": "2023-12-01T17:08:47Z",#}
+                    {#    "date_of_birth_sort": "1587-12-31T00:00:00Z",#}
+                    {#    "rdfs_seeAlso-resource": [#}
+                    {#        "http://localhost/resource/a68cb884-a3d7-415a-ada0-23690cf3fea2",#}
+                    {#        "http://localhost/resource/c75ad224-26ec-4c37-8aab-72ce4fada7b6"#}
+                    {#    ],#}
+                    {#    "rdf_type": "http://xmlns.com/foaf/0.1/Agent",#}
+                    {#    "uuid_related": [#}
+                    {#        "3cba98c8-9778-4b8a-bd09-a9a06223e600",#}
+                    {#        "64121921-384d-43fc-aaeb-e19f15a697ab",#}
+                    {#        "a68cb884-a3d7-415a-ada0-23690cf3fea2",#}
+                    {#        "c75ad224-26ec-4c37-8aab-72ce4fada7b6",#}
+                    {#        "d6326c7f-a716-41fc-8400-6236982866f5",#}
+                    {#        "0349455f-99e3-4219-9630-67c0b1fce709",#}
+                    {#        "5fb31e34-f984-4e71-83ce-52fe018bd542",#}
+                    {#        "130c4a46-955e-44ab-b0a1-c0ad77120f5b"#}
+                    {#    ],#}
+                    {#    "bio_Death-ox_year": 1660,#}
+                    {#    "uuid": "e2f45de7-7311-45ad-b652-ae831c0ad4b9",#}
+                    {#    "rel_siblingOf-person": [#}
+                    {#        "http://localhost/person/3cba98c8-9778-4b8a-bd09-a9a06223e600"#}
+                    {#    ],#}
+                    {#    "bio_Birth-ox_year": 1587,#}
+                    {#    "foaf_gender": "male",#}
+                    {#    "rel_spouseOf-person": [#}
+                    {#        "http://localhost/person/64121921-384d-43fc-aaeb-e19f15a697ab"#}
+                    {#    ],#}
+                    {#    "dcterms_identifier-edit_": "edit_cofk_union_person-cofk_import_selden_people-person_id:000000316",#}
+                    {#    "frbr_creatorOf-work": [#}
+                    {#        "http://localhost/work/5fb31e34-f984-4e71-83ce-52fe018bd542",#}
+                    {#        "http://localhost/work/130c4a46-955e-44ab-b0a1-c0ad77120f5b"#}
+                    {#    ],#}
+                    {#    "dcterms_identifier-uri_": "uri_http://localhost/person/e2f45de7-7311-45ad-b652-ae831c0ad4b9",#}
+                    {#    "ox_totalWorksByAgent": 2,#}
+                    {#    "mail_recipientOf-work": [#}
+                    {#        "http://localhost/work/d6326c7f-a716-41fc-8400-6236982866f5",#}
+                    {#        "http://localhost/work/0349455f-99e3-4219-9630-67c0b1fce709"#}
+                    {#    ],#}
+                    {#    "ox_internalModifiedByUser": "Kim McLean-Fiander",#}
+                    {#    "ox_internalModified": "2016-06-21T11:15:18Z",#}
+                    {#    "uri": "//emlo.bodleian.ox.ac.uk/e2f45de7-7311-45ad-b652-ae831c0ad4b9",#}
+                    {#    "foaf_name": "Seymour, William, 1587-1660",#}
+                    {#    "browse": "Seymour, William, 1587-1660",#}
+                    {#    "name-strict": "Seymour, William, 1587-1660",#}
+                    {#    "foaf_name-firstletter": "Seymour, William, 1587-1660",#}
+                    {#    "date_of_death_sort": "1660-12-31T00:00:00Z",#}
+                    {#    "dcterms_identifier-uuid_": "uuid_e2f45de7-7311-45ad-b652-ae831c0ad4b9",#}
+                    {#    "id": "uuid_e2f45de7-7311-45ad-b652-ae831c0ad4b9",#}
+                    {#    "ox_internalCreated": "2011-10-18T17:42:32Z",#}
+                    {#    "dcterms_identifier-editi_": "editi_700316",#}
+                    {#    "_version_": 1784100189696425985,#}
+                    {#    "timestamp_indexed": "2023-12-01T17:08:48.789Z",#}
+                    {#    "ox_isOrganisation": false#}
+                    {#}#}
+                    <thead>
                     <tr>
-                        <td>
-                            <input type="checkbox"/>
-                        </td>
-                        <td>
-                            {# KTODO link profile #}
-                            <a href="#">
-                                {{ row['foaf_name'] }}
-                            </a>
-                        </td>
-
-                        {# KTODO url of letters #}
-                        <td> {{ letters_link(row['ox_totalWorksByAgent'], '#') }} </td>
-                        <td> {{ letters_link(row['ox_totalWorksAddressedToAgent'], '#') }} </td>
-                        <td> {{ letters_link(row['ox_totalWorksMentioningAgent'], '#')}} </td>
-                        <td>
-                            {{ detail_row('Alternative names', row['skos_altLabel']) }}
-                            {{ detail_row('Titles of roles', row['ox_titlesRolesOccupations']) }}
-                            {{ detail_row('Gender', row['foaf_gender']) }}
-                        </td>
+                        <th></th>
+                        <th> Name</th>
+                        <th> Letters Written</th>
+                        <th> Letters Received</th>
+                        <th> Letters Mentioning</th>
+                        <th> Further details</th>
                     </tr>
-                {% endfor %}
 
-                </tbody>
+                    </thead>
 
-            </table>
+                    <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            <td>
+                                <input type="checkbox"/>
+                            </td>
+                            <td>
+                                {# KTODO link profile #}
+                                <a href="#">
+                                    {{ row['foaf_name'] }}
+                                </a>
+                            </td>
+
+                            {# KTODO url of letters #}
+                            <td> {{ letters_link(row['ox_totalWorksByAgent'], '#') }} </td>
+                            <td> {{ letters_link(row['ox_totalWorksAddressedToAgent'], '#') }} </td>
+                            <td> {{ letters_link(row['ox_totalWorksMentioningAgent'], '#') }} </td>
+                            <td>
+                                {{ detail_row('Alternative names', row['skos_altLabel']) }}
+                                {{ detail_row('Titles of roles', row['ox_titlesRolesOccupations']) }}
+                                {{ detail_row('Gender', row['foaf_gender']) }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
 
 
-        </div>
-
-
+            </div>
+        </form>
     </div>
 
 

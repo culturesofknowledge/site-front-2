@@ -1,8 +1,8 @@
 import json
 
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, request
 
-from site_front_2.datasrc import solr_serv
+from site_front_2.datasrc import solr_serv, fieldmap
 
 bp = Blueprint('browse', __name__)
 
@@ -25,9 +25,18 @@ def create_browse_pages_data():
     return browse_pages
 
 
-def get_people_rows():
+def get_people_rows(browse, is_org, sort='browse asc', n_rows=1000):
+    q = f"""
+    {fieldmap.get_is_organisation_fieldname()}:{solr_serv.true_false(is_org)} AND
+    browse:{browse} AND (
+    {fieldmap.get_total_works_written_by_agent_fieldname()}:[1 TO *] OR
+    {fieldmap.get_total_works_recd_by_agent_fieldname()}:[1 TO *] OR
+    {fieldmap.get_total_works_mentioning_agent_fieldname()}:[1 TO *] 
+    )
+    """
+
     sol = solr_serv.conn('people')
-    sol_response = sol.search("*:*", rows=1000)
+    sol_response = sol.search(q, rows=n_rows, sort=sort)
     return sol_response
 
 
@@ -38,14 +47,20 @@ def home():
 
 @bp.route('/people')
 def people():
-    rows = list(get_people_rows())
+    letter = request.args.get('letter', 'a')
+
+    rows = list(get_people_rows(f'{letter}*', is_org=False))
     for row in rows:
         print(json.dumps(row, indent=4))
+
+    browse_pages = create_browse_pages_data()
+    cur_browse_name = BROWSE_NAME_PEOPLE
     return render_template(
         'browse.jinja2',
-        cur_browse_name=BROWSE_NAME_PEOPLE,
-        browse_pages=create_browse_pages_data(),
+        cur_browse_page=next(b for b in browse_pages if b['name'] == cur_browse_name),
+        browse_pages=browse_pages,
         rows=rows,
+        cur_letter=letter,
     )
 
 

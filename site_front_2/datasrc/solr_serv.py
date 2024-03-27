@@ -17,4 +17,4 @@ def conn__OLD(object):
 
 def conn(object):
     sol = pysolr.Solr(solrconfig.solr_urls[object])
-    yield sol
+    return sol

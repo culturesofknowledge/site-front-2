@@ -50,13 +50,16 @@
 
     </style>
 
+
+    <script src="{{ url_for('static', filename='dist/browse.bundle.js') }}"></script>
+
     <script>
-        function handleLetterClick(e) {
-            e.preventDefault();
-            document.getElementById('selected_letter').value = e.target.innerText;
-            document.getElementById('browse_form').submit();
-        }
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('loaded');
+            emfr.browse.init();
+        });
     </script>
+
 
 {% endblock %}
 
@@ -260,6 +263,17 @@
                 </ul>
             </div>
 
+            <div class="filter flex flex-row space-x-4 justify-center mb-12 items-center">
+                {{ filter_checkbox('Female', 'gender:female' ) }}
+                {{ filter_checkbox('Male', 'gender:male' ) }}
+                {{ filter_checkbox('Unknown', 'gender:unknown' ) }}
+                <span>|</span>
+                {{ filter_checkbox('Letters Written', 'written' ) }}
+                {{ filter_checkbox('Letters Received', 'received' ) }}
+                {{ filter_checkbox('Letters Mentioning', 'mentioned' ) }}
+            </div>
+
+
             <table>
 
                 <thead>
@@ -276,7 +290,7 @@
 
                 <tbody>
                 {% for row in rows %}
-                    <tr>
+                    <tr class="filterable" filter="{{ row | create_filter_values }}">
                         <td>
                             <input type="checkbox"/>
                         </td>
@@ -326,4 +340,12 @@
     {% else %}
         <a href="{{ url }}">{{ value }}</a>
     {% endif %}
+{% endmacro %}
+
+
+{% macro filter_checkbox(label, filter_val) %}
+    <label class="h-5">
+        <input type="checkbox" class="filter-cb" value="{{ filter_val }}"/>
+        {{ label }}
+    </label>
 {% endmacro %}

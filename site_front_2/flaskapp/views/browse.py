@@ -3,8 +3,10 @@ import json
 from flask import Blueprint, render_template, redirect, url_for, request
 
 from site_front_2.datasrc import solr_serv, fieldmap
+from site_front_2.flaskapp.filters import browse_filters
 
 bp = Blueprint('browse', __name__)
+bp.add_app_template_filter(browse_filters.create_filter_values, 'create_filter_values')
 
 BROWSE_NAME_PEOPLE = 'People'
 

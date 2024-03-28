@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
     <script src="{{ url_for('static', filename='dist/core.bundle.js') }}"></script>
 
+    {#    <script src="{{ url_for('static', filename='dist/styles.bundle.js') }}"></script>#}
+    <link rel="stylesheet" href="{{ url_for('static', filename='dist/styles.bundle.css') }}">
 
     {% block head %}{% endblock %}
 </head>

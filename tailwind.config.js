@@ -2,7 +2,7 @@
 module.exports = {
     content: [
         "./site_front_2/flaskapp/static/js/**/*.{js,html}",
-        "./site_front_2/flaskapp/templates/**/*.{js,html}",
+        "./site_front_2/flaskapp/templates/**/*.{js,html,jinja2}",
     ],
     theme: {
         extend: {
@@ -14,7 +14,6 @@ module.exports = {
     corePlugins: {
         preflight: false,
     },
-    // plugins: [require("daisyui")],
     // corePlugins: {
     //   preflight: false,
     // },

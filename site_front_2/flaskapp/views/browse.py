@@ -49,9 +49,11 @@ def home():
 
 @bp.route('/people')
 def people():
-    letter = request.args.get('letter', 'a')
+    letter = request.args.get('letter', 'A')
 
     rows = list(get_people_rows(f'{letter}*', is_org=False))
+
+    # TOBEREMOVE debugging
     for row in rows:
         print(json.dumps(row, indent=4))
 

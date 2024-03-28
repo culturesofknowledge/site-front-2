@@ -252,12 +252,12 @@
 
             {% set alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
 
-            <div class="pagination-centered">
+            <div class="pagination-centered mt-8">
                 <ul class="alphabet pagination">
                     {% for letter in alpha %}
                         {% set active_class = 'current' if cur_letter == letter else '' %}
                         <li class="{{ active_class }}">
-                            <a href="#" onclick="handleLetterClick(event)">{{ letter }}</a>
+                            <a href="#" onclick="emfr.browse.handleLetterClick(event)"> {{ letter }} </a>
                         </li>
                     {% endfor %}
                 </ul>

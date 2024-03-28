@@ -9,11 +9,10 @@ const BUILD_DIR = `${STATIC_DIR}/dist`;
 config = {
     entry: {
         core: `${JS_DIR}/emfr/core/index.js`,
-        // styles: [
-        //     `${JS_DIR}/emfr/main.css`,
-        //     `${JS_DIR}/emfr/app-missing.css`,
-        //     `${JS_DIR}/emfr/app-ext.css`
-        // ]
+        browse: `${JS_DIR}/emfr/browse/index.js`,
+        styles: [
+            `${STATIC_DIR}/css/tailwind.css`,
+        ]
     },
     output: {
         path: BUILD_DIR,

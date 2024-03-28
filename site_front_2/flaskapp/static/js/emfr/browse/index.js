@@ -1,26 +1,34 @@
 const jquery = require('jquery');
 const $ = jquery;
 
+
+function updateFormValue(field, vlaue) {
+    document.querySelector(`#browse_form input[name="${field}"]`).value = vlaue;
+}
+
 export function handleLetterClick(e) {
     e.preventDefault();
-    document.getElementById('selected_letter').value = e.target.innerText;
+    updateFormValue('letter', e.target.innerText);
     document.getElementById('browse_form').submit();
 }
 
 function onFilterChange() {
     const selectedFilters = getSelectedFilters();
-    // const values = document.querySelectorAll()..map((i, v) => e.value);
-    // $('.filter-cb').
     console.log(selectedFilters);
+
+    // show/hide filterable elements
     $('.filterable[filter]').each((i, v) => {
         const $v = $(v);
         const filters = $v.attr('filter').split(' ');
-        arraysIntersect(selectedFilters, filters) ? $v.show() : $v.hide();
-    })
+        isSubset(selectedFilters, filters ) ? $v.show() : $v.hide();
+    });
+
+    // update form
+    updateFormValue('filters', selectedFilters.join(' '));
 }
 
-function arraysIntersect(array1, array2) {
-    return array1.some(item => array2.includes(item));
+function isSubset(superset, subset) {
+    return subset.every(item => superset.includes(item));
 }
 
 function getSelectedFilters() {

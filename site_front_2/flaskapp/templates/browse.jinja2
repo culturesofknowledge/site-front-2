@@ -95,7 +95,8 @@
     </div>
 
     <form id="browse_form" action="{{ cur_browse_page['url'] }}" method="get">
-        <input id="selected_letter" type="hidden" name="letter" value="{{ cur_letter }}"/>
+        <input type="hidden" name="letter" value="{{ cur_letter }}"/>
+        <input name="filters" type="hidden" value="{{ cur_filters | join(' ')  }}"/>
     </form>
 
     <div class="row">
@@ -264,13 +265,13 @@
             </div>
 
             <div class="filter flex flex-row space-x-4 justify-center mb-12 items-center">
-                {{ filter_checkbox('Female', 'gender:female' ) }}
-                {{ filter_checkbox('Male', 'gender:male' ) }}
-                {{ filter_checkbox('Unknown', 'gender:unknown' ) }}
+                {{ filter_checkbox('Female', 'gender:female', cur_filters) }}
+                {{ filter_checkbox('Male', 'gender:male' , cur_filters) }}
+                {{ filter_checkbox('Unknown', 'gender:unknown', cur_filters ) }}
                 <span>|</span>
-                {{ filter_checkbox('Letters Written', 'written' ) }}
-                {{ filter_checkbox('Letters Received', 'received' ) }}
-                {{ filter_checkbox('Letters Mentioning', 'mentioned' ) }}
+                {{ filter_checkbox('Letters Written', 'written', cur_filters ) }}
+                {{ filter_checkbox('Letters Received', 'received', cur_filters ) }}
+                {{ filter_checkbox('Letters Mentioning', 'mentioned', cur_filters ) }}
             </div>
 
 
@@ -279,11 +280,11 @@
                 <thead>
                 <tr>
                     <th></th>
-                    <th> Name</th>
-                    <th> Letters Written</th>
-                    <th> Letters Received</th>
-                    <th> Letters Mentioning</th>
-                    <th> Further details</th>
+                    <th>Name</th>
+                    <th>Letters Written</th>
+                    <th>Letters Received</th>
+                    <th>Letters Mentioning</th>
+                    <th>Further details</th>
                 </tr>
 
                 </thead>
@@ -343,9 +344,10 @@
 {% endmacro %}
 
 
-{% macro filter_checkbox(label, filter_val) %}
+{% macro filter_checkbox(label, filter_val, checked_arr) %}
     <label class="h-5">
-        <input type="checkbox" class="filter-cb" value="{{ filter_val }}"/>
+        <input type="checkbox" class="filter-cb"
+               value="{{ filter_val }}" {{ 'checked' if filter_val in checked_arr }}/>
         {{ label }}
     </label>
 {% endmacro %}

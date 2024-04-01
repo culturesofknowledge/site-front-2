@@ -1,6 +1,9 @@
 {% extends "base.jinja2" %}
 
 {% block head %}
+
+    <meta name="filters" content="{{ cur_filters | join(' ') }}"/>
+
     <style>
         {#    KTODO cleanup styles, check which should be remove #}
         .browseby {
@@ -56,7 +59,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             console.log('loaded');
-            emfr.browse.init();
+            emfr.browse.init('#filters-root');
         });
     </script>
 
@@ -264,15 +267,9 @@
                 </ul>
             </div>
 
-            <div class="filter flex flex-row space-x-4 justify-center mb-12 items-center">
-                {{ filter_checkbox('Female', 'gender:female', cur_filters) }}
-                {{ filter_checkbox('Male', 'gender:male' , cur_filters) }}
-                {{ filter_checkbox('Unknown', 'gender:unknown', cur_filters ) }}
-                <span>|</span>
-                {{ filter_checkbox('Letters Written', 'written', cur_filters ) }}
-                {{ filter_checkbox('Letters Received', 'received', cur_filters ) }}
-                {{ filter_checkbox('Letters Mentioning', 'mentioned', cur_filters ) }}
-            </div>
+
+            <div id="filters-root" class="h-12 mb-4"></div>
+
 
 
             <table>
@@ -343,11 +340,3 @@
     {% endif %}
 {% endmacro %}
 
-
-{% macro filter_checkbox(label, filter_val, checked_arr) %}
-    <label class="h-5">
-        <input type="checkbox" class="filter-cb"
-               value="{{ filter_val }}" {{ 'checked' if filter_val in checked_arr }}/>
-        {{ label }}
-    </label>
-{% endmacro %}

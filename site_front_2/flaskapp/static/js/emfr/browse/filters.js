@@ -1,4 +1,4 @@
-import {metaContent} from "../emfrUtils";
+import {metaContent} from "../domUtils";
 import * as browseUtils from "./browseUtils";
 import * as reactUtils from '../reactUtils';
 import React from 'react';

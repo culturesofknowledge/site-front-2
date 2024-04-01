@@ -1,4 +1,4 @@
-import {updateFormValue} from "../emfrUtils";
+import {updateFormValue} from "../domUtils";
 export function updateFormValue(field, vlaue) {
     updateFormValue('#browse_form', field, vlaue);
 }

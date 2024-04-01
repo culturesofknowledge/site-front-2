@@ -17,6 +17,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/data/location.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/data/newcsv/comment.csv">
           <value>
             <Attribute>
@@ -38,6 +45,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/data/newcsv/person.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/data/oldcsv/comment.csv">
           <value>
             <Attribute>
@@ -46,6 +60,27 @@
           </value>
         </entry>
         <entry key="/data/oldcsv/institution.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/data/oldcsv/location.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/data/oldcsv/person.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/data/person.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

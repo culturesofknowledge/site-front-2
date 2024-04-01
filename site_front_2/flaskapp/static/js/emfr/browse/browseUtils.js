@@ -1,5 +1,6 @@
+import {updateFormValue} from "../emfrUtils";
 export function updateFormValue(field, vlaue) {
-    document.querySelector(`#browse_form input[name="${field}"]`).value = vlaue;
+    updateFormValue('#browse_form', field, vlaue);
 }
 
 export function isSubset(superset, subset) {

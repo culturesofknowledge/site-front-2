@@ -21,3 +21,19 @@ export function renderInContainer(child, containerSelector = '#react-container')
         );
     }
 }
+
+
+export function bindElementsEvent(selector, eventName, handler) {
+    React.useEffect(() => {
+        const elements = [...document.querySelectorAll(selector)];
+        elements.forEach(ele => {
+            ele.addEventListener(eventName, handler);
+        });
+
+        return () => {
+            elements.forEach(ele => {
+                ele.removeEventListener(eventName, handler);
+            });
+        };
+    },);
+}

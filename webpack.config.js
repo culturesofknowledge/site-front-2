@@ -12,6 +12,7 @@ config = {
         browse: `${JS_DIR}/emfr/browse/index.js`,
         styles: [
             `${STATIC_DIR}/css/tailwind.css`,
+            `${STATIC_DIR}/css/base-new.css`,
         ]
     },
     output: {

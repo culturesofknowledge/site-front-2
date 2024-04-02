@@ -50,7 +50,7 @@ function LetterSelection() {
         setCurIdValues(curIdValues.filter(v => v[0] !== uuid));
     }
 
-    const handleChange = function (e) {
+    const handleTableCheckboxChange = function (e) {
         const letterDataEle = $(e.target).closest('.letterData')[0]
         const uuid = getMetaContent('uuid', letterDataEle);
         if (e.target.checked) {
@@ -63,13 +63,12 @@ function LetterSelection() {
         }
     };
 
-
-    bindElementsEvent(tableCheckboxes.checkboxSelector, 'change', handleChange);
-
-
     function handleItemClick(uuid, name) {
         removeCurIdValues(uuid);
     }
+
+    bindElementsEvent(tableCheckboxes.checkboxSelector, 'change', handleTableCheckboxChange);
+
 
     return <div>
         <span>Current selection:</span>

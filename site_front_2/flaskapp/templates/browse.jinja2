@@ -59,7 +59,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             console.log('loaded');
-            emfr.browse.init('#filters-root');
+            emfr.browse.init('#filters-root', '#letter-selection-root');
         });
     </script>
 
@@ -99,7 +99,7 @@
 
     <form id="browse_form" action="{{ cur_browse_page['url'] }}" method="get">
         <input type="hidden" name="letter" value="{{ cur_letter }}"/>
-        <input name="filters" type="hidden" value="{{ cur_filters | join(' ')  }}"/>
+        <input name="filters" type="hidden" value="{{ cur_filters | join(' ') }}"/>
     </form>
 
     <div class="row">
@@ -271,49 +271,55 @@
             <div id="filters-root" class="h-12 mb-4"></div>
 
 
+            <div>
 
-            <table>
+                <div id="letter-selection-root"></div>
 
-                <thead>
-                <tr>
-                    <th></th>
-                    <th>Name</th>
-                    <th>Letters Written</th>
-                    <th>Letters Received</th>
-                    <th>Letters Mentioning</th>
-                    <th>Further details</th>
-                </tr>
+                <table>
 
-                </thead>
-
-                <tbody>
-                {% for row in rows %}
-                    <tr class="filterable" filter="{{ row | create_filter_values }}">
-                        <td>
-                            <input type="checkbox"/>
-                        </td>
-                        <td>
-                            {# KTODO link profile #}
-                            <a href="#">
-                                {{ row['foaf_name'] }}
-                            </a>
-                        </td>
-
-                        {# KTODO url of letters #}
-                        <td> {{ letters_link(row['ox_totalWorksByAgent'], '#') }} </td>
-                        <td> {{ letters_link(row['ox_totalWorksAddressedToAgent'], '#') }} </td>
-                        <td> {{ letters_link(row['ox_totalWorksMentioningAgent'], '#') }} </td>
-                        <td>
-                            {{ detail_row('Alternative names', row['skos_altLabel']) }}
-                            {{ detail_row('Titles of roles', row['ox_titlesRolesOccupations']) }}
-                            {{ detail_row('Gender', row['foaf_gender']) }}
-                        </td>
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Letters Written</th>
+                        <th>Letters Received</th>
+                        <th>Letters Mentioning</th>
+                        <th>Further details</th>
                     </tr>
-                {% endfor %}
 
-                </tbody>
+                    </thead>
 
-            </table>
+                    <tbody>
+                    {% for row in rows %}
+                        <tr class="filterable" filter="{{ row | create_filter_values }}">
+                            <td class="letterData">
+                                <meta name="uuid" content="{{ row['uuid'] }}"/>
+                                <meta name="name" content="{{ row['foaf_name'] }}"/>
+                                <input type="checkbox"/>
+                            </td>
+                            <td>
+                                {# KTODO link profile #}
+                                <a href="#">
+                                    {{ row['foaf_name'] }}
+                                </a>
+                            </td>
+
+                            {# KTODO url of letters #}
+                            <td> {{ letters_link(row['ox_totalWorksByAgent'], '#') }} </td>
+                            <td> {{ letters_link(row['ox_totalWorksAddressedToAgent'], '#') }} </td>
+                            <td> {{ letters_link(row['ox_totalWorksMentioningAgent'], '#') }} </td>
+                            <td>
+                                {{ detail_row('Alternative names', row['skos_altLabel']) }}
+                                {{ detail_row('Titles of roles', row['ox_titlesRolesOccupations']) }}
+                                {{ detail_row('Gender', row['foaf_gender']) }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+            </div>
 
 
         </div>

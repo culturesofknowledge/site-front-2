@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import * as reactUtils from "../reactUtils";
 import {bindElementsEvent} from "../reactUtils";
 import {getMetaContent} from "../domUtils";
@@ -8,19 +8,43 @@ const $ = require('jquery');
 function Item({uuid, name, onClick}) {
     return (
         <div>
-            <h1>{name}</h1>
+            <button onClick={(e) => onClick(uuid, name)}>{name}</button>
         </div>
     )
 }
 
 
+class TableCheckboxes {
+    constructor() {
+        this.checkboxSelector = '.letterData input[type="checkbox"]';
+    }
+
+
+    syncChecked(selectedUuids) {
+        $('.letterData input[type="checkbox"]:checked')
+            .filter((i, v) => !selectedUuids.includes(v.value))
+            .prop('checked', false);
+        $('.letterData input[type="checkbox"]:not(:checked)')
+            .filter((i, v) => selectedUuids.includes(v.value))
+            .prop('checked', true);
+    }
+
+
+}
+
+
 function LetterSelection({idValues = []}) {
     const [curIdValues, setCurIdValues] = React.useState(idValues);
+    const tableCheckboxes = new TableCheckboxes();
+
+
+    useEffect(() => {
+        tableCheckboxes.syncChecked(curIdValues.map(v => v[0]));
+    }, [curIdValues]);
+
 
     function addCurIdValues(idValue) {
-        // debugger
-        let newVar = [...curIdValues, idValue];
-        setCurIdValues(newVar);
+        setCurIdValues([...curIdValues, idValue]);
     }
 
     function removeCurIdValues(uuid) {
@@ -29,11 +53,6 @@ function LetterSelection({idValues = []}) {
 
     const handleChange = function (e) {
         const letterDataEle = $(e.target).closest('.letterData')[0]
-
-        // TOBEREMOVE
-        console.log(getMetaContent('name', letterDataEle))
-        console.log(getMetaContent('uuid', letterDataEle))
-
         const uuid = getMetaContent('uuid', letterDataEle);
         if (e.target.checked) {
             const idValue = [
@@ -46,13 +65,19 @@ function LetterSelection({idValues = []}) {
     };
 
 
-    bindElementsEvent('.letterData input[type="checkbox"]', 'change', handleChange);
+    bindElementsEvent(tableCheckboxes.checkboxSelector, 'change', handleChange);
 
+
+    function handleItemClick(uuid, name) {
+        removeCurIdValues(uuid);
+    }
 
     return <div>
         <span>Current selection:</span>
         <div>
-            {curIdValues?.map(([id, value], i) => <Item key={i} uuid={id} name={value}/>)}
+            {curIdValues?.map(([id, value], i) => (
+                <Item key={i} uuid={id} name={value} onClick={handleItemClick}/>
+            ))}
         </div>
     </div>
 

@@ -19,7 +19,6 @@ class TableCheckboxes {
         this.checkboxSelector = '.letterData input[type="checkbox"]';
     }
 
-
     syncChecked(selectedUuids) {
         $('.letterData input[type="checkbox"]:checked')
             .filter((i, v) => !selectedUuids.includes(v.value))
@@ -29,17 +28,17 @@ class TableCheckboxes {
             .prop('checked', true);
     }
 
-
 }
 
 
-function LetterSelection({idValues = []}) {
-    const [curIdValues, setCurIdValues] = React.useState(idValues);
+function LetterSelection() {
+    const [curIdValues, setCurIdValues] = React.useState(JSON.parse(localStorage.getItem('curIdValues') || '[]'));
     const tableCheckboxes = new TableCheckboxes();
 
 
     useEffect(() => {
         tableCheckboxes.syncChecked(curIdValues.map(v => v[0]));
+        localStorage.setItem('curIdValues', JSON.stringify(curIdValues));
     }, [curIdValues]);
 
 

@@ -1,4 +1,4 @@
-import {metaContent} from "../domUtils";
+import {getMetaContent} from "../domUtils";
 import * as browseUtils from "./browseUtils";
 import * as reactUtils from '../reactUtils';
 import React from 'react';
@@ -72,8 +72,7 @@ function Filters(checkedFilters) {
 
 
 export function renderFilters(containerSelector = '#react-container') {
-    const filterValues = metaContent('filters').split(' ');
-    console.log(filterValues);
+    const filterValues = getMetaContent('filters').split(' ');
     reactUtils.renderInContainer(Filters(filterValues), containerSelector);
 }
 

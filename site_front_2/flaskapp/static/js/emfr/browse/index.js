@@ -1,9 +1,7 @@
-import * as filters from "./filters";
+export {renderFilters} from "./filters";
+export {renderLetterSelection} from "./letterSelection";
+export {renderTopBtn} from "./topBtn";
 import * as browseUtils from "./browseUtils";
-import {renderLetterSelection} from "./letterSelection";
-
-const $ = require('jquery');
-
 
 export function handleLetterClick(e) {
     e.preventDefault();
@@ -11,10 +9,3 @@ export function handleLetterClick(e) {
     document.getElementById('browse_form').submit();
 
 }
-
-
-export function init(filtersSelector, selectionSelector) {
-    filters.renderFilters(filtersSelector);
-    renderLetterSelection(selectionSelector)
-}
-

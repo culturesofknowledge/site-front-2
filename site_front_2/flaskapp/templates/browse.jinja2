@@ -59,7 +59,9 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             console.log('loaded');
-            emfr.browse.init('#filters-root', '#letter-selection-root');
+            emfr.browse.renderLetterSelection('#letter-selection-root');
+            emfr.browse.renderFilters('#filters-root')
+            emfr.browse.renderTopBtn('#top-btn-root')
         });
     </script>
 

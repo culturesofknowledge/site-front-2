@@ -11,3 +11,14 @@ export function getMetaContent(name, rootEle = null) {
 export function updateFormValue(formSelector, field, vlaue) {
     document.querySelector(`${formSelector} input[name="${field}"]`).value = vlaue;
 }
+
+export function getStoreItemJson(key) {
+    const val = localStorage.getItem(key);
+    return val ? JSON.parse(val) : null;
+}
+
+export function setStoreItemJson(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+    return value;
+}
+

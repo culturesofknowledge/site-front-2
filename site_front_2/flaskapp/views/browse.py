@@ -10,15 +10,6 @@ bp.add_app_template_filter(browse_filters.create_filter_values, 'create_filter_v
 
 BROWSE_NAME_PEOPLE = 'People'
 
-BROWSE_FILTERS = [
-    'gender:male',
-    'gender:female',
-    'gender:unknown',
-    'written',
-    'received',
-    'mentioned',
-]
-
 
 def create_browse_pages_data():
     browse_pages = [
@@ -59,8 +50,6 @@ def home():
 @bp.route('/people')
 def people():
     letter = request.args.get('letter', 'A')
-    cur_filters = request.args.get('filters', '')
-    cur_filters = cur_filters.split(' ') if cur_filters else BROWSE_FILTERS
 
     rows = list(get_people_rows(f'{letter}*', is_org=False))
 
@@ -76,7 +65,6 @@ def people():
         browse_pages=browse_pages,
         rows=rows,
         cur_letter=letter,
-        cur_filters=cur_filters,
     )
 
 

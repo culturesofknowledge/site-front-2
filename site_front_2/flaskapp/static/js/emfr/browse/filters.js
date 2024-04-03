@@ -1,4 +1,4 @@
-import {getMetaContent} from "../domUtils";
+import {getStoreItemJson, setStoreItemJson} from "../domUtils";
 import * as browseUtils from "./browseUtils";
 import * as reactUtils from '../reactUtils';
 import React from 'react';
@@ -20,16 +20,25 @@ function Filter({label, value, onChange, checked, className}) {
     );
 }
 
+const FILTERS = {
+    'gender:male': 'Male',
+    'gender:female': 'Female',
+    'gender:unknown': 'Unknown',
+    'written': 'Letters Written',
+    'received': 'Letters Received',
+    'mentioned': 'Letters Mentioning',
+}
+
 function Filters(checkedFilters) {
     const filters1 = [
-        ['Male', 'gender:male',],
-        ['Female', 'gender:female',],
-        ['Unknown', 'gender:unknown',],
+        'gender:male',
+        'gender:female',
+        'gender:unknown',
     ]
     const filters2 = [
-        ['Letters Written', 'written',],
-        ['Letters Received', 'received',],
-        ['Letters Mentioning', 'mentioned',],
+        'written',
+        'received',
+        'mentioned',
     ]
 
     function handleFilterChange() {
@@ -43,8 +52,8 @@ function Filters(checkedFilters) {
             browseUtils.isSubset(selectedFilters, filters) ? $v.show() : $v.hide();
         });
 
-        // update form
-        browseUtils.updateFormValue('filters', selectedFilters.join(' '));
+        // update filters
+        setStoreItemJson('peopleFilters', selectedFilters);
     }
 
 
@@ -61,18 +70,23 @@ function Filters(checkedFilters) {
         ))
     }
 
+    function toLabelValuePairs(keys) {
+        return keys.map(k => [FILTERS[k], k]);
+    }
+
     return (
         <div className="filter flex flex-row space-x-4 justify-center mb-12 items-center">
-            {toFilters(filters1)}
+            {toFilters(toLabelValuePairs(filters1))}
             <span>|</span>
-            {toFilters(filters2)}
+            {toFilters(toLabelValuePairs(filters2))}
         </div>
     );
 }
 
 
 export function renderFilters(containerSelector = '#react-container') {
-    const filterValues = getMetaContent('filters').split(' ');
+    // KTODO filters default all
+    const filterValues = getStoreItemJson('peopleFilters') || Object.keys(FILTERS);
     reactUtils.renderInContainer(Filters(filterValues), containerSelector);
 }
 

@@ -1,7 +1,7 @@
 import {getStoreItemJson, setStoreItemJson} from "../domUtils";
 import * as browseUtils from "./browseUtils";
 import * as reactUtils from '../reactUtils';
-import React from 'react';
+import React, {useEffect} from 'react';
 
 const $ = require('jquery');
 
@@ -29,7 +29,8 @@ const FILTERS = {
     'mentioned': 'Letters Mentioning',
 }
 
-function Filters(checkedFilters) {
+function Filters({checkedFilters}) {
+    const [selectedFilters, setSelectedFilters] = React.useState(checkedFilters);
     const filters1 = [
         'gender:male',
         'gender:female',
@@ -41,8 +42,7 @@ function Filters(checkedFilters) {
         'mentioned',
     ]
 
-    function handleFilterChange() {
-        const selectedFilters = getSelectedFilters();
+    useEffect(() => {
         console.log(selectedFilters);
 
         // show/hide filterable elements
@@ -54,6 +54,10 @@ function Filters(checkedFilters) {
 
         // update filters
         setStoreItemJson('peopleFilters', selectedFilters);
+    }, [selectedFilters]);
+
+    function handleFilterChange() {
+        setSelectedFilters(getSelectedFilters());
     }
 
 
@@ -64,7 +68,7 @@ function Filters(checkedFilters) {
                 label={label}
                 value={value}
                 onChange={handleFilterChange}
-                checked={checkedFilters.includes(value)}
+                checked={selectedFilters.includes(value)}
                 className="h-5"
             />
         ))
@@ -85,9 +89,8 @@ function Filters(checkedFilters) {
 
 
 export function renderFilters(containerSelector = '#react-container') {
-    // KTODO filters default all
     const filterValues = getStoreItemJson('peopleFilters') || Object.keys(FILTERS);
-    reactUtils.renderInContainer(Filters(filterValues), containerSelector);
+    reactUtils.renderInContainer(<Filters checkedFilters={filterValues} />, containerSelector);
 }
 
 function getSelectedFilters() {

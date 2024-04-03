@@ -83,7 +83,7 @@ function LetterSelection() {
 
 
     return (
-        curIdValues ? <div className={
+        curIdValues.length ? <div className={
             "w-56 mr-6 px-4 " +
             "border-y border-y-amber-300 " +
             "border-solid border-x-0 "}>

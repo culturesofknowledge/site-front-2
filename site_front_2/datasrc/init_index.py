@@ -291,7 +291,16 @@ def generateAdditional(singular, record, solr_item):
 
 
 def main():
-    pass
+    fill_solr([
+        "locations",
+        "comments",
+        "images",
+        "works",
+        "people",
+        "manifestations",
+        "institutions",
+        "resources",
+    ], None)
 
 
 if __name__ == '__main__':

@@ -6,6 +6,7 @@
     <link href="https://fonts.googleapis.com/css?family=Arvo" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
     <title>Early Modern Letter Online : {{ title }}</title>
+     {% block extra_stylesheets %}{% endblock %}
 </head>
 <body>
     <!-- START header / menu -->
@@ -104,5 +105,6 @@
     </div>
     <!-- END footer -->
 
+    {% block extra_js_bottom %}{% endblock %}
 </body>
 </html>

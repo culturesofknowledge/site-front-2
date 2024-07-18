@@ -9,13 +9,5 @@
 
 {% block extra_js_bottom %}
     {% include "_edges_common_js.jinja2" %}
-    <script type="text/javascript" src="../static/js/browse.edge.js"></script>
-
-    <script type="text/javascript">
-        if (!window.hasOwnProperty("emlo")) { emlo = {}}
-         emlo.init({
-            selector: "#emlo-browse-list",
-            index: "http://localhost:7812",
-        });
-    </script>
+    <script type="module" src="../static/js/browse.edge.js"></script>
 {% endblock extra_js_bottom %}

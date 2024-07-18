@@ -3,19 +3,11 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<div id="emlo-search"></div>
+    <div id="emlo-search"></div>
 {% endblock %}
 
 
 {% block extra_js_bottom %}
     {% include "_edges_common_js.jinja2" %}
-    <script type="text/javascript" src="../static/js/home.edges.js"></script>
-
-    <script type="text/javascript">
-        if (!window.hasOwnProperty("emlo")) { emlo = {}}
-         emlo.init({
-            selector: "#emlo-search",
-            index: "http://localhost:7812",
-        });
-    </script>
+    <script type="module" src="../static/js/home.edges.js"></script>
 {% endblock extra_js_bottom %}

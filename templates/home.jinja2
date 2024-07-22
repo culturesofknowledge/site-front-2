@@ -3,7 +3,75 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-    <div id="emlo-search"></div>
+    {# Start EMLO intro #}
+    <div class="row">
+
+        <div class="large-2 columns"><!-- dummy column -->&nbsp;</div>
+
+        <div class="large-10 columns" style="padding-left:25px">
+            <br/>
+            <h1>Welcome to Early Modern Letters Online</h1>
+
+            <p>
+                Created by the Cultures of Knowledge Project with generous funding from The Andrew W.
+                Mellon Foundation, and now very generously funded by the Packard Humanities Institute,
+                Early Modern Letters Online — EMLO — is a combined finding aid and editorial interface
+                for basic descriptions of early modern correspondence.
+            </p>
+        </div>
+    </div>
+    {# END EMLO intro #}
+
+    {# Start EMLO search #}
+    {# TODO: Add BG Color #}
+    <div class="panel" style="">
+        <div class="row ">
+            <div id="emlo-search"></div>
+        </div>
+    </div>
+    {# End EMLO search #}
+
+    {# START Catalogue statistics #}
+    <div class="row">
+        <div class="large-12 columns">
+            <ul class="small-block-grid-2 medium-block-grid-5 large-block-grid-10">
+              {# TODO Content needs to be added #}
+              <p> Content needs to be added </p>
+            </ul> 
+        </div> 
+    </div> 
+    {# End Catalogue statistics #}
+
+    {# START Featured catalogues #}
+    {# Need to update this data using JS #}
+    <div id="news-output" class="panel">
+        <div class="row">
+            <h2 style="margin-left:15px;">Featured catalogues</h2>
+
+            <div class="item large-4 medium-4 small-12 columns">
+                <a class="link">
+                    <div class="image"></div>
+                    <h3 class="title">Title of News</h3>
+                </a>
+            </div>
+
+            <div class="item large-4 medium-4 small-12 columns">
+                <a class="link">
+                    <div class="image"></div>
+                    <h3 class="title">Title of News</h3>
+                </a>
+            </div>
+
+            <div class="item large-4 medium-4 small-12 columns">
+                <a class="link">
+                    <div class="image"></div>
+                    <h3 class="title">Title of News</h3>
+                </a>
+            </div>
+        </div>
+    </div>
+    {# End Featured catalogues #}
+
 {% endblock %}
 
 

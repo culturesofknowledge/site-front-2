@@ -1,6 +1,10 @@
 from flask import Flask
 from views.home import home_bp
 from views.browse import browse_bp
+from views.advance import advance_bp
+from views.collections import collections_bp
+from views.contribute import contribute_bp
+from views.about import about_bp
 from config import Config
 
 def create_app():
@@ -9,6 +13,10 @@ def create_app():
 
     app.register_blueprint(home_bp)
     app.register_blueprint(browse_bp)
+    app.register_blueprint(advance_bp)
+    app.register_blueprint(collections_bp)
+    app.register_blueprint(contribute_bp)
+    app.register_blueprint(about_bp)
 
     return app
 

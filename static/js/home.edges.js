@@ -10,8 +10,8 @@ try {
       defaultOperator: "AND",
       defaultField: "author_sort",
       renderer: new edges.renderers.bs3.FullSearchController({
-        freetextSubmitDelay: 1000,
-        searchButton: true,
+        freetextSubmitDelay: 0,
+        searchButton: false,
         searchPlaceholder: "Search for anything",
         clearButton: false,
         searchButtonText: "Search",

@@ -1,0 +1,74 @@
+{% extends "base.jinja2" %}
+
+{% block title %}About{% endblock %}
+
+{% block content %}
+    <div class="about-fixed-nav">
+        <a href="#context">Context</a>
+        <a href="#citation">Citation Guidelines</a>
+        <a href="#copyright">Copyright and Scholarly Responsibility</a>
+        <a href="#issues">Known Issues</a>
+        <a href="#credits">Credits</a>
+        <a href="#technical">Technical Overview</a>
+        <a href="#cookies">Cookies</a>
+        <a href="#contact">Contact</a>
+    </div>  
+
+    {# Start About intro #}
+    <div class="row">
+
+        <div class="large-2 columns"><!-- dummy column -->&nbsp;</div>
+
+        <div class="large-10 columns" style="padding-left:25px">
+            <br/>
+            <h1>About</h1>
+
+            <p>
+                <i>Early Modern Letters Online</i>is a combined finding aid and editorial interface for basic descriptions of 
+                early modern correspondence: a collaboratively populated union catalogue of sixteenth-, seventeenth-, and 
+                eighteenth-century letters. <strong>EMLO is an active project in continual development:</strong> 
+                please let us know what you think, and get involved!
+            </p>
+        </div>   
+        
+        <div id="context" class="large-10 columns" style="padding-left:25px">
+            {% include './components/about/context.jinja2' %}
+        </div>
+
+        <div id="citation" class="large-10 columns" style="padding-left:25px">
+            {% include './components/about/citation.jinja2' %}
+        </div>
+
+        <div id="copyright" class="large-10 columns" style="padding-left:25px">
+            {% include './components/about/copyright.jinja2' %}
+        </div>
+
+        <div id="issues" class="large-10 columns" style="padding-left:25px">
+            {% include './components/about/issues.jinja2' %}
+        </div>
+
+        <div id="credits" class="large-10 columns" style="padding-left:25px">
+            {% include './components/about/credits.jinja2' %}
+        </div>
+
+        <div id="technical" class="large-10 columns" style="padding-left:25px">
+            {% include './components/about/technical.jinja2' %}
+        </div>
+
+        <div id="cookies" class="large-10 columns" style="padding-left:25px">
+            {% include './components/about/cookies.jinja2' %}
+        </div>
+
+        <div id="contact" class="large-10 columns" style="padding-left:25px">
+            {% include './components/about/contact.jinja2' %}
+        </div>
+    </div>
+    {# END About intro #}
+
+   
+{% endblock %}
+
+
+{% block extra_js_bottom %}
+   
+{% endblock extra_js_bottom %}

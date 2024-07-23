@@ -1,0 +1,62 @@
+{% extends "base.jinja2" %}
+
+{% block title %}Collection{% endblock %}
+
+{% block content %}
+    <div id="collections" class="row">
+        <div class="large-2 columns"><!-- dummy column -->&nbsp;</div>
+
+        <div class="large-10 columns" style="padding-left:25px">
+            <br />
+            <h1>Explore Collections</h1>
+			
+            <div>
+                <p>We are working at present to provide our user community with 
+                access to EMLO’s rapidly growing list of catalogue collections through a
+                number of distinct entry points. Currently it is possible to search 
+                from this page via the ‘<a href="http://emlo.bodleian.ox.ac.uk/blog/?page_id=1966">Catalogues</a>‘
+                option — where correspondences are listed in alphabetical order by the 
+                name of the individual correspondent or by name of the collector or 
+                collection — or to view groups of correspondences clustered according to
+                ‘<a href="http://emlo.bodleian.ox.ac.uk/blog/?page_id=1989">Themes</a>‘. 
+                Catalogues may be viewed and selected also under ‘
+                <a href="http://emlo.bodleian.ox.ac.uk/blog/?page_id=2259">Contributor</a>‘, 
+                where they are ordered by the name of the contributing scholar, project, institution, or publisher.
+            </p>
+
+            <p>
+                Alongside this we have in development areas where it will be possible
+                to search for catalogues chronologically or geographically, or by 
+                holding institution. These new search groupings, together with 
+                accompanying live visualizations drawn from the union catalogue, will be
+                released on this page over the course of the coming weeks.
+            </p>
+
+            {# TODO: Needs to be moved on same application route #}
+            <ul>
+                <li class="collections-catalogue">
+                    <a title="Catalogues" href="http://emlo-portal.bodleian.ox.ac.uk/collections/?page_id=1966">Catalogues</a>
+                </li>
+                <li class="collections-catalogue">
+                    <a title="Themes" href="http://emlo-portal.bodleian.ox.ac.uk/collections/?page_id=1989">Themes</a>
+                </li>
+                <li class="collections-catalogue">
+                    <a title="Chronology" href="http://emlo.bodleian.ox.ac.uk/vis/chronology">Chronology (pilot)</a>
+                </li>
+                <li class="collections-catalogue">
+                    <a title="Geography" href="http://emlo.bodleian.ox.ac.uk/vis/geography">Geography (pilot)</a>
+                </li>
+                <li class="collections-catalogue">
+                    <a href="http://emlo.bodleian.ox.ac.uk/blog/?page_id=2259">Contributors</a>
+                </li>
+                <li class="collections-catalogue">
+                    <a title="Repositories (pilot)" href="http://emlo-portal.bodleian.ox.ac.uk/collections/?page_id=1982">Repositories (pilot)</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block extra_js_bottom %}
+{% endblock extra_js_bottom %}

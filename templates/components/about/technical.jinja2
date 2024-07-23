@@ -1,0 +1,27 @@
+<div>
+    <hr class="yellow-divider" />
+
+    <h3>Technical Overview</h3>
+    <p>EMLO runs on the Bodleian digital object management and preservation 
+    platform, designed to support digital library projects within the 
+    University of Oxford 
+    (notably <a href="http://www.bodleian.ox.ac.uk/ora" target="_blank" rel="noopener">Oxford University Research Archive</a>).
+    This provides a flexible platform that is able to accommodate a wide 
+    variety of file formats and metadata standards that readily scales to 
+    high data volumes. The core EMLO object model allows contributors to 
+    provide rich metadata on five epistolary entities — letters, 
+    manifestations (different archival and printed versions of the same 
+    letter), agents (people and organizations), locations, and repositories 
+    that are interlinked using RDF-compatible ontologies. Contributions are 
+    uploaded initially into EMLO-Collect via spreadsheet, direct data entry,
+    or from a data collection tool, which allow contributors to make 
+    corrections before submission to the editorial team. Submitted data is 
+    then ingested into a powerful ‘back-end’ database — 
+    <a href="https://emlo-edit.bodleian.ox.ac.uk/interface/union.php" target="_blank" rel="noopener">EMLO-Edit</a>,
+    based on PostgreSQL — where it can be enhanced and de-duplicated by the
+    editorial team using a powerful suite of web-based editing and merging 
+    tools. Publication-ready data is released to a front end — you’re using 
+    this now — built with Python/Pylons, which provides a set of discovery 
+    services that provide full text indexing and faceted search 
+    (<a href="http://lucene.apache.org/solr/" target="_blank" rel="noopener">Apache Solr</a>).</p>
+</div>

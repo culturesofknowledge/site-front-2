@@ -1,0 +1,42 @@
+{% extends "base.jinja2" %}
+
+{% block title %}Contribute{% endblock %}
+
+{% block content %}
+    <div>
+        <div class="fixed-nav">
+            <a href="#submit">Submit Existing Data</a>
+            <a href="#refine">Gather, Curate and Edit Your Data</a>
+            <a href="#share">Publish Your Data</a>
+        </div> 
+
+        <div class="row">
+
+            <div class="large-2 columns"><!-- dummy column -->&nbsp;</div>
+
+            <div class="large-10 columns" style="padding-left:25px">
+
+                <div id="contribute">
+                    {% include './components/contribute/contribute.jinja2' %}
+                </div>
+
+                <div id="submit" class="large-10 columns" style="padding-left:25px">
+                    {% include './components/contribute/submit.jinja2' %}
+                </div>
+                
+                <div id="refine" class="large-10 columns" style="padding-left:25px">
+                    {% include './components/contribute/refine.jinja2' %}
+                </div>
+
+                <div id="share" class="large-10" style="padding-left:25px">
+                    {% include './components/contribute/share.jinja2' %}
+                </div>
+            </div>  
+        </div>
+    </div>    
+{% endblock %}
+
+
+{% block extra_js_bottom %}
+   
+{% endblock extra_js_bottom %}

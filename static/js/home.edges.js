@@ -9,12 +9,10 @@ try {
       category: "controller",
       defaultOperator: "AND",
       defaultField: "author_sort",
-      renderer: new edges.renderers.bs3.FullSearchController({
-        freetextSubmitDelay: 0,
-        searchButton: false,
-        searchPlaceholder: "Search for anything",
+      renderer: new edges.renderers.bs5.SearchBox({
+        freetextSubmitDelay: -1,
         clearButton: false,
-        searchButtonText: "Search",
+        searchPlaceholder: "all people",
       }),
     }),
     new edges.components.ResultsDisplay({

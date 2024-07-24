@@ -1,7 +1,7 @@
 import emloEdges from "./edges.js";
 
 try {
-  emloEdges.selector = "emlo-search";
+  emloEdges.selector = "home-search";
   emloEdges.collection = "/solr/works/select";
   emloEdges.components = [
     new edges.components.FullSearchController({

@@ -10,6 +10,18 @@ def browse():
 def people():
     return render_template('/pages/browse/people.jinja2', title="Browse:People")
 
-@browse_bp.route('/location')
-def location():
-    return render_template('/pages/browse/location.jinja2', title="Browse:Location")
+@browse_bp.route('/locations')
+def locations():
+    return render_template('/pages/browse/locations.jinja2', title="Browse:Locations")
+
+@browse_bp.route('/organisations')
+def organisations():
+    return render_template('/pages/browse/organisations.jinja2', title="Browse:Organisations")
+
+@browse_bp.route('/institutions')
+def institutions():
+    return render_template('/pages/browse/institutions.jinja2', title="Browse:Institutions")
+
+@browse_bp.route('/works')
+def works():
+    return render_template('/pages/browse/works.jinja2', title="Browse:Works")

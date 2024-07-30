@@ -23,63 +23,20 @@
     {# END EMLO intro #}
 
     {# Start EMLO search #}
-    {# TODO: Add BG Color #}
-    <div class="panel" style="">
-        <div class="row ">
-            <form>
-                <div id="home-search"></div>
-            </form>
-            
-            <div class="large-9 hide-for-small columns" style="margin-top:10px">	
-                <p class="text-center" style="margin-bottom:0">Want a full set of fields? Try <a href="{{ url_for('advance.advance') }}">Search+</a></p>
-                <p class="text-center" style="">Prefer things at a glance? You can also <a href="{{ url_for('browse.browse') }}">Browse</a></p>
-            </div>
-            <div class="small-12 show-for-small columns" style="margin-top:0">
-                <p class="text-center" style="margin-bottom:0">Want a full set of fields? Try <a href="{{ url_for('advance.advance') }}">Search+</a></p>
-                <p class="text-center" style="">Prefer things at a glance? You can also <a href="{{ url_for('browse.browse') }}">Browse</a></p>
-            </div>
-        </div>
+    <div id="search-form-section">
+        {% include './components/home/search.jinja2' %}
     </div>
     {# End EMLO search #}
 
     {# START Catalogue statistics #}
-    <div class="row">
-        <div class="large-12 columns">
-            <ul class="small-block-grid-2 medium-block-grid-5 large-block-grid-10">
-              {# TODO Content needs to be added #}
-              <p> Content needs to be added </p>
-            </ul> 
-        </div> 
+    <div id="home-stats">
+        {% include './components/home/stats.jinja2' %}
     </div> 
     {# End Catalogue statistics #}
 
     {# START Featured catalogues #}
-    {# Need to update this data using JS #}
-    <div id="news-output" class="panel">
-        <div class="row">
-            <h2 style="margin-left:15px;">Featured catalogues</h2>
-
-            <div class="item large-4 medium-4 small-12 columns">
-                <a class="link">
-                    <div class="image"></div>
-                    <h3 class="title">Title of News</h3>
-                </a>
-            </div>
-
-            <div class="item large-4 medium-4 small-12 columns">
-                <a class="link">
-                    <div class="image"></div>
-                    <h3 class="title">Title of News</h3>
-                </a>
-            </div>
-
-            <div class="item large-4 medium-4 small-12 columns">
-                <a class="link">
-                    <div class="image"></div>
-                    <h3 class="title">Title of News</h3>
-                </a>
-            </div>
-        </div>
+    <div id="catalogues">
+        {% include './components/home/catalouge.jinja2' %}
     </div>
     {# End Featured catalogues #}
 

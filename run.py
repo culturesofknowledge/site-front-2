@@ -5,6 +5,7 @@ from views.advance import advance_bp
 from views.collections import collections_bp
 from views.contribute import contribute_bp
 from views.about import about_bp
+from views.forms import forms_bp
 from config import Config
 
 def create_app():
@@ -17,6 +18,7 @@ def create_app():
     app.register_blueprint(collections_bp)
     app.register_blueprint(contribute_bp)
     app.register_blueprint(about_bp)
+    app.register_blueprint(forms_bp)
 
     return app
 

@@ -1,0 +1,41 @@
+{% extends "base.jinja2" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <div class="row">
+
+        <div class="large-2 columns"><!-- dummy column -->&nbsp;</div>
+
+        <div class="large-10 columns" style="padding-left:25px">
+            <br/>
+            <h2>Internal Server Error</h2>
+            <p>Sorry, something went wrong on our end. Please try again later.</p>
+
+            <p id="hiddenError">{{ err }}</p>
+
+            <div class=row>
+                {% if err %}
+                    <a style="margin:0px 20px" onclick="copyToClipboard()">Copy Error Details</a>
+                {% endif %}
+                <a href="{{ url_for('home.home') }}">Go to Home</a>
+            </div>
+            <br/><br/><br/>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block extra_js_bottom %}
+<script>
+function copyToClipboard() {
+    console.log("jie")
+    const errorText = document.getElementById('hiddenError').innerText;
+    navigator.clipboard.writeText(errorText).then(function() {
+        alert('Error details copied to clipboard!');
+    }, function(err) {
+        alert('Failed to copy error details.');
+    });
+}
+</script>
+{% endblock extra_js_bottom %}

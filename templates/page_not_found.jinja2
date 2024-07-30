@@ -1,0 +1,22 @@
+{% extends "base.jinja2" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <div class="row">
+
+        <div class="large-2 columns"><!-- dummy column -->&nbsp;</div>
+
+        <div class="large-10 columns" style="padding-left:25px">
+            <br/>
+            <h2>Missing</h2>
+            <p>Sorry, that record has not been found, it may have been merged with another record. Sorry about that.</p>
+            <a href="{{ url_for('home.home') }}">Go to Home</a>
+            <br/><br/><br/>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block extra_js_bottom %}
+{% endblock extra_js_bottom %}

@@ -1,0 +1,203 @@
+<div class="panel" style="">
+  <div class="row">
+    <form id="search" action="/forms/">
+
+      {# Search people - Starts #}
+      <div class="large-11 small-10 columns">
+        <label for="people">Search people</label>
+        <input
+          id="people"
+          name="people"
+          type="text"
+          class="text"
+          value="newton"
+          title="Search letters for authors, senders, recipients, and people mentioned, e.g. 'Samuel Hartlib', 'John Aubrey', or 'The Royal Society'. &lt;
+                  br/&gt;&lt;br/&gt;Search is not case sensitive."
+        />
+      </div>
+      <div class="large-1 small-2 columns">
+        <label>&nbsp;<!-- for alingment--></label>
+        <span
+          data-tooltip=""
+          aria-haspopup="true"
+          class="has-tip tip-top"
+          data-selector="tooltip-lz7zrq1x0"
+          aria-describedby="tooltip-lz7zrq1x0"
+          title=""
+        >
+          <img
+            style="min-width: 25px; text-align: left"
+            class="help"
+            src="/static/img/icon-help.png"
+            alt="Help"
+          />
+        </span>
+      </div>
+      {# Search people - Ends #}
+
+      {# Search year - Starts #}
+      <div class="large-6 small-5 columns">
+        <label>Search from year</label>
+        <select
+          id="dat_from_year"
+          name="dat_from_year"
+          title="Search from this year."
+          class="year_from"
+        >
+          <option class="default" selected="selected">all years</option>
+          {% for year in range(1500, 1841) %}
+          <option value="{{ year }}">{{ year }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="small-5 columns">
+        <label>Search to year</label>
+        <select
+          id="dat_to_year"
+          name="dat_to_year"
+          title="Search up to this year."
+          class="year_to"
+        >
+          <option class="default" selected="selected">all years</option>
+          {% for year in range(1500, 1841) %}
+          <option value="{{ year }}">{{ year }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="large-1 small-2 columns">
+        <label>&nbsp;<!-- for alignment--></label>
+        <span
+          data-tooltip=""
+          aria-haspopup="true"
+          class="has-tip tip-top"
+          data-selector="tooltip-lz7zrq1x1"
+          aria-describedby="tooltip-lz7zrq1x1"
+          title=""
+        >
+          <img
+            style="min-width: 25px; text-align: left"
+            class="help"
+            src="/static/img/icon-help.png"
+            alt="Help"
+          />
+        </span>
+      </div>
+      {# Search year - Ends #}
+
+      {# Search places - Starts #}
+      <div class="large-11 small-10 columns">
+        <label for="locations">Search places</label>
+
+        <input
+          id="locations"
+          name="locations"
+          type="text"
+          class="text"
+          value="all places"
+          onfocus="
+  javascript:textClear(this);"
+          onblur="
+  javascript:textFill(this);"
+          title="Search the places that letters were sent from or to, e.g. 'Queen's College', 'Paris', or 'Spain'. &lt;br/&gt;&lt;br/&gt;Search is not case sensitive."
+        />
+      </div>
+      <div class="large-1 small-2 columns">
+        <label>&nbsp;<!-- for alingment--></label>
+
+        <span
+          data-tooltip=""
+          aria-haspopup="true"
+          class="has-tip tip-top"
+          data-selector="tooltip-lz7zrq1x2"
+          aria-describedby="tooltip-lz7zrq1x2"
+          title=""
+        >
+          <img
+            style="min-width: 25px; text-align: left"
+            class="help"
+            src="/static/img/icon-help.png"
+            alt="Help"
+          />
+        </span>
+      </div>
+      {# Search places - Ends #}
+
+      {# Search content - Starts #}
+      <div class="large-11 small-10 columns">
+        <label>Search content</label>
+
+        <input
+          id="let_con"
+          name="let_con"
+          type="text"
+          class="text"
+          value="all content"
+          onfocus="
+  javascript:textClear(this);"
+          onblur="
+  javascript:textFill(this);"
+          title="Search across abstracts, keywords, incipits, excipits, transcriptions, and enclosures, e.g. 'Spider' or 'Mathematics'. &lt;br/&gt;&lt;br/&gt;Search is not case sensitive. "
+        />
+      </div>
+      <div class="large-1 small-2 columns">
+        <label>&nbsp;<!-- for alingment--></label>
+
+        <span
+          data-tooltip=""
+          aria-haspopup="true"
+          class="has-tip tip-top"
+          data-selector="tooltip-lz7zrq1x3"
+          aria-describedby="tooltip-lz7zrq1x3"
+          title=""
+        >
+          <img
+            style="min-width: 25px; text-align: left"
+            class="help"
+            src="/static/img/icon-help.png"
+            alt="Help"
+          />
+        </span>
+      </div>
+
+      <div class="large-3 columns">
+        <input
+          class="button submit search-related"
+          type="submit"
+          name="submit-normal"
+          value="Search"
+          style="margin-top: 13px"
+        />
+
+        <input
+          type="hidden"
+          id="search_type"
+          name="search_type"
+          value="normal"
+        />
+      </div>
+      {# Search content - Ends #}
+    </form>
+
+    <div class="large-9 hide-for-small columns" style="margin-top: 10px">
+      <p class="text-center" style="margin-bottom: 0">
+        Want a full set of fields? Try
+        <a href="{{ url_for('advance.advance') }}">Search+</a>
+      </p>
+      <p class="text-center" style="">
+        Prefer things at a glance? You can also
+        <a href="{{ url_for('browse.people') }}">Browse</a>
+      </p>
+    </div>
+    <div class="small-12 show-for-small columns" style="margin-top: 0">
+      <p class="text-center" style="margin-bottom: 0">
+        Want a full set of fields? Try
+        <a href="{{ url_for('advance.advance') }}">Search+</a>
+      </p>
+      <p class="text-center" style="">
+        Prefer things at a glance? You can also
+        <a href="{{ url_for('browse.people') }}">Browse</a>
+      </p>
+    </div>
+  </div>
+</div>

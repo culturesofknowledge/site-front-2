@@ -5,7 +5,7 @@ __pycache__/
 .idea/usage.statistics.xml
 .idea/shelf/
 .env
-
+.idea/*
 
 # file for the Gradle or Maven based projects
 .idea/modules.xml

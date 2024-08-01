@@ -1,0 +1,652 @@
+<div class="section clearfix">
+    <hr class="yellow-divider" />
+    
+    <h3>
+        <img
+        src="/static/img/icon-people.png"
+        alt="People Icon"
+        />People
+    </h3>
+
+    <fieldset>
+        <legend>All people</legend>
+
+        <label for="people">Name</label>
+        <div class="row">
+        <div class="small-11 columns">
+            <input
+            id="people"
+            name="people"
+            type="text"
+            class="text"
+            value="all people"
+            onfocus="
+javascript:textClear(this);"
+            onblur="
+javascript:textFill(this);"
+            title="Search letters for authors, senders, recipients, and people mentioned, e.g. 'Samuel Hartlib', 'John Aubrey', or 'The Royal Society'. Search is not case sensitive. "
+            />
+        </div>
+        <div class="small-1 columns">
+            <span
+            data-tooltip=""
+            aria-haspopup="true"
+            class="has-tip tip-top"
+            data-selector="tooltip-lz9klwc50"
+            aria-describedby="tooltip-lz9klwc50"
+            title=""
+            >
+            <img
+                style="min-width: 25px; text-align: left"
+                class="help"
+                src="/static/img/icon-help.png"
+                alt="Help"
+            />
+            </span>
+        </div>
+        </div>
+
+        <div class="row">
+        <div class="columns small-12 large-3">
+            <label for="people_gend">Gender</label>
+            <div class="row">
+            <div class="large-9 columns">
+                <select
+                id="people_gend"
+                name="people_gend"
+                title=""
+                class=""
+                >
+                <option class="default" selected="selected">all</option>
+                <option value="female">Female</option>
+                <option value="male">Male</option>
+                <option value="unknown">unknown</option>
+                </select>
+            </div>
+            <div class="large-3 columns">
+                <span
+                data-tooltip=""
+                aria-haspopup="true"
+                class="has-tip tip-top"
+                data-selector="tooltip-lz9klwc51"
+                aria-describedby="tooltip-lz9klwc51"
+                title=""
+                >
+                <img
+                    style="min-width: 25px; text-align: left"
+                    class="help"
+                    src="/static/img/icon-help.png"
+                    alt="Help"
+                />
+                </span>
+            </div>
+            </div>
+        </div>
+
+        <div class="columns small-12 large-5 end">
+            <label>&nbsp;<!-- for alignment--></label>
+            <div class="row">
+            <div class="large-10 columns">
+                <input
+                type="checkbox"
+                id="agent_org"
+                name="agent_org"
+                value="true"
+                class="checkbox"
+                />
+
+                <label for="agent_org">Only Organizations</label>
+            </div>
+            <div class="large-2 columns">
+                <span
+                data-tooltip=""
+                aria-haspopup="true"
+                class="has-tip tip-top"
+                data-selector="tooltip-lz9klwc52"
+                aria-describedby="tooltip-lz9klwc52"
+                title=""
+                >
+                <img
+                    style="min-width: 25px; text-align: left"
+                    class="help"
+                    src="/static/img/icon-help.png"
+                    alt="Help"
+                />
+                </span>
+            </div>
+            </div>
+        </div>
+        </div>
+
+        <label for="people_roles">Titles, roles, or occupations</label>
+        <div class="row">
+        <div class="large-11 columns">
+            <input
+            id="people_roles"
+            name="people_roles"
+            type="text"
+            class="text"
+            value="all roles and titles"
+            onfocus="
+javascript:textClear(this);"
+            onblur="
+javascript:textFill(this);"
+            title="Search for people by title, role, or occupation, e.g. 'Bookseller' or 'Politician'. Search is not case sensitive. "
+            />
+        </div>
+        <div class="large-1 columns">
+            <span
+            data-tooltip=""
+            aria-haspopup="true"
+            class="has-tip tip-top"
+            data-selector="tooltip-lz9klwc53"
+            aria-describedby="tooltip-lz9klwc53"
+            title=""
+            >
+            <img
+                style="min-width: 25px; text-align: left"
+                class="help"
+                src="/static/img/icon-help.png"
+                alt="Help"
+            />
+            </span>
+        </div>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Senders</legend>
+
+        <label for="aut">Name</label>
+        <div class="row">
+        <div class="small-11 columns">
+            <input
+            id="aut"
+            name="aut"
+            type="text"
+            class="text"
+            value="all senders"
+            onfocus="
+javascript:textClear(this);"
+            onblur="
+javascript:textFill(this);"
+            />
+        </div>
+        <div class="small-1 columns">
+            <span
+            data-tooltip=""
+            aria-haspopup="true"
+            class="has-tip tip-top"
+            data-selector="tooltip-lz9klwc54"
+            aria-describedby="tooltip-lz9klwc54"
+            title=""
+            >
+            <img
+                style="min-width: 25px; text-align: left"
+                class="help"
+                src="/static/img/icon-help.png"
+                alt="Help"
+            />
+            </span>
+        </div>
+        </div>
+
+        <div class="row">
+        <div class="columns small-12 large-3">
+            <label for="aut_gend">Gender</label>
+            <div class="row">
+            <div class="large-9 columns">
+                <select id="aut_gend" name="aut_gend" title="" class="">
+                <option class="default" selected="selected">all</option>
+                <option value="female">Female</option>
+                <option value="male">Male</option>
+                <option value="unknown">unknown</option>
+                </select>
+            </div>
+            <div class="large-3 columns">
+                <span
+                data-tooltip=""
+                aria-haspopup="true"
+                class="has-tip tip-top"
+                data-selector="tooltip-lz9klwc55"
+                aria-describedby="tooltip-lz9klwc55"
+                title=""
+                >
+                <img
+                    style="min-width: 25px; text-align: left"
+                    class="help"
+                    src="/static/img/icon-help.png"
+                    alt="Help"
+                />
+                </span>
+            </div>
+            </div>
+        </div>
+
+        <div class="columns small-12 large-5">
+            <label>&nbsp;<!-- for alignment--></label>
+            <div class="row">
+            <div class="large-10 columns">
+                <input
+                type="checkbox"
+                id="aut_org"
+                name="aut_org"
+                value="true"
+                class="checkbox"
+                />
+
+                <label for="aut_org">Only Organizations</label>
+            </div>
+            <div class="large-2 columns">
+                <span
+                data-tooltip=""
+                aria-haspopup="true"
+                class="has-tip tip-top"
+                data-selector="tooltip-lz9klwc56"
+                aria-describedby="tooltip-lz9klwc56"
+                title=""
+                >
+                <img
+                    style="min-width: 25px; text-align: left"
+                    class="help"
+                    src="/static/img/icon-help.png"
+                    alt="Help"
+                />
+                </span>
+            </div>
+            </div>
+        </div>
+
+        <div class="columns small-12 large-4">
+            <label>&nbsp;<!-- for alignment--></label>
+            <div class="row">
+            <div class="large-9 columns">
+                <input
+                type="checkbox"
+                id="aut_mark"
+                name="aut_mark"
+                value="true"
+                class="checkbox"
+                />
+
+                <label for="aut_mark">As marked</label>
+            </div>
+            <div class="large-3 columns">
+                <span
+                data-tooltip=""
+                aria-haspopup="true"
+                class="has-tip tip-top"
+                data-selector="tooltip-lz9klwc57"
+                aria-describedby="tooltip-lz9klwc57"
+                title=""
+                >
+                <img
+                    style="min-width: 25px; text-align: left"
+                    class="help"
+                    src="/static/img/icon-help.png"
+                    alt="Help"
+                />
+                </span>
+            </div>
+            </div>
+        </div>
+        </div>
+
+        <label for="aut_roles">Titles, roles, or occupations</label>
+        <div class="row">
+        <div class="large-11 columns">
+            <input
+            id="aut_roles"
+            name="aut_roles"
+            type="text"
+            class="text"
+            value="all roles and titles"
+            onfocus="
+javascript:textClear(this);"
+            onblur="
+javascript:textFill(this);"
+            title="Search for authors and senders by title, role, or occupation, e.g. 'Bookseller' or 'Politician'. Search is not case sensitive. "
+            />
+        </div>
+        <div class="large-1 columns">
+            <span
+            data-tooltip=""
+            aria-haspopup="true"
+            class="has-tip tip-top"
+            data-selector="tooltip-lz9klwc58"
+            aria-describedby="tooltip-lz9klwc58"
+            title=""
+            >
+            <img
+                style="min-width: 25px; text-align: left"
+                class="help"
+                src="/static/img/icon-help.png"
+                alt="Help"
+            />
+            </span>
+        </div>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Recipients</legend>
+
+        <label for="rec">Name</label>
+        <div class="row">
+        <div class="small-11 columns">
+            <input
+            id="rec"
+            name="rec"
+            type="text"
+            class="text"
+            value="all recipients"
+            onfocus="
+javascript:textClear(this);"
+            onblur="
+javascript:textFill(this);"
+            />
+        </div>
+        <div class="small-1 columns">
+            <span
+            data-tooltip=""
+            aria-haspopup="true"
+            class="has-tip tip-top"
+            data-selector="tooltip-lz9klwc59"
+            aria-describedby="tooltip-lz9klwc59"
+            title=""
+            >
+            <img
+                style="min-width: 25px; text-align: left"
+                class="help"
+                src="/static/img/icon-help.png"
+                alt="Help"
+            />
+            </span>
+        </div>
+        </div>
+
+        <div class="row">
+        <div class="columns small-12 large-3">
+            <label for="rec_gend">Gender</label>
+            <div class="row">
+            <div class="large-9 columns">
+                <select id="rec_gend" name="rec_gend" title="" class="">
+                <option class="default" selected="selected">all</option>
+                <option value="female">Female</option>
+                <option value="male">Male</option>
+                <option value="unknown">unknown</option>
+                </select>
+            </div>
+
+            <div class="large-3 columns">
+                <span
+                data-tooltip=""
+                aria-haspopup="true"
+                class="has-tip tip-top"
+                data-selector="tooltip-lz9klwc5a"
+                aria-describedby="tooltip-lz9klwc5a"
+                title=""
+                >
+                <img
+                    style="min-width: 25px; text-align: left"
+                    class="help"
+                    src="/static/img/icon-help.png"
+                    alt="Help"
+                />
+                </span>
+            </div>
+            </div>
+        </div>
+
+        <div class="columns small-12 large-5">
+            <label>&nbsp;<!-- for alignment--></label>
+            <div class="row">
+            <div class="large-10 columns">
+                <input
+                type="checkbox"
+                id="rec_org"
+                name="rec_org"
+                value="true"
+                class="checkbox"
+                />
+
+                <label for="rec_org">Only Organizations</label>
+            </div>
+            <div class="large-2 columns">
+                <span
+                data-tooltip=""
+                aria-haspopup="true"
+                class="has-tip tip-top"
+                data-selector="tooltip-lz9klwc5b"
+                aria-describedby="tooltip-lz9klwc5b"
+                title=""
+                >
+                <img
+                    style="min-width: 25px; text-align: left"
+                    class="help"
+                    src="/static/img/icon-help.png"
+                    alt="Help"
+                />
+                </span>
+            </div>
+            </div>
+        </div>
+
+        <div class="columns small-12 large-4">
+            <label>&nbsp;<!-- for alignment--></label>
+            <div class="row">
+            <div class="large-9 columns">
+                <input
+                type="checkbox"
+                id="rec_mark"
+                name="rec_mark"
+                value="true"
+                class="checkbox"
+                />
+
+                <label for="rec_mark">As marked</label>
+            </div>
+            <div class="large-3 columns">
+                <span
+                data-tooltip=""
+                aria-haspopup="true"
+                class="has-tip tip-top"
+                data-selector="tooltip-lz9klwc5c"
+                aria-describedby="tooltip-lz9klwc5c"
+                title=""
+                >
+                <img
+                    style="min-width: 25px; text-align: left"
+                    class="help"
+                    src="/static/img/icon-help.png"
+                    alt="Help"
+                />
+                </span>
+            </div>
+            </div>
+        </div>
+        </div>
+
+        <label for="rec_roles">Titles, roles, or occupations</label>
+        <div class="row">
+        <div class="large-11 columns">
+            <input
+            id="rec_roles"
+            name="rec_roles"
+            type="text"
+            class="text"
+            value="all roles and titles"
+            onfocus="
+javascript:textClear(this);"
+            onblur="
+javascript:textFill(this);"
+            title="Search for recipients by title, role, or occupation, e.g. 'Bookseller' or 'Politician'. Search is not case sensitive. "
+            />
+        </div>
+        <div class="large-1 columns">
+            <span
+            data-tooltip=""
+            aria-haspopup="true"
+            class="has-tip tip-top"
+            data-selector="tooltip-lz9klwc5d"
+            aria-describedby="tooltip-lz9klwc5d"
+            title=""
+            >
+            <img
+                style="min-width: 25px; text-align: left"
+                class="help"
+                src="/static/img/icon-help.png"
+                alt="Help"
+            />
+            </span>
+        </div>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>People Mentioned</legend>
+
+        <label for="ment">Name</label>
+        <div class="row">
+        <div class="small-11 columns">
+            <input
+            id="ment"
+            name="ment"
+            type="text"
+            class="text"
+            value="all people mentioned"
+            onfocus="
+javascript:textClear(this);"
+            onblur="
+javascript:textFill(this);"
+            />
+        </div>
+        <div class="small-1 columns">
+            <span
+            data-tooltip=""
+            aria-haspopup="true"
+            class="has-tip tip-top"
+            data-selector="tooltip-lz9klwc5e"
+            aria-describedby="tooltip-lz9klwc5e"
+            title=""
+            >
+            <img
+                style="min-width: 25px; text-align: left"
+                class="help"
+                src="/static/img/icon-help.png"
+                alt="Help"
+            />
+            </span>
+        </div>
+        </div>
+
+        <div class="row">
+        <div class="columns small-12 large-3">
+            <label for="ment_gend">Gender</label>
+            <div class="row">
+            <div class="large-9 columns">
+                <select id="ment_gend" name="ment_gend" title="" class="">
+                <option class="default" selected="selected">all</option>
+                <option value="female">Female</option>
+                <option value="male">Male</option>
+                <option value="unknown">unknown</option>
+                </select>
+            </div>
+            <div class="large-3 columns">
+                <span
+                data-tooltip=""
+                aria-haspopup="true"
+                class="has-tip tip-top"
+                data-selector="tooltip-lz9klwc5f"
+                aria-describedby="tooltip-lz9klwc5f"
+                title=""
+                >
+                <img
+                    style="min-width: 25px; text-align: left"
+                    class="help"
+                    src="/static/img/icon-help.png"
+                    alt="Help"
+                />
+                </span>
+            </div>
+            </div>
+        </div>
+
+        <div class="columns small-12 large-5 end">
+            <label>&nbsp;<!-- for alignment--></label>
+            <div class="row">
+            <div class="large-10 columns">
+                <input
+                type="checkbox"
+                id="ment_org"
+                name="ment_org"
+                value="true"
+                class="checkbox"
+                />
+
+                <label for="ment_org">Only Organizations</label>
+            </div>
+            <div class="large-2 columns">
+                <span
+                data-tooltip=""
+                aria-haspopup="true"
+                class="has-tip tip-top"
+                data-selector="tooltip-lz9klwc5g"
+                aria-describedby="tooltip-lz9klwc5g"
+                title=""
+                >
+                <img
+                    style="min-width: 25px; text-align: left"
+                    class="help"
+                    src="/static/img/icon-help.png"
+                    alt="Help"
+                />
+                </span>
+            </div>
+            </div>
+        </div>
+        </div>
+
+        <label for="ment_roles">Titles, roles, or occupations</label>
+        <div class="row">
+        <div class="large-11 columns">
+            <input
+            id="ment_roles"
+            name="ment_roles"
+            type="text"
+            class="text"
+            value="all roles and titles"
+            onfocus="
+javascript:textClear(this);"
+            onblur="
+javascript:textFill(this);"
+            title="Search for people mentioned in letters by title, role, or occupation, e.g. 'Bookseller' or 'Politician'. Search is not case sensitive. "
+            />
+        </div>
+        <div class="large-1 columns">
+            <span
+            data-tooltip=""
+            aria-haspopup="true"
+            class="has-tip tip-top"
+            data-selector="tooltip-lz9klwc5h"
+            aria-describedby="tooltip-lz9klwc5h"
+            title=""
+            >
+            <img
+                style="min-width: 25px; text-align: left"
+                class="help"
+                src="/static/img/icon-help.png"
+                alt="Help"
+            />
+            </span>
+        </div>
+        </div>
+    </fieldset>
+
+    <input
+        name="submit-advanced"
+        type="submit"
+        class="button submit search-related"
+        value="Search"
+    />
+    </div>

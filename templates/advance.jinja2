@@ -3,7 +3,49 @@
 {% block title %}Search+{% endblock %}
 
 {% block content %}
+    <div>
+        <div class="fixed-nav">
+            <h3>
+                Jump to:
+            </h3>
 
+            <a href="#people_section">People</a>
+            <a href="#dates_section">Dates</a>
+            <a href="#places_section">Places</a>
+            <a href="#letters_section">Content</a>
+            <a href="#institutions_section">Repositories and Editions</a>
+        </div> 
+        
+        <div class="row">
+            <div class="large-2 columns"><!-- dummy column -->&nbsp;</div>
+
+            <div class="large-10 columns" style="padding-left:25px">
+                    <div id="about">
+                        <br/>
+                        <h2 class="main">Search+</h2>
+                    </div>
+
+                    <div id="people_section" class="large-10 columns" style="padding-left:25px">
+                        {% include './components/advance/people.jinja2' %}
+                    </div>
+
+                    <div id="dates_section" class="large-10 columns" style="padding-left:25px">
+                        {% include './components/advance/dates.jinja2' %}
+                    </div>
+                    <div id="places_section" class="large-10 columns" style="padding-left:25px">
+                        {% include './components/advance/places.jinja2' %}
+                    </div>
+
+                    <div id="letters_section" class="large-10 columns" style="padding-left:25px">
+                        {% include './components/advance/letters.jinja2' %}
+                    </div>
+
+                    <div id="institutions_section" class="large-10" style="padding-left:25px">
+                        {% include './components/advance/institutions.jinja2' %}
+                    </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 

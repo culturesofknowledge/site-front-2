@@ -1,0 +1,815 @@
+<div class="section clearfix">
+  <hr class="yellow-divider" />
+  
+  <h3><img src="/static/img/icon-quill.png" alt="Content Icon" />Content</h3>
+
+  <fieldset>
+    <legend>Content</legend>
+
+    <label for="let_con">Search Content</label>
+    <div class="row">
+      <div class="small-11 columns">
+        <input
+          id="let_con"
+          name="let_con"
+          type="text"
+          class="text"
+          value="all content"
+          onfocus="
+  javascript:textClear(this);"
+          onblur="
+  javascript:textFill(this);"
+        />
+      </div>
+      <div class="small-1 columns">
+        <span
+          data-tooltip=""
+          aria-haspopup="true"
+          class="has-tip tip-top"
+          data-selector="tooltip-lz9klwc5r"
+          aria-describedby="tooltip-lz9klwc5r"
+          title=""
+        >
+          <img
+            style="min-width: 25px; text-align: left"
+            class="help"
+            src="/static/img/icon-help.png"
+            alt="Help"
+          />
+        </span>
+      </div>
+    </div>
+
+    <label for="let_type">Document type</label>
+    <div class="row">
+      <div class="small-11 columns">
+        <select id="let_type" name="let_type" title="" class="">
+          <option class="default" selected="selected">all types</option>
+          <option>Digital copy</option>
+          <option>Draft</option>
+          <option>Extract</option>
+          <option>Letter</option>
+          <option>Manuscript copy</option>
+          <option>Printed copy</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="small-1 columns">
+        <span
+          data-tooltip=""
+          aria-haspopup="true"
+          class="has-tip tip-top"
+          data-selector="tooltip-lz9klwc5s"
+          aria-describedby="tooltip-lz9klwc5s"
+          title=""
+        >
+          <img
+            style="min-width: 25px; text-align: left"
+            class="help"
+            src="/static/img/icon-help.png"
+            alt="Help"
+          />
+        </span>
+      </div>
+    </div>
+
+    <label for="let_lang">Language</label>
+    <div class="row">
+      <div class="small-11 columns">
+        <select
+          id="let_lang"
+          name="let_lang"
+          title=""
+          class="select2-hidden-accessible"
+          tabindex="-1"
+          aria-hidden="true"
+        >
+          <option class="default" selected="selected">all languages</option>
+
+          <option>Ancient Greek</option>
+          <option>Basque</option>
+          <option>Cornish</option>
+          <option>Czech</option>
+          <option>Danish</option>
+          <option>Dutch</option>
+          <option>English</option>
+          <option>French</option>
+          <option>German</option>
+          <option>Hebrew</option>
+          <option>Irish</option>
+          <option>Italian</option>
+          <option>Latin</option>
+          <option>Old French</option>
+          <option>Polish</option>
+          <option>Scottish Gaelic</option>
+          <option>Spanish</option>
+          <option>Swedish</option>
+          <option>Welsh</option></select
+        ><span
+          class="select2 select2-container select2-container--default"
+          dir="ltr"
+          style="width: 582px"
+          ><span class="selection"
+            ><span
+              class="select2-selection select2-selection--single"
+              role="combobox"
+              aria-haspopup="true"
+              aria-expanded="false"
+              title=""
+              tabindex="0"
+              aria-labelledby="select2-let_lang-container"
+              ><span
+                class="select2-selection__rendered"
+                id="select2-let_lang-container"
+                title="all languages"
+                >all languages</span
+              ><span class="select2-selection__arrow" role="presentation"
+                ><b role="presentation"></b></span></span></span
+          ><span class="dropdown-wrapper" aria-hidden="true"></span
+        ></span>
+      </div>
+      <div class="small-1 columns">
+        <span
+          data-tooltip=""
+          aria-haspopup="true"
+          class="has-tip tip-top"
+          data-selector="tooltip-lz9klwc5t"
+          aria-describedby="tooltip-lz9klwc5t"
+          title=""
+        >
+          <img
+            style="min-width: 25px; text-align: left"
+            class="help gap"
+            src="/static/img/icon-help.png"
+            alt="Help"
+          />
+        </span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="columns small-12 large-4">
+        <label>Only with</label>
+        <div class="row">
+          <div class="small-9 columns">
+            <input
+              type="checkbox"
+              id="let_ima"
+              name="let_ima"
+              value="true"
+              class="checkbox"
+            />
+
+            <label for="let_ima">Images</label>
+          </div>
+          <div class="small-3 columns">
+            <span
+              data-tooltip=""
+              aria-haspopup="true"
+              class="has-tip tip-top"
+              data-selector="tooltip-lz9klwc5u"
+              aria-describedby="tooltip-lz9klwc5u"
+              title=""
+            >
+              <img
+                style="min-width: 25px; text-align: left"
+                class="help"
+                src="/static/img/icon-help.png"
+                alt="Help"
+              />
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns small-12 large-4">
+        <label>Only with</label>
+        <div class="row">
+          <div class="small-9 columns">
+            <input
+              type="checkbox"
+              id="let_abst"
+              name="let_abst"
+              value="true"
+              class="checkbox"
+            />
+
+            <label for="let_abst">Abstracts</label>
+          </div>
+          <div class="small-3 columns">
+            <span
+              data-tooltip=""
+              aria-haspopup="true"
+              class="has-tip tip-top"
+              data-selector="tooltip-lz9klwc5v"
+              aria-describedby="tooltip-lz9klwc5v"
+              title=""
+            >
+              <img
+                style="min-width: 25px; text-align: left"
+                class="help"
+                src="/static/img/icon-help.png"
+                alt="Help"
+              />
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns small-12 large-4">
+        <label>Only with</label>
+        <div class="row">
+          <div class="small-9 columns">
+            <input
+              type="checkbox"
+              id="let_trans"
+              name="let_trans"
+              value="true"
+              class="checkbox"
+            />
+
+            <label for="let_trans">Transcriptions</label>
+          </div>
+          <div class="small-3 columns">
+            <span
+              data-tooltip=""
+              aria-haspopup="true"
+              class="has-tip tip-top"
+              data-selector="tooltip-lz9klwc5w"
+              aria-describedby="tooltip-lz9klwc5w"
+              title=""
+            >
+              <img
+                style="min-width: 25px; text-align: left"
+                class="help"
+                src="/static/img/icon-help.png"
+                alt="Help"
+              />
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Postage Marks</legend>
+
+    <label for="let_pmark_tex">Search postage mark</label>
+    <div class="row">
+      <div class="small-11 columns">
+        <input
+          id="let_pmark_tex"
+          name="let_pmark_tex"
+          type="text"
+          class="text"
+          value="all postage marks"
+          onfocus="
+  javascript:textClear(this);"
+          onblur="
+  javascript:textFill(this);"
+        />
+      </div>
+      <div class="small-1 columns">
+        <span
+          data-tooltip=""
+          aria-haspopup="true"
+          class="has-tip tip-top"
+          data-selector="tooltip-lz9klwc5x"
+          aria-describedby="tooltip-lz9klwc5x"
+          title=""
+        >
+          <img
+            style="min-width: 25px; text-align: left"
+            class="help"
+            src="/static/img/icon-help.png"
+            alt="Help"
+          />
+        </span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="small-6 columns end">
+        <div class="row">
+          <div class="small-10 columns">
+            <input
+              type="checkbox"
+              id="let_pmark"
+              name="let_pmark"
+              value="true"
+              class="checkbox"
+            />
+
+            <label for="let_pmark">Only with postage marks</label>
+          </div>
+          <div class="small-2 columns">
+            <span
+              data-tooltip=""
+              aria-haspopup="true"
+              class="has-tip tip-top"
+              data-selector="tooltip-lz9klwc5y"
+              aria-describedby="tooltip-lz9klwc5y"
+              title=""
+            >
+              <img
+                style="min-width: 25px; text-align: left"
+                class="help"
+                src="/static/img/icon-help.png"
+                alt="Help"
+              />
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Endorsements</legend>
+
+    <label for="let_end_tex">Search endorsement</label>
+    <div class="row">
+      <div class="small-11 columns">
+        <input
+          id="let_end_tex"
+          name="let_end_tex"
+          type="text"
+          class="text"
+          value="all endorsements"
+          onfocus="
+  javascript:textClear(this);"
+          onblur="
+  javascript:textFill(this);"
+        />
+      </div>
+      <div class="small-1 columns">
+        <span
+          data-tooltip=""
+          aria-haspopup="true"
+          class="has-tip tip-top"
+          data-selector="tooltip-lz9klwc5z"
+          aria-describedby="tooltip-lz9klwc5z"
+          title=""
+        >
+          <img
+            style="min-width: 25px; text-align: left"
+            class="help"
+            src="/static/img/icon-help.png"
+            alt="Help"
+          />
+        </span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="small-6 columns end">
+        <div class="row">
+          <div class="small-10 columns">
+            <input
+              type="checkbox"
+              id="let_end"
+              name="let_end"
+              value="true"
+              class="checkbox"
+            />
+
+            <label for="let_end">Only with endorsements</label>
+          </div>
+          <div class="small-2 columns">
+            <span
+              data-tooltip=""
+              aria-haspopup="true"
+              class="has-tip tip-top"
+              data-selector="tooltip-lz9klwc510"
+              aria-describedby="tooltip-lz9klwc510"
+              title=""
+            >
+              <img
+                style="min-width: 25px; text-align: left"
+                class="help"
+                src="/static/img/icon-help.png"
+                alt="Help"
+              />
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Enclosures</legend>
+
+    <label for="let_with_en_tex">Search enclosures</label>
+    <div class="row">
+      <div class="small-11 columns">
+        <input
+          id="let_with_en_tex"
+          name="let_with_en_tex"
+          type="text"
+          class="text"
+          value="all enclosures"
+          onfocus="
+  javascript:textClear(this);"
+          onblur="
+  javascript:textFill(this);"
+        />
+      </div>
+      <div class="small-1 columns">
+        <span
+          data-tooltip=""
+          aria-haspopup="true"
+          class="has-tip tip-top"
+          data-selector="tooltip-lz9klwc511"
+          aria-describedby="tooltip-lz9klwc511"
+          title=""
+        >
+          <img
+            style="min-width: 25px; text-align: left"
+            class="help"
+            src="/static/img/icon-help.png"
+            alt="Help"
+          />
+        </span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="small-12 large-6 columns">
+        <div class="row">
+          <div class="small-10 columns">
+            <input
+              type="checkbox"
+              id="let_with_en"
+              name="let_with_en"
+              value="true"
+              class="checkbox"
+            />
+
+            <label for="let_with_en">Only with enclosures</label>
+          </div>
+          <div class="small-2 columns">
+            <span
+              data-tooltip=""
+              aria-haspopup="true"
+              class="has-tip tip-top"
+              data-selector="tooltip-lz9klwc512"
+              aria-describedby="tooltip-lz9klwc512"
+              title=""
+            >
+              <img
+                style="min-width: 25px; text-align: left"
+                class="help gap"
+                src="/static/img/icon-help.png"
+                alt="Help"
+              />
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="small-12 large-6 columns">
+        <div class="row">
+          <div class="small-10 columns">
+            <input
+              type="checkbox"
+              id="let_en"
+              name="let_en"
+              value="true"
+              class="checkbox"
+            />
+
+            <label for="let_en">Only enclosed</label>
+          </div>
+          <div class="small-2 columns">
+            <span
+              data-tooltip=""
+              aria-haspopup="true"
+              class="has-tip tip-top"
+              data-selector="tooltip-lz9klwc513"
+              aria-describedby="tooltip-lz9klwc513"
+              title=""
+            >
+              <img
+                style="min-width: 25px; text-align: left"
+                class="help"
+                src="/static/img/icon-help.png"
+                alt="Help"
+              />
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Seals</legend>
+
+    <label for="let_seal_tex">Search seals</label>
+    <div class="row">
+      <div class="small-11 columns">
+        <input
+          id="let_seal_tex"
+          name="let_seal_tex"
+          type="text"
+          class="text"
+          value="all seals"
+          onfocus="
+  javascript:textClear(this);"
+          onblur="
+  javascript:textFill(this);"
+        />
+      </div>
+      <div class="small-1 columns">
+        <span
+          data-tooltip=""
+          aria-haspopup="true"
+          class="has-tip tip-top"
+          data-selector="tooltip-lz9klwc514"
+          aria-describedby="tooltip-lz9klwc514"
+          title=""
+        >
+          <img
+            style="min-width: 25px; text-align: left"
+            class="help"
+            src="/static/img/icon-help.png"
+            alt="Help"
+          />
+        </span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="small-6 columns end">
+        <div class="row">
+          <div class="small-10 columns">
+            <input
+              type="checkbox"
+              id="let_seal"
+              name="let_seal"
+              value="true"
+              class="checkbox"
+            />
+
+            <label for="let_seal">Only with seals</label>
+          </div>
+          <div class="small-2 columns">
+            <span
+              data-tooltip=""
+              aria-haspopup="true"
+              class="has-tip tip-top"
+              data-selector="tooltip-lz9klwc515"
+              aria-describedby="tooltip-lz9klwc515"
+              title=""
+            >
+              <img
+                style="min-width: 25px; text-align: left"
+                class="help"
+                src="/static/img/icon-help.png"
+                alt="Help"
+              />
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Paper</legend>
+
+    <label for="let_pap_typ_tex">Paper type</label>
+    <div class="row">
+      <div class="small-11 columns">
+        <input
+          id="let_pap_typ_tex"
+          name="let_pap_typ_tex"
+          type="text"
+          class="text"
+          value="all paper types"
+          onfocus="
+  javascript:textClear(this);"
+          onblur="
+  javascript:textFill(this);"
+        />
+      </div>
+      <div class="small-1 columns">
+        <span
+          data-tooltip=""
+          aria-haspopup="true"
+          class="has-tip tip-top"
+          data-selector="tooltip-lz9klwc516"
+          aria-describedby="tooltip-lz9klwc516"
+          title=""
+        >
+          <img
+            style="min-width: 25px; text-align: left"
+            class="help"
+            src="/static/img/icon-help.png"
+            alt="Help"
+          />
+        </span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="small-6 columns end">
+        <div class="row">
+          <div class="small-10 columns">
+            <input
+              type="checkbox"
+              id="let_pap_typ"
+              name="let_pap_typ"
+              value="true"
+              class="checkbox"
+            />
+
+            <label for="let_pap_typ">Only with paper type</label>
+          </div>
+          <div class="small-2 columns">
+            <span
+              data-tooltip=""
+              aria-haspopup="true"
+              class="has-tip tip-top"
+              data-selector="tooltip-lz9klwc517"
+              aria-describedby="tooltip-lz9klwc517"
+              title=""
+            >
+              <img
+                style="min-width: 25px; text-align: left"
+                class="help"
+                src="/static/img/icon-help.png"
+                alt="Help"
+              />
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <label for="let_pap_siz_tex">Paper Sizes</label>
+    <div class="row">
+      <div class="small-11 columns">
+        <input
+          id="let_pap_siz_tex"
+          name="let_pap_siz_tex"
+          type="text"
+          class="text"
+          value="all paper sizes"
+          onfocus="
+  javascript:textClear(this);"
+          onblur="
+  javascript:textFill(this);"
+        />
+      </div>
+      <div class="small-1 columns">
+        <span
+          data-tooltip=""
+          aria-haspopup="true"
+          class="has-tip tip-top"
+          data-selector="tooltip-lz9klwc518"
+          aria-describedby="tooltip-lz9klwc518"
+          title=""
+        >
+          <img
+            style="min-width: 25px; text-align: left"
+            class="help"
+            src="/static/img/icon-help.png"
+            alt="Help"
+          />
+        </span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="small-6 columns end">
+        <div class="row">
+          <div class="small-10 columns">
+            <input
+              type="checkbox"
+              id="let_pap_siz"
+              name="let_pap_siz"
+              value="true"
+              class="checkbox"
+            />
+
+            <label for="let_pap_siz">Only with paper sizes</label>
+          </div>
+          <div class="small-2 columns">
+            <span
+              data-tooltip=""
+              aria-haspopup="true"
+              class="has-tip tip-top"
+              data-selector="tooltip-lz9klwc519"
+              aria-describedby="tooltip-lz9klwc519"
+              title=""
+            >
+              <img
+                style="min-width: 25px; text-align: left"
+                class="help"
+                src="/static/img/icon-help.png"
+                alt="Help"
+              />
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="small-6 columns">
+        <label>Page count</label>
+        <div class="row">
+          <div class="small-10 columns">
+            <input
+              type="checkbox"
+              id="let_page"
+              name="let_page"
+              value="true"
+              class="checkbox"
+            />
+
+            <label for="let_page">Only with page count</label>
+          </div>
+          <div class="small-2 columns">
+            <span
+              data-tooltip=""
+              aria-haspopup="true"
+              class="has-tip tip-top"
+              data-selector="tooltip-lz9klwc51a"
+              aria-describedby="tooltip-lz9klwc51a"
+              title=""
+            >
+              <img
+                style="min-width: 25px; text-align: left"
+                class="help"
+                src="/static/img/icon-help.png"
+                alt="Help"
+              />
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="small-4 columns end">
+        <label for="let_page_min">Minimum number of pages</label>
+        <div class="row">
+          <div class="small-9 columns">
+            <select
+              id="let_page_min"
+              name="let_page_min"
+              title=""
+              class="numbers"
+            >
+              <option class="default" value="0" selected="selected">
+                any number
+              </option>
+
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option>
+              <option>6</option>
+              <option>7</option>
+              <option>8</option>
+              <option>9</option>
+              <option>10</option>
+              <option>20</option>
+              <option>30</option>
+              <option>40</option>
+              <option>50</option>
+              <option>100</option>
+            </select>
+          </div>
+          <div class="small-3 columns">
+            <span
+              data-tooltip=""
+              aria-haspopup="true"
+              class="has-tip tip-top"
+              data-selector="tooltip-lz9klwc51b"
+              aria-describedby="tooltip-lz9klwc51b"
+              title=""
+            >
+              <img
+                style="min-width: 25px; text-align: left"
+                class="help"
+                src="/static/img/icon-help.png"
+                alt="Help"
+              />
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+  <input
+    name="submit-advanced"
+    type="submit"
+    class="button submit search-related"
+    value="Search"
+  />
+</div>

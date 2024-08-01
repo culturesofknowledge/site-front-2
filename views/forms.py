@@ -31,6 +31,4 @@ def results():
     people = request.args.get('people')
     locations = request.args.get('locations')
 
-    print("Received query parameters: field1=")
-
     return render_template('/pages/forms/results.jinja2', title="Results" , people=people, locations=locations)

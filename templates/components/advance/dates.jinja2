@@ -1,0 +1,525 @@
+<div class="section clearfix" id="dates_section">
+  <hr class="yellow-divider" />
+  
+  <h3><img src="/static/img/icon-calendar.png" alt="Dates Icon" />Dates</h3>
+
+  <fieldset class="alignment">
+    <label>Single Date</label>
+    <div class="row">
+      <div class="columns small-12 large-3">
+        <select
+          id="dat_sin_year"
+          name="dat_sin_year"
+          title=""
+          class="select2-hidden-accessible"
+          tabindex="-1"
+          aria-hidden="true"
+        >
+          <option class="default" selected="selected">all years</option>
+          {% for year in range(1500, 1841) %}
+          <option value="{{ year }}">{{ year }}</option>
+          {% endfor %}
+        </select>
+
+        <span
+          class="select2 select2-container select2-container--default"
+          dir="ltr"
+          style="width: 138px"
+        >
+          <span class="selection">
+            <span
+              class="select2-selection select2-selection--single"
+              role="combobox"
+              aria-haspopup="true"
+              aria-expanded="false"
+              title=""
+              tabindex="0"
+              aria-labelledby="select2-dat_sin_year-container"
+              ><span
+                class="select2-selection__rendered"
+                id="select2-dat_sin_year-container"
+                title="all years"
+                >all years</span
+              ><span class="select2-selection__arrow" role="presentation"
+                ><b role="presentation"></b></span></span></span
+          ><span class="dropdown-wrapper" aria-hidden="true"></span
+        ></span>
+      </div>
+      <div class="columns small-12 large-4">
+        <select
+          id="dat_sin_month"
+          name="dat_sin_month"
+          title=""
+          class="select2-hidden-accessible"
+          tabindex="-1"
+          aria-hidden="true"
+        >
+          <option class="default" value="all months" selected="selected">
+            all months
+          </option>
+          <option value="1">January</option>
+          <option value="2">February</option>
+          <option value="3">March</option>
+          <option value="4">April</option>
+          <option value="5">May</option>
+          <option value="6">June</option>
+          <option value="7">July</option>
+          <option value="8">August</option>
+          <option value="9">September</option>
+          <option value="10">October</option>
+          <option value="11">November</option>
+          <option value="12">December</option></select
+        ><span
+          class="select2 select2-container select2-container--default"
+          dir="ltr"
+          style="width: 194px"
+          ><span class="selection"
+            ><span
+              class="select2-selection select2-selection--single"
+              role="combobox"
+              aria-haspopup="true"
+              aria-expanded="false"
+              title=""
+              tabindex="0"
+              aria-labelledby="select2-dat_sin_month-container"
+              ><span
+                class="select2-selection__rendered"
+                id="select2-dat_sin_month-container"
+                title="all months"
+                >all months</span
+              ><span class="select2-selection__arrow" role="presentation"
+                ><b role="presentation"></b></span></span></span
+          ><span class="dropdown-wrapper" aria-hidden="true"></span
+        ></span>
+      </div>
+      <div class="columns small-12 large-3">
+        <select
+          id="dat_sin_day"
+          name="dat_sin_day"
+          title=""
+          class="select2-hidden-accessible"
+          tabindex="-1"
+          aria-hidden="true"
+        >
+          <option class="default" selected="selected">all dates</option>
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+          <option>6</option>
+          <option>7</option>
+          <option>8</option>
+          <option>9</option>
+          <option>10</option>
+          <option>11</option>
+          <option>12</option>
+          <option>13</option>
+          <option>14</option>
+          <option>15</option>
+          <option>16</option>
+          <option>17</option>
+          <option>18</option>
+          <option>19</option>
+          <option>20</option>
+          <option>21</option>
+          <option>22</option>
+          <option>23</option>
+          <option>24</option>
+          <option>25</option>
+          <option>26</option>
+          <option>27</option>
+          <option>28</option>
+          <option>29</option>
+          <option>30</option>
+          <option>31</option></select
+        ><span
+          class="select2 select2-container select2-container--default"
+          dir="ltr"
+          style="width: 138px"
+          ><span class="selection"
+            ><span
+              class="select2-selection select2-selection--single"
+              role="combobox"
+              aria-haspopup="true"
+              aria-expanded="false"
+              title=""
+              tabindex="0"
+              aria-labelledby="select2-dat_sin_day-container"
+              ><span
+                class="select2-selection__rendered"
+                id="select2-dat_sin_day-container"
+                title="all dates"
+                >all dates</span
+              ><span class="select2-selection__arrow" role="presentation"
+                ><b role="presentation"></b></span></span></span
+          ><span class="dropdown-wrapper" aria-hidden="true"></span
+        ></span>
+      </div>
+      <div class="columns small-12 large-2">
+        <span
+          data-tooltip=""
+          aria-haspopup="true"
+          class="has-tip tip-top"
+          data-selector="tooltip-lz9klwc5i"
+          aria-describedby="tooltip-lz9klwc5i"
+          title=""
+        >
+          <img
+            style="min-width: 25px; text-align: left"
+            class="help"
+            src="/static/img/icon-help.png"
+            alt="Help"
+          />
+        </span>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Between</legend>
+
+    <label>From</label>
+    <div class="row">
+      <div class="columns small-12 large-3">
+        <select
+          id="dat_from_year"
+          name="dat_from_year"
+          title=""
+          class="select2-hidden-accessible"
+          tabindex="-1"
+          aria-hidden="true"
+        >
+          <option class="default" selected="selected">all years</option>
+          {% for year in range(1500, 1841) %}
+          <option value="{{ year }}">{{ year }}</option>
+          {% endfor %}</select
+        ><span
+          class="select2 select2-container select2-container--default"
+          dir="ltr"
+          style="width: 137px"
+          ><span class="selection"
+            ><span
+              class="select2-selection select2-selection--single"
+              role="combobox"
+              aria-haspopup="true"
+              aria-expanded="false"
+              title=""
+              tabindex="0"
+              aria-labelledby="select2-dat_from_year-container"
+              ><span
+                class="select2-selection__rendered"
+                id="select2-dat_from_year-container"
+                title="all years"
+                >all years</span
+              ><span class="select2-selection__arrow" role="presentation"
+                ><b role="presentation"></b></span></span></span
+          ><span class="dropdown-wrapper" aria-hidden="true"></span
+        ></span>
+      </div>
+      <div class="columns small-12 large-4">
+        <select
+          id="dat_from_month"
+          name="dat_from_month"
+          title=""
+          class="select2-hidden-accessible"
+          tabindex="-1"
+          aria-hidden="true"
+        >
+          <option class="default" value="all months" selected="selected">
+            all months
+          </option>
+          <option value="1">January</option>
+          <option value="2">February</option>
+          <option value="3">March</option>
+          <option value="4">April</option>
+          <option value="5">May</option>
+          <option value="6">June</option>
+          <option value="7">July</option>
+          <option value="8">August</option>
+          <option value="9">September</option>
+          <option value="10">October</option>
+          <option value="11">November</option>
+          <option value="12">December</option></select
+        ><span
+          class="select2 select2-container select2-container--default"
+          dir="ltr"
+          style="width: 193px"
+          ><span class="selection"
+            ><span
+              class="select2-selection select2-selection--single"
+              role="combobox"
+              aria-haspopup="true"
+              aria-expanded="false"
+              title=""
+              tabindex="0"
+              aria-labelledby="select2-dat_from_month-container"
+              ><span
+                class="select2-selection__rendered"
+                id="select2-dat_from_month-container"
+                title="all months"
+                >all months</span
+              ><span class="select2-selection__arrow" role="presentation"
+                ><b role="presentation"></b></span></span></span
+          ><span class="dropdown-wrapper" aria-hidden="true"></span
+        ></span>
+      </div>
+      <div class="columns small-12 large-3">
+        <select
+          id="dat_from_day"
+          name="dat_from_day"
+          title=""
+          class="select2-hidden-accessible"
+          tabindex="-1"
+          aria-hidden="true"
+        >
+          <option class="default" selected="selected">all dates</option>
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+          <option>6</option>
+          <option>7</option>
+          <option>8</option>
+          <option>9</option>
+          <option>10</option>
+          <option>11</option>
+          <option>12</option>
+          <option>13</option>
+          <option>14</option>
+          <option>15</option>
+          <option>16</option>
+          <option>17</option>
+          <option>18</option>
+          <option>19</option>
+          <option>20</option>
+          <option>21</option>
+          <option>22</option>
+          <option>23</option>
+          <option>24</option>
+          <option>25</option>
+          <option>26</option>
+          <option>27</option>
+          <option>28</option>
+          <option>29</option>
+          <option>30</option>
+          <option>31</option></select
+        ><span
+          class="select2 select2-container select2-container--default"
+          dir="ltr"
+          style="width: 137px"
+          ><span class="selection"
+            ><span
+              class="select2-selection select2-selection--single"
+              role="combobox"
+              aria-haspopup="true"
+              aria-expanded="false"
+              title=""
+              tabindex="0"
+              aria-labelledby="select2-dat_from_day-container"
+              ><span
+                class="select2-selection__rendered"
+                id="select2-dat_from_day-container"
+                title="all dates"
+                >all dates</span
+              ><span class="select2-selection__arrow" role="presentation"
+                ><b role="presentation"></b></span></span></span
+          ><span class="dropdown-wrapper" aria-hidden="true"></span
+        ></span>
+      </div>
+      <div class="columns small-12 large-2">
+        <span
+          data-tooltip=""
+          aria-haspopup="true"
+          class="has-tip tip-top"
+          data-selector="tooltip-lz9klwc5j"
+          aria-describedby="tooltip-lz9klwc5j"
+          title=""
+        >
+          <img
+            style="min-width: 25px; text-align: left"
+            class="help"
+            src="/static/img/icon-help.png"
+            alt="Help"
+          />
+        </span>
+      </div>
+    </div>
+
+    <label>To</label>
+    <div class="row">
+      <div class="columns small-12 large-3">
+        <select
+          id="dat_to_year"
+          name="dat_to_year"
+          title=""
+          class="select2-hidden-accessible"
+          tabindex="-1"
+          aria-hidden="true"
+        >
+          <option class="default" selected="selected">all years</option>
+          {% for year in range(1500, 1841) %}
+          <option value="{{ year }}">{{ year }}</option>
+          {% endfor %}</select
+        ><span
+          class="select2 select2-container select2-container--default"
+          dir="ltr"
+          style="width: 137px"
+          ><span class="selection"
+            ><span
+              class="select2-selection select2-selection--single"
+              role="combobox"
+              aria-haspopup="true"
+              aria-expanded="false"
+              title=""
+              tabindex="0"
+              aria-labelledby="select2-dat_to_year-container"
+              ><span
+                class="select2-selection__rendered"
+                id="select2-dat_to_year-container"
+                title="all years"
+                >all years</span
+              ><span class="select2-selection__arrow" role="presentation"
+                ><b role="presentation"></b></span></span></span
+          ><span class="dropdown-wrapper" aria-hidden="true"></span
+        ></span>
+      </div>
+      <div class="columns small-12 large-4">
+        <select
+          id="dat_to_month"
+          name="dat_to_month"
+          title=""
+          class="select2-hidden-accessible"
+          tabindex="-1"
+          aria-hidden="true"
+        >
+          <option class="default" value="all months" selected="selected">
+            all months
+          </option>
+          <option value="1">January</option>
+          <option value="2">February</option>
+          <option value="3">March</option>
+          <option value="4">April</option>
+          <option value="5">May</option>
+          <option value="6">June</option>
+          <option value="7">July</option>
+          <option value="8">August</option>
+          <option value="9">September</option>
+          <option value="10">October</option>
+          <option value="11">November</option>
+          <option value="12">December</option></select
+        ><span
+          class="select2 select2-container select2-container--default"
+          dir="ltr"
+          style="width: 193px"
+          ><span class="selection"
+            ><span
+              class="select2-selection select2-selection--single"
+              role="combobox"
+              aria-haspopup="true"
+              aria-expanded="false"
+              title=""
+              tabindex="0"
+              aria-labelledby="select2-dat_to_month-container"
+              ><span
+                class="select2-selection__rendered"
+                id="select2-dat_to_month-container"
+                title="all months"
+                >all months</span
+              ><span class="select2-selection__arrow" role="presentation"
+                ><b role="presentation"></b></span></span></span
+          ><span class="dropdown-wrapper" aria-hidden="true"></span
+        ></span>
+      </div>
+      <div class="columns small-12 large-3">
+        <select
+          id="dat_to_day"
+          name="dat_to_day"
+          title=""
+          class="select2-hidden-accessible"
+          tabindex="-1"
+          aria-hidden="true"
+        >
+          <option class="default" selected="selected">all dates</option>
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+          <option>6</option>
+          <option>7</option>
+          <option>8</option>
+          <option>9</option>
+          <option>10</option>
+          <option>11</option>
+          <option>12</option>
+          <option>13</option>
+          <option>14</option>
+          <option>15</option>
+          <option>16</option>
+          <option>17</option>
+          <option>18</option>
+          <option>19</option>
+          <option>20</option>
+          <option>21</option>
+          <option>22</option>
+          <option>23</option>
+          <option>24</option>
+          <option>25</option>
+          <option>26</option>
+          <option>27</option>
+          <option>28</option>
+          <option>29</option>
+          <option>30</option>
+          <option>31</option></select
+        ><span
+          class="select2 select2-container select2-container--default"
+          dir="ltr"
+          style="width: 137px"
+          ><span class="selection"
+            ><span
+              class="select2-selection select2-selection--single"
+              role="combobox"
+              aria-haspopup="true"
+              aria-expanded="false"
+              title=""
+              tabindex="0"
+              aria-labelledby="select2-dat_to_day-container"
+              ><span
+                class="select2-selection__rendered"
+                id="select2-dat_to_day-container"
+                title="all dates"
+                >all dates</span
+              ><span class="select2-selection__arrow" role="presentation"
+                ><b role="presentation"></b></span></span></span
+          ><span class="dropdown-wrapper" aria-hidden="true"></span
+        ></span>
+      </div>
+      <div class="columns small-12 large-2">
+        <span
+          data-tooltip=""
+          aria-haspopup="true"
+          class="has-tip tip-top"
+          data-selector="tooltip-lz9klwc5k"
+          aria-describedby="tooltip-lz9klwc5k"
+          title=""
+        >
+          <img
+            style="min-width: 25px; text-align: left"
+            class="help"
+            src="/static/img/icon-help.png"
+            alt="Help"
+          />
+        </span>
+      </div>
+    </div>
+  </fieldset>
+
+  <input
+    name="submit-advanced"
+    type="submit"
+    class="button submit search-related"
+    value="Search"
+  />
+</div>

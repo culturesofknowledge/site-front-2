@@ -1,64 +1,45 @@
-// const emloEdges = {
-//   active: {},
-//   selector: "",
-//   solrURL: ,
-//   collection: "",
-//   template: null,
-//   components: [],
+const emlo = {
+  active: {},
+  selector: "",
+  solrURL: "http://localhost:7812",
+  collection: "",
+  template: null,
+  components: [],
 
-//   init: function () {
-//     if (!this.selector || !this.solrURL || !this.collection) {
-//       throw new Error("Selector, Solr URL, and collection must be provided.");
-//     }
+  init: function () {
+    if (!this.selector) {
+      throw new Error("Selector must be provided.");
+    }
 
-//     if (!this.template) {
-//       this.template = new edges.templates.bs3.Facetview();
-//     }
+    if (!this.collection) {
+      throw new Error("Collection must be provided.");
+    }
 
-//     console.log("Initializing...");
-//     this.active[this.selector] = new edges.Edge({
-//       selector: `#${this.selector}`,
-//       searchUrl: `${this.solrURL}${this.collection}`,
-//       template: this.template,
-//       queryAdapter: new edges.es.SolrQueryAdapter(),
-//       components: this.components,
-//     });
-//   },
-// };
+    if (!this.solrURL) {
+      throw new Error("Solr URL must be provided.");
+    }
 
-// export default emloEdges;
+    if (!this.template) {
+      console.warn(
+        "Template is missing we are using the default template for edges"
+      );
+      this.template = new edges.templates.bs3.Facetview();
+    }
 
-let emlo = {};
-emlo.active = {};
-emlo.solrURL = "http://localhost:7812";
-emlo.init = function (params) {
-  let template = null;
+    if (this.components.length <= 0) {
+      console.warn(
+        `No components entry found for the selector: ${params.selector}`
+      );
+    }
 
-  if (!params.selector) {
-    throw new Error("Selector must be provided.");
-  }
-
-  if (!params.collection) {
-    throw new Error("Collection must be provided.");
-  }
-
-  if (!params.template) {
-    template = new edges.templates.bs3.Facetview();
-  }
-
-  if (params.components.length <= 0) {
-    console.warn(
-      `No components entry found for the selector: ${params.selector}`
-    );
-  }
-
-  emlo.active[params.selector] = new edges.Edge({
-    selector: `#${params.selector}`,
-    searchUrl: `${emlo.solrURL}${params.collection}`,
-    template: template,
-    queryAdapter: new edges.es.SolrQueryAdapter(),
-    components: params.components,
-  });
+    this.active[this.selector] = new edges.Edge({
+      selector: `#${this.selector}`,
+      searchUrl: `${this.solrURL}${this.collection}`,
+      template: this.template,
+      queryAdapter: new edges.es.SolrQueryAdapter(),
+      components: this.components,
+    });
+  },
 };
 
 emlo.ResultTable = class extends edges.Component {

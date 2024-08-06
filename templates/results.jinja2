@@ -11,9 +11,11 @@
                 <br/>
                 <h2 class="main">Search+</h2>
             </div>
-
-             <div id="people" class="large-10 columns" style="padding-left:25px">
-                {% include '/components/advance/people.jinja2' %}
+            
+            <div id="below">HEllo</div>
+             <div id="" class="large-10 columns" style="padding-left:25px">
+                Inside main div
+                <div id="result-edges"></div>
             </div>
        </div>
     </div>
@@ -39,4 +41,7 @@ function hello() {
     }
 }
 </script>
+
+    {% include "_edges_common_js.jinja2" %}
+    <script type="module" src="../static/js/result.edges.js"></script>
 {% endblock extra_js_bottom %} 

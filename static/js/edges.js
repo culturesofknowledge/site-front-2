@@ -35,6 +35,9 @@ const emlo = {
     this.active[this.selector] = new edges.Edge({
       selector: `#${this.selector}`,
       searchUrl: `${this.solrURL}${this.collection}`,
+      openingQuery: {
+        size: 24,
+      },
       template: this.template,
       queryAdapter: new edges.es.SolrQueryAdapter(),
       components: this.components,
@@ -186,10 +189,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
   constructor(params) {
     super(params);
 
-    //////////////////////////////////////////////
     // parameters that can be passed in
-
-    // what to display when there are no results
     this.noResultsText = edges.util.getParam(
       params,
       "noResultsText",
@@ -199,8 +199,10 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
     // ordered list of fields with headers, pre and post wrappers, and a value function
     this.tableDisplay = edges.util.getParam(params, "tableDisplay", []);
 
-    // if a multi-value field is found that needs to be displayed, which character
-    // to use to join
+    // flag to control whether the index column is displayed
+    this.showIndex = edges.util.getParam(params, "showIndex", true);
+    this.serialHeader = edges.util.getParam(params, "serialHeader", "#");
+    // if a multi-value field is found that needs to be displayed, which character to use to join
     this.arrayValueJoin = edges.util.getParam(params, "arrayValueJoin", ", ");
 
     // if a field does not have a value, don't display anything from its part of the render
@@ -210,13 +212,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       true
     );
 
-    //////////////////////////////////////////////
     // variables for internal state
-
-    this.renderFields = [];
-
-    this.displayMap = {};
-
     this.namespace = "edges-bs3-results-fields-by-table";
   }
 
@@ -228,7 +224,6 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
 
     const results = this.component.results;
     if (results && results.length > 0) {
-      // list the css classes we'll require
       const recordClasses = edges.util.styleClasses(
         this.namespace,
         "record",
@@ -239,12 +234,17 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       const headers = this.tableDisplay
         .map((field) => `<th>${edges.util.escapeHtml(field.header)}</th>`)
         .join("");
-      let rows = results.map((result) => this._renderResult(result)).join("");
+      const headerRow = this.showIndex
+        ? `<tr><th>${this.serialHeader}</th>${headers}</tr>`
+        : `<tr>${headers}</tr>`;
+      let rows = results
+        .map((result, index) => this._renderResult(result, index))
+        .join("");
 
       frag = `
             <table class="table table-bordered">
                 <thead>
-                    <tr>${headers}</tr>
+                    ${headerRow}
                 </thead>
                 <tbody>
                     ${rows}
@@ -253,7 +253,6 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
         `;
     }
 
-    // finally stick it all together into the container
     const containerClasses = edges.util.styleClasses(
       this.namespace,
       "container",
@@ -263,8 +262,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
     this.component.context.html(container);
   }
 
-  _renderResult(res) {
-    // get a list of the fields on the object to display
+  _renderResult(res, index) {
     const rowClasses = edges.util.styleClasses(
       this.namespace,
       "row",
@@ -290,7 +288,9 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       })
       .join("");
 
-    return `<tr class="${rowClasses}">${row}</tr>`;
+    return this.showIndex
+      ? `<tr class="${rowClasses}"><td>${index + 1}</td>${row}</tr>`
+      : `<tr class="${rowClasses}">${row}</tr>`;
   }
 
   _getValue(path, rec, def) {

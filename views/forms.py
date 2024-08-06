@@ -31,4 +31,4 @@ def results():
     people = request.args.get('people')
     locations = request.args.get('locations')
 
-    return render_template('/pages/forms/results.jinja2', title="Results" , people=people, locations=locations)
+    return render_template('results.jinja2', title="Results" , people=people, locations=locations)

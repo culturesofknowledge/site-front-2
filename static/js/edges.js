@@ -4,6 +4,7 @@ const emlo = {
   solrURL: "http://localhost:7812",
   collection: "",
   template: null,
+  openingQuery: null,
   components: [],
 
   init: function () {
@@ -32,16 +33,24 @@ const emlo = {
       );
     }
 
-    this.active[this.selector] = new edges.Edge({
-      selector: `#${this.selector}`,
-      searchUrl: `${this.solrURL}${this.collection}`,
-      openingQuery: {
-        size: 24,
-      },
-      template: this.template,
-      queryAdapter: new edges.es.SolrQueryAdapter(),
-      components: this.components,
-    });
+    if (this.openingQuery) {
+      this.active[this.selector] = new edges.Edge({
+        selector: `#${this.selector}`,
+        searchUrl: `${this.solrURL}${this.collection}`,
+        openingQuery: new es.Query(this.openingQuery),
+        template: this.template,
+        queryAdapter: new edges.es.SolrQueryAdapter(),
+        components: this.components,
+      });
+    } else {
+      this.active[this.selector] = new edges.Edge({
+        selector: `#${this.selector}`,
+        searchUrl: `${this.solrURL}${this.collection}`,
+        template: this.template,
+        queryAdapter: new edges.es.SolrQueryAdapter(),
+        components: this.components,
+      });
+    }
   },
 };
 

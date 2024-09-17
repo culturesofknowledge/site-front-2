@@ -32,3 +32,6 @@ data/**/*.csv.bak
 
 # docker
 docker/emfr/data-solr
+
+# ENV folder
+site-front-2

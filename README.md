@@ -4,27 +4,32 @@
 
 1. **Clone the repository:**
 
-2. **Create and Activate virtual env:**
+2. **Checkout to edges-integration**
+   ```sh
+   git checkout edges-integration
+   ```
+
+3. **Create and Activate virtual env:**
 
    ```sh
    python3 -m venv site-front-env
    source site-front-env/bin/activate
    ```
 
-3. **Install the dependencies:**
+4. **Install the dependencies:**
 
    ```sh
    pip install -r requirements.txt
    ```
 
-4. **Set up the environment variables:**
+5. **Set up the environment variables:**
    Create a `.env` file in the root directory and add the following:
 
    ```env
    PORT=5000 [you can choose some other port number too]
    ```
 
-5. **Run the application:**
+6. **Run the application:**
    ```sh
    python run.py
    ```
@@ -33,6 +38,15 @@
 
 - The application will be accessible at `http://localhost:5000`.
 - Solr will be accessible at `http://localhost:8983`.
+
+### How to run this project - [Temp arrangement]
+This project is missing it's own solr ingration hence we will he using the older project which can be accessible [here](). 
+You need to follow the following steps 
+1. Run the site-front project, this will allow us to access solr data from the current EMLO front. 
+2. Run Proxy server, use this project this will allow you to access the EMLO front solr without any CORS issues. 
+3. Run the current project. 
+
+NOTE: The proxy server runs on port 7812, In case you are changing this port you need to make changes in this project too. 
 
 ## File Structure
 

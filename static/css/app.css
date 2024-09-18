@@ -10114,6 +10114,20 @@ ul.pagination li {
   flex-direction: column;
 }
 
+.side-nav {
+  top: 263px;
+  border-top: 1px solid #efc319;
+  border-bottom: 1px solid #efc319;
+  padding-top: 15px;
+  max-width: 222px;
+  position: absolute;
+  left: 400px;
+  font-size: 1rem;
+  line-height: 2.6;
+  display: flex;
+  flex-direction: column;
+}
+
 .yellow-divider {
   border-top: 1px solid #efc319;
 }

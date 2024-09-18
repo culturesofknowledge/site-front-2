@@ -3,16 +3,41 @@
 {% block title %}Results{% endblock %}
 
 {% block content %}
+    <div class="side-nav">
+        <h2 class="main">Search</h2>
+
+        <div id="current_search">
+            <h3 class="main">Your current search</h3>
+        </div>
+        
+        <div id="refine_search">
+            <h3 class="main">Refine your results</h3>
+            <div id="emlo-refine-search"></div>
+        </div>
+    </div>
     <div class="row">
        <div class="large-2 columns"><!-- dummy column -->&nbsp;</div>
 
        <div class="large-10 columns" style="padding-left:25px">
             <div id="about">
                 <br/>
-                <h2 class="main">Results</h2>
+                <h2 class="main">
+                    <span class="font-18">
+                        1690 results (50 results per page)
+                    </span>
+
+                    <br><br>
+                    
+                    <div data-alert="" class="alert-box secondary radius">
+                        EMLO is an active, collaborative project in continual development, and as such may contain errors/duplicates. 
+                        We rely on feedback from the scholarly community: if you spot an error, please 
+                        <a href="/about#contact">get in touch</a>.
+                    </div>
+
+                </h2>
             </div>
-        
-             <div id="" class="large-10 columns" style="padding-left:25px">
+   
+             <div id="" class="large-10 columns" style="margin-left:25px">
                 <div id="emlo-results"></div>
             </div>
        </div>
@@ -42,4 +67,5 @@ function hello() {
 
     {% include "_edges_common_js.jinja2" %}
     <script type="module" src="../static/js/result.edges.js"></script>
+    <script type="module" src="../static/js/result_refine.edges.js"></script>
 {% endblock extra_js_bottom %} 

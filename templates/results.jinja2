@@ -5,6 +5,10 @@
 {% block content %}
     <div class="side-nav">
         <h2 class="main">Search</h2>
+        
+        <div id="modify_search">
+            <button onclick="modifyCurrentSearch()"> Modify search </button>
+        </div>
 
         <div id="current_search">
             <h3 class="main">Your current search</h3>
@@ -47,7 +51,7 @@
 
 {% block extra_js_bottom %}
 <script>
-function hello() {
+function modifyCurrentSearch() {
     try {
         const currentParams = new URLSearchParams(window.location.search);
             

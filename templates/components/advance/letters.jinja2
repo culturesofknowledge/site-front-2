@@ -14,7 +14,7 @@
           name="let_con"
           type="text"
           class="text"
-          value="all content"
+          value="{{ let_con if let_con else 'all content' }}" 
           onfocus="
   javascript:textClear(this);"
           onblur="

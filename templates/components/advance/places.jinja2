@@ -14,7 +14,7 @@
           name="locations"
           type="text"
           class="text"
-          value="all places"
+          value="{{ locations if locations else 'all places' }}" 
           onfocus="
   javascript:textClear(this);"
           onblur="

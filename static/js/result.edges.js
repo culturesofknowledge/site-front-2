@@ -3,9 +3,23 @@ import emlo from "./edges.js";
 try {
 
   // Fetching URL params
-  const params = window.location.params
+  const queryString = window.location.search
 
-  console.log("params" , params)
+  if(queryString) {
+    const params = new URLSearchParams(queryString)
+    console.log("params" , typeof params)
+    emlo.openingQuery = {
+      must: [],
+    }
+    const people = params.get("people")
+    
+    if(people) {
+      emlo.openingQuery.must.push({
+        term : { "author_sort" : people }
+      })
+    }
+    
+  }
 
   emlo.selector = "emlo-results";
   emlo.collection = "/solr/works/select";
@@ -96,7 +110,7 @@ try {
       }),
     }),
   ];
-
+  console.log("emlo" , emlo)
   emlo.init();
 } catch (error) {
   console.error(error.message);

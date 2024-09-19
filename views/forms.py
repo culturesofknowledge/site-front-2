@@ -21,14 +21,11 @@ def forms():
     if locations and locations != "all places":
         query_params['locations'] = locations
     if let_con and let_con != "all content":
-        query_params['let_con'] = dat_from_year
+        query_params['let_con'] = let_con
 
     # Redirect to the new URL with query parameters
     return redirect(url_for('forms.results', **query_params))
 
 @forms_bp.route('/advance')
 def results():
-    people = request.args.get('people')
-    locations = request.args.get('locations')
-
-    return render_template('results.jinja2', title="Results" , people=people, locations=locations)
+    return render_template('results.jinja2', title="Results")

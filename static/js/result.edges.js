@@ -13,34 +13,34 @@ try {
     }
 
     const people = params.get("people")
-    const fromDate = params.get("dat_from_year")
-    const toDate = params.get("dat_to_year")
-    const locations = params.get("locations")
-    const content = params.get("let_con")
+    // const fromDate = params.get("dat_from_year")
+    // const toDate = params.get("dat_to_year")
+    // const locations = params.get("locations")
+    // const content = params.get("let_con")
 
     if(people) {
-      emlo.openingQuery.must.push({
-        term : { "author_sort" : people }
-      })
+        emlo.openingQuery.must.push({
+          term : { "person-author" : people }
+        })
     }
 
-    if(fromDate && toDate) {
-      emlo.openingQuery.must.push({
-        term : { "author_sort" : people }
-      })
-    }
+    // if(fromDate && toDate) {
+    //   emlo.openingQuery.must.push({
+    //     term : { "author_sort" : people }
+    //   })
+    // }
 
-    if(locations) {
-      emlo.openingQuery.must.push({
-        term : { "author_sort" : people }
-      })
-    }
+    // if(locations) {
+    //   emlo.openingQuery.must.push({
+    //     term : { "author_sort" : people }
+    //   })
+    // }
 
-    if(content) {
-      emlo.openingQuery.must.push({
-        term : { "author_sort" : people }
-      })
-    }
+    // if(content) {
+    //   emlo.openingQuery.must.push({
+    //     term : { "author_sort" : people }
+    //   })
+    // }
     
   }
 
@@ -81,10 +81,20 @@ try {
         serialHeader: "",
         tableDisplay: [
           {
+            header: "",
+            field: "resources",
+            pre: '',
+            post: '',
+            type: 'link',
+            linkText : 'Letter',
+            valueFunction: null,
+          },
+          {
             header: "Date",
-            field: "cito_Catalog",
-            pre: '<a href="mailto:',
-            post: '">',
+            field: "started_date_sort",
+            pre: '',
+            post: '',
+            type : 'date',
             valueFunction: null,
           },
           {
@@ -96,28 +106,28 @@ try {
           },
           {
             header: "Origin",
-            field: "author_sort",
+            field: "origin_sort",
             pre: "",
             post: "",
             valueFunction: null,
           },
           {
             header: "Addressee",
-            field: "author_sort",
+            field: "recipient_sort",
             pre: "",
             post: "",
             valueFunction: null,
           },
           {
             header: "Destination",
-            field: "author_sort",
+            field: "pla_des_name",
             pre: "",
             post: "",
             valueFunction: null,
           },
           {
             header: "Repositories & Versions",
-            field: "author_sort",
+            field: "",
             pre: "",
             post: "",
             valueFunction: null,
@@ -128,7 +138,7 @@ try {
       }),
     }),
   ];
-  console.log("emlo" , emlo)
+
   emlo.init();
 } catch (error) {
   console.error(error.message);

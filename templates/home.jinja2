@@ -44,4 +44,25 @@
 
 
 {% block extra_js_bottom %}
+<script>
+function changeEventOnFrom(val){
+    dat_to_year = document.getElementById("dat_to_year")
+    
+    if(val == "all years") {
+        dat_to_year.value = "all years"
+    } else if(val > dat_to_year.value) {
+        dat_to_year.value = val
+    }
+}
+
+function changeEventOnTo(val){
+    dat_from_year = document.getElementById("dat_from_year")
+    
+    if(val == "all years") {
+        dat_from_year.value = "all years"
+    } else if(val < dat_from_year.value) {
+        dat_from_year.value = val
+    } 
+}
+</script>
 {% endblock extra_js_bottom %}

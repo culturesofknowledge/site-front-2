@@ -6,9 +6,11 @@
     <div class="side-nav">
         <h2 class="main">Search</h2>
         
-        <div id="modify_search">
-            <button onclick="modifyCurrentSearch()"> Modify search </button>
-        </div>
+        {% if request.args %}
+            <div id="modify_search">
+                <button onclick="modifyCurrentSearch()">Modify search</button>
+            </div>
+        {% endif %}
 
         <div id="current_search">
             <h3 class="main">Your current search</h3>

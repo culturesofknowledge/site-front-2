@@ -20,30 +20,6 @@
           <option value="{{ year }}">{{ year }}</option>
           {% endfor %}
         </select>
-
-        <span
-          class="select2 select2-container select2-container--default"
-          dir="ltr"
-          style="width: 138px"
-        >
-          <span class="selection">
-            <span
-              class="select2-selection select2-selection--single"
-              role="combobox"
-              aria-haspopup="true"
-              aria-expanded="false"
-              title=""
-              tabindex="0"
-              aria-labelledby="select2-dat_sin_year-container"
-              ><span
-                class="select2-selection__rendered"
-                id="select2-dat_sin_year-container"
-                title="all years"
-                >all years</span
-              ><span class="select2-selection__arrow" role="presentation"
-                ><b role="presentation"></b></span></span></span
-          ><span class="dropdown-wrapper" aria-hidden="true"></span
-        ></span>
       </div>
       <div class="columns small-12 large-4">
         <select
@@ -69,28 +45,7 @@
           <option value="10">October</option>
           <option value="11">November</option>
           <option value="12">December</option></select
-        ><span
-          class="select2 select2-container select2-container--default"
-          dir="ltr"
-          style="width: 194px"
-          ><span class="selection"
-            ><span
-              class="select2-selection select2-selection--single"
-              role="combobox"
-              aria-haspopup="true"
-              aria-expanded="false"
-              title=""
-              tabindex="0"
-              aria-labelledby="select2-dat_sin_month-container"
-              ><span
-                class="select2-selection__rendered"
-                id="select2-dat_sin_month-container"
-                title="all months"
-                >all months</span
-              ><span class="select2-selection__arrow" role="presentation"
-                ><b role="presentation"></b></span></span></span
-          ><span class="dropdown-wrapper" aria-hidden="true"></span
-        ></span>
+        >
       </div>
       <div class="columns small-12 large-3">
         <select
@@ -102,59 +57,10 @@
           aria-hidden="true"
         >
           <option class="default" selected="selected">all dates</option>
-          <option>1</option>
-          <option>2</option>
-          <option>3</option>
-          <option>4</option>
-          <option>5</option>
-          <option>6</option>
-          <option>7</option>
-          <option>8</option>
-          <option>9</option>
-          <option>10</option>
-          <option>11</option>
-          <option>12</option>
-          <option>13</option>
-          <option>14</option>
-          <option>15</option>
-          <option>16</option>
-          <option>17</option>
-          <option>18</option>
-          <option>19</option>
-          <option>20</option>
-          <option>21</option>
-          <option>22</option>
-          <option>23</option>
-          <option>24</option>
-          <option>25</option>
-          <option>26</option>
-          <option>27</option>
-          <option>28</option>
-          <option>29</option>
-          <option>30</option>
-          <option>31</option></select
-        ><span
-          class="select2 select2-container select2-container--default"
-          dir="ltr"
-          style="width: 138px"
-          ><span class="selection"
-            ><span
-              class="select2-selection select2-selection--single"
-              role="combobox"
-              aria-haspopup="true"
-              aria-expanded="false"
-              title=""
-              tabindex="0"
-              aria-labelledby="select2-dat_sin_day-container"
-              ><span
-                class="select2-selection__rendered"
-                id="select2-dat_sin_day-container"
-                title="all dates"
-                >all dates</span
-              ><span class="select2-selection__arrow" role="presentation"
-                ><b role="presentation"></b></span></span></span
-          ><span class="dropdown-wrapper" aria-hidden="true"></span
-        ></span>
+          {% for date in range(1, 32) %}
+            <option value="{{ date }}">{{ date }}</option>
+          {% endfor %}
+        </select>
       </div>
       <div class="columns small-12 large-2">
         <span
@@ -190,32 +96,13 @@
           tabindex="-1"
           aria-hidden="true"
         >
-          <option class="default" selected="selected">all years</option>
+          <option class="default">
+            {{dat_from_year}}
+          </option>
           {% for year in range(1500, 1841) %}
-          <option value="{{ year }}">{{ year }}</option>
+            <option value="{{ year }}">{{ year }}</option>
           {% endfor %}</select
-        ><span
-          class="select2 select2-container select2-container--default"
-          dir="ltr"
-          style="width: 137px"
-          ><span class="selection"
-            ><span
-              class="select2-selection select2-selection--single"
-              role="combobox"
-              aria-haspopup="true"
-              aria-expanded="false"
-              title=""
-              tabindex="0"
-              aria-labelledby="select2-dat_from_year-container"
-              ><span
-                class="select2-selection__rendered"
-                id="select2-dat_from_year-container"
-                title="all years"
-                >all years</span
-              ><span class="select2-selection__arrow" role="presentation"
-                ><b role="presentation"></b></span></span></span
-          ><span class="dropdown-wrapper" aria-hidden="true"></span
-        ></span>
+        >
       </div>
       <div class="columns small-12 large-4">
         <select
@@ -224,8 +111,7 @@
           title=""
           class="select2-hidden-accessible"
           tabindex="-1"
-          aria-hidden="true"
-        >
+          aria-hidden="true">
           <option class="default" value="all months" selected="selected">
             all months
           </option>
@@ -240,29 +126,8 @@
           <option value="9">September</option>
           <option value="10">October</option>
           <option value="11">November</option>
-          <option value="12">December</option></select
-        ><span
-          class="select2 select2-container select2-container--default"
-          dir="ltr"
-          style="width: 193px"
-          ><span class="selection"
-            ><span
-              class="select2-selection select2-selection--single"
-              role="combobox"
-              aria-haspopup="true"
-              aria-expanded="false"
-              title=""
-              tabindex="0"
-              aria-labelledby="select2-dat_from_month-container"
-              ><span
-                class="select2-selection__rendered"
-                id="select2-dat_from_month-container"
-                title="all months"
-                >all months</span
-              ><span class="select2-selection__arrow" role="presentation"
-                ><b role="presentation"></b></span></span></span
-          ><span class="dropdown-wrapper" aria-hidden="true"></span
-        ></span>
+          <option value="12">December</option>
+        </select>
       </div>
       <div class="columns small-12 large-3">
         <select
@@ -274,59 +139,10 @@
           aria-hidden="true"
         >
           <option class="default" selected="selected">all dates</option>
-          <option>1</option>
-          <option>2</option>
-          <option>3</option>
-          <option>4</option>
-          <option>5</option>
-          <option>6</option>
-          <option>7</option>
-          <option>8</option>
-          <option>9</option>
-          <option>10</option>
-          <option>11</option>
-          <option>12</option>
-          <option>13</option>
-          <option>14</option>
-          <option>15</option>
-          <option>16</option>
-          <option>17</option>
-          <option>18</option>
-          <option>19</option>
-          <option>20</option>
-          <option>21</option>
-          <option>22</option>
-          <option>23</option>
-          <option>24</option>
-          <option>25</option>
-          <option>26</option>
-          <option>27</option>
-          <option>28</option>
-          <option>29</option>
-          <option>30</option>
-          <option>31</option></select
-        ><span
-          class="select2 select2-container select2-container--default"
-          dir="ltr"
-          style="width: 137px"
-          ><span class="selection"
-            ><span
-              class="select2-selection select2-selection--single"
-              role="combobox"
-              aria-haspopup="true"
-              aria-expanded="false"
-              title=""
-              tabindex="0"
-              aria-labelledby="select2-dat_from_day-container"
-              ><span
-                class="select2-selection__rendered"
-                id="select2-dat_from_day-container"
-                title="all dates"
-                >all dates</span
-              ><span class="select2-selection__arrow" role="presentation"
-                ><b role="presentation"></b></span></span></span
-          ><span class="dropdown-wrapper" aria-hidden="true"></span
-        ></span>
+          {% for date in range(1, 32) %}
+            <option value="{{ date }}">{{ date }}</option>
+          {% endfor %}
+        </select>
       </div>
       <div class="columns small-12 large-2">
         <span
@@ -358,32 +174,13 @@
           tabindex="-1"
           aria-hidden="true"
         >
-          <option class="default" selected="selected">all years</option>
+          <option class="default">
+            {{dat_to_year}}
+          </option>
           {% for year in range(1500, 1841) %}
           <option value="{{ year }}">{{ year }}</option>
           {% endfor %}</select
-        ><span
-          class="select2 select2-container select2-container--default"
-          dir="ltr"
-          style="width: 137px"
-          ><span class="selection"
-            ><span
-              class="select2-selection select2-selection--single"
-              role="combobox"
-              aria-haspopup="true"
-              aria-expanded="false"
-              title=""
-              tabindex="0"
-              aria-labelledby="select2-dat_to_year-container"
-              ><span
-                class="select2-selection__rendered"
-                id="select2-dat_to_year-container"
-                title="all years"
-                >all years</span
-              ><span class="select2-selection__arrow" role="presentation"
-                ><b role="presentation"></b></span></span></span
-          ><span class="dropdown-wrapper" aria-hidden="true"></span
-        ></span>
+        >
       </div>
       <div class="columns small-12 large-4">
         <select
@@ -409,28 +206,7 @@
           <option value="10">October</option>
           <option value="11">November</option>
           <option value="12">December</option></select
-        ><span
-          class="select2 select2-container select2-container--default"
-          dir="ltr"
-          style="width: 193px"
-          ><span class="selection"
-            ><span
-              class="select2-selection select2-selection--single"
-              role="combobox"
-              aria-haspopup="true"
-              aria-expanded="false"
-              title=""
-              tabindex="0"
-              aria-labelledby="select2-dat_to_month-container"
-              ><span
-                class="select2-selection__rendered"
-                id="select2-dat_to_month-container"
-                title="all months"
-                >all months</span
-              ><span class="select2-selection__arrow" role="presentation"
-                ><b role="presentation"></b></span></span></span
-          ><span class="dropdown-wrapper" aria-hidden="true"></span
-        ></span>
+        >
       </div>
       <div class="columns small-12 large-3">
         <select
@@ -442,59 +218,10 @@
           aria-hidden="true"
         >
           <option class="default" selected="selected">all dates</option>
-          <option>1</option>
-          <option>2</option>
-          <option>3</option>
-          <option>4</option>
-          <option>5</option>
-          <option>6</option>
-          <option>7</option>
-          <option>8</option>
-          <option>9</option>
-          <option>10</option>
-          <option>11</option>
-          <option>12</option>
-          <option>13</option>
-          <option>14</option>
-          <option>15</option>
-          <option>16</option>
-          <option>17</option>
-          <option>18</option>
-          <option>19</option>
-          <option>20</option>
-          <option>21</option>
-          <option>22</option>
-          <option>23</option>
-          <option>24</option>
-          <option>25</option>
-          <option>26</option>
-          <option>27</option>
-          <option>28</option>
-          <option>29</option>
-          <option>30</option>
-          <option>31</option></select
-        ><span
-          class="select2 select2-container select2-container--default"
-          dir="ltr"
-          style="width: 137px"
-          ><span class="selection"
-            ><span
-              class="select2-selection select2-selection--single"
-              role="combobox"
-              aria-haspopup="true"
-              aria-expanded="false"
-              title=""
-              tabindex="0"
-              aria-labelledby="select2-dat_to_day-container"
-              ><span
-                class="select2-selection__rendered"
-                id="select2-dat_to_day-container"
-                title="all dates"
-                >all dates</span
-              ><span class="select2-selection__arrow" role="presentation"
-                ><b role="presentation"></b></span></span></span
-          ><span class="dropdown-wrapper" aria-hidden="true"></span
-        ></span>
+           {% for date in range(1, 32) %}
+            <option value="{{ date }}">{{ date }}</option>
+          {% endfor %}
+        </select>
       </div>
       <div class="columns small-12 large-2">
         <span

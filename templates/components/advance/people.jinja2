@@ -19,7 +19,7 @@
             name="people"
             type="text"
             class="text"
-            value="all people"
+            value="{{ people if people else 'all people' }}" 
             onfocus="
 javascript:textClear(this);"
             onblur="

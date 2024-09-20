@@ -99,6 +99,7 @@ try {
       category: "results",
       secondaryResults: false,
       infiniteScroll: true,
+      size : 20,
       infiniteScrollPageSize: 50,
       renderer: new emlo.ResultTableRenderer({
         noResultsText: "No results to display",
@@ -166,4 +167,27 @@ try {
   emlo.init();
 } catch (error) {
   console.error(error.message);
+}
+
+function generateResultHeader(selector){
+  let currentDoc = document.getElementById("result-header")
+
+  if(emlo && emlo.active && emlo.active[selector]){
+    const activeRes = emlo.active[selector]
+
+    if(activeRes.result && activeRes.result.data && activeRes.result.data.response && activeRes.result.data.response.numFound) {
+      if(activeRes.result.data.response.numFound > 50) {
+        currentDoc.innerHTML = `${activeRes.result.data.response.numFound} results (50 result per page)`
+        return
+      } else {
+        currentDoc.innerHTML = `${activeRes.result.data.response.numFound} results`
+        return
+      }
+    }
+  }
+  currentDoc.innerHTML = ""
+}
+
+window.onload = () => {
+  generateResultHeader("emlo-results")
 }

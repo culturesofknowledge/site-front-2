@@ -10,9 +10,7 @@ try {
    
     emlo.openingQuery = {
       must: [],
-      // query : {
-      //   "range" : {}
-      // },
+      query : {},
       queryStrings : []
     }
 
@@ -34,13 +32,13 @@ try {
     }
     
     if(fromDate && toDate) {
-      if(emlo.openingQuery.query.range) {
-        emlo.openingQuery.query.range = Object.assign(emlo.openingQuery.query.range , {
-          "ox_started-ox_year": {
-            "gte": fromDate,
-            "lte": toDate
-          }
-        })
+      if (!emlo.openingQuery.query.range) {
+        emlo.openingQuery.query.range = {}; 
+      }
+
+      emlo.openingQuery.query.range["ox_started-ox_year"] = {
+        "gte": fromDate,
+        "lte": toDate
       }
     }
 

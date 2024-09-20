@@ -28,8 +28,8 @@
             <div id="about">
                 <br/>
                 <h2 class="main">
-                    <span class="font-18">
-                        1690 results (50 results per page)
+                    {# This value is generated inside result.edges.js do not remove this element #}
+                    <span id="result-header" class="font-18">
                     </span>
 
                     <br><br>
@@ -52,6 +52,11 @@
 
 
 {% block extra_js_bottom %}
+
+{% include "_edges_common_js.jinja2" %}
+<script type="module" src="../static/js/result.edges.js"></script>
+<script type="module" src="../static/js/result_refine.edges.js"></script>
+
 <script>
 function modifyCurrentSearch() {
     try {
@@ -70,7 +75,4 @@ function modifyCurrentSearch() {
     }
 }
 </script>
-    {% include "_edges_common_js.jinja2" %}
-    <script type="module" src="../static/js/result.edges.js"></script>
-    <script type="module" src="../static/js/result_refine.edges.js"></script>
 {% endblock extra_js_bottom %} 

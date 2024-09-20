@@ -28,7 +28,6 @@ try {
         }),
     }),
   ];
-
   emlo.init();
 } catch (error) {
   console.error(error.message);

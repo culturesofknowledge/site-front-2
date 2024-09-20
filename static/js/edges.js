@@ -81,7 +81,7 @@ emlo.ResultTable = class extends edges.Component {
       "infiniteScrollPageSize",
       10
     );
-
+    
     //////////////////////////////////////
     // variables for tracking internal state
 

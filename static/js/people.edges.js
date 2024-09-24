@@ -125,7 +125,7 @@ try {
       }),
     }),
   ];
-  console.log("emlo" , emlo)
+  
   emlo.init();
 } catch (error) {
   console.error(error.message);

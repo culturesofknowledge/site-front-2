@@ -18,7 +18,8 @@ def locations():
 
 @browse_bp.route('/organisations')
 def organisations():
-    return render_template('/pages/browse/organisations.jinja2', title="Browse:Organisations")
+    letter = request.args.get('letter', '').lower()
+    return render_template('/pages/browse/organisations.jinja2', title="Browse:Organisations", letter=letter)
 
 @browse_bp.route('/institutions')
 def institutions():

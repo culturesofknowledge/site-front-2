@@ -1,30 +1,28 @@
-{# TODO: adjust href in such a way that it can be reused #}
-
 <ul class="alphabet pagination">
-    <li class="current"><a href="#">A</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=b">B</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=c">C</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=d">D</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=e">E</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=f">F</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=g">G</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=h">H</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=i">I</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=j">J</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=k">K</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=l">L</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=m">M</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=n">N</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=o">O</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=p">P</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=q">Q</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=r">R</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=s">S</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=t">T</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=u">U</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=v">V</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=w">W</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=x">X</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=y">Y</a></li>
-    <li><a href="http://emlo.bodleian.ox.ac.uk/browse/people?letter=z">Z</a></li>
+    {# Loop through the alphabet A-Z #}
+    {% for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
+        <li class="{% if current_letter == letter.lower() %}current{% endif %}">
+            <a href="{{ base_url }}?letter={{ letter | lower }}">{{ letter }}</a>
+        </li>
+    {% endfor %}
 </ul>
+
+<script>
+window.onload = () => {
+    const queryString = window.location.search;
+    const params = new URLSearchParams(queryString);
+    let current_letter = params.get("letter") || "a"; // Default to 'a' if not present
+    
+    // Highlight the current letter if not handled by Jinja2
+    const currentElement = document.querySelector(`.alphabet.pagination li.current`);
+    if (currentElement) {
+        currentElement.classList.remove('current'); // Remove current class if needed
+    }
+    if (current_letter) {
+        const activeLetterElement = document.querySelector(`.alphabet.pagination li a[href*="?letter=${current_letter}"]`);
+        if (activeLetterElement) {
+            activeLetterElement.parentElement.classList.add('current'); 
+        }
+    }
+}
+</script>

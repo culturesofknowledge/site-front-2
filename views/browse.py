@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, request
 
 browse_bp = Blueprint('browse', __name__ , url_prefix='/browse')
 
@@ -8,7 +8,8 @@ def browse():
 
 @browse_bp.route('/people')
 def people():
-    return render_template('/pages/browse/people.jinja2', title="Browse:People")
+    letter = request.args.get('letter', '').lower()
+    return render_template('/pages/browse/people.jinja2', title="Browse:People" , letter=letter)
 
 @browse_bp.route('/locations')
 def locations():

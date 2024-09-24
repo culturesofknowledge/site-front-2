@@ -50,23 +50,23 @@ try {
     "lte": "*"
   }
 
-  // Handle fields to return
-  emlo.openingQuery.queryStrings.push({
-      queryString: {
-          query: "*",
-          fields: [
-              "dcterms_identifier-uri_",
-              "foaf_name",
-              "skos_altLabel",
-              "ox_titlesRolesOccupations",
-              "foaf_gender",
-              "ox_totalWorksByAgent",
-              "ox_totalWorksAddressedToAgent",
-              "ox_totalWorksMentioningAgent",
-              "rdfs_seeAlso-resource"
-          ]
-      }
-  });
+  // Handle fields to return - TODO: Handle this part in edges
+  // emlo.openingQuery.queryStrings.push({
+  //     queryString: {
+  //         query: "*",
+  //         fields: [
+  //             "dcterms_identifier-uri_",
+  //             "foaf_name",
+  //             "skos_altLabel",
+  //             "ox_titlesRolesOccupations",
+  //             "foaf_gender",
+  //             "ox_totalWorksByAgent",
+  //             "ox_totalWorksAddressedToAgent",
+  //             "ox_totalWorksMentioningAgent",
+  //             "rdfs_seeAlso-resource"
+  //         ]
+  //     }
+  // });
 
   emlo.selector = "browse-people-results";
   emlo.collection = "/solr/people/select";

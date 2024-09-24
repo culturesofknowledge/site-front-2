@@ -11,7 +11,14 @@
         </div>
 
         <div class="row">
-            
+            <div id="browse-organisations-results"></div>
         </div>
     </div>
 {% endblock %}
+
+
+{% block extra_js_bottom %}
+
+{% include "_edges_common_js.jinja2" %}
+<script type="module" src="../static/js/organisation.edges.js"></script>
+{% endblock extra_js_bottom %} 

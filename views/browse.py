@@ -13,7 +13,8 @@ def people():
 
 @browse_bp.route('/locations')
 def locations():
-    return render_template('/pages/browse/locations.jinja2', title="Browse:Locations")
+    letter = request.args.get('letter', '').lower()
+    return render_template('/pages/browse/locations.jinja2', title="Browse:Locations" , letter=letter)
 
 @browse_bp.route('/organisations')
 def organisations():

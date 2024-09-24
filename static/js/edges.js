@@ -43,6 +43,7 @@ const emlo = {
         components: this.components,
       });
     } else {
+      console.log("Operating from else")
       this.active[this.selector] = new edges.Edge({
         selector: `#${this.selector}`,
         searchUrl: `${this.solrURL}${this.collection}`,

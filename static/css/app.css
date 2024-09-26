@@ -10155,3 +10155,8 @@ ul.pagination li {
 #collections li a:not(.button) {
   color: #008cba !important;
 }
+
+.browseby li.active {
+  background-color: #e4e4e4;
+  padding: 5px;
+}

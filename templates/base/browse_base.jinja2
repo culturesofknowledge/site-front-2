@@ -27,26 +27,39 @@ ul.pagination li a {
             <div class="columns hide-for-small hide-for-medium large-2">
             </div>
 
-            <div class="columns small-12 large-10">
+            <div class="columns small-12 large-10 browseby">
                 <ul class="small-block-grid-3 medium-block-grid-6 large-block-grid-6">
-
                     <li><h3>Browse by</h3></li>
 
-                    <li class="stats-text text-center active"><a href="{{ url_for('browse.people') }}">
-                    <img src="{{ url_for('static', filename='img/icon-stats-people.png') }}" alt="People icon" class="stats-icon"><br>People</a></li>
+                    <li class="stats-text text-center {% if request.endpoint == 'browse.people' %}active{% endif %}">
+                        <a href="{{ url_for('browse.people') }}">
+                            <img src="{{ url_for('static', filename='img/icon-stats-people.png') }}" alt="People icon" class="stats-icon"><br>People
+                        </a>
+                    </li>
 
-                    <li class="stats-text text-center"><a href="{{ url_for('browse.locations') }}">
-                    <img src="{{ url_for('static', filename='img/icon-stats-locations.png') }}" alt="Locations icon" class="stats-icon"><br>Locations</a></li>
+                    <li class="stats-text text-center {% if request.endpoint == 'browse.locations' %}active{% endif %}">
+                        <a href="{{ url_for('browse.locations') }}">
+                            <img src="{{ url_for('static', filename='img/icon-stats-locations.png') }}" alt="Locations icon" class="stats-icon"><br>Locations
+                        </a>
+                    </li>
 
-                    <li class="stats-text text-center"><a href="{{ url_for('browse.organisations') }}">
-                    <img src="{{ url_for('static', filename='img/icon-stats-organisations.png') }}" alt="Organizations icon" class="stats-icon"><br>Organizations</a></li>
+                    <li class="stats-text text-center {% if request.endpoint == 'browse.organisations' %}active{% endif %}">
+                        <a href="{{ url_for('browse.organisations') }}">
+                            <img src="{{ url_for('static', filename='img/icon-stats-organisations.png') }}" alt="Organizations icon" class="stats-icon"><br>Organizations
+                        </a>
+                    </li>
 
-                    <li class="stats-text text-center"><a href="{{ url_for('browse.institutions') }}">
-                    <img src="{{ url_for('static', filename='img/icon-stats-repositories.png') }}" alt="Repositories icon" class="stats-icon"><br>Repositories</a></li>
+                    <li class="stats-text text-center {% if request.endpoint == 'browse.institutions' %}active{% endif %}">
+                        <a href="{{ url_for('browse.institutions') }}">
+                            <img src="{{ url_for('static', filename='img/icon-stats-repositories.png') }}" alt="Repositories icon" class="stats-icon"><br>Repositories
+                        </a>
+                    </li>
 
-                    <li class="stats-text text-center"><a href="{{ url_for('browse.works') }}">
-                    <img src="{{ url_for('static', filename='img/icon-stats-works.png') }}" alt="Years icon" class="stats-icon"><br>Years</a></li>
-
+                    <li class="stats-text text-center {% if request.endpoint == 'browse.works' %}active{% endif %}">
+                        <a href="{{ url_for('browse.works') }}">
+                            <img src="{{ url_for('static', filename='img/icon-stats-works.png') }}" alt="Years icon" class="stats-icon"><br>Years
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>

@@ -7,8 +7,8 @@
         <br/>
 
         <div class="pagination-centered">
-           <select name="decade" id="decade" onchange="change_decade(this.value)">
-                {% for decade in range(1500, 1840 , 10) %}
+            <select name="decade" id="decade" onchange="change_decade(this.value)">
+                {% for decade in range(1500, 1840, 10) %}
                     <option value="{{ decade }}" {% if decade == current_decade %}selected="selected"{% endif %}>{{ decade }}s</option>
                 {% endfor %}
             </select>
@@ -16,11 +16,17 @@
             {# <p> {{current_decade}} - {{current_year}} </p> #}
 
             <ul class="alphabet pagination">
-                {% for year in  years_range %}
+                <li>
+                    <a onclick="change_decade(current_decade - 10)"> << </a>
+                </li>
+                {% for year in years_range %}
                     <li class="{% if current_year == year %}current{% endif %}">
                         <a href="{{ base_url }}?year={{ year }}">{{ year }}</a>
                     </li>
                 {% endfor %}
+                <li>
+                    <a onclick="change_decade(current_decade + 10)"> >> </a>
+                </li>
             </ul>
         </div>
 
@@ -35,14 +41,14 @@
 {% include "_edges_common_js.jinja2" %}
 <script type="module" src="../static/js/works.edges.js"></script>
 <script lang="js">
-const queryString = window.location.search
+const queryString = window.location.search;
 
 function change_decade(selectedDecade) {
-    console.log("Got the decade" , selectedDecade)
+    console.log("Got the decade", selectedDecade);
     window.location.href = `{{ base_url }}?year=${selectedDecade}`;
 }
 
+// Update current_decade variable for JavaScript to use
+const current_decade = {{ current_decade }};
 </script>
-{% endblock extra_js_bottom %} 
-
-
+{% endblock extra_js_bottom %}

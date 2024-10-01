@@ -50,4 +50,67 @@
 
 
 {% block extra_js_bottom %}
+<script>
+function advanceSearchPeople(event){
+  
+    try {
+        const inputs = [
+            { id: "people", defaultValue: "all people", paramName: "people" },
+            { id: "people_gend", defaultValue: "all", paramName: "people_gend" },
+            { id: "people_roles", defaultValue: "all roles and titles", paramName: "people_roles" },
+            { id: "agent_org", defaultValue: "false", paramName: "agent_org" },
+            { id: "aut", defaultValue: "all senders", paramName: "aut" },
+            { id: "aut_gend", defaultValue: "all", paramName: "aut_gend" },
+            { id: "aut_roles", defaultValue: "all roles and titles", paramName: "aut_roles" },
+            { id: "aut_org", defaultValue: "false", paramName: "aut_org" },
+            { id: "aut_mark", defaultValue: "false", paramName: "aut_mark" },
+            { id: "rec", defaultValue: "all recipients", paramName: "rec" },
+            { id: "rec_gend", defaultValue: "all", paramName: "rec_gend" },
+            { id: "rec_roles", defaultValue: "all roles and titles", paramName: "rec_roles" },
+            { id: "rec_org", defaultValue: "false", paramName: "rec_org" },
+            { id: "rec_mark", defaultValue: "false", paramName: "rec_mark" },
+            { id: "ment", defaultValue: "all people mentioned", paramName: "ment" },
+            { id: "ment_gend", defaultValue: "all", paramName: "ment_gend" },
+            { id: "ment_roles", defaultValue: "all roles and titles", paramName: "ment_roles" },
+            { id: "ment_org", defaultValue: "false", paramName: "ment_org" },
+        ];
+
+        const baseURL = `${window.location.origin}/forms/advance`;
+        let sendQuery = false;
+        let queryString = "";
+
+        const baseOrigin = window.location.origin;
+
+        inputs.forEach(input => {
+            const value = document.getElementById(input.id).value;
+
+            if (value && value !== input.defaultValue) {
+                sendQuery = true;
+                queryString += `${checkQueryOpt(queryString)}${input.paramName}=${value}`;
+            }
+        });
+
+        if(queryString) {
+            window.location.href = `${baseURL}?${queryString}`
+        } else {
+            window.location.href = `${baseURL}`
+        }
+
+    } catch (err) {
+        console.error(`got an error: "${err}" while processing people advance search.`)
+    } 
+}
+
+function checkQueryOpt(val) {
+    if(val) {
+        return `&`
+    } 
+
+    return ''
+}
+
+function changeCheckboxValue(checkbox) {
+    checkbox.value = checkbox.checked
+}
+</script>
 {% endblock extra_js_bottom %}

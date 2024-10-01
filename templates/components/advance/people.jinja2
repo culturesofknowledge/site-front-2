@@ -20,10 +20,6 @@
             type="text"
             class="text"
             value="{{ people if people else 'all people' }}" 
-            onfocus="
-javascript:textClear(this);"
-            onblur="
-javascript:textFill(this);"
             title="Search letters for authors, senders, recipients, and people mentioned, e.g. 'Samuel Hartlib', 'John Aubrey', or 'The Royal Society'. Search is not case sensitive. "
             />
         </div>
@@ -91,8 +87,9 @@ javascript:textFill(this);"
                 type="checkbox"
                 id="agent_org"
                 name="agent_org"
-                value="true"
                 class="checkbox"
+                value="false"
+                onchange="changeCheckboxValue(this)"
                 />
 
                 <label for="agent_org">Only Organizations</label>
@@ -165,7 +162,7 @@ javascript:textFill(this);"
             name="aut"
             type="text"
             class="text"
-            value="all senders"
+            value="{{ aut if aut else 'all senders' }}" 
             onfocus="
 javascript:textClear(this);"
             onblur="
@@ -231,7 +228,8 @@ javascript:textFill(this);"
                 type="checkbox"
                 id="aut_org"
                 name="aut_org"
-                value="true"
+                value="false"
+                onchange="changeCheckboxValue(this)"
                 class="checkbox"
                 />
 
@@ -265,7 +263,8 @@ javascript:textFill(this);"
                 type="checkbox"
                 id="aut_mark"
                 name="aut_mark"
-                value="true"
+                value="false"
+                onchange="changeCheckboxValue(this)"
                 class="checkbox"
                 />
 
@@ -339,7 +338,7 @@ javascript:textFill(this);"
             name="rec"
             type="text"
             class="text"
-            value="all recipients"
+            value="{{ rec if rec else 'all recipients' }}" 
             onfocus="
 javascript:textClear(this);"
             onblur="
@@ -406,7 +405,8 @@ javascript:textFill(this);"
                 type="checkbox"
                 id="rec_org"
                 name="rec_org"
-                value="true"
+                value="false"
+                onchange="changeCheckboxValue(this)"
                 class="checkbox"
                 />
 
@@ -440,7 +440,8 @@ javascript:textFill(this);"
                 type="checkbox"
                 id="rec_mark"
                 name="rec_mark"
-                value="true"
+                value="false"
+                onchange="changeCheckboxValue(this)"
                 class="checkbox"
                 />
 
@@ -514,7 +515,7 @@ javascript:textFill(this);"
             name="ment"
             type="text"
             class="text"
-            value="all people mentioned"
+            value="{{ ment if ment else 'all people mentioned' }}" 
             onfocus="
 javascript:textClear(this);"
             onblur="
@@ -580,7 +581,8 @@ javascript:textFill(this);"
                 type="checkbox"
                 id="ment_org"
                 name="ment_org"
-                value="true"
+                value="false"
+                onchange="changeCheckboxValue(this)"
                 class="checkbox"
                 />
 
@@ -643,10 +645,5 @@ javascript:textFill(this);"
         </div>
     </fieldset>
 
-    <input
-        name="submit-advanced"
-        type="submit"
-        class="button submit search-related"
-        value="Search"
-    />
-    </div>
+    <button onclick="advanceSearchPeople()" name="submit-advanced" type="submit" class="button submit search-related">Search</button>
+    </div

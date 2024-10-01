@@ -7,6 +7,19 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
     <title>Early Modern Letter Online : {{ title }}</title>
     {% block extra_stylesheets %}{% endblock %}
+    <script>
+        function quickSearch(event) {
+            event.preventDefault();
+
+            try {
+                const searchQuery = document.getElementById("all_search").value
+
+                window.location.href = `${window.location.origin}/forms/advance?everything=${searchQuery}&search_type=quick`
+            } catch(err) {
+                console.error(err)
+            } 
+        }
+    </script>
 </head>
 <body>
     <!-- START header / menu -->
@@ -46,11 +59,9 @@
                 <ul class="right yellow-bg">
                     <!-- search bar -->
                     <li class="has-form">
-                        <form action="/forms/quick" method="get" id="circle-search">
+                        <form onSubmit="quickSearch(event)" id="circle-search">
                             <div class="row">
-                                <input style="position: static; margin-top: 7px"
-                                    name="everything" type="search" placeholder="Keywords..."/>
-                                <input name="search_type" type="hidden" value="quick"/>
+                                <input style="position: static; margin-top: 7px" id="all_search" type="search" placeholder="Keywords..."/>
                             </div>
                         </form>
                     </li>

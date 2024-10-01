@@ -1,125 +1,3 @@
-// export function searchQueryObj() {
-//   // Fetching URL params
-//   const queryString = window.location.search;
-
-//   if (queryString) {
-//     const params = new URLSearchParams(queryString);
-
-//     let openingQuery = {
-//       must: [],
-//       query: {},
-//       queryStrings: [],
-//     };
-
-//     const inputParams = [
-//       { key: "people", ref: "people" },
-//       { key: "people_gend", ref: "people" },
-//       { key: "people_roles", ref: "people" },
-//       { key: "agent_org", ref: "people" },
-//       { key: "aut", ref: "aut" },
-//       { key: "aut_gend", ref: "aut" },
-//       { key: "aut_mark", ref: "aut" },
-//       { key: "aut_org", ref: "aut" },
-//       { key: "aut_roles", ref: "aut" },
-//       { key: "rec", ref: "rec" },
-//       { key: "rec_gend", ref: "rec" },
-//       { key: "rec_mark", ref: "rec" },
-//       { key: "rec_roles", ref: "rec" },
-//       { key: "rec_org", ref: "rec" },
-//       { key: "ment", ref: "ment" },
-//       { key: "ment_org", ref: "ment" },
-//       { key: "ment_roles", ref: "ment" },
-//       { key: "ment_gend", ref: "ment" },
-//       { key: "ment" },
-//       { key: "dat_from_year" },
-//       { key: "dat_to_year" },
-//       { key: "locations" },
-//       { key: "let_con" },
-//       { key: "dat_from_year" },
-//     ];
-
-//     const people = params.get("people");
-//     const aut = params.get("aut");
-//     const rec = params.get("rec");
-//     const ment = params.get("ment");
-//     const fromDate = params.get("dat_from_year");
-//     const toDate = params.get("dat_to_year");
-//     const locations = params.get("locations");
-//     const content = params.get("let_con");
-
-//     if (people) {
-//       openingQuery.queryStrings.push({
-//         queryString: people,
-//         fields: [
-//           { field: "person-author", operator: "OR" },
-//           { field: "person-recipient", operator: "OR" },
-//           { field: "person-mentioned", operator: "OR" },
-//         ],
-//       });
-//     }
-
-//     if (aut) {
-//       openingQuery.queryStrings.push({
-//         queryString: aut,
-//         fields: [{ field: "person-author", operator: "AND" }],
-//       });
-//     }
-
-//     if (rec) {
-//       openingQuery.queryStrings.push({
-//         queryString: rec,
-//         fields: [{ field: "person-recipient", operator: "AND" }],
-//       });
-//     }
-
-//     if (ment) {
-//       openingQuery.queryStrings.push({
-//         queryString: ment,
-//         fields: [{ field: "person-mentioned", operator: "AND" }],
-//       });
-//     }
-
-//     if (fromDate && toDate) {
-//       if (!openingQuery.query.range) {
-//         openingQuery.query.range = {};
-//       }
-
-//       openingQuery.query.range["ox_started-ox_year"] = {
-//         gte: fromDate,
-//         lte: toDate,
-//       };
-//     }
-
-//     if (locations) {
-//       openingQuery.queryStrings.push({
-//         queryString: locations,
-//         fields: [
-//           { field: "location-origin", operator: "OR" },
-//           { field: "location-destination", operator: "OR" },
-//           { field: "location-mentioned", operator: "OR" },
-//         ],
-//       });
-//     }
-
-//     if (content) {
-//       openingQuery.queryStrings.push({
-//         queryString: content,
-//         fields: [
-//           { field: "dcterms_abstract", operator: "OR" },
-//           { field: "ox_keywords", operator: "OR" },
-//           { field: "ox_incipit", operator: "OR" },
-//           { field: "ox_excipit", operator: "OR" },
-//           { field: "mail_postScript", operator: "OR" },
-//         ],
-//       });
-//     }
-
-//     return openingQuery;
-//   } else {
-//     return null;
-//   }
-// }
-
 export function searchQueryObj() {
   // Fetching URL params
   const queryString = window.location.search;
@@ -128,6 +6,41 @@ export function searchQueryObj() {
 
   const params = new URLSearchParams(queryString);
 
+  if (params && params.get("search_type")) {
+    return quickSearch(params);
+  } else {
+    return advanceSearch(params);
+  }
+}
+
+function quickSearch(params) {
+  let openingQuery = {
+    must: [],
+  };
+
+  const searchQuery = params.get("everything");
+
+  if (searchQuery != "") {
+    openingQuery.must.push({
+      term: {
+        default_search_field: searchQuery,
+      },
+    });
+  } else {
+    openingQuery.must.push({
+      term: {
+        default_search_field: "*",
+      },
+    });
+  }
+
+  return {
+    openingQuery: openingQuery,
+    collection: "/solr/all/select",
+  };
+}
+
+function advanceSearch(params) {
   let openingQuery = {
     must: [],
     query: {},
@@ -304,7 +217,8 @@ export function searchQueryObj() {
     };
   }
 
-  console.log("Opening Query", openingQuery);
-
-  return openingQuery;
+  return {
+    openingQuery: openingQuery,
+    collection: "",
+  };
 }

@@ -43,7 +43,6 @@ const emlo = {
         components: this.components,
       });
     } else {
-      console.log("Operating from else")
       this.active[this.selector] = new edges.Edge({
         selector: `#${this.selector}`,
         searchUrl: `${this.solrURL}${this.collection}`,
@@ -82,7 +81,7 @@ emlo.ResultTable = class extends edges.Component {
       "infiniteScrollPageSize",
       10
     );
-    
+
     //////////////////////////////////////
     // variables for tracking internal state
 
@@ -294,15 +293,14 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
           return "<td></td>";
         }
 
-        if(field.type) {
-          if(field.type == 'date'){
-
-            return `<td>${this._formatDate(val)}</td>`
-          } else if (field.type == 'link') {
-            if(field.linkText){
-              return `<td><a href=${val}>${field.linkText}</a></td>`
+        if (field.type) {
+          if (field.type == "date") {
+            return `<td>${this._formatDate(val)}</td>`;
+          } else if (field.type == "link") {
+            if (field.linkText) {
+              return `<td><a href=${val}>${field.linkText}</a></td>`;
             } else {
-              return `<td><a href=${val}>Link</a></td>`
+              return `<td><a href=${val}>Link</a></td>`;
             }
           }
         }
@@ -344,23 +342,33 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
 
     // Check if the date is invalid
     if (isNaN(date.getTime())) {
-        return ''; // Return empty string if date is invalid
+      return ""; // Return empty string if date is invalid
     }
 
     // Define an array of month names
     const months = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ];
 
     // Extract day, month, and year
-    const day = date.getDate().toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, "0");
     const month = months[date.getMonth()];
     const year = date.getFullYear();
 
     // Format date as dd month yyyy
     return `${day} ${month} ${year}`;
-}
+  }
 };
 
 export default emlo;

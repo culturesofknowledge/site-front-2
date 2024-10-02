@@ -208,12 +208,52 @@ function advanceSearch(params) {
   });
 
   // Handle date range query
-  const fromDate = params.get("dat_from_year");
-  const toDate = params.get("dat_to_year");
+  const sinYear = params.get("dat_sin_year");
+  const sinMonth = params.get("dat_sin_month");
+  const sinDay = params.get("dat_sin_day");
+  const fromYear = params.get("dat_from_year");
+  const fromMonth = params.get("dat_from_month");
+  const fromDay = params.get("dat_from_day");
+  const toYear = params.get("dat_to_year");
+  const toMonth = params.get("dat_to_month");
+  const toDay = params.get("dat_to_day");
+
+  if (sinYear) {
+    openingQuery.queryStrings.push({
+      queryString: sinYear,
+      fields: [
+        { field: "ox_started-ox_year", operator: "OR" },
+        { field: "ox_completed-ox_year", operator: "OR" },
+      ],
+    });
+  }
+
+  if (sinMonth) {
+    openingQuery.queryStrings.push({
+      queryString: sinMonth,
+      fields: [
+        { field: "ox_started-ox_month", operator: "OR" },
+        { field: "ox_completed-ox_month", operator: "OR" },
+      ],
+    });
+  }
+
+  if (sinDay) {
+    openingQuery.queryStrings.push({
+      queryString: sinMonth,
+      fields: [
+        { field: "ox_started-ox_day", operator: "OR" },
+        { field: "ox_completed-ox_day", operator: "OR" },
+      ],
+    });
+  }
+
+  const fromDate = generateTimestamp(fromYear, fromMonth, fromDay);
+  const toDate = generateTimestamp(toYear, toMonth, toDay, "to");
 
   if (fromDate && toDate) {
     openingQuery.query.range = {
-      "ox_started-ox_year": { gte: fromDate, lte: toDate },
+      started_date_sort: { gte: fromDate, lte: toDate },
     };
   }
 
@@ -221,4 +261,33 @@ function advanceSearch(params) {
     openingQuery: openingQuery,
     collection: "",
   };
+}
+
+function generateTimestamp(year, month, day, range = "from") {
+  // Use year 1 if 'from' and year 9999 if 'to' when the year is not provided
+  if (!year) {
+    year = range === "from" ? 1 : 9999;
+  }
+
+  if (!month) {
+    month = range === "from" ? 1 : 12;
+  }
+
+  if (!day) {
+    day = range === "from" ? 1 : 31;
+  }
+
+  let date;
+
+  if (range === "from") {
+    // Create date object for the start of the day (00:00:00)
+    date = `${year}-${month}-${day}T00:00:00Z`;
+  } else if (range === "to") {
+    // Create date object for the end of the day (23:59:59)
+    date = `${year}-${month}-${day}T23:59:59Z`;
+  } else {
+    throw new Error("Range must be either 'from' or 'to'");
+  }
+
+  return date;
 }

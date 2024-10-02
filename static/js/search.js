@@ -148,6 +148,18 @@ function advanceSearch(params) {
       ],
     },
     {
+      param: "pla_ori_name",
+      queryStringFields: [{ field: "location-origin", operator: "OR" }],
+    },
+    {
+      param: "pla_des_name",
+      queryStringFields: [{ field: "location-destination", operator: "OR" }],
+    },
+    {
+      param: "pla_ment_name",
+      queryStringFields: [{ field: "location-mentioned", operator: "OR" }],
+    },
+    {
       param: "let_con",
       queryStringFields: [
         { field: "dcterms_abstract", operator: "OR" },
@@ -189,6 +201,42 @@ function advanceSearch(params) {
           openingQuery.queryStrings.push({
             queryString: paramValue,
             fields: [{ field: "mail_addressees-rdf_value", operator: "AND" }],
+          });
+        } else {
+          openingQuery.queryStrings.push({
+            queryString: paramValue,
+            fields: config.queryStringFields,
+          });
+        }
+      }
+    }
+
+    if (config.param == "pla_ori_name") {
+      const ori_mark = params.get("pla_ori_mark");
+
+      if (paramValue) {
+        if (ori_mark == "true") {
+          openingQuery.queryStrings.push({
+            queryString: paramValue,
+            fields: [{ field: "mail_origin-rdf_value", operator: "AND" }],
+          });
+        } else {
+          openingQuery.queryStrings.push({
+            queryString: paramValue,
+            fields: config.queryStringFields,
+          });
+        }
+      }
+    }
+
+    if (config.param == "pla_des_name") {
+      const des_mark = params.get("pla_des_mark");
+
+      if (paramValue) {
+        if (des_mark == "true") {
+          openingQuery.queryStrings.push({
+            queryString: paramValue,
+            fields: [{ field: "mail_destination-rdf_value", operator: "AND" }],
           });
         } else {
           openingQuery.queryStrings.push({
@@ -248,8 +296,16 @@ function advanceSearch(params) {
     });
   }
 
-  const fromDate = generateTimestamp(fromYear, fromMonth, fromDay);
-  const toDate = generateTimestamp(toYear, toMonth, toDay, "to");
+  let fromDate,
+    toDate = "";
+
+  if (fromYear || fromMonth || fromDay) {
+    fromDate = generateTimestamp(fromYear, fromMonth, fromDay);
+  }
+
+  if (toYear || toMonth || toDay) {
+    toDate = generateTimestamp(toYear, toMonth, toDay, "to");
+  }
 
   if (fromDate && toDate) {
     openingQuery.query.range = {
@@ -264,6 +320,7 @@ function advanceSearch(params) {
 }
 
 function generateTimestamp(year, month, day, range = "from") {
+  console.log(year, month, day);
   // Use year 1 if 'from' and year 9999 if 'to' when the year is not provided
   if (!year) {
     year = range === "from" ? 1 : 9999;

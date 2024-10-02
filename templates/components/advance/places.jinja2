@@ -15,10 +15,6 @@
           type="text"
           class="text"
           value="{{ locations if locations else 'all places' }}" 
-          onfocus="
-  javascript:textClear(this);"
-          onblur="
-  javascript:textFill(this);"
         />
       </div>
       <div class="small-1 columns">
@@ -53,10 +49,6 @@
           type="text"
           class="text"
           value="all origins"
-          onfocus="
-  javascript:textClear(this);"
-          onblur="
-  javascript:textFill(this);"
         />
       </div>
       <div class="small-1 columns">
@@ -84,7 +76,8 @@
           type="checkbox"
           id="pla_ori_mark"
           name="pla_ori_mark"
-          value="true"
+          value="false"
+          onchange="changeCheckboxValue(this)"
           class="checkbox"
         />
 
@@ -122,10 +115,6 @@
           type="text"
           class="text"
           value="all destinations"
-          onfocus="
-  javascript:textClear(this);"
-          onblur="
-  javascript:textFill(this);"
         />
       </div>
       <div class="small-1 columns">
@@ -153,7 +142,8 @@
           type="checkbox"
           id="pla_des_mark"
           name="pla_des_mark"
-          value="true"
+          value="false"
+          onchange="changeCheckboxValue(this)"
           class="checkbox"
         />
 
@@ -191,10 +181,6 @@
           type="text"
           class="text"
           value="all places mentioned"
-          onfocus="
-  javascript:textClear(this);"
-          onblur="
-  javascript:textFill(this);"
         />
       </div>
       <div class="small-1 columns">
@@ -217,10 +203,5 @@
     </div>
   </fieldset>
 
-  <input
-    name="submit-advanced"
-    type="submit"
-    class="button submit search-related"
-    value="Search"
-  />
+  <button onclick="advanceSearch()" name="submit-advanced" type="submit" class="button submit search-related">Search</button>
 </div>

@@ -7,61 +7,33 @@
     <label>Single Date</label>
     <div class="row">
       <div class="columns small-12 large-3">
-        <select
-          id="dat_sin_year"
-          name="dat_sin_year"
-          title=""
-          class="select2-hidden-accessible"
-          tabindex="-1"
-          aria-hidden="true"
+        <select id="dat_sin_year" name="dat_sin_year" class="select2-hidden-accessible" tabindex="-1" aria-hidden="true"
+          onchange="updateDays('dat_sin_year' , 'dat_sin_month' , 'dat_sin_day')"
         >
           <option class="default" selected="selected">all years</option>
-          {% for year in range(1500, 1841) %}
+          {% for year in range(start_year, end_year) %}
           <option value="{{ year }}">{{ year }}</option>
           {% endfor %}
         </select>
       </div>
       <div class="columns small-12 large-4">
-        <select
-          id="dat_sin_month"
-          name="dat_sin_month"
-          title=""
-          class="select2-hidden-accessible"
-          tabindex="-1"
-          aria-hidden="true"
+        <select id="dat_sin_month" name="dat_sin_month" class="select2-hidden-accessible" tabindex="-1" aria-hidden="true"
+          onchange="updateDays('dat_sin_year' , 'dat_sin_month' , 'dat_sin_day')"
         >
           <option class="default" value="all months" selected="selected">
             all months
           </option>
-          <option value="1">January</option>
-          <option value="2">February</option>
-          <option value="3">March</option>
-          <option value="4">April</option>
-          <option value="5">May</option>
-          <option value="6">June</option>
-          <option value="7">July</option>
-          <option value="8">August</option>
-          <option value="9">September</option>
-          <option value="10">October</option>
-          <option value="11">November</option>
-          <option value="12">December</option></select
-        >
-      </div>
-      <div class="columns small-12 large-3">
-        <select
-          id="dat_sin_day"
-          name="dat_sin_day"
-          title=""
-          class="select2-hidden-accessible"
-          tabindex="-1"
-          aria-hidden="true"
-        >
-          <option class="default" selected="selected">all dates</option>
-          {% for date in range(1, 32) %}
-            <option value="{{ date }}">{{ date }}</option>
+          {% for month, month_num in months_map.items() %}
+            <option value="{{ month_num }}">{{ month }}</option>
           {% endfor %}
         </select>
       </div>
+      <div class="columns small-12 large-3">
+        <select id="dat_sin_day" name="dat_sin_day" class="select2-hidden-accessible" tabindex="-1" aria-hidden="true">
+          <option class="default" selected="selected">all dates</option>
+        </select>
+      </div>
+
       <div class="columns small-12 large-2">
         <span
           data-tooltip=""
@@ -88,60 +60,30 @@
     <label>From</label>
     <div class="row">
       <div class="columns small-12 large-3">
-        <select
-          id="dat_from_year"
-          name="dat_from_year"
-          title=""
-          class="select2-hidden-accessible"
-          tabindex="-1"
-          aria-hidden="true"
-        >
+        <select id="dat_from_year" name="dat_from_year" class="select2-hidden-accessible" tabindex="-1" aria-hidden="true"
+        onchange="updateDays('dat_from_year' , 'dat_from_month' , 'dat_from_day')">
           <option class="default">
             {{dat_from_year}}
           </option>
-          {% for year in range(1500, 1841) %}
+          {% for year in range(start_year, end_year) %}
             <option value="{{ year }}">{{ year }}</option>
-          {% endfor %}</select
-        >
+          {% endfor %}
+        </select>
       </div>
       <div class="columns small-12 large-4">
-        <select
-          id="dat_from_month"
-          name="dat_from_month"
-          title=""
-          class="select2-hidden-accessible"
-          tabindex="-1"
-          aria-hidden="true">
+        <select id="dat_from_month" name="dat_from_month" class="select2-hidden-accessible" tabindex="-1" aria-hidden="true"
+        onchange="updateDays('dat_from_year' , 'dat_from_month' , 'dat_from_day')">
           <option class="default" value="all months" selected="selected">
             all months
           </option>
-          <option value="1">January</option>
-          <option value="2">February</option>
-          <option value="3">March</option>
-          <option value="4">April</option>
-          <option value="5">May</option>
-          <option value="6">June</option>
-          <option value="7">July</option>
-          <option value="8">August</option>
-          <option value="9">September</option>
-          <option value="10">October</option>
-          <option value="11">November</option>
-          <option value="12">December</option>
+          {% for month, month_num in months_map.items() %}
+            <option value="{{ month_num }}">{{ month }}</option>
+          {% endfor %}
         </select>
       </div>
       <div class="columns small-12 large-3">
-        <select
-          id="dat_from_day"
-          name="dat_from_day"
-          title=""
-          class="select2-hidden-accessible"
-          tabindex="-1"
-          aria-hidden="true"
-        >
+        <select id="dat_from_day" name="dat_from_day" class="select2-hidden-accessible" tabindex="-1" aria-hidden="true">
           <option class="default" selected="selected">all dates</option>
-          {% for date in range(1, 32) %}
-            <option value="{{ date }}">{{ date }}</option>
-          {% endfor %}
         </select>
       </div>
       <div class="columns small-12 large-2">
@@ -164,63 +106,33 @@
     </div>
 
     <label>To</label>
+
     <div class="row">
       <div class="columns small-12 large-3">
-        <select
-          id="dat_to_year"
-          name="dat_to_year"
-          title=""
-          class="select2-hidden-accessible"
-          tabindex="-1"
-          aria-hidden="true"
-        >
+        <select id="dat_to_year" name="dat_to_year" class="select2-hidden-accessible" tabindex="-1" aria-hidden="true"
+        onchange="updateDays('dat_to_year' , 'dat_to_month' , 'dat_to_day')">
           <option class="default">
             {{dat_to_year}}
           </option>
-          {% for year in range(1500, 1841) %}
+          {% for year in range(start_year, end_year) %}
           <option value="{{ year }}">{{ year }}</option>
-          {% endfor %}</select
-        >
+          {% endfor %}
+        </select>
       </div>
       <div class="columns small-12 large-4">
-        <select
-          id="dat_to_month"
-          name="dat_to_month"
-          title=""
-          class="select2-hidden-accessible"
-          tabindex="-1"
-          aria-hidden="true"
-        >
+        <select id="dat_to_month" name="dat_to_month" class="select2-hidden-accessible" tabindex="-1" aria-hidden="true"
+        onchange="updateDays('dat_to_year' , 'dat_to_month' , 'dat_to_day')">
           <option class="default" value="all months" selected="selected">
             all months
           </option>
-          <option value="1">January</option>
-          <option value="2">February</option>
-          <option value="3">March</option>
-          <option value="4">April</option>
-          <option value="5">May</option>
-          <option value="6">June</option>
-          <option value="7">July</option>
-          <option value="8">August</option>
-          <option value="9">September</option>
-          <option value="10">October</option>
-          <option value="11">November</option>
-          <option value="12">December</option></select
-        >
+          {% for month, month_num in months_map.items() %}
+            <option value="{{ month_num }}">{{ month }}</option>
+          {% endfor %}
+        </select>
       </div>
       <div class="columns small-12 large-3">
-        <select
-          id="dat_to_day"
-          name="dat_to_day"
-          title=""
-          class="select2-hidden-accessible"
-          tabindex="-1"
-          aria-hidden="true"
-        >
+        <select id="dat_to_day" name="dat_to_day" class="select2-hidden-accessible" tabindex="-1" aria-hidden="true">
           <option class="default" selected="selected">all dates</option>
-           {% for date in range(1, 32) %}
-            <option value="{{ date }}">{{ date }}</option>
-          {% endfor %}
         </select>
       </div>
       <div class="columns small-12 large-2">
@@ -243,10 +155,5 @@
     </div>
   </fieldset>
 
-  <input
-    name="submit-advanced"
-    type="submit"
-    class="button submit search-related"
-    value="Search"
-  />
+  <button onclick="advanceSearch()" name="submit-advanced" type="submit" class="button submit search-related">Search</button>
 </div>

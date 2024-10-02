@@ -25,22 +25,22 @@
                         <h2 class="main">Search+</h2>
                     </div>
 
-                    <div id="people_section" class="large-10 columns" style="padding-left:25px">
+                    <div id="people_section" class="large-12 columns" style="padding-left:25px">
                         {% include './components/advance/people.jinja2' %}
                     </div>
 
-                    <div id="dates_section" class="large-10 columns" style="padding-left:25px">
+                    <div id="dates_section" class="large-12 columns" style="padding-left:25px">
                         {% include './components/advance/dates.jinja2' %}
                     </div>
-                    <div id="places_section" class="large-10 columns" style="padding-left:25px">
+                    <div id="places_section" class="large-12 columns" style="padding-left:25px">
                         {% include './components/advance/places.jinja2' %}
                     </div>
 
-                    <div id="letters_section" class="large-10 columns" style="padding-left:25px">
+                    <div id="letters_section" class="large-12 columns" style="padding-left:25px">
                         {% include './components/advance/letters.jinja2' %}
                     </div>
 
-                    <div id="institutions_section" class="large-10" style="padding-left:25px">
+                    <div id="institutions_section" class="large-12" style="padding-left:25px">
                         {% include './components/advance/institutions.jinja2' %}
                     </div>
             </div>
@@ -51,7 +51,7 @@
 
 {% block extra_js_bottom %}
 <script>
-function advanceSearchPeople(event){
+function advanceSearch(event){
   
     try {
         const inputs = [
@@ -73,6 +73,15 @@ function advanceSearchPeople(event){
             { id: "ment_gend", defaultValue: "all", paramName: "ment_gend" },
             { id: "ment_roles", defaultValue: "all roles and titles", paramName: "ment_roles" },
             { id: "ment_org", defaultValue: "false", paramName: "ment_org" },
+            { id: "dat_sin_year", defaultValue: "all years", paramName: "dat_sin_year" },
+            { id: "dat_sin_month", defaultValue: "all months", paramName: "dat_sin_month" },
+            { id: "dat_sin_day", defaultValue: "all dates", paramName: "dat_sin_day" },
+            { id: "dat_from_year", defaultValue: "all years", paramName: "dat_from_year" },
+            { id: "dat_from_month", defaultValue: "all months", paramName: "dat_from_month" },
+            { id: "dat_from_day", defaultValue: "all dates", paramName: "dat_from_day" },
+            { id: "dat_to_year", defaultValue: "all years", paramName: "dat_to_year" },
+            { id: "dat_to_month", defaultValue: "all months", paramName: "dat_to_month" },
+            { id: "dat_to_day", defaultValue: "all dates", paramName: "dat_to_day" },
         ];
 
         const baseURL = `${window.location.origin}/forms/advance`;
@@ -111,6 +120,53 @@ function checkQueryOpt(val) {
 
 function changeCheckboxValue(checkbox) {
     checkbox.value = checkbox.checked
+}
+
+// Handling dynamic dates for selected months
+function updateDays(yearElementID, monthElementID, dayElementID){
+    try {
+        // Displaying an error if any element ID is missing
+        if(!yearElementID || !monthElementID || !dayElementID) {
+            console.error(`Element ID is missing for updating days as per selected month`)
+            return
+        }
+        
+        const year = document.getElementById(yearElementID).value;
+        const month = document.getElementById(monthElementID).value;
+        const daySelect = document.getElementById(dayElementID);
+        daySelect.innerHTML = '<option class="default" selected="selected">all dates</option>';
+
+        if (month == "all months") {
+            console.debug("Reurning default value found")
+            return
+        }
+        
+        let daysInMonth;
+
+        switch (month) {
+        case "01": case "03": case "05": case "07": case "08": case "10": case "12":
+            daysInMonth = 31;
+            break;
+        case "04": case "06": case "09": case "11":
+            daysInMonth = 30;
+            break;
+        case "02":
+            daysInMonth = (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)) ? 29 : 28;
+            break;
+        default:
+            daysInMonth = 31;
+            break;
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const option = document.createElement("option");
+            option.value = day;
+            option.textContent = day;
+            daySelect.appendChild(option);
+        }
+    } catch (err) {
+        console.error(err)
+    }
 }
 </script>
 {% endblock extra_js_bottom %}

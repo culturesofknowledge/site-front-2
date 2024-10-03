@@ -183,7 +183,7 @@ try {
       }),
     ];
   }
-
+  console.log("queryObj", queryObj.openingQuery);
   emlo.init();
 } catch (error) {
   console.error(error.message);

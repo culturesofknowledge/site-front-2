@@ -54,6 +54,136 @@ const emlo = {
   },
 };
 
+emlo.DropDown = class extends edges.Component {
+  constructor(params) {
+    super(params);
+    this.results = false;
+
+    this.hitCount = 0;
+  }
+
+  synchronise() {
+    this.results = [];
+    this.hitCount = 0;
+
+    var source = this.edge.result;
+
+    // if there are no sources to pull results from, leave us with an empty
+    // result set
+    if (!source) {
+      return;
+    }
+
+    // first filter the results
+    var results = source.results();
+    this._appendResults({ results: results });
+
+    // record the hit count for later use
+    this.hitCount = source.total();
+  }
+
+  _appendResults(params) {
+    var results = params.results;
+
+    this.results = this.results.concat(results);
+  }
+};
+
+emlo.DropDownRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+
+    // parameters that can be passed in
+    this.noResultsText = edges.util.getParam(
+      params,
+      "noResultsText",
+      "No results to display"
+    );
+
+    this.field = edges.util.getParam(params, "field", "");
+    // ordered list of fields with headers, pre and post wrappers, and a value function
+    this.dropdownDisplay = edges.util.getParam(params, "dropdownDisplay", []);
+
+    // default option text for dropdown
+    this.defaultOptionText = edges.util.getParam(
+      params,
+      "defaultOptionText",
+      "Please select an option"
+    );
+
+    // variables for internal state
+    this.namespace = "edges-bs3-results-dropdown";
+  }
+
+  draw() {
+    let frag = this.noResultsText;
+    if (this.component.results === false) {
+      frag = "";
+    }
+
+    const results = this.component.results;
+    if (results && results.length > 0) {
+      // Create dropdown options
+      let options = results
+        .map((result) => this._renderOption(result))
+        .join("");
+
+      // Add default option at the beginning
+      options =
+        `<option value="" disabled selected>${this.defaultOptionText}</option>` +
+        options;
+
+      // Create dropdown element
+      frag = `
+        <select class="form-control">
+          ${options}
+        </select>
+      `;
+    }
+
+    const containerClasses = edges.util.styleClasses(
+      this.namespace,
+      "container",
+      this.component.id
+    );
+    const container = `<div class="${containerClasses}">${frag}</div>`;
+    this.component.context.html(container);
+  }
+
+  _renderOption(result) {
+    if (this.field) {
+      const value = this._getValue(this.field, result, "");
+      const displayText = this._getValue(this.field, result, "");
+
+      return `<option value="${edges.util.escapeHtml(
+        value
+      )}">${edges.util.escapeHtml(displayText)}</option>`;
+    }
+  }
+
+  _getValue(path, rec, def) {
+    if (def === undefined) {
+      def = false;
+    }
+    const bits = path.split(".");
+    let val = rec;
+    for (let i = 0; i < bits.length; i++) {
+      const field = bits[i];
+      if (field in val) {
+        val = val[field];
+      } else {
+        return def;
+      }
+    }
+    if ($.isArray(val)) {
+      val = val.join(this.arrayValueJoin);
+    } else if ($.isPlainObject(val)) {
+      val = def;
+    }
+    return val;
+  }
+};
+
 emlo.ResultTable = class extends edges.Component {
   constructor(params) {
     super(params);

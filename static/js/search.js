@@ -45,6 +45,7 @@ function advanceSearch(params) {
     must: [],
     query: {},
     queryStrings: [],
+    sort: [],
   };
 
   // Define an array of objects that map parameter names to query configurations
@@ -56,6 +57,7 @@ function advanceSearch(params) {
         { field: "person-recipient", operator: "OR" },
         { field: "person-mentioned", operator: "OR" },
       ],
+      sortOptions: [{ field: "started_date_sort", order: "asc" }],
     },
     {
       param: "people_gend",
@@ -252,6 +254,10 @@ function advanceSearch(params) {
         queryString: paramValue,
         fields: config.queryStringFields,
       });
+    }
+
+    if (config.sortOptions && config.sortOptions.length > 0) {
+      openingQuery.sort.push(config.sortOptions);
     }
   });
 

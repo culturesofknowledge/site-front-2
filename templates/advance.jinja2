@@ -50,6 +50,8 @@
 
 
 {% block extra_js_bottom %}
+{% include "_edges_common_js.jinja2" %}
+<script type="module" src="../static/js/repository_dropdown.edges.js"></script>
 <script>
 function advanceSearch(event){
   

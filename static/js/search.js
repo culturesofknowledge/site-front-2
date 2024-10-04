@@ -334,6 +334,18 @@ function advanceSearch(params) {
     });
   }
 
+  if (params.get("let_seal_tex") && params.get("let_seal_tex") != "") {
+    openingQuery.queryStrings.push({
+      queryString: params.get("let_seal_tex"),
+      fields: [{ field: "manifestation-seal", operator: "OR" }],
+    });
+  } else if (params.get("let_seal") && params.get("let_seal") == "true") {
+    openingQuery.queryStrings.push({
+      queryString: "*",
+      fields: [{ field: "manifestation-seal", operator: "OR" }],
+    });
+  }
+
   // Handle date range query
   const sinYear = params.get("dat_sin_year");
   const sinMonth = params.get("dat_sin_month");

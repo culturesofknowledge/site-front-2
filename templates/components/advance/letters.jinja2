@@ -15,10 +15,6 @@
           type="text"
           class="text"
           value="{{ let_con if let_con else 'all content' }}" 
-          onfocus="
-  javascript:textClear(this);"
-          onblur="
-  javascript:textFill(this);"
         />
       </div>
       <div class="small-1 columns">
@@ -45,13 +41,9 @@
       <div class="small-11 columns">
         <select id="let_type" name="let_type" title="" class="">
           <option class="default" selected="selected">all types</option>
-          <option>Digital copy</option>
-          <option>Draft</option>
-          <option>Extract</option>
-          <option>Letter</option>
-          <option>Manuscript copy</option>
-          <option>Printed copy</option>
-          <option>Other</option>
+          {% for document_type in document_types %}
+          <option value="{{ document_type }}"> {{ document_type }} </option>
+          {% endfor %}
         </select>
       </div>
       <div class="small-1 columns">
@@ -85,27 +77,11 @@
           aria-hidden="true"
         >
           <option class="default" selected="selected">all languages</option>
-
-          <option>Ancient Greek</option>
-          <option>Basque</option>
-          <option>Cornish</option>
-          <option>Czech</option>
-          <option>Danish</option>
-          <option>Dutch</option>
-          <option>English</option>
-          <option>French</option>
-          <option>German</option>
-          <option>Hebrew</option>
-          <option>Irish</option>
-          <option>Italian</option>
-          <option>Latin</option>
-          <option>Old French</option>
-          <option>Polish</option>
-          <option>Scottish Gaelic</option>
-          <option>Spanish</option>
-          <option>Swedish</option>
-          <option>Welsh</option></select
-        ><span
+          {% for language in languages %}
+          <option value="{{ language }}">{{ language }}</option>
+          {% endfor %}
+        </select>
+        <span
           class="select2 select2-container select2-container--default"
           dir="ltr"
           style="width: 582px"
@@ -156,7 +132,8 @@
               type="checkbox"
               id="let_ima"
               name="let_ima"
-              value="true"
+              value="false"
+              onchange="changeCheckboxValue(this)"
               class="checkbox"
             />
 
@@ -190,8 +167,8 @@
               type="checkbox"
               id="let_abst"
               name="let_abst"
-              value="true"
-              class="checkbox"
+              value="false"
+              onchange="changeCheckboxValue(this)"
             />
 
             <label for="let_abst">Abstracts</label>
@@ -224,7 +201,8 @@
               type="checkbox"
               id="let_trans"
               name="let_trans"
-              value="true"
+              value="false"
+              onchange="changeCheckboxValue(this)"
               class="checkbox"
             />
 
@@ -297,7 +275,8 @@
               type="checkbox"
               id="let_pmark"
               name="let_pmark"
-              value="true"
+              value="false"
+              onchange="changeCheckboxValue(this)"
               class="checkbox"
             />
 
@@ -370,7 +349,8 @@
               type="checkbox"
               id="let_end"
               name="let_end"
-              value="true"
+              value="false"
+              onchange="changeCheckboxValue(this)"
               class="checkbox"
             />
 
@@ -443,7 +423,8 @@
               type="checkbox"
               id="let_with_en"
               name="let_with_en"
-              value="true"
+              value="false"
+              onchange="changeCheckboxValue(this)"
               class="checkbox"
             />
 
@@ -476,7 +457,8 @@
               type="checkbox"
               id="let_en"
               name="let_en"
-              value="true"
+              value="false"
+              onchange="changeCheckboxValue(this)"
               class="checkbox"
             />
 
@@ -549,7 +531,8 @@
               type="checkbox"
               id="let_seal"
               name="let_seal"
-              value="true"
+              value="false"
+              onchange="changeCheckboxValue(this)"
               class="checkbox"
             />
 
@@ -622,7 +605,8 @@
               type="checkbox"
               id="let_pap_typ"
               name="let_pap_typ"
-              value="true"
+              value="false"
+              onchange="changeCheckboxValue(this)"
               class="checkbox"
             />
 
@@ -691,7 +675,8 @@
               type="checkbox"
               id="let_pap_siz"
               name="let_pap_siz"
-              value="true"
+              value="false"
+              onchange="changeCheckboxValue(this)"
               class="checkbox"
             />
 
@@ -727,7 +712,8 @@
               type="checkbox"
               id="let_page"
               name="let_page"
-              value="true"
+              value="false"
+              onchange="changeCheckboxValue(this)"
               class="checkbox"
             />
 

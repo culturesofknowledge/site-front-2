@@ -346,6 +346,41 @@ function advanceSearch(params) {
     });
   }
 
+  if (params.get("let_pap_typ_tex") && params.get("let_pap_typ_tex") != "") {
+    openingQuery.queryStrings.push({
+      queryString: params.get("let_pap_typ_tex"),
+      fields: [{ field: "manifestation-paper_type", operator: "OR" }],
+    });
+  } else if (params.get("let_pap_type") && params.get("let_seal") == "true") {
+    openingQuery.queryStrings.push({
+      queryString: "*",
+      fields: [{ field: "manifestation-paper_type", operator: "OR" }],
+    });
+  }
+
+  if (params.get("let_pap_siz_tex") && params.get("let_pap_siz_tex") != "") {
+    openingQuery.queryStrings.push({
+      queryString: params.get("let_pap_siz_tex"),
+      fields: [{ field: "manifestation-paper_size", operator: "OR" }],
+    });
+  } else if (params.get("let_pap_siz") && params.get("let_pap_siz") == "true") {
+    openingQuery.queryStrings.push({
+      queryString: "*",
+      fields: [{ field: "manifestation-paper_type", operator: "OR" }],
+    });
+  }
+
+  if (params.get("let_page_min") && params.get("let_page_min") != "") {
+    openingQuery.query.range = {
+      "manifestation-paper_size": { gte: params.get("let_page_min"), lte: "*" },
+    };
+  } else if (params.get("let_pap_siz") && params.get("let_pap_siz") == "true") {
+    openingQuery.queryStrings.push({
+      queryString: "*",
+      fields: [{ field: "manifestation-paper_type", operator: "OR" }],
+    });
+  }
+
   // Handle date range query
   const sinYear = params.get("dat_sin_year");
   const sinMonth = params.get("dat_sin_month");

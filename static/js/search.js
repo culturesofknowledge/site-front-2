@@ -256,29 +256,6 @@ function advanceSearch(params) {
       }
     }
 
-    if (params.get("let_ima") == "true") {
-      openingQuery.queryStrings.push({
-        queryString: "*",
-        fields: [{ field: "manifestation-has_image", operator: "AND" }],
-      });
-    }
-
-    if (params.get("let_trans") == "true") {
-      openingQuery.queryStrings.push({
-        queryString: "*",
-        fields: [
-          { field: "manifestation-urlOfTranscription", operator: "AND" },
-        ],
-      });
-    }
-
-    if (params.get("let_abst") == "true") {
-      openingQuery.queryStrings.push({
-        queryString: "*",
-        fields: [{ field: "dcterms_abstract", operator: "AND" }],
-      });
-    }
-
     if (paramValue) {
       openingQuery.queryStrings.push({
         queryString: paramValue,
@@ -286,6 +263,39 @@ function advanceSearch(params) {
       });
     }
   });
+
+  if (params.get("let_ima") == "true") {
+    openingQuery.queryStrings.push({
+      queryString: "*",
+      fields: [{ field: "manifestation-has_image", operator: "AND" }],
+    });
+  }
+
+  if (params.get("let_trans") == "true") {
+    openingQuery.queryStrings.push({
+      queryString: "*",
+      fields: [{ field: "manifestation-urlOfTranscription", operator: "AND" }],
+    });
+  }
+
+  if (params.get("let_abst") == "true") {
+    openingQuery.queryStrings.push({
+      queryString: "*",
+      fields: [{ field: "dcterms_abstract", operator: "AND" }],
+    });
+  }
+
+  if (params.get("let_pmark_tex") && params.get("let_pmark_tex") != "") {
+    openingQuery.queryStrings.push({
+      queryString: params.get("let_pmark_tex"),
+      fields: [{ field: "manifestation-postage_mark", operator: "AND" }],
+    });
+  } else if (params.get("let_pmark") && params.get("let_pmark") == "true") {
+    openingQuery.queryStrings.push({
+      queryString: "*",
+      fields: [{ field: "manifestation-postage_mark", operator: "AND" }],
+    });
+  }
 
   // Handle date range query
   const sinYear = params.get("dat_sin_year");

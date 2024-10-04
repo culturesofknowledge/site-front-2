@@ -309,6 +309,31 @@ function advanceSearch(params) {
     });
   }
 
+  if (params.get("let_with_en_tex") && params.get("let_with_en_tex") != "") {
+    openingQuery.queryStrings.push({
+      queryString: params.get("let_with_en_tex"),
+      fields: [
+        { field: "manifestation-enclosure", operator: "OR" },
+        { field: "manifestation-non_letter_enclosures", operator: "OR" },
+      ],
+    });
+  } else if (params.get("let_with_en") && params.get("let_with_en") == "true") {
+    openingQuery.queryStrings.push({
+      queryString: "*",
+      fields: [
+        { field: "manifestation-enclosure", operator: "OR" },
+        { field: "manifestation-non_letter_enclosures", operator: "OR" },
+      ],
+    });
+  }
+
+  if (params.get("let_en") == "true") {
+    openingQuery.queryStrings.push({
+      queryString: "*",
+      fields: [{ field: "manifestation-enclosed", operator: "AND" }],
+    });
+  }
+
   // Handle date range query
   const sinYear = params.get("dat_sin_year");
   const sinMonth = params.get("dat_sin_month");

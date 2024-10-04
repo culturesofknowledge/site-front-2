@@ -178,6 +178,16 @@ function advanceSearch(params) {
       param: "let_lang",
       queryStringFields: [{ field: "dcterms_language", operator: "OR" }],
     },
+    {
+      param: "repository",
+      queryStringFields: [
+        { field: "manifestation-institution-place", operator: "OR" },
+      ],
+    },
+    {
+      param: "let_shel",
+      queryStringFields: [{ field: "manifestation-shelfmark", operator: "OR" }],
+    },
   ];
 
   // Loop through paramConfigs to generate query strings
@@ -378,6 +388,18 @@ function advanceSearch(params) {
     openingQuery.queryStrings.push({
       queryString: "*",
       fields: [{ field: "manifestation-paper_type", operator: "OR" }],
+    });
+  }
+
+  if (params.get("let_pe_tex") && params.get("let_pe_tex") != "") {
+    openingQuery.queryStrings.push({
+      queryString: params.get("let_pe_tex"),
+      fields: [{ field: "manifestation-printed_edition", operator: "OR" }],
+    });
+  } else if (params.get("let_pe") && params.get("let_pe") == "true") {
+    openingQuery.queryStrings.push({
+      queryString: "*",
+      fields: [{ field: "manifestation-printed_edition", operator: "OR" }],
     });
   }
 

@@ -27,6 +27,39 @@ def advance():
         "December": "12"
     }
 
+    # Variables used inside advance/letter.jinja2
+    languages = [
+        "Ancient Greek",
+        "Basque",
+        "Cornish",
+        "Czech",
+        "Danish",
+        "Dutch",
+        "English",
+        "French",
+        "German",
+        "Hebrew",
+        "Irish",
+        "Italian",
+        "Latin",
+        "Old French",
+        "Polish",
+        "Scottish Gaelic",
+        "Spanish",
+        "Swedish",
+        "Welsh"
+    ]
+
+    document_types = [
+        "Digital copy",
+        "Draft",
+        "Extract",
+        "Letter",
+        "Manuscript copy",
+        "Printed copy",
+        "Other"
+    ]
+
     return render_template('advance.jinja2', title="Search +", 
                            people=people, 
                            locations=locations, 
@@ -35,4 +68,6 @@ def advance():
                            let_con=let_con,
                            months_map=months_map,
                            start_year=start_year,
-                           end_year=end_year)
+                           end_year=end_year,
+                           languages=languages,
+                           document_types=document_types)

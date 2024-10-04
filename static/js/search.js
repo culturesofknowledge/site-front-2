@@ -171,6 +171,14 @@ function advanceSearch(params) {
         { field: "mail_postScript", operator: "OR" },
       ],
     },
+    {
+      param: "let_type",
+      queryStringFields: [{ field: "manifestation-doc_type", operator: "OR" }],
+    },
+    {
+      param: "let_lang",
+      queryStringFields: [{ field: "dcterms_language", operator: "OR" }],
+    },
   ];
 
   // Loop through paramConfigs to generate query strings
@@ -247,6 +255,29 @@ function advanceSearch(params) {
           });
         }
       }
+    }
+
+    if (params.get("let_ima") == "true") {
+      openingQuery.queryStrings.push({
+        queryString: "*",
+        fields: [{ field: "manifestation-has_image", operator: "AND" }],
+      });
+    }
+
+    if (params.get("let_trans") == "true") {
+      openingQuery.queryStrings.push({
+        queryString: "*",
+        fields: [
+          { field: "manifestation-urlOfTranscription", operator: "AND" },
+        ],
+      });
+    }
+
+    if (params.get("let_abst") == "true") {
+      openingQuery.queryStrings.push({
+        queryString: "*",
+        fields: [{ field: "dcterms_abstract", operator: "AND" }],
+      });
     }
 
     if (paramValue) {

@@ -4,12 +4,12 @@ import { searchQueryObj } from "./search.js";
 try {
   const queryObj = searchQueryObj();
 
-  if (queryObj && queryObj.openingQuery != null) {
+  if (queryObj != null && queryObj.openingQuery != null) {
     emlo.openingQuery = queryObj.openingQuery;
   }
   emlo.selector = "emlo-results";
 
-  if (queryObj && queryObj.collection != "") {
+  if (queryObj != null && queryObj.collection != "") {
     emlo.collection = queryObj.collection;
 
     emlo.components = [
@@ -183,7 +183,7 @@ try {
       }),
     ];
   }
-  console.log("queryObj", queryObj.openingQuery);
+
   emlo.init();
 } catch (error) {
   console.error(error.message);

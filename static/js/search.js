@@ -297,6 +297,18 @@ function advanceSearch(params) {
     });
   }
 
+  if (params.get("let_end_tex") && params.get("let_end_tex") != "") {
+    openingQuery.queryStrings.push({
+      queryString: params.get("let_end_tex"),
+      fields: [{ field: "manifestation-endorsements", operator: "AND" }],
+    });
+  } else if (params.get("let_end") && params.get("let_end") == "true") {
+    openingQuery.queryStrings.push({
+      queryString: "*",
+      fields: [{ field: "manifestation-endorsements", operator: "AND" }],
+    });
+  }
+
   // Handle date range query
   const sinYear = params.get("dat_sin_year");
   const sinMonth = params.get("dat_sin_month");

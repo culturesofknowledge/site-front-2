@@ -113,7 +113,7 @@ function advanceSearch(event){
             { id: "let_pap_siz", defaultValue: "false", paramName: "let_pap_siz" },
             { id: "let_pap_siz_tex", defaultValue: "all paper sizes", paramName: "let_pap_siz_tex" },
             { id: "let_page", defaultValue: "false", paramName: "let_page" },
-            { id: "let_page_min", defaultValue: "all number", paramName: "let_page_min" },
+            { id: "let_page_min", defaultValue: "0", paramName: "let_page_min" },
             { id: "repository", defaultValue: "all repositories", paramName: "repository" },
             { id: "let_shel", defaultValue: "all shelfmarks", paramName: "let_shel" },
             { id: "let_pe", defaultValue: "false", paramName: "let_pe" },
@@ -127,11 +127,13 @@ function advanceSearch(event){
         const baseOrigin = window.location.origin;
 
         inputs.forEach(input => {
-            const value = document.getElementById(input.id).value;
+            if(document.getElementById(input.id)) {
+                const value = document.getElementById(input.id).value;
 
-            if (value && value !== input.defaultValue) {
-                sendQuery = true;
-                queryString += `${checkQueryOpt(queryString)}${input.paramName}=${value}`;
+                if (value && value !== input.defaultValue) {
+                    sendQuery = true;
+                    queryString += `${checkQueryOpt(queryString)}${input.paramName}=${value}`;
+                }
             }
         });
 

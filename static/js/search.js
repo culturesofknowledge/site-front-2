@@ -1,3 +1,5 @@
+const ROWS_COUNT = 50;
+
 export function searchQueryObj() {
   // Fetching URL params
   const queryString = window.location.search;
@@ -17,6 +19,7 @@ export function searchQueryObj() {
 function quickSearch(params) {
   let openingQuery = {
     must: [],
+    size: ROWS_COUNT, // This will allow us to fetch number of rows using solr query.
     sort: [{ field: "score", order: "desc" }],
   };
 
@@ -49,6 +52,7 @@ function advanceSearch(params) {
     must: [],
     query: {},
     queryStrings: [],
+    size: ROWS_COUNT, // This will allow us to fetch number of rows using solr query.
     sort: [
       { field: "started_date_sort", order: "asc" },
       { field: "score", order: "desc" },

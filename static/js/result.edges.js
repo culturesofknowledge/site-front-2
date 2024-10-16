@@ -192,27 +192,50 @@ try {
 function generateResultHeader(selector) {
   let currentDoc = document.getElementById("result-header");
 
-  if (emlo && emlo.active && emlo.active[selector]) {
-    const activeRes = emlo.active[selector];
-
-    if (
-      activeRes.result &&
-      activeRes.result.data &&
-      activeRes.result.data.response &&
-      activeRes.result.data.response.numFound
-    ) {
-      if (activeRes.result.data.response.numFound > 50) {
-        currentDoc.innerHTML = `${activeRes.result.data.response.numFound} results (50 result per page)`;
-        return;
-      } else {
-        currentDoc.innerHTML = `${activeRes.result.data.response.numFound} results`;
-        return;
-      }
-    }
+  // Check if the fetching process is active
+  if (!emlo || !emlo.active || !emlo.active[selector]) {
+    currentDoc.innerHTML = "Loading results...";
+    return;
   }
-  currentDoc.innerHTML = "";
+
+  const activeRes = emlo.active[selector];
+
+  // Check if results are fetched correctly
+  if (
+    activeRes.result &&
+    activeRes.result.data &&
+    activeRes.result.data.response &&
+    activeRes.result.data.response.numFound
+  ) {
+    const numFound = activeRes.result.data.response.numFound;
+    if (numFound > 50) {
+      currentDoc.innerHTML = `${numFound} results (50 results per page)`;
+    } else {
+      currentDoc.innerHTML = `${numFound} results`;
+    }
+  } else {
+    // Fallback message when results are not fetched
+    currentDoc.innerHTML = "No results found.";
+  }
+}
+
+// Retry fetching results after a delay
+function checkResultsWithRetry(selector, retries = 5, delay = 2000) {
+  let attempt = 0;
+
+  const intervalId = setInterval(() => {
+    generateResultHeader(selector);
+    attempt++;
+    if (attempt >= retries) {
+      clearInterval(intervalId);
+    }
+  }, delay);
 }
 
 window.onload = () => {
+  // Call the function initially
   generateResultHeader("emlo-results");
+
+  // Set up a retry mechanism to check results
+  checkResultsWithRetry("emlo-results");
 };

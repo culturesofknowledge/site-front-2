@@ -562,4 +562,315 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
   }
 };
 
+emlo.FacetRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+
+    ///////////////////////////////////////
+    // parameters that can be passed in
+    this.title = edges.util.getParam(params, "title", "Select");
+    this.hideInactive = edges.util.getParam(params, "hideInactive", false);
+    this.controls = edges.util.getParam(params, "controls", true);
+    this.open = edges.util.getParam(params, "open", false);
+    this.togglable = edges.util.getParam(params, "togglable", true);
+    this.showSelected = edges.util.getParam(params, "showSelected", true);
+    this.sortCycle = edges.util.getParam(params, "sortCycle", [
+      "count desc",
+      "count asc",
+      "term desc",
+      "term asc",
+    ]);
+    this.countFormat = edges.util.getParam(params, "countFormat", false);
+    this.tooltipText = edges.util.getParam(params, "tooltipText", false);
+    this.tooltip = edges.util.getParam(params, "tooltip", false);
+    this.tooltipState = "closed";
+    this.namespace = "edges-bs4-refining-and-term-selector";
+    this.displayLimit = 10; // Show only the first 10 entries by default
+    this.showAll = false; // Track whether to show all entries
+  }
+
+  draw() {
+    let ts = this.component;
+
+    if (!ts.active && this.hideInactive) {
+      ts.context.html("");
+      return;
+    }
+
+    const valClass = edges.util.allClasses(
+      this.namespace,
+      "value",
+      this.component.id
+    );
+    const filterRemoveClass = edges.util.allClasses(
+      this.namespace,
+      "filter-remove",
+      this.component.id
+    );
+
+    const resultsListClass = edges.util.styleClasses(
+      this.namespace,
+      "results-list",
+      this.component.id
+    );
+    const resultClass = edges.util.styleClasses(
+      this.namespace,
+      "result",
+      this.component.id
+    );
+    const controlClass = edges.util.styleClasses(
+      this.namespace,
+      "controls",
+      this.component.id
+    );
+    const facetClass = edges.util.styleClasses(
+      this.namespace,
+      "facet",
+      this.component.id
+    );
+    const headerClass = edges.util.styleClasses(
+      this.namespace,
+      "header",
+      this.component.id
+    );
+    const selectedClass = edges.util.styleClasses(
+      this.namespace,
+      "selected",
+      this.component.id
+    );
+
+    const controlId = edges.util.htmlID(
+      this.namespace,
+      "controls",
+      this.component.id
+    );
+    const sizeId = edges.util.htmlID(this.namespace, "size", this.component.id);
+    const orderId = edges.util.htmlID(
+      this.namespace,
+      "order",
+      this.component.id
+    );
+    const toggleId = edges.util.htmlID(
+      this.namespace,
+      "toggle",
+      this.component.id
+    );
+    const resultsId = edges.util.htmlID(
+      this.namespace,
+      "results",
+      this.component.id
+    );
+    const showMoreId = edges.util.htmlID(
+      this.namespace,
+      "show-more",
+      this.component.id
+    );
+
+    let results = "Loading...";
+    if (ts.values !== false) {
+      results = "No data available";
+    }
+
+    if (ts.values && ts.values.length > 0) {
+      results = "";
+      const filterTerms = ts.filters.map((filter) => filter.term.toString());
+
+      ts.values.forEach((val, idx) => {
+        if (!filterTerms.includes(val.term.toString())) {
+          let count = val.count;
+          if (this.countFormat) {
+            count = this.countFormat(count);
+          }
+          const isHidden = idx >= this.displayLimit && !this.showAll;
+          results +=
+            `<div class="${resultClass}" style="${
+              isHidden ? "display:none;" : ""
+            }"><a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
+              val.term
+            )}">` +
+            `${edges.util.escapeHtml(val.display)}</a> (${count})</div>`;
+        }
+      });
+    }
+
+    // Add "Show more" button if there are more than 10 entries
+    let showMoreFrag = "";
+    if (ts.values.length > this.displayLimit && !this.showAll) {
+      showMoreFrag = `<div class="text-center"><button id="${showMoreId}" class="btn btn-link">Show more</button></div>`;
+    }
+
+    let tooltipFrag = "";
+    if (this.tooltipText) {
+      const tt = this._shortTooltip();
+      const tooltipClass = edges.util.styleClasses(
+        this.namespace,
+        "tooltip",
+        this.component.id
+      );
+      const tooltipId = edges.util.htmlID(
+        this.namespace,
+        "tooltip",
+        this.component.id
+      );
+      tooltipFrag = `<div id="${tooltipId}" class="${tooltipClass}" style="display:none"><div class="row"><div class="col-md-12">${tt}</div></div></div>`;
+    }
+
+    let controlFrag = "";
+    if (this.controls) {
+      controlFrag = `<div class="${controlClass}" style="display:none" id="${controlId}"><div class="row"> 
+                      <div class="col-md-12">
+                          <div class="btn-group">
+                              <button type="button" class="btn btn-default btn-sm" id="${sizeId}" title="List Size">0</button> 
+                              <button type="button" class="btn btn-default btn-sm" id="${orderId}" title="List Order"></button> 
+                          </div>
+                      </div>
+                  </div></div>`;
+    }
+
+    let filterFrag = "";
+    if (ts.filters.length > 0 && this.showSelected) {
+      ts.filters.forEach((filt) => {
+        filterFrag += `<div class="${resultClass}"><strong>${edges.util.escapeHtml(
+          filt.display
+        )}&nbsp;`;
+        filterFrag += `<a href="#" class="${filterRemoveClass}" data-key="${edges.util.escapeHtml(
+          filt.term
+        )}">`;
+        filterFrag += '<i class="fas fa-times"></i></a>';
+        filterFrag += "</strong></a></div>";
+      });
+    }
+
+    let tog = this.title;
+    if (this.togglable) {
+      tog = `<a href="#" id="${toggleId}"><i class="fas fa-plus"></i>&nbsp;${this.title}</a>`;
+    }
+
+    let frag = `<div class="${facetClass}">
+                      <div class="${headerClass}"><div class="row"> 
+                          <div class="col-md-12">
+                              ${tog}
+                          </div>
+                      </div></div>
+                      ${tooltipFrag}
+                      {{CONTROLS}}
+                      <div class="row" style="display:none" id="${resultsId}">
+                          <div class="col-md-12">
+                              <div class="${selectedClass}">{{SELECTED}}</div>
+                              <div class="${resultsListClass}">{{RESULTS}}</div>
+                              ${showMoreFrag}
+                          </div>
+                      </div></div>`;
+
+    frag = frag
+      .replace(/{{RESULTS}}/g, results)
+      .replace(/{{CONTROLS}}/g, controlFrag)
+      .replace(/{{SELECTED}}/g, filterFrag);
+
+    ts.context.html(frag);
+
+    this.setUISize();
+    this.setUISort();
+    this.setUIOpen();
+
+    const valueSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "value",
+      this.component.id
+    );
+    const filterRemoveSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "filter-remove",
+      this
+    );
+    const toggleSelector = edges.util.idSelector(
+      this.namespace,
+      "toggle",
+      this
+    );
+    const sizeSelector = edges.util.idSelector(this.namespace, "size", this);
+    const orderSelector = edges.util.idSelector(this.namespace, "order", this);
+    const showMoreSelector = edges.util.idSelector(
+      this.namespace,
+      "show-more",
+      this
+    );
+
+    edges.on(valueSelector, "click", this, "termSelected");
+    edges.on(toggleSelector, "click", this, "toggleOpen");
+    edges.on(filterRemoveSelector, "click", this, "removeFilter");
+    edges.on(sizeSelector, "click", this, "changeSize");
+    edges.on(orderSelector, "click", this, "changeSort");
+
+    if (this.component.jq(showMoreSelector).length > 0) {
+      edges.on(showMoreSelector, "click", this, "showMoreEntries");
+    }
+  }
+
+  showMoreEntries() {
+    this.showAll = true;
+    this.draw(); // Re-draw the component to show all entries
+  }
+
+  setUIOpen() {
+    const resultsSelector = edges.util.idSelector(
+      this.namespace,
+      "results",
+      this.component.id
+    );
+    const controlsSelector = edges.util.idSelector(
+      this.namespace,
+      "controls",
+      this.component.id
+    );
+    const tooltipSelector = edges.util.idSelector(
+      this.namespace,
+      "tooltip",
+      this.component.id
+    );
+    const toggleSelector = edges.util.idSelector(
+      this.namespace,
+      "toggle",
+      this.component.id
+    );
+
+    const results = this.component.jq(resultsSelector);
+    const controls = this.component.jq(controlsSelector);
+    const tooltip = this.component.jq(tooltipSelector);
+    const toggle = this.component.jq(toggleSelector);
+
+    if (this.open) {
+      toggle.find("i").removeClass("fa-plus").addClass("fa-minus");
+      controls.show();
+      results.show();
+      tooltip.show();
+    } else {
+      toggle.find("i").removeClass("fa-minus").addClass("fa-plus");
+      controls.hide();
+      results.hide();
+      tooltip.hide();
+    }
+  }
+
+  setUISize() {
+    const sizeSelector = edges.util.idSelector(
+      this.namespace,
+      "size",
+      this.component.id
+    );
+    const size = this.component.jq(sizeSelector);
+    size.html(this.component.size);
+  }
+
+  setUISort() {
+    const orderSelector = edges.util.idSelector(
+      this.namespace,
+      "order",
+      this.component.id
+    );
+    const order = this.component.jq(orderSelector);
+    order.html(this.component.currentSort);
+  }
+};
+
 export default emlo;

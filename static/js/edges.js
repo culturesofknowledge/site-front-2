@@ -401,12 +401,72 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
     this.component.context.html(container);
   }
 
+  // _renderResult(res, index) {
+  //   const rowClasses = edges.util.styleClasses(
+  //     this.namespace,
+  //     "row",
+  //     this.component.id
+  //   );
+  //   const row = this.tableDisplay
+  //     .map((field) => {
+  //       let val = "";
+  //       if (field.field) {
+  //         val = this._getValue(field.field, res, val);
+  //       }
+  //       if (val) {
+  //         val = edges.util.escapeHtml(val);
+  //       }
+  //       if (field.valueFunction) {
+  //         val = field.valueFunction(val, res, this);
+  //       }
+  //       if (!val && this.omitFieldIfEmpty) {
+  //         return "<td></td>";
+  //       }
+
+  //       if (field.type) {
+  //         if (field.type == "date") {
+  //           return `<td>${this._formatDate(val)}</td>`;
+  //         } else if (field.type == "link") {
+  //           if (field.linkText) {
+  //             return `<td><a href=${val}>${field.linkText}</a></td>`;
+  //           } else {
+  //             return `<td><a href=${val}>Link</a></td>`;
+  //           }
+  //         }
+  //       }
+
+  //       return `<td>${field.pre || ""}${val}${field.post || ""}</td>`;
+  //     })
+  //     .join("");
+
+  //   return this.showIndex
+  //     ? `<tr class="${rowClasses}"><td>${index + 1}</td>${row}</tr>`
+  //     : `<tr class="${rowClasses}">${row}</tr>`;
+  // }
+
   _renderResult(res, index) {
     const rowClasses = edges.util.styleClasses(
       this.namespace,
       "row",
       this.component.id
     );
+
+    // Default page size if not defined
+    const pageSize = this.component.infiniteScrollPageSize || 50;
+
+    // Safely retrieve the pagination component
+    let pageNumber = 1; // Default to the first page
+
+    const paginationComponent = this.component.edge.components.find(
+      (comp) => comp.id === "top-pager"
+    );
+    if (paginationComponent && paginationComponent.page) {
+      pageNumber = paginationComponent.page;
+    }
+
+    // Calculate the continuous serial number using the pageNumber and pageSize
+    const continuousIndex = (pageNumber - 1) * pageSize + index + 1;
+
     const row = this.tableDisplay
       .map((field) => {
         let val = "";
@@ -439,8 +499,9 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       })
       .join("");
 
+    // Add continuous serial number as the first cell in the row if showIndex is enabled
     return this.showIndex
-      ? `<tr class="${rowClasses}"><td>${index + 1}</td>${row}</tr>`
+      ? `<tr class="${rowClasses}"><td>${continuousIndex}</td>${row}</tr>`
       : `<tr class="${rowClasses}">${row}</tr>`;
   }
 

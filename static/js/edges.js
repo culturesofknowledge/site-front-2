@@ -78,7 +78,7 @@ emlo.ResultTemplate = class extends edges.Template {
       <div class="side-nav"> 
         <h2 class="main">Search</h2>
        
-          <div id="modify_search">
+          <div id="modify_search" style="display:none;">
               <button onclick="modifyCurrentSearch()">Modify search</button>
           </div>
 

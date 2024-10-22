@@ -249,10 +249,20 @@ function checkResultsWithRetry(selector, retries = 5, delay = 2000) {
   }, delay);
 }
 
-// window.onload = () => {
-//   // Call the function initially
-//   generateResultHeader("emlo-results");
+window.onload = () => {
+  // Call the function initially
+  generateResultHeader("emlo-results");
 
-//   // Set up a retry mechanism to check results
-//   checkResultsWithRetry("emlo-results");
-// };
+  // Set up a retry mechanism to check results
+  checkResultsWithRetry("emlo-results");
+};
+
+$(document).ready(function () {
+  // Get the current URL's search parameters
+  const queryParams = new URLSearchParams(window.location.search);
+
+  // Check if there are any query parameters
+  if (queryParams.toString()) {
+    $("#modify_search").show();
+  }
+});

@@ -118,7 +118,7 @@ try {
         category: "refine_search",
         field: "author_sort",
         display: "Author",
-        renderer: new edges.renderers.bs3.RefiningANDTermSelector({
+        renderer: new emlo.FacetRenderer({
           open: true,
           title: "Author",
           showSelected: false,

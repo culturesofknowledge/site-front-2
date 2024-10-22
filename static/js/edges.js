@@ -653,7 +653,7 @@ emlo.FacetRenderer = class extends edges.Renderer {
     this.tooltipText = edges.util.getParam(params, "tooltipText", false);
     this.tooltip = edges.util.getParam(params, "tooltip", false);
     this.tooltipState = "closed";
-    this.namespace = "edges-bs4-refining-and-term-selector";
+    this.namespace = "emlo-facet-view";
     this.displayLimit = 10; // Show only the first 10 entries by default
     this.showAll = false; // Track whether to show all entries
   }
@@ -751,13 +751,21 @@ emlo.FacetRenderer = class extends edges.Renderer {
             count = this.countFormat(count);
           }
           const isHidden = idx >= this.displayLimit && !this.showAll;
-          results +=
-            `<div class="${resultClass}" style="${
-              isHidden ? "display:none;" : ""
-            }"><a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
-              val.term
-            )}">` +
-            `${edges.util.escapeHtml(val.display)}</a> (${count})</div>`;
+          results += `
+            <tr  style="${isHidden ? "display:none;" : ""}">
+              <td>
+                <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
+            val.term
+          )}">
+                  <img class="facet" src="../img/plus-facet.png" height="15px" width="15px" />  
+                  ${edges.util.escapeHtml(val.display)}
+                </a>
+              </td>
+              <td>
+                ${count}
+              </td>
+            </tr>
+            `;
         }
       });
     }
@@ -825,9 +833,12 @@ emlo.FacetRenderer = class extends edges.Renderer {
                       {{CONTROLS}}
                       <div class="row" style="display:none" id="${resultsId}">
                           <div class="col-md-12">
-                              <div class="${selectedClass}">{{SELECTED}}</div>
-                              <div class="${resultsListClass}">{{RESULTS}}</div>
-                              ${showMoreFrag}
+                            <table class="facet">
+                              <tbody>
+                                {{RESULTS}}
+                              </tbody>
+                            </table>
+                            ${showMoreFrag} 
                           </div>
                       </div></div>`;
 

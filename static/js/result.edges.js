@@ -37,7 +37,7 @@ try {
 
       new emlo.ResultTable({
         id: "results",
-        category: "results",
+        category: "main",
         secondaryResults: false,
         infiniteScroll: true,
         size: 20,
@@ -110,6 +110,19 @@ try {
           showSizeSelector: false,
           showRecordCount: false,
           showChevrons: true,
+        }),
+      }),
+
+      new edges.components.RefiningANDTermSelector({
+        id: "author_sort",
+        category: "refine_search",
+        field: "author_sort",
+        display: "Author",
+        renderer: new edges.renderers.bs3.RefiningANDTermSelector({
+          open: true,
+          title: "Author",
+          showSelected: false,
+          controls: false,
         }),
       }),
 
@@ -190,32 +203,36 @@ try {
 }
 
 function generateResultHeader(selector) {
-  let currentDoc = document.getElementById("result-header");
+  try {
+    let currentDoc = document.getElementById("result-header");
 
-  // Check if the fetching process is active
-  if (!emlo || !emlo.active || !emlo.active[selector]) {
-    currentDoc.innerHTML = "Loading results...";
-    return;
-  }
-
-  const activeRes = emlo.active[selector];
-
-  // Check if results are fetched correctly
-  if (
-    activeRes.result &&
-    activeRes.result.data &&
-    activeRes.result.data.response &&
-    activeRes.result.data.response.numFound
-  ) {
-    const numFound = activeRes.result.data.response.numFound;
-    if (numFound > 50) {
-      currentDoc.innerHTML = `${numFound} results (50 results per page)`;
-    } else {
-      currentDoc.innerHTML = `${numFound} results`;
+    // Check if the fetching process is active
+    if (!emlo || !emlo.active || !emlo.active[selector]) {
+      currentDoc.innerHTML = "Loading results...";
+      return;
     }
-  } else {
-    // Fallback message when results are not fetched
-    currentDoc.innerHTML = "No results found.";
+
+    const activeRes = emlo.active[selector];
+
+    // Check if results are fetched correctly
+    if (
+      activeRes.result &&
+      activeRes.result.data &&
+      activeRes.result.data.response &&
+      activeRes.result.data.response.numFound
+    ) {
+      const numFound = activeRes.result.data.response.numFound;
+      if (numFound > 50) {
+        currentDoc.innerHTML = `${numFound} results (50 results per page)`;
+      } else {
+        currentDoc.innerHTML = `${numFound} results`;
+      }
+    } else {
+      // Fallback message when results are not fetched
+      currentDoc.innerHTML = "No results found.";
+    }
+  } catch (err) {
+    console.error(err);
   }
 }
 
@@ -232,10 +249,10 @@ function checkResultsWithRetry(selector, retries = 5, delay = 2000) {
   }, delay);
 }
 
-window.onload = () => {
-  // Call the function initially
-  generateResultHeader("emlo-results");
+// window.onload = () => {
+//   // Call the function initially
+//   generateResultHeader("emlo-results");
 
-  // Set up a retry mechanism to check results
-  checkResultsWithRetry("emlo-results");
-};
+//   // Set up a retry mechanism to check results
+//   checkResultsWithRetry("emlo-results");
+// };

@@ -3,7 +3,8 @@
 {% block title %}Results{% endblock %}
 
 {% block content %}
-    <div class="side-nav">
+   <div id="emlo-results"></div>
+    {# <div class="side-nav">
         <h2 class="main">Search</h2>
         
         {% if request.args %}
@@ -28,7 +29,6 @@
             <div id="about">
                 <br/>
                 <h2 class="main">
-                    {# This value is generated inside result.edges.js do not remove this element #}
                     <span id="result-header" class="font-18">
                     </span>
 
@@ -47,7 +47,7 @@
                 <div id="emlo-results"></div>
             </div>
        </div>
-    </div>
+    </div> #}
 {% endblock %}
 
 
@@ -55,7 +55,7 @@
 
 {% include "_edges_common_js.jinja2" %}
 <script type="module" src="../static/js/result.edges.js"></script>
-<script type="module" src="../static/js/result_refine.edges.js"></script>
+{# <script type="module" src="../static/js/result_refine.edges.js"></script> #}
 
 <script>
 function modifyCurrentSearch() {

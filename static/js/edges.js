@@ -24,7 +24,7 @@ const emlo = {
       console.warn(
         "Template is missing we are using the default template for edges"
       );
-      this.template = new edges.templates.bs3.Facetview();
+      this.template = new emlo.ResultTemplate();
     }
 
     if (this.components.length <= 0) {
@@ -54,6 +54,75 @@ const emlo = {
   },
 };
 
+emlo.ResultTemplate = class extends edges.Template {
+  constructor(params) {
+    super(params);
+  }
+
+  draw(edge) {
+    this.edge = edge;
+    let results = "";
+
+    let resultComponents = edge.category("results");
+    for (let i = 0; i < resultComponents.length; i++) {
+      results += `<div id="${resultComponents[i].id}"></div>`;
+    }
+
+    let refine_search = "";
+    let refineSearchComponents = edge.category("refine_search");
+    for (let i = 0; i < refineSearchComponents.length; i++) {
+      refine_search += `<div id="${refineSearchComponents[i].id}"></div>`;
+    }
+
+    let frag = `<div class="row">
+      <div class="side-nav"> 
+        <h2 class="main">Search</h2>
+       
+          <div id="modify_search">
+              <button onclick="modifyCurrentSearch()">Modify search</button>
+          </div>
+
+         <div id="current_search">
+            <h3 class="main">Your current search</h3>
+        </div>
+
+        <div id="refine_search">
+            <h3 class="main">Refine your results</h3>
+            ${refine_search}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="large-2 columns"><!-- dummy column -->&nbsp;</div>
+
+        <div class="large-10 columns" style="margin-left:25px">
+            <div id="about">
+                <br/>
+                <h2 class="main">
+                    <span id="result-header" class="font-18">
+                    </span>
+
+                    <br><br>
+                    
+                    <div data-alert="" class="alert-box secondary radius">
+                        EMLO is an active, collaborative project in continual development, and as such may contain errors/duplicates. 
+                        We rely on feedback from the scholarly community: if you spot an error, please 
+                        <a href="/about#contact">get in touch</a>.
+                    </div>
+
+                </h2>
+            </div>
+   
+             <div id="" class="large-12 columns" style="margin-left:25px">
+              ${results}
+            </div>
+        </div>
+      </div>
+    </div>`;
+
+    this.edge.context.html(frag);
+  }
+};
 emlo.DropDown = class extends edges.Component {
   constructor(params) {
     super(params);

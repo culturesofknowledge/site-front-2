@@ -1028,4 +1028,94 @@ emlo.FacetRenderer = class extends edges.Renderer {
   }
 };
 
+emlo.SelectedFacetRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+
+    ///////////////////////////////////////
+    // parameters that can be passed in
+    this.title = edges.util.getParam(params, "title", "Selected Facets");
+    this.namespace = "emlo-selected-facet-view";
+  }
+
+  draw() {
+    let ts = this.component;
+
+    // Clear the context if no filters are active
+    if (ts.filters.length === 0) {
+      ts.context.html("<p>No selections made.</p>");
+      return;
+    }
+
+    // Class selectors for styling
+    const facetClass = edges.util.styleClasses(
+      this.namespace,
+      "facet",
+      this.component.id
+    );
+    const headerClass = edges.util.styleClasses(
+      this.namespace,
+      "header",
+      this.component.id
+    );
+    const selectedClass = edges.util.styleClasses(
+      this.namespace,
+      "selected",
+      this.component.id
+    );
+    const resultClass = edges.util.styleClasses(
+      this.namespace,
+      "result",
+      this.component.id
+    );
+    const filterRemoveClass = edges.util.allClasses(
+      this.namespace,
+      "filter-remove",
+      this.component.id
+    );
+
+    // Build the selected filters display
+    let filterFrag = "";
+    ts.filters.forEach((filt) => {
+      filterFrag += `<div class="${resultClass}">
+                       <strong>Value: ${edges.util.escapeHtml(
+                         filt.display
+                       )}</strong><br />
+                       <strong>Type: ${typeof filt.term}</strong>
+                       <a href="#" class="${filterRemoveClass}" data-key="${edges.util.escapeHtml(
+        filt.term
+      )}">
+                         <i class="fas fa-times"></i> Remove
+                       </a>
+                     </div>`;
+    });
+
+    let frag = `<div class="${facetClass}">
+                  <div class="${headerClass}">
+                    <h4>${this.title}</h4>
+                  </div>
+                  <div class="${selectedClass}">
+                    ${filterFrag}
+                  </div>
+                </div>`;
+
+    // Render the HTML in the component context
+    ts.context.html(frag);
+
+    // Set event handler for removing selected filters
+    const filterRemoveSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "filter-remove",
+      this.component.id
+    );
+    edges.on(filterRemoveSelector, "click", this, "removeFilter");
+  }
+
+  removeFilter(element) {
+    const key = this.component.jq(element).attr("data-key");
+    this.component.removeFilterByTerm(key);
+    this.draw(); // Redraw the component to reflect the changes
+  }
+};
+
 export default emlo;

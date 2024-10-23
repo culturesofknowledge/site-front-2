@@ -129,7 +129,7 @@ try {
 
       new edges.components.RefiningANDTermSelector({
         id: "selected",
-        category: "refine_search",
+        category: "selected_facets",
         renderer: new emlo.SelectedFacetRenderer({}),
       }),
 

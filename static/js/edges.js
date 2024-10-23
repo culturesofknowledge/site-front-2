@@ -738,7 +738,13 @@ emlo.FacetRenderer = class extends edges.Renderer {
 
     let results = "Loading...";
     if (ts.values !== false) {
-      results = "No data available";
+      results = `
+        <tr>
+          <td>
+            None
+          </td>
+        </tr>
+      `;
     }
 
     if (ts.values && ts.values.length > 0) {

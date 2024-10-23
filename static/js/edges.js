@@ -752,12 +752,12 @@ emlo.FacetRenderer = class extends edges.Renderer {
           }
           const isHidden = idx >= this.displayLimit && !this.showAll;
           results += `
-            <tr  style="${isHidden ? "display:none;" : ""}">
+            <tr style="${isHidden ? "display:none;" : ""}">
               <td>
                 <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
             val.term
           )}">
-                  <img class="facet" src="../img/plus-facet.png" height="15px" width="15px" />  
+                  <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />  
                   ${edges.util.escapeHtml(val.display)}
                 </a>
               </td>
@@ -820,7 +820,7 @@ emlo.FacetRenderer = class extends edges.Renderer {
 
     let tog = this.title;
     if (this.togglable) {
-      tog = `<a href="#" id="${toggleId}"><i class="fas fa-plus"></i>&nbsp;${this.title}</a>`;
+      tog = `<p class="main">${this.title}</p>`;
     }
 
     let frag = `<div class="${facetClass}">

@@ -967,6 +967,65 @@ emlo.FacetRenderer = class extends edges.Renderer {
     const order = this.component.jq(orderSelector);
     order.html(this.component.currentSort);
   }
+
+  termSelected(element) {
+    var term = this.component.jq(element).attr("data-key");
+    this.component.selectTerm(term);
+  }
+
+  removeFilter(element) {
+    var term = this.component.jq(element).attr("data-key");
+    this.component.removeFilter(term);
+  }
+
+  toggleOpen(element) {
+    this.open = !this.open;
+    this.setUIOpen();
+  }
+
+  changeSize(element) {
+    var newSize = prompt(
+      "Currently displaying " +
+        this.component.size +
+        " results per page. How many would you like instead?"
+    );
+    if (newSize) {
+      this.component.changeSize(parseInt(newSize));
+    }
+  }
+
+  changeSort(element) {
+    var current = this.component.orderBy + " " + this.component.orderDir;
+    var idx = $.inArray(current, this.sortCycle);
+    var next = this.sortCycle[(idx + 1) % 4];
+    var bits = next.split(" ");
+    this.component.changeSort(bits[0], bits[1]);
+  }
+
+  toggleTooltip(element) {
+    var tooltipSpanSelector = edges.util.idSelector(
+      this.namespace,
+      "tooltip-span",
+      this.component.id
+    );
+    var container = this.component.jq(tooltipSpanSelector).parent();
+    var tt = "";
+    if (this.tooltipState === "closed") {
+      tt = this._longTooltip();
+      this.tooltipState = "open";
+    } else {
+      tt = this._shortTooltip();
+      this.tooltipState = "closed";
+    }
+    container.html(tt);
+    var tooltipSelector = edges.util.idSelector(
+      this.namespace,
+      "tooltip-toggle",
+      this.component.id
+    );
+    // refresh the event binding
+    edges.on(tooltipSelector, "click", this, "toggleTooltip");
+  }
 };
 
 export default emlo;

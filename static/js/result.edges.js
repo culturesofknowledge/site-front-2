@@ -123,6 +123,7 @@ try {
           title: "Author",
           showSelected: false,
           controls: false,
+          displayLimit: 2,
         }),
       }),
 

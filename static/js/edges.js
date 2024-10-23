@@ -643,6 +643,7 @@ emlo.FacetRenderer = class extends edges.Renderer {
     this.open = edges.util.getParam(params, "open", false);
     this.togglable = edges.util.getParam(params, "togglable", true);
     this.showSelected = edges.util.getParam(params, "showSelected", true);
+    this.displayLimit = edges.util.getParam(params, "displayLimit", 10);
     this.sortCycle = edges.util.getParam(params, "sortCycle", [
       "count desc",
       "count asc",
@@ -654,7 +655,7 @@ emlo.FacetRenderer = class extends edges.Renderer {
     this.tooltip = edges.util.getParam(params, "tooltip", false);
     this.tooltipState = "closed";
     this.namespace = "emlo-facet-view";
-    this.displayLimit = 10; // Show only the first 10 entries by default
+
     this.showAll = false; // Track whether to show all entries
   }
 

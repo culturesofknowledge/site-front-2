@@ -68,6 +68,12 @@ emlo.ResultTemplate = class extends edges.Template {
       results += `<div id="${resultComponents[i].id}"></div>`;
     }
 
+    let selected_facets = "";
+    let selectedFacetComponents = edge.category("selected_facets");
+    for (let i = 0; i < selectedFacetComponents.length; i++) {
+      selected_facets += `<div id="${selectedFacetComponents[i].id}"></div>`;
+    }
+
     let refine_search = "";
     let refineSearchComponents = edge.category("refine_search");
     for (let i = 0; i < refineSearchComponents.length; i++) {
@@ -84,6 +90,7 @@ emlo.ResultTemplate = class extends edges.Template {
 
          <div id="current_search">
             <h3 class="main">Your current search</h3>
+            ${selected_facets}
         </div>
 
         <div id="refine_search">

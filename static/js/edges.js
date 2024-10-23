@@ -1041,7 +1041,7 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
 
     ///////////////////////////////////////
     // parameters that can be passed in
-    this.title = edges.util.getParam(params, "title", "Selected Facets");
+    this.title = edges.util.getParam(params, "title", "");
     this.namespace = "emlo-selected-facet-view";
   }
 
@@ -1050,7 +1050,7 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
 
     // Clear the context if no filters are active
     if (ts.filters.length === 0) {
-      ts.context.html("<p>No selections made.</p>");
+      ts.context.html("<tr><td>None</td></tr>");
       return;
     }
 
@@ -1084,17 +1084,22 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
     // Build the selected filters display
     let filterFrag = "";
     ts.filters.forEach((filt) => {
-      filterFrag += `<div class="${resultClass}">
-                       <strong>Value: ${edges.util.escapeHtml(
-                         filt.display
-                       )}</strong><br />
-                       <strong>Type: ${typeof filt.term}</strong>
-                       <a href="#" class="${filterRemoveClass}" data-key="${edges.util.escapeHtml(
+      console.log("filt", filt);
+      filterFrag += `
+        <tr class="${resultClass}">
+          <td>
+          ${typeof filt.term}
+          </td>
+          <td>
+            <a href="#" class="${filterRemoveClass} selected-facets" data-key="${edges.util.escapeHtml(
         filt.term
       )}">
-                         <i class="fas fa-times"></i> Remove
-                       </a>
-                     </div>`;
+                   ${edges.util.escapeHtml(filt.display)}
+                  <img class="facet" src="../../static/img/minus-facet.png" style="height:15px;" />
+                </a>
+          </td>
+        </tr>
+      `;
     });
 
     let frag = `<div class="${facetClass}">
@@ -1102,7 +1107,11 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
                     <h4>${this.title}</h4>
                   </div>
                   <div class="${selectedClass}">
-                    ${filterFrag}
+                  <table class="facet">
+                    <tbody>
+                      ${filterFrag}
+                    </tbody>
+                  </table>
                   </div>
                 </div>`;
 

@@ -10160,3 +10160,9 @@ ul.pagination li {
   background-color: #e4e4e4;
   padding: 5px;
 }
+
+.selected-facets {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

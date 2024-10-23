@@ -127,6 +127,12 @@ try {
         }),
       }),
 
+      new edges.components.RefiningANDTermSelector({
+        id: "selected",
+        category: "refine_search",
+        renderer: new emlo.SelectedFacetRenderer({}),
+      }),
+
       new emlo.ResultTable({
         id: "results",
         category: "results",

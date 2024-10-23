@@ -758,7 +758,7 @@ emlo.FacetRenderer = class extends edges.Renderer {
                 <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
             val.term
           )}">
-                  <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />  
+                  <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
                   ${edges.util.escapeHtml(val.display)}
                 </a>
               </td>
@@ -773,8 +773,16 @@ emlo.FacetRenderer = class extends edges.Renderer {
 
     // Add "Show more" button if there are more than 10 entries
     let showMoreFrag = "";
-    if (ts.values.length > this.displayLimit && !this.showAll) {
-      showMoreFrag = `<div class="text-center"><button id="${showMoreId}" class="btn btn-link">Show more</button></div>`;
+    if (ts.values.length > this.displayLimit) {
+      showMoreFrag = `
+        <tr>
+          <td id="${showMoreId}" class="btn btn-link">
+            ${this.showAll ? "Click to hide" : "Click to show more..."}
+          </td>
+          <td>
+          </td>
+        </tr>
+      `;
     }
 
     let tooltipFrag = "";
@@ -795,11 +803,11 @@ emlo.FacetRenderer = class extends edges.Renderer {
 
     let controlFrag = "";
     if (this.controls) {
-      controlFrag = `<div class="${controlClass}" style="display:none" id="${controlId}"><div class="row"> 
+      controlFrag = `<div class="${controlClass}" style="display:none" id="${controlId}"><div class="row">
                       <div class="col-md-12">
                           <div class="btn-group">
-                              <button type="button" class="btn btn-default btn-sm" id="${sizeId}" title="List Size">0</button> 
-                              <button type="button" class="btn btn-default btn-sm" id="${orderId}" title="List Order"></button> 
+                              <button type="button" class="btn btn-default btn-sm" id="${sizeId}" title="List Size">0</button>
+                              <button type="button" class="btn btn-default btn-sm" id="${orderId}" title="List Order"></button>
                           </div>
                       </div>
                   </div></div>`;
@@ -825,7 +833,7 @@ emlo.FacetRenderer = class extends edges.Renderer {
     }
 
     let frag = `<div class="${facetClass}">
-                      <div class="${headerClass}"><div class="row"> 
+                      <div class="${headerClass}"><div class="row">
                           <div class="col-md-12">
                               ${tog}
                           </div>
@@ -837,16 +845,17 @@ emlo.FacetRenderer = class extends edges.Renderer {
                             <table class="facet">
                               <tbody>
                                 {{RESULTS}}
+                                {{SHOWMOREFRAG}}
                               </tbody>
                             </table>
-                            ${showMoreFrag} 
                           </div>
                       </div></div>`;
 
     frag = frag
       .replace(/{{RESULTS}}/g, results)
       .replace(/{{CONTROLS}}/g, controlFrag)
-      .replace(/{{SELECTED}}/g, filterFrag);
+      .replace(/{{SELECTED}}/g, filterFrag)
+      .replace(/{{SHOWMOREFRAG}}/g, showMoreFrag);
 
     ts.context.html(frag);
 
@@ -889,7 +898,7 @@ emlo.FacetRenderer = class extends edges.Renderer {
   }
 
   showMoreEntries() {
-    this.showAll = true;
+    this.showAll = !this.showAll;
     this.draw(); // Re-draw the component to show all entries
   }
 

@@ -5,6 +5,7 @@
 1. **Clone the repository:**
 
 2. **Checkout to edges-integration**
+
    ```sh
    git checkout edges-integration
    ```
@@ -27,6 +28,7 @@
 
    ```env
    PORT=5000 [you can choose some other port number too]
+   SOLR_URL= [you need to point this to your solr url]
    ```
 
 6. **Run the application:**
@@ -37,16 +39,14 @@
 ## Usage
 
 - The application will be accessible at `http://localhost:5000`.
-- Solr will be accessible at `http://localhost:8983`.
 
 ### How to run this project - [Temp arrangement]
-This project is missing it's own solr ingration hence we will he using the older project which can be accessible [here](https://github.com/culturesofknowledge/site-front). 
-You need to follow the following steps 
-1. Run the site-front project, this will allow us to access solr data from the current EMLO front. 
-2. Run Proxy server, use [this](https://github.com/varadekd/proxy-server) project this will allow you to access the EMLO front solr without any CORS issues. 
-3. Run the current project. 
 
-NOTE: The proxy server runs on port 7812, In case you are changing this port you need to make changes in this project too. 
+This project is missing it's own solr ingration hence we will he using the older project which can be accessible [here](https://github.com/culturesofknowledge/site-front).
+You need to follow the following steps
+
+1. Run the site-front project, this will allow us to access solr data from the current EMLO front.
+2. Run the current project.
 
 ## File Structure
 

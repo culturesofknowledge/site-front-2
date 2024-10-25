@@ -17,7 +17,7 @@ if not SOLR_URL:
 def solr_proxy(subpath):
     try:
         # Construct the full URL for the external API request
-        full_url = f"{SOLR_URL}/{subpath}"  # Append the captured subpath
+        full_url = f"{SOLR_URL}/solr/{subpath}"  # Append the captured subpath
 
         # Forward the request to the external API
         response = requests.request(

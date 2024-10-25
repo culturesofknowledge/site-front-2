@@ -1,7 +1,7 @@
 const emlo = {
   active: {},
   selector: "",
-  solrURL: "http://localhost:7812",
+  solrURL: "",
   collection: "",
   template: null,
   openingQuery: null,
@@ -14,10 +14,6 @@ const emlo = {
 
     if (!this.collection) {
       throw new Error("Collection must be provided.");
-    }
-
-    if (!this.solrURL) {
-      throw new Error("Solr URL must be provided.");
     }
 
     if (!this.template) {

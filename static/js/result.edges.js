@@ -150,6 +150,7 @@ try {
               pre: "",
               post: "",
               type: "link",
+              linkHrefPrefix: "/profile/work/",
               linkText: "Letter",
               valueFunction: null,
             },

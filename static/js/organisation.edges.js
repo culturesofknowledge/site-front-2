@@ -1,54 +1,54 @@
 import emlo from "./edges.js";
 
 try {
-
   // Fetching URL params
-  const queryString = window.location.search
-  let current_search_letter = "a" // Setting this as default a
+  const queryString = window.location.search;
+  let current_search_letter = "a"; // Setting this as default a
 
-  if(queryString) {
-    const params = new URLSearchParams(queryString)
-    const letter = params.get("letter")
+  if (queryString) {
+    const params = new URLSearchParams(queryString);
+    const letter = params.get("letter");
 
-    if(letter) {
-      current_search_letter = letter
+    if (letter) {
+      current_search_letter = letter;
     }
   }
-  
+
   emlo.openingQuery = {
-      must: [],
-      query : {
-          bool: {
-              must: []
-          }
+    must: [],
+    query: {
+      bool: {
+        must: [],
       },
-      from: 0,  
-      size: 999999999,  
-      queryStrings : []
-  }
+    },
+    from: 0,
+    size: 999999999,
+    queryStrings: [],
+  };
 
   emlo.openingQuery.must.push({ term: { ox_isOrganisation: true } }); // ox_isOrganisation is false
-  emlo.openingQuery.must.push({ term: { browse: `${current_search_letter}*` } }); // browse starts with 'd'
-
+  emlo.openingQuery.must.push({
+    term: { browse: `${current_search_letter}*` },
+  }); // browse starts with 'd'
 
   if (!emlo.openingQuery.query.range) {
-    emlo.openingQuery.query.range = {}; 
+    emlo.openingQuery.query.range = {};
   }
 
   emlo.openingQuery.query.range["ox_totalWorksByAgent"] = {
-    "gte": 1,
-    "lte": "*"
-  }
+    gte: 1,
+    lte: "*",
+  };
 
   emlo.openingQuery.query.range["ox_totalWorksAddressedToAgent"] = {
-    "gte": 1,
-    "lte": "*"
-  }
+    gte: 1,
+    lte: "*",
+  };
 
   emlo.openingQuery.query.range["ox_totalWorksMentioningAgent"] = {
-    "gte": 1,
-    "lte": "*"
-  }
+    gte: 1,
+    lte: "*",
+  };
 
   // Handle fields to return - TODO: Handle this part in edges
   // emlo.openingQuery.queryStrings.push({
@@ -72,13 +72,12 @@ try {
   emlo.collection = "/solr/people/select";
 
   emlo.components = [
-  
     new emlo.ResultTable({
       id: "results",
       category: "results",
       secondaryResults: false,
       infiniteScroll: false,
-      size : 20,
+      size: 20,
       infiniteScrollPageSize: 999999999,
       renderer: new emlo.ResultTableRenderer({
         noResultsText: "No results to display",
@@ -87,8 +86,11 @@ try {
           {
             header: "Name",
             field: "foaf_name",
-            pre: '',
-            post: '',
+            pre: "",
+            post: "",
+            type: "link",
+            linkHref: "uuid",
+            linkHrefPrefix: "/profile/person/",
             valueFunction: null,
           },
           {
@@ -125,7 +127,7 @@ try {
       }),
     }),
   ];
-  
+
   emlo.init();
 } catch (error) {
   console.error(error.message);

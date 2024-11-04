@@ -1,33 +1,32 @@
 import emlo from "./edges.js";
 
 try {
-
   // Fetching URL params
-  const queryString = window.location.search
-  let current_year = 1600 
-  if(queryString) {
-    const params = new URLSearchParams(queryString)
-    const year = params.get("year")
+  const queryString = window.location.search;
+  let current_year = 1600;
+  if (queryString) {
+    const params = new URLSearchParams(queryString);
+    const year = params.get("year");
 
-    if(year) {
-        current_year = year
+    if (year) {
+      current_year = year;
     }
   }
-  
+
   emlo.openingQuery = {
-      from: 0,  
-      size: 999999999,  
-      queryStrings : []
-  }
+    from: 0,
+    size: 999999999,
+    queryStrings: [],
+  };
 
   emlo.openingQuery.queryStrings.push({
     queryString: current_year,
     fields: [
-        { field: "ox_started-ox_year", operator: "OR" },
-        { field: "ox_completed-ox_year", operator: "OR" }
-    ]
-  })
-  
+      { field: "ox_started-ox_year", operator: "OR" },
+      { field: "ox_completed-ox_year", operator: "OR" },
+    ],
+  });
+
   // Handle fields to return - TODO: Handle this part in edges
   // emlo.openingQuery.queryStrings.push({
   //     queryString: {
@@ -50,14 +49,13 @@ try {
   emlo.collection = "/solr/works/select";
 
   emlo.components = [
-  
     new emlo.ResultTable({
       id: "results",
       category: "results",
       secondaryResults: false,
       infiniteScroll: false,
-      showCount : false,
-      size : 20,
+      showCount: false,
+      size: 20,
       infiniteScrollPageSize: 999999999,
       renderer: new emlo.ResultTableRenderer({
         noResultsText: `None found for the year ${current_year}. `,
@@ -66,8 +64,11 @@ try {
           {
             header: "Description of letter",
             field: "dcterms_description",
-            pre: '',
-            post: '',
+            pre: "",
+            post: "",
+            type: "link",
+            linkHref: "uuid",
+            linkHrefPrefix: "/profile/work/",
             valueFunction: null,
           },
           {
@@ -83,7 +84,7 @@ try {
       }),
     }),
   ];
-  
+
   emlo.init();
 } catch (error) {
   console.error(error.message);

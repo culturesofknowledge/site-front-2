@@ -146,7 +146,7 @@ try {
           tableDisplay: [
             {
               header: "",
-              field: "resources",
+              field: "uuid",
               pre: "",
               post: "",
               type: "link",
@@ -184,7 +184,7 @@ try {
             },
             {
               header: "Destination",
-              field: "pla_des_name",
+              field: "destination_sort",
               pre: "",
               post: "",
               valueFunction: null,

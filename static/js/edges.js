@@ -556,9 +556,12 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
         }
 
         if (field.type) {
+          const type = field.type;
           if (field.type == "date") {
             return `<td>${this._formatDate(val)}</td>`;
-          } else if (field.type == "link") {
+          }
+
+          if (field.type == "link") {
             // Setting href for the link tag in the table
             let href = "#";
             if (field.linkHref) {
@@ -584,6 +587,21 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
             }
 
             return `<td><a href="${prefix}${href}">${linkText}</a></td>`;
+          }
+
+          if (field.type == "multiple") {
+            if (field.multipleFields && field.multipleFields.length > 0) {
+              const self = this;
+              const multipleFieldDisplay = field.multipleFields
+                .map((item) => {
+                  console.log("Items", item);
+                  const value = this._getValue(item.field, res, "");
+                  return value ? `<div>${item.label}: ${value}</div>` : "";
+                })
+                .join(""); // Join without separators for a stacked display
+
+              return `<td>${multipleFieldDisplay}</td>`;
+            }
           }
         }
 

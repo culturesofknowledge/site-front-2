@@ -594,7 +594,6 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
               const self = this;
               const multipleFieldDisplay = field.multipleFields
                 .map((item) => {
-                  console.log("Items", item);
                   const value = this._getValue(item.field, res, "");
                   return value ? `<div>${item.label}: ${value}</div>` : "";
                 })

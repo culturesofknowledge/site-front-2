@@ -559,11 +559,31 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
           if (field.type == "date") {
             return `<td>${this._formatDate(val)}</td>`;
           } else if (field.type == "link") {
-            if (field.linkText) {
-              return `<td><a href=${val}>${field.linkText}</a></td>`;
+            // Setting href for the link tag in the table
+            let href = "#";
+            if (field.linkHref) {
+              href = this._getValue(field.linkHref, res, val);
             } else {
-              return `<td><a href=${val}>Link</a></td>`;
+              href = val;
             }
+
+            // Setting the display name for the link
+            let linkText = "Link";
+
+            if (field.linkText) {
+              linkText = field.linkText;
+            } else if (val) {
+              linkText = val;
+            }
+
+            // Setting link prefix
+            let prefix = "";
+
+            if (field.linkHrefPrefix) {
+              prefix = field.linkHrefPrefix;
+            }
+
+            return `<td><a href="${prefix}${href}">${linkText}</a></td>`;
           }
         }
 

@@ -24,6 +24,7 @@ try {
     from: 0,
     size: 999999999,
     queryStrings: [],
+    sort: [{ field: "browse", order: "asc" }],
   };
 
   emlo.openingQuery.must.push({
@@ -118,6 +119,12 @@ try {
             field: "level_county",
             pre: "",
             post: "",
+            type: "multiple",
+            multipleFields: [
+              { label: "Alternative names", field: "ox_locationAlternateName" },
+              { label: "Latitude", field: "geo_lat" },
+              { label: "Longitude", field: "geo_long" },
+            ],
             valueFunction: null,
           },
         ],
@@ -126,7 +133,7 @@ try {
       }),
     }),
   ];
-  console.log("emlo", emlo);
+
   emlo.init();
 } catch (error) {
   console.error(error.message);

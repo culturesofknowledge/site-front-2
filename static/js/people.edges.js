@@ -122,12 +122,12 @@ try {
             post: "",
             type: "multiple",
             multipleFields: [
-              { label: "Alternative names: ", field: "skos_altLabel" },
+              { label: "Alternative names", field: "skos_altLabel" },
               {
-                label: "Titles or roles: ",
+                label: "Titles or roles",
                 field: "ox_titlesRolesOccupations",
               },
-              { label: "Gender: ", field: "foaf_gender" },
+              { label: "Gender", field: "foaf_gender" },
             ],
             valueFunction: null,
           },

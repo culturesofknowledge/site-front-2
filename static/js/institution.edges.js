@@ -24,6 +24,7 @@ try {
     from: 0,
     size: 999999999,
     queryStrings: [],
+    sort: [{ field: "browse", order: "asc" }],
   };
 
   emlo.openingQuery.must.push({
@@ -81,14 +82,29 @@ try {
           },
           {
             header: "Further details",
-            field: "geonames_alternateName",
+            field: "",
             pre: "",
             post: "",
+            type: "multiple",
+            multipleFields: [
+              {
+                label: "Alternative names for repository",
+                field: "geonames_alternateName",
+              },
+              {
+                label: "City",
+                field: "geonames_locatedIn",
+              },
+              {
+                label: "Country",
+                field: "geonames_inCountry",
+              },
+            ],
             valueFunction: null,
           },
         ],
         arrayValueJoin: ", ",
-        omitFieldIfEmpty: true,
+        omitFieldIfEmpty: false,
       }),
     }),
   ];

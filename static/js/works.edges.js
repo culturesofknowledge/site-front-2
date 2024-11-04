@@ -17,6 +17,7 @@ try {
     from: 0,
     size: 999999999,
     queryStrings: [],
+    sort: [{ field: "started_date_sort", order: "asc" }],
   };
 
   emlo.openingQuery.queryStrings.push({

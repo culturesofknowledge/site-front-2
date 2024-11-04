@@ -8,7 +8,7 @@ try {
     emlo.openingQuery = queryObj.openingQuery;
   }
   emlo.selector = "emlo-results";
-
+  emlo.template = new emlo.ResultTemplate();
   if (queryObj != null && queryObj.collection != "") {
     emlo.collection = queryObj.collection;
 

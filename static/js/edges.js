@@ -20,7 +20,7 @@ const emlo = {
       console.warn(
         "Template is missing we are using the default template for edges"
       );
-      this.template = new emlo.ResultTemplate();
+      this.template = new edges.templates.bs3.Facetview();
     }
 
     if (this.components.length <= 0) {

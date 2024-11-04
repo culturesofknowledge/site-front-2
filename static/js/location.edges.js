@@ -129,7 +129,7 @@ try {
           },
         ],
         arrayValueJoin: ", ",
-        omitFieldIfEmpty: true,
+        omitFieldIfEmpty: false,
       }),
     }),
   ];

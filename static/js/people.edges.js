@@ -24,6 +24,7 @@ try {
     from: 0,
     size: 999999999,
     queryStrings: [],
+    sort: [{ field: "browse", order: "asc" }],
   };
 
   emlo.openingQuery.must.push({ term: { ox_isOrganisation: false } }); // ox_isOrganisation is false
@@ -119,6 +120,15 @@ try {
             field: "foaf_gender",
             pre: "",
             post: "",
+            type: "multiple",
+            multipleFields: [
+              { label: "Alternative names: ", field: "skos_altLabel" },
+              {
+                label: "Titles or roles: ",
+                field: "ox_titlesRolesOccupations",
+              },
+              { label: "Gender: ", field: "foaf_gender" },
+            ],
             valueFunction: null,
           },
         ],

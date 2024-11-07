@@ -21,7 +21,7 @@ services:
     ports:
       - "8983:8983"
     volumes:
-      - ./solr-emlo/solr/home:/opt/solr/server/solr/home
+      - ./docker-emlo/solr-emlo/solr/home:/opt/solr/server/solr/home
       - ./data-solr/:/data-solr/
     ulimits:
       nofile:

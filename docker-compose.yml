@@ -21,8 +21,8 @@ services:
     ports:
       - "8983:8983"
     volumes:
-      - ./docker-emlo/solr-emlo/solr/home:/opt/solr/server/solr/home
-      - ./data-solr/:/data-solr/
+      - ./docker-emlo/solr-conf/solr/home:/opt/solr/server/solr/home
+      - ./docker-emlo/solr-data/:/data-solr/
     ulimits:
       nofile:
         soft: "65536"

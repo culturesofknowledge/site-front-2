@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!--  
+ This is the Solr schema file. This file should be named "schema.xml" and
+ should be in the conf directory under the solr home
+ (i.e. ./solr/conf/schema.xml by default) 
+ or located where the classloader for the Solr webapp can find it.
+
+ This example schema is the recommended starting point for users.
+ It should be kept correct and concise, usable out-of-the-box.
+
+ For more information, on how to customize this file, please see
+ http://wiki.apache.org/solr/SchemaXml
+
+ PERFORMANCE NOTE: this schema includes many optional features and should not
+ be used for benchmarking.  To improve performance one could
+  - set stored="false" for all fields possible (esp large fields) when you
+    only need to search on the field but don't need to return the original
+    value.
+  - set indexed="false" if you don't need to search on the field, but only
+    return the field as a result of searching on other indexed fields.
+  - remove all unneeded copyField statements
+  - for best index size and searching performance, set "index" to false
+    for all general text fields, use copyField to copy them to the
+    catchall "text" field, and use that for searching.
+  - For maximum indexing performance, use the StreamingUpdateSolrServer
+    java client.
+  - Remember to run the JVM in server mode, and use a higher logging level
+    that avoids logging every request
+-->
+
+<schema name="comments" version="1.2">
+  <!-- attribute "name" is the name of this schema and is only used for display purposes.
+       Applications should change this to reflect the nature of the search collection.
+       version="1.2" is Solr's version number for the schema syntax and semantics.  It should
+       not normally be changed by applications.
+       1.0: multiValued attribute did not exist, all fields are multiValued by nature
+       1.1: multiValued attribute introduced, false by default 
+       1.2: omitTermFreqAndPositions attribute introduced, true by default except for text fields.
+     -->
+
+  <types>
+    <!-- field type definitions. The "name" attribute is
+       just a label to be used by field definitions.  The "class"
+       attribute and any other attributes determine the real
+       behavior of the fieldType.
+         Class names starting with "solr" refer to java classes in the
+       org.apache.solr.analysis package.
+    -->
+
+    <!-- The StrField type is not analyzed, but indexed/stored verbatim.  
+       - StrField and TextField support an optional compressThreshold which
+       limits compression (if enabled in the derived fields) to values which
+       exceed a certain size (in characters).
+    -->
+    <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
+
+    <!-- boolean type: "true" or "false" -->
+    <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" omitNorms="true"/>
+
+    <!-- The optional sortMissingLast and sortMissingFirst attributes are
+         currently supported on types that are sorted internally as strings.
+	       This includes "string","boolean","sint","slong","sfloat","sdouble","pdate"
+       - If sortMissingLast="true", then a sort on this field will cause documents
+         without the field to come after documents with the field,
+         regardless of the requested sort order (asc or desc).
+       - If sortMissingFirst="true", then a sort on this field will cause documents
+         without the field to come before documents with the field,
+         regardless of the requested sort order.
+       - If sortMissingLast="false" and sortMissingFirst="false" (the default),
+         then default lucene sorting will be used which places docs without the
+         field first in an ascending sort and last in a descending sort.
+    -->    
+
+    <!--
+      Default numeric field types. For faster range queries, consider the tint/tfloat/tlong/tdouble types.
+    -->
+    <fieldType name="long" class="solr.TrieLongField" precisionStep="0" omitNorms="true" positionIncrementGap="0"/>
+
+    <!-- A Trie based date field for faster date range queries and date faceting. -->
+    <fieldType name="tdate" class="solr.TrieDateField" omitNorms="true" precisionStep="6" positionIncrementGap="0"/>
+
+
+    <!-- A text field that uses WordDelimiterFilter to enable splitting and matching of
+        words on case-change, alpha numeric boundaries, and non-alphanumeric chars,
+        so that a query of "wifi" or "wi fi" could match a document containing "Wi-Fi".
+        Synonyms and stopwords are customized by external files, and stemming is enabled.
+        -->
+    <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
+      <analyzer type="index">
+        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+        <!-- Case insensitive stop word removal.
+          analyzers to leave a 'gap' for more accurate phrase queries.
+        -->
+        <filter class="solr.StopFilterFactory"
+                ignoreCase="true"
+                words="stopwords.txt"
+                />
+        <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="0" splitOnCaseChange="1"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+        <filter class="solr.StopFilterFactory"
+                ignoreCase="true"
+                words="stopwords.txt"
+                />
+        <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="0" catenateNumbers="0" catenateAll="0" splitOnCaseChange="1"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+    </fieldType>
+
+	  <fieldType name="uuid" class="solr.UUIDField" indexed="true" />
+ </types>
+
+
+ <fields>
+   <!-- Valid attributes for fields:
+     name: mandatory - the name for the field
+     type: mandatory - the name of a previously defined type from the 
+       <types> section
+     indexed: true if this field should be indexed (searchable or sortable)
+     stored: true if this field should be retrievable
+     compressed: [false] if this field should be stored using gzip compression
+       (this will only apply if the field type is compressable; among
+       the standard field types, only TextField and StrField are)
+     multiValued: true if this field may contain multiple values per document
+     omitNorms: (expert) set to true to omit the norms associated with
+       this field (this disables length normalization and index-time
+       boosting for the field, and saves some memory).  Only full-text
+       fields or fields that need an index-time boost need norms.
+     termVectors: [false] set to true to store the term vector for a
+       given field.
+       When using MoreLikeThis, fields used for similarity should be
+       stored for best performance.
+     termPositions: Store position information with the term vector.  
+       This will increase storage costs.
+     termOffsets: Store offset information with the term vector. This 
+       will increase storage costs.
+     default: a value that should be used if no value is specified
+       when adding a document.
+   -->
+
+<!-- Auto-generated by comment_schemawriter.py -->
+
+
+<!-- start CofK: comments -->
+
+
+<!--          -->
+<!-- required -->
+<!--          -->
+	 <field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>
+  <field name="id"  type="string"  indexed="true"  stored="true"  required="true"  />
+	 <field name="uuid"  type="uuid"  indexed="true"  stored="true"  required="true"  />
+	 <field name="uri"  type="string"  indexed="true"  stored="true"  required="true"  />
+
+
+	 <field name="uuid_related"  type="uuid"  indexed="true"  stored="true" multiValued="true" />
+
+  <field name="dcterms_identifier-uuid_"  type="string"  indexed="true"  stored="true"  required="true"  />
+  <field name="dcterms_identifier-uri_"  type="string"  indexed="true"  stored="true"  required="true"  />
+  <field name="dcterms_identifier-edit_"  type="string"  indexed="true"  stored="true"  required="true"  /> <!-- comment_id -->
+<!--          -->
+<!-- optional -->
+<!--          --> 
+  <field name="bibo_Note"  type="text"  indexed="true"  stored="true"  />
+  <field name="rdf_type"  type="string"  indexed="false"  stored="true"  />
+  <field name="ox_internalAdded"  type="tdate"  indexed="true"  stored="true"  />
+  <field name="ox_internalCreated"  type="tdate"  indexed="true"  stored="true"  /> <!-- creation_timestamp -->
+  <field name="ox_internalModified"  type="tdate"  indexed="true"  stored="true"  /> <!-- change_timestamp -->
+  <field name="ox_internalModifiedByUser"  type="string"  indexed="false"  stored="true"  /> <!-- change_user -->
+
+
+<!--                     -->
+<!-- Links from comments -->
+<!--                     --> 
+
+  <field name="bibo_annotates-work"  type="string"  indexed="true"  stored="true"  multiValued="true"  /> <!-- type-refers_to -->
+  <field name="bibo_annotates-person"  type="string"  indexed="true"  stored="true"  multiValued="true"  /> <!-- type-refers_to -->
+  <field name="bibo_annotates-location"  type="string"  indexed="true"  stored="true"  multiValued="true"  /> <!-- type-refers_to -->
+  <field name="bibo_annotates-manifestation"  type="string"  indexed="true"  stored="true"  multiValued="true"  /> <!-- type-refers_to -->
+  <field name="ox_annotatesAddressee-work"  type="string"  indexed="true"  stored="true"  multiValued="true"  /> <!-- type-refers_to_addressee -->
+  <field name="ox_annotatesAuthor-work"  type="string"  indexed="true"  stored="true"  multiValued="true"  /> <!-- type-refers_to_author -->
+  <field name="ox_annotatesDate-work"  type="string"  indexed="true"  stored="true"  multiValued="true"  /> <!-- type-refers_to_date -->
+  <field name="ox_annotatesDate-manifestation"  type="string"  indexed="false"  stored="true"  multiValued="true"  /> <!-- type-refers_to_date -->
+  <field name="ox_annotatesReceiptDate-manifestation"  type="string"  indexed="false"  stored="true"  multiValued="true"  /> <!-- type-refers_to_receipt_date -->
+  <field name="ox_annotatesAgentsReferenced-work"  type="string"  indexed="true"  stored="true"  multiValued="true"  /> <!-- type-refers_to_people_mentioned_in_work -->
+  <field name="ox_annotatesOrigin-work"  type="string"  indexed="true"  stored="true"  multiValued="true"  />
+  <field name="ox_annotatesDestination-work"  type="string"  indexed="true"  stored="true"  multiValued="true"  />
+  <field name="ox_annotatesRoute-work"  type="string"  indexed="true"  stored="true"  multiValued="true"  />
+
+     <!-- end CofK: links from comments -->
+
+
+
+
+<!--            -->
+<!-- additional -->
+<!--            --> 
+
+  <field name="timestamp_indexed"  type="tdate"  indexed="true"  stored="true"  multiValued="false"  default="NOW"  />
+  <field name="object_type"  type="string"  indexed="true"  stored="true"  required="true"  default="comment"  />
+  <field name="default_search_field"  type="text"  indexed="true"  stored="false"  multiValued="true"  />
+
+<!-- end CofK: comments -->
+   
+ </fields>
+
+ <!-- Field to use to determine and enforce document uniqueness. 
+      Unless this field is marked with required="false", it will be a required field
+   -->
+ <uniqueKey>dcterms_identifier-uuid_</uniqueKey>
+
+ <!-- field for the QueryParser to use when an explicit fieldname is absent -->
+ <defaultSearchField>default_search_field</defaultSearchField>
+
+ <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
+ <solrQueryParser defaultOperator="OR"/>
+
+  <!-- copyField commands copy one field to another at the time a document
+        is added to the index.  It's used either to index the same field differently,
+        or to add multiple fields to the same field for easier/faster searching.  -->
+
+<!-- Auto-generated by comment_schemawriter.py -->
+<!--                                          -->
+<!-- <copyField source="SOURCE" dest="DEST"/> -->
+<!--                                          --> 
+  <copyField source="dcterms_identifier-uuid_" dest="id"/>
+
+  <copyField source="bibo_Note" dest="default_search_field"/>
+   
+   <!-- Above, multiple source fields are copied to the [text] field. 
+	  Another way to map multiple source fields to the same 
+	  destination field is to use the dynamic field syntax. 
+	  copyField also supports a maxChars to copy setting.  -->
+	   
+   <!-- <copyField source="*_t" dest="text" maxChars="3000"/> -->
+
+   <!-- copy name to alphaNameSort, a field designed for sorting by name -->
+   <!-- <copyField source="name" dest="alphaNameSort"/> -->
+ 
+
+ <!-- Similarity is the scoring routine for each document vs. a query.
+      A custom similarity may be specified here, but the default is fine
+      for most applications.  -->
+ <!-- <similarity class="org.apache.lucene.search.DefaultSimilarity"/> -->
+ <!-- ... OR ...
+      Specify a SimilarityFactory class name implementation
+      allowing parameters to be used.
+ -->
+ <!--
+ <similarity class="com.example.solr.CustomSimilarityFactory">
+   <str name="paramkey">param value</str>
+ </similarity>
+ -->
+
+
+</schema>

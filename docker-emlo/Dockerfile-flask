@@ -1,0 +1,17 @@
+FROM python:3.12
+
+RUN python -m pip install --upgrade pip
+
+COPY requirements.txt requirements.txt
+RUN python -m pip install -r requirements.txt
+
+COPY run.py run.py
+
+# Needed for run.py imports
+COPY views views
+COPY solr solr
+COPY config.py config.py
+
+# The templates and icons are stored here
+COPY templates templates
+COPY static static

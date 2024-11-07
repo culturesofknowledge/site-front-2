@@ -31,8 +31,8 @@ data/**/*.csv
 data/**/*.csv.bak
 
 # docker
-solr-emlo
-data-solr
+docker-emlo/solr-data/*
+!docker-emlo/solr-data/.keep
 
 # ENV folder
 site-front-2

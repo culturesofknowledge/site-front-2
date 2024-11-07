@@ -1,0 +1,29 @@
+services:
+  web-flask:
+    restart: always
+    build:
+      context: .
+      dockerfile: ./docker-emlo/Dockerfile-flask
+    environment:
+      SOLR_URL: "localhost"
+    expose:
+      - "5000"
+    ports:
+      - 5000:5000
+    command: python run.py
+
+  solr:
+    build: ./docker-emlo/solr-emlo
+    #restart: no
+    environment:
+      SOLR_LOG_LEVEL: INFO
+      LD_BIND_NOW: 1
+    ports:
+      - "8983:8983"
+    volumes:
+      - ./solr-emlo/solr/home:/opt/solr/server/solr/home
+      - ./data-solr/:/data-solr/
+    ulimits:
+      nofile:
+        soft: "65536"
+        hard: "65536"

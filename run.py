@@ -7,7 +7,7 @@ from views.contribute import contribute_bp
 from views.about import about_bp
 from views.forms import forms_bp
 from views.errors import errors_bp
-from solr.solr import solr_bp
+from views.solr import solr_bp
 from config import Config
 
 def create_app():

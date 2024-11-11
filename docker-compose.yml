@@ -13,7 +13,7 @@ services:
     command: python run.py
 
   solr:
-    build: ./docker-emlo/solr-emlo
+    build: ./docker-emlo/solr-conf
     #restart: no
     environment:
       SOLR_LOG_LEVEL: INFO

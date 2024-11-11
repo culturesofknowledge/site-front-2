@@ -748,6 +748,7 @@ emlo.FacetRenderer = class extends edges.Renderer {
     this.countFormat = edges.util.getParam(params, "countFormat", false);
     this.tooltipText = edges.util.getParam(params, "tooltipText", false);
     this.tooltip = edges.util.getParam(params, "tooltip", false);
+    this.hideCount = edges.util.getParam(params, "hideCount", 0); //  this will hide the facets after mentioned count entries are selected.
     this.tooltipState = "closed";
     this.namespace = "emlo-facet-view";
 
@@ -842,9 +843,10 @@ emlo.FacetRenderer = class extends edges.Renderer {
       `;
     }
 
+    const filterTerms = ts.filters.map((filter) => filter.term.toString());
+
     if (ts.values && ts.values.length > 0) {
       results = "";
-      const filterTerms = ts.filters.map((filter) => filter.term.toString());
 
       ts.values.forEach((val, idx) => {
         if (!filterTerms.includes(val.term.toString())) {
@@ -933,7 +935,15 @@ emlo.FacetRenderer = class extends edges.Renderer {
       tog = `<p class="main">${this.title}</p>`;
     }
 
-    let frag = `<div class="${facetClass}">
+    let isHideCount = false;
+
+    if (filterTerms.length >= this.hideCount && this.hideCount > 0) {
+      isHideCount = true;
+    }
+
+    let frag = `<div class="${facetClass}" style="${
+      isHideCount ? "display:none;" : ""
+    }">
                       <div class="${headerClass}"><div class="row">
                           <div class="col-md-12">
                               ${tog}

@@ -124,6 +124,7 @@ try {
           showSelected: false,
           controls: false,
           displayLimit: 5,
+          hideCount: 1,
         }),
       }),
 

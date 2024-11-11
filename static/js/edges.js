@@ -671,6 +671,61 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
   }
 };
 
+emlo.Facet = class extends edges.components.RefiningANDTermSelector {
+  constructor(params) {
+    super(params);
+  }
+
+  synchronise() {
+    // reset the state of the internal variables
+    if (this.lifecycle === "update") {
+      // if we are in the "update" lifecycle, then reset and read all the values
+      this.values = [];
+      if (this.edge.result) {
+        this._readValues({ result: this.edge.result });
+      }
+    } else if (this.lifecycle === "static" && this.syncCounts) {
+      if (this.edge.result) {
+        this._syncCounts({ result: this.edge.result });
+      }
+    }
+    this.filters = [];
+
+    // extract all the filter values that pertain to this selector
+    let filters = this.edge.currentQuery.listMust(
+      new es.TermFilter({ field: this.field })
+    );
+
+    for (let i = 0; i < filters.length; i++) {
+      let val = filters[i].value;
+      let translate_val = this._translate(val);
+      let displayValue = val !== translate_val ? translate_val : val;
+
+      this.filters.push({
+        display: displayValue,
+        term: val,
+        field: filters[i].field,
+      });
+    }
+  }
+
+  removeFilter(field, term) {
+    let nq = this.edge.cloneQuery();
+
+    nq.removeMust(
+      new es.TermFilter({
+        field: field,
+        value: term,
+      })
+    );
+
+    // reset the search page to the start and then trigger the next query
+    nq.from = 0;
+    this.edge.pushQuery(nq);
+    this.edge.cycle();
+  }
+};
+
 emlo.FacetRenderer = class extends edges.Renderer {
   constructor(params) {
     super(params);
@@ -1117,7 +1172,6 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
     // Build the selected filters display
     let filterFrag = "";
     ts.filters.forEach((filt) => {
-      console.log("filt", filt);
       filterFrag += `
         <tr class="${resultClass}">
           <td>
@@ -1126,7 +1180,7 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
           <td>
             <a href="#" class="${filterRemoveClass} selected-facets" data-key="${edges.util.escapeHtml(
         filt.term
-      )}">
+      )}" data-field="${edges.util.escapeHtml(filt.field)}" >
                    ${edges.util.escapeHtml(filt.display)}
                   <img class="facet" src="../../static/img/minus-facet.png" style="height:15px;" />
                 </a>
@@ -1161,8 +1215,10 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
   }
 
   removeFilter(element) {
-    const key = this.component.jq(element).attr("data-key");
-    this.component.removeFilterByTerm(key);
+    const term = element.getAttribute("data-key");
+    const field = element.getAttribute("data-field");
+
+    this.component.removeFilter(field, term);
     this.draw(); // Redraw the component to reflect the changes
   }
 };

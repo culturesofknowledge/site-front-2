@@ -1,0 +1,3 @@
+[submodule "static/libs/edges"]
+	path = static/libs/edges
+	url = https://github.com/CottageLabs/edges.git

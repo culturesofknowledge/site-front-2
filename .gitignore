@@ -33,7 +33,8 @@ data/**/*.csv
 data/**/*.csv.bak
 
 # docker
-docker-emlo/solr-data/*
+docker-emlo/solr-data
+docker-emlo/redis
 !docker-emlo/solr-data/.keep
 
 # ENV folder

@@ -14,7 +14,9 @@ __pycache__/
 # generated from Gradle or Maven project
 .idea/libraries/
 
-
+# re-indexer
+indexing/src/solr_reindexing
+indexing/src/solr_csv_export
 
 # nodejs
 node_modules/

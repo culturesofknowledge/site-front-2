@@ -1,0 +1,196 @@
+Instructions for adding a new relationship type to Solr
+=======================================================
+
+If your attempts to re-index Solr lead to an error message, you may find it help to check:
+
+/logs/solr/solr_process-via-supervisor.log
+
+You might want to search for the word 'SEVERE' because Solr seems to think that most errors are
+severe errors!
+
+But let's hope that the following instructions will lead to a totally error-free addition of
+a new relationship type to the system!
+
+-------------------------------------------------------
+
+1. Edit /home/dev/web/web/lib/fieldmap.py: add functions to pass back the names of new Solr fields.
+
+   - Let's take an example relationship: Person visited Place. The two sides of the relationship
+     consist of different types (the left-hand side is 'person'; the right-hand side is 'place').
+     Because there are different types on the two sides, you need to create TWO new functions,
+     one to express the relationship right-to-left, the other left-to-right.
+
+  - Our current naming convention for Solr fieldnames is namespace:predicate-ObjectTypeReturned.
+    Please try to name the function so that it indicates WHAT IS BEING RETURNED, e.g. 
+
+    - If I want to find out the locations visited by a particular person:
+
+      def get_place_visited_fieldname():
+        return 'ox:wasAt-location'
+
+    - If I want to find out the people who visited a particular place:
+
+      def get_people_who_visited_place_fieldname():
+        return 'rel:wasVisitedBy-person'
+
+   - Let's take another example relationship: Person was a relative of a second Person.
+     In this case, the two sides of the relationship are the same. It makes no difference whether
+     we look at it left-to-right or right-to-left. So we only need one fieldmap function:
+
+     def get_is_relative_of_fieldname():
+       return 'rel:relativeOf-person'
+
+-------------------------------------------------------
+
+2. Edit /home/dev/workspace/indexing/src/relationships.py
+
+   This file consists mainly of a dictionary of the column names used in the SQL 'relationship type'
+   table (which will have been imported from the editing interface as a CSV file). 
+
+   The possible values for relationship types can be found out by checking the file 
+   /home/dev/subversion/trunk/source/union/cofk_union_relationship_type.csv 
+
+   Returning to the 'person visited place' example, the SQL column name for this relationship type
+   is 'was_in_location'.
+
+   We should therefore add a dictionary entry with the key 'relationship_type-was_in_location'.
+
+   The value of this dictionary entry should be a LIST, as we may need multiple entries, e.g. to 
+   show that a comment can refer to a work, a person, a place, etc.
+
+   For each entry in the list, we need a call to the function set_rel_cfg(), into which we will
+   pass the values returned by our 'fieldmap' functions defined above, e.g.
+
+   'relationship_type-was_in_location': [
+     # Person (on left) visited or lived in place (on right)
+     set_rel_cfg( type_on_left   = 'person', \
+                  get_left_side  = get_people_who_visited_place_fieldname(), \
+                  type_on_right  = 'location', \
+                  get_right_side = get_place_visited_fieldname()), ],
+
+   And here is an example of a relationship type where we need multiple entries:
+
+   'relationship_type-refers_to': [ 
+     # Comment (on left) refers to work (on right)
+     set_rel_cfg( type_on_left   = 'comment', \
+                  get_left_side  = get_relations_to_comments_fieldname(), \
+                  type_on_right  = 'work', \
+                  get_right_side = get_work_commented_on_fieldname()),
+                               
+     # Comment (on left) refers to person (on right)
+     set_rel_cfg( type_on_left   = 'comment', \
+                  get_left_side  = get_relations_to_comments_fieldname(), \
+                  type_on_right  = 'person', \
+                  get_right_side = get_person_commented_on_fieldname()),
+                               
+     # Comment (on left) refers to manifestation (on right)
+     set_rel_cfg( type_on_left   = 'comment', \
+                  get_left_side  = get_relations_to_comments_fieldname(), \
+                  type_on_right  = 'manifestation', \
+                  get_right_side = get_manifestation_commented_on_fieldname()),
+                               
+     # Comment (on left) refers to location (on right)
+     set_rel_cfg( type_on_left   = 'comment', \
+                  get_left_side  = get_relations_to_comments_fieldname(), \
+                  type_on_right  = 'location', \
+                  get_right_side = get_place_commented_on_fieldname()),
+   ],
+
+
+-------------------------------------------------------
+
+3. Edit the relevant schemawriter.py in /home/dev/workspace/indexing/src.
+
+   - Continuing with the example of 'Person visited Place', we would need to edit:
+     - person_schemawriter.py
+     - location_schemawriter.py
+
+   - In both files, go to the 'write_relations()' function
+
+   - Within write_relations(), add a new call to write_field(), 
+     e.g. if we are editing the Person Schema Writer:
+
+     write_field( name=get_place_visited_fieldname(),
+                  type="string", indexed="true", stored="true", multiValued="true" )
+
+     (Obviously you may well need to change the values for the 'type' and 'multiValued' arguments.
+     Look at examples of similar fields to help with this.)
+
+     Then you will need to do much the same in the Location Schema Writer:
+
+     write_field( name=get_people_who_visited_place_fieldname(),
+                  type="string", indexed="true", stored="true", multiValued="true" )
+
+     N.B. By default, the new field names will be copied from the individual core such as
+     'people' and 'locations' into the 'all' core. However, several different cores may contain
+     fields with the same names. For example, works, people, places and manifestations can all
+     have comments attached to them. To pick up these comments, we use the fieldmap function
+     'get_relations_to_comments_fieldname()', which returns 'ox:isAnnotatedBy-comment'.
+     However, we only want 'ox:isAnnotatedBy-comment' to appear ONCE per schema.xml file, otherwise
+     we will get a 'Duplicate field' error. So if the 'all' schema already contains the field
+     that you are adding to these individual schemas, you must suppress the transfer of the field
+     from the individual schema to the 'all' schema. A parameter called 'called_from' is passed
+     into the write_relations() function. If this parameter contains the value 'all', you need
+     to suppress the writing out of the duplicate field, as follows:
+
+     if called_from != 'all':
+       write_field( name=get_relations_to_comments_fieldname(),
+                    type="string", indexed="true", stored="true", multiValued="true" )
+
+-------------------------------------------------------
+
+4. Run /home/dev/workspace/indexing/src/write_schemas.sh
+
+   This will regenerate the schema.xml files for every Solr core, both individual and 'all'.
+
+-------------------------------------------------------
+
+5. Restart Solr so that it picks up the changed schemas:
+
+   cd /home/dev/supervisor
+   supervisorctl 
+   (enter username and password)
+   restart solr_process:solr_process_1
+   exit
+-------------------------------------------------------
+
+6. Import your new data into Solr:
+
+   Run /home/dev/workspace/indexing/src/index_all.sh
+
+-------------------------------------------------------
+
+7. Edit relations.py in /home/dev/web/web/lib.
+
+   This file holds which links should be fetched when a single record is wanted in the profile.
+   It consists mainly of a dictionary where:
+   - the keys are core/object types (in the singular), e.g. 'location'
+   - the values are a list of field names to pick up in the 'profile' page for that object type.
+
+   N.B. Please always use 'fieldmap' functions to return the field names.
+
+   Here is an example for 'location':
+
+   'location' : [
+      get_works_with_origin_fieldname(),
+      get_works_with_destination_fieldname(),
+      get_people_born_at_place_fieldname(),
+      get_people_who_died_at_place_fieldname(),
+      get_people_who_visited_place_fieldname(),
+      get_relations_to_comments_fieldname(),
+   ],
+
+-------------------------------------------------------
+
+8. Restart pylons in the same way as you restarted Solr, but with this statement:
+
+restart pylons_process:pylons_webservice_1
+
+This should pick up your changes from relations.py and make your new data available for use
+in the profile page. (To actually display it, you will need to edit the relevant mako file.)
+
+-------------------------------------------------------
+
+And now you're good to go!
+Sue Burgess, 27 July 2011.
+

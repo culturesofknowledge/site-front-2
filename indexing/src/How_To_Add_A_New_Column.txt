@@ -1,0 +1,13 @@
+fieldmap.py  in /home/dev/web/web/lib
+- add an entry to fieldmap.py for the new field e.g. get_whatever_the_field_is()
+
+csvtordf.py  in /home/dev/workspace/indexing/src
+- search for the SQL column name in csvtordf.py e.g. find the line 'creation_user':None,
+- change None to something like { predicate: fieldmap.get_whatever_the_field_is() }
+- if the column should be a date or boolean, you will need to add a converter function here, e.g. see
+  change_timestamp or is_organisation
+
+*schemawriter.py  in /home/dev/workspace/indexing/src
+- add an entry as described in How_To_Add_A_New_Relationship_Type.txt
+- run write_schemas.sh
+- restart solr

@@ -2,13 +2,13 @@ volumes:
   redis:
 
 services:
-  web-flask:
+  web:
     restart: always
     build:
       context: .
       dockerfile: ./docker-emlo/Dockerfile-flask
-    environment:
-      SOLR_URL: "http://localhost:8983/solr/"
+    env_file:
+      - .env
     expose:
       - "5000"
     ports:

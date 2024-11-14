@@ -671,6 +671,61 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
   }
 };
 
+emlo.Facet = class extends edges.components.RefiningANDTermSelector {
+  constructor(params) {
+    super(params);
+  }
+
+  synchronise() {
+    // reset the state of the internal variables
+    if (this.lifecycle === "update") {
+      // if we are in the "update" lifecycle, then reset and read all the values
+      this.values = [];
+      if (this.edge.result) {
+        this._readValues({ result: this.edge.result });
+      }
+    } else if (this.lifecycle === "static" && this.syncCounts) {
+      if (this.edge.result) {
+        this._syncCounts({ result: this.edge.result });
+      }
+    }
+    this.filters = [];
+
+    // extract all the filter values that pertain to this selector
+    let filters = this.edge.currentQuery.listMust(
+      new es.TermFilter({ field: this.field })
+    );
+
+    for (let i = 0; i < filters.length; i++) {
+      let val = filters[i].value;
+      let translate_val = this._translate(val);
+      let displayValue = val !== translate_val ? translate_val : val;
+
+      this.filters.push({
+        display: displayValue,
+        term: val,
+        field: filters[i].field,
+      });
+    }
+  }
+
+  removeFilter(field, term) {
+    let nq = this.edge.cloneQuery();
+
+    nq.removeMust(
+      new es.TermFilter({
+        field: field,
+        value: term,
+      })
+    );
+
+    // reset the search page to the start and then trigger the next query
+    nq.from = 0;
+    this.edge.pushQuery(nq);
+    this.edge.cycle();
+  }
+};
+
 emlo.FacetRenderer = class extends edges.Renderer {
   constructor(params) {
     super(params);
@@ -693,6 +748,7 @@ emlo.FacetRenderer = class extends edges.Renderer {
     this.countFormat = edges.util.getParam(params, "countFormat", false);
     this.tooltipText = edges.util.getParam(params, "tooltipText", false);
     this.tooltip = edges.util.getParam(params, "tooltip", false);
+    this.hideCount = edges.util.getParam(params, "hideCount", 0); //  this will hide the facets after mentioned count entries are selected.
     this.tooltipState = "closed";
     this.namespace = "emlo-facet-view";
 
@@ -787,9 +843,10 @@ emlo.FacetRenderer = class extends edges.Renderer {
       `;
     }
 
+    const filterTerms = ts.filters.map((filter) => filter.term.toString());
+
     if (ts.values && ts.values.length > 0) {
       results = "";
-      const filterTerms = ts.filters.map((filter) => filter.term.toString());
 
       ts.values.forEach((val, idx) => {
         if (!filterTerms.includes(val.term.toString())) {
@@ -878,7 +935,15 @@ emlo.FacetRenderer = class extends edges.Renderer {
       tog = `<p class="main">${this.title}</p>`;
     }
 
-    let frag = `<div class="${facetClass}">
+    let isHideCount = false;
+
+    if (filterTerms.length >= this.hideCount && this.hideCount > 0) {
+      isHideCount = true;
+    }
+
+    let frag = `<div class="${facetClass}" style="${
+      isHideCount ? "display:none;" : ""
+    }">
                       <div class="${headerClass}"><div class="row">
                           <div class="col-md-12">
                               ${tog}
@@ -1117,7 +1182,6 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
     // Build the selected filters display
     let filterFrag = "";
     ts.filters.forEach((filt) => {
-      console.log("filt", filt);
       filterFrag += `
         <tr class="${resultClass}">
           <td>
@@ -1126,7 +1190,7 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
           <td>
             <a href="#" class="${filterRemoveClass} selected-facets" data-key="${edges.util.escapeHtml(
         filt.term
-      )}">
+      )}" data-field="${edges.util.escapeHtml(filt.field)}" >
                    ${edges.util.escapeHtml(filt.display)}
                   <img class="facet" src="../../static/img/minus-facet.png" style="height:15px;" />
                 </a>
@@ -1161,8 +1225,10 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
   }
 
   removeFilter(element) {
-    const key = this.component.jq(element).attr("data-key");
-    this.component.removeFilterByTerm(key);
+    const term = element.getAttribute("data-key");
+    const field = element.getAttribute("data-field");
+
+    this.component.removeFilter(field, term);
     this.draw(); // Redraw the component to reflect the changes
   }
 };

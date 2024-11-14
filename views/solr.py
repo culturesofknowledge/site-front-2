@@ -13,14 +13,14 @@ SOLR_URL = os.getenv('SOLR_URL')
 if not SOLR_URL:
     raise ValueError("SOLR_URL environment variable is not set. Please configure it before starting the app.")
 
-@solr_bp.route('/solr/<path:subpath>', methods=['GET', 'POST', 'PUT', 'DELETE'])  # Include methods you need
+@solr_bp.route('/solr/<path:subpath>', methods=['GET'])  # Include methods you need
 def solr_proxy(subpath):
     try:
         # Construct the full URL for the external API request
         full_url = f"{SOLR_URL}/solr/{subpath}"  # Append the captured subpath
 
         # Forward the request to the external API
-        response = requests.request(
+        response = requests.request(solr
             method=request.method,  # Forward the original request method
             url=full_url,
             headers={key: value for key, value in request.headers if key != 'Host'},  # Forward headers

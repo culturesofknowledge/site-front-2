@@ -113,7 +113,7 @@ try {
         }),
       }),
 
-      new edges.components.RefiningANDTermSelector({
+      new emlo.Facet({
         id: "author_sort",
         category: "refine_search",
         field: "author_sort",
@@ -124,10 +124,11 @@ try {
           showSelected: false,
           controls: false,
           displayLimit: 5,
+          hideCount: 1,
         }),
       }),
 
-      new edges.components.RefiningANDTermSelector({
+      new emlo.Facet({
         id: "selected",
         category: "selected_facets",
         renderer: new emlo.SelectedFacetRenderer({}),

@@ -5,10 +5,10 @@
 Install a python venv and install needed libraries
 
 ```bash
+python -m venv solr_reindexing
 source solr_reindexing/bin/activate
 pip install --upgrade pip
 pip install solrpy pysolr redis feedparser
-python -m venv solr_reindexing
 ```
 
 Import the csv files into a proper location. e.g.

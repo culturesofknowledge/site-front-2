@@ -23,9 +23,7 @@ def solr_proxy(subpath):
         # Forward the request to the external API
         response = requests.request(
             method=request.method,  # Forward the original request method
-            url=full_url,
-            headers={key: value for key, value in request.headers if key != 'Host'},  # Forward headers
-            params=request.args  # Forward query parameters
+            url=full_url
         )
 
         # Raise an error if the external request failed

@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 import requests
 import os
 from dotenv import load_dotenv
+from urllib.parse import urljoin
 
 load_dotenv()
 
@@ -17,14 +18,13 @@ if not SOLR_URL:
 def solr_proxy(subpath):
     try:
         # Construct the full URL for the external API request
-        full_url = f"{SOLR_URL}/solr/{subpath}"  # Append the captured subpath
+        full_url =  urljoin(SOLR_URL, "solr", subpath)  # Append the captured subpath
 
         # Forward the request to the external API
         response = requests.request(
             method=request.method,  # Forward the original request method
             url=full_url,
             headers={key: value for key, value in request.headers if key != 'Host'},  # Forward headers
-            json=request.get_json(),  # Forward JSON payload for POST/PUT
             params=request.args  # Forward query parameters
         )
 

@@ -9,7 +9,7 @@ COPY run.py run.py
 
 # Needed for run.py imports
 COPY views views
-COPY solr solr
+# COPY solr solr
 COPY config.py config.py
 
 # The templates and icons are stored here

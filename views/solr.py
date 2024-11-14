@@ -20,7 +20,7 @@ def solr_proxy(subpath):
         full_url = f"{SOLR_URL}/solr/{subpath}"  # Append the captured subpath
 
         # Forward the request to the external API
-        response = requests.request(solr
+        response = requests.request(
             method=request.method,  # Forward the original request method
             url=full_url,
             headers={key: value for key, value in request.headers if key != 'Host'},  # Forward headers

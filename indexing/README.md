@@ -11,30 +11,24 @@ pip install --upgrade pip
 pip install solrpy pysolr redis feedparser
 ```
 
-Import the csv files into a proper location. e.g.
-`mkdir solr_csv_export`
-
->  Note the above directory should be referenced in the file `sourceconfig_base.py`
+Import the csv files to be indexed.
 
 ```bash
-cp <SomeWhere>/*.csv .
+mkdir solr_csv_export
 cd solr_csv_export
-```
+cp <SomeWhere>/*.csv .
 
-
-
-In the same directory, we need a file (`need_index`) to say that we need the indexing to be run
-
-```bash
+# Tell the indexer that it needs to run
+rm need_index
 touch need_index
 cat 1 >> need_index
 ```
-
-
+>  Note the directory ("solr_csv_export") can be anything you prefer. It is referenced in the file `sourceconfig_base.py`
 
 Then, run the actual indexing
 
 ```bash
+# Get back into the indexing directory : site-front-2/indexing/src
 cd ..
 ./index.sh
 ```

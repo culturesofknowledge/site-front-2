@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request
 
 advance_bp = Blueprint('advance', __name__)
 
+
 @advance_bp.route('/advance')
 def advance():
     people = request.args.get('people')

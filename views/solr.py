@@ -6,7 +6,7 @@ from urllib.parse import urljoin, urlencode
 
 load_dotenv()
 
-solr_bp = Blueprint("solr" ,__name__)
+solr_bp = Blueprint("solr", __name__)
 
 # External API endpoint you want to fetch data from
 SOLR_URL = os.getenv('SOLR_URL', '')
@@ -14,20 +14,23 @@ SOLR_URL = os.getenv('SOLR_URL', '')
 if not SOLR_URL:
     raise ValueError("SOLR_URL environment variable is not set. Please configure it before starting the app.")
 
+
 @solr_bp.route('/solr/<path:subpath>', methods=['GET'])  # Include methods you need
 def solr_proxy(subpath):
     try:
-        print(f"Got subpath as: {subpath}")
         # Construct the full URL for the external API request
-        full_url =  urljoin(SOLR_URL, f"solr/{subpath}")    # Append the captured subpath
+        # Append the captured subpath
+        full_url = urljoin(SOLR_URL, subpath)
 
         # Convert query parameters to a query string for logging
         query_params = request.args.to_dict()
-        query_string = urlencode(query_params)
-        full_url_with_params = f"{full_url}?{query_string}" if query_string else full_url
-        
+        full_url_with_params = full_url
+        if query_params:
+            query_string = urlencode(query_params)
+            full_url_with_params = f"{full_url}?{query_string}"
+
         # Log the full URL with query parameters
-        print(f"Requesting URL: {full_url_with_params}")
+        # print(f"Requesting URL: {full_url_with_params}")
 
         # Make the request to the external Solr API, including query parameters
         response = requests.request(

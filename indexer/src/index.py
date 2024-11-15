@@ -23,7 +23,7 @@ import indexer
 import sourceconfig_base
 # import imp
 
-indexer_check_file = sourceconfig_base.base + "need_index"
+indexer_check_file = os.path.join(sourceconfig_base.base, "need_index")
 
 def GetSelection():
 	print("CSV conversion to RDF and Solr")
@@ -107,7 +107,7 @@ def RunIndexing( indexing=None, skip_id_generation=False, skip_store_relations=F
 
 		for csv_file_name in csvtordf.csv_files:
 
-			csv_file_location = sourceconfig_base.base + csvtordf.csv_files[csv_file_name][0]
+			csv_file_location = os.path.join(sourceconfig_base.base, csvtordf.csv_files[csv_file_name][0])
 			new_csv_file_location = csv_file_location + ".new"
 
 			if os.path.isfile(csv_file_location) :

@@ -102,7 +102,7 @@ def GenerateIds( _, red_ids ):
 
             print("  - " + csv_file)
             
-            csv_file_location = sourceconfig_base.base + csv_file
+            csv_file_location = os.path.join(sourceconfig_base.base, csv_file)
 
             if os.path.isfile(csv_file_location) :
 
@@ -193,7 +193,7 @@ def StoreRelations( _, red_rel, red_ids ):
 
         print("  - " + csv_file, end=' ')
 
-        csv_file_location = sourceconfig_base.base + csv_file
+        csv_file_location = os.path.join(sourceconfig_base.base, csv_file)
 
         # with fast_csv.Reader(io.open(csv_file_location)) as reader :
         with open(csv_file_location, mode='r') as csv_file:
@@ -329,7 +329,7 @@ def FillSolr( indexing, red_temp ):
                 #
                 # open each csvfile and output to entity store as rdf
                 #
-                csv_file_location = sourceconfig_base.base + csv_file
+                csv_file_location = os.path.join(sourceconfig_base.base, csv_file)
                 print("  - CSV file:  " + csv_file_location)
 
                 csv_records = []

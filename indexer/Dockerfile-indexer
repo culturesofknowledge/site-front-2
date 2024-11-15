@@ -1,6 +1,7 @@
 FROM python:3.12-alpine
 
 ENV APP_DIR=/data
+WORKDIR ${APP_DIR}
 
 RUN apk update && apk upgrade
 

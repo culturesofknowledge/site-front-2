@@ -1,15 +1,6 @@
-'''
-Created on 26 Aug 2010
-
-@author: dev
-
-Set up values for use with redis.
-
-'''
-
-# host = "redis"
-host = "localhost"
-port = 6379
+import os
+host = os.getenv('REDIS_HOST', '')
+port = os.getenv('REDIS_PORT', '6379')
 
 # Databases we are using
 db_default = 0

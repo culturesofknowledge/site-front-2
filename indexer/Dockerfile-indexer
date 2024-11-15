@@ -1,0 +1,14 @@
+FROM python:3.12-alpine
+
+ENV APP_DIR=/data
+
+RUN apk update && apk upgrade
+
+RUN apk add bash build-base vim git
+
+RUN python -m pip install --upgrade pip
+
+COPY src/ $APP_DIR
+RUN cd $APP_DIR && python -m pip install -r requirements.txt
+
+RUN chmod +x $APP_DIR/index.sh

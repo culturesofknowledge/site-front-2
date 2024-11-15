@@ -1,13 +1,5 @@
-'''
-Created on 27 Aug 2010
-
-@author: dev
-
-solr configurations
-'''
-
-# solr_base_url = "http://solr:8983/solr/"
-solr_base_url = "http://localhost:8983/solr/"
+import os
+solr_base_url = os.getenv('SOLR_URL')
 
 solr_urls = {
     'all' : solr_base_url + 'all',
@@ -20,7 +12,6 @@ solr_urls = {
     'institutions' : solr_base_url + 'institutions',
     'resources' : solr_base_url + 'resources',
 }
-
 
 solr_urls_stage = {
     'all' : solr_base_url + 'all_stage',

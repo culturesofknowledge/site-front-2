@@ -36,6 +36,8 @@ data/**/*.csv.bak
 docker-emlo/solr-data
 docker-emlo/redis
 !docker-emlo/solr-data/.keep
+docker-emlo/csv_inport_files
+!docker-emlo/csv_inport_files-data/.keep
 
 # ENV folder
 site-front-2

@@ -13,11 +13,11 @@ services:
       - "5000"
     ports:
       - 5000:5000
-    command: python run.py
+    command: bash -c "/bin/docker-entrypoint.sh"
 
   solr:
     build: ./docker-emlo/solr-conf
-    #restart: no
+    restart: always
     environment:
       SOLR_LOG_LEVEL: INFO
       LD_BIND_NOW: 1

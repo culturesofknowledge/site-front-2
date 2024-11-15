@@ -9,7 +9,7 @@ load_dotenv()
 solr_bp = Blueprint("solr" ,__name__)
 
 # External API endpoint you want to fetch data from
-SOLR_URL = os.getenv('SOLR_URL')
+SOLR_URL = os.getenv('SOLR_URL', '')
 
 if not SOLR_URL:
     raise ValueError("SOLR_URL environment variable is not set. Please configure it before starting the app.")

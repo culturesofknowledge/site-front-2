@@ -1,4 +1,6 @@
 __author__ = 'sers0034'
+from dotenv import load_dotenv
+load_dotenv()
 
 import sys
 import time

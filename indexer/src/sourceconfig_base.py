@@ -1,2 +1,1 @@
-# base="/data/"
-base="./solr_csv_export/"
+base = "/data/csv_import_files"

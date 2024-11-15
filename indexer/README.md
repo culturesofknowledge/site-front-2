@@ -1,34 +1,87 @@
-# How to run the indexer code :
+# Index data in Solr
 
-`cd site-front-2/indexing/src`
+## Run the indexer using docker
 
-Install a python venv and install needed libraries
+### Setup the data
+1. The indexer needs source csv files. 
 
-```bash
-python -m venv solr_reindexing
-source solr_reindexing/bin/activate
-pip install --upgrade pip
-pip install solrpy pysolr redis feedparser
+   These need to be placed in the `CSV_FOLDER_IMPORT_PATH` defined in the .env file.
+
+   These files are obtained from emlo-edit solr export.
+
+2. Tell the indexer that it needs to run
+
+   There needs to be a file named `need_index` within the `CSV_FOLDER_IMPORT_PATH` with the text `1`
+
+   ```
+   cd $CSV_FOLDER_IMPORT_PATH
+   rm need_index
+   touch need_index
+   cat 1 >> need_index
+   ```
+
+### Run the indexer
+
+Once the docker-containers are built for EMLO site-front-2 (see [Readme](https://github.com/culturesofknowledge/site-front-2/blob/feature/index_solr/README.md#run-using-docker) on how to), you just need to start the docker container `indexer`. 
+
+```
+docker-compose start indexer
 ```
 
-Import the csv files to be indexed.
+It will then run the indexer.
 
-```bash
-mkdir solr_csv_export
-cd solr_csv_export
-cp <SomeWhere>/*.csv .
+You can look at the logs in `docker-compose logs -f indexer`
 
-# Tell the indexer that it needs to run
-rm need_index
-touch need_index
-cat 1 >> need_index
-```
->  Note the directory ("solr_csv_export") can be anything you prefer. It is referenced in the file `sourceconfig_base.py`
+It may take a few hours to complete the indexing process.
 
-Then, run the actual indexing
+## Run the indexer natively
 
-```bash
-# Get back into the indexing directory : site-front-2/indexing/src
-cd ..
-./index.sh
-```
+### Setup the code
+
+1. Clone the git repository:
+
+2. Change to the indexer directory:
+
+   ```
+   cd site-front-2/indexer/src
+   ```
+
+3. Create and activate virtual env:
+
+   ```sh
+   python3 -m venv site-front-env
+   source site-front-env/bin/activate
+   ```
+
+4. Install the dependencies:
+
+   ```sh
+   pip install -r requirements.txt
+   ```
+
+### Setup the data
+1. The indexer needs source csv files. 
+
+   These need to be placed in the directory `/data/csv_import_files`.
+
+   Note: If the files are in a different location, change the path in``indexer/src/sourceconfig_base.py` 
+
+   These files are obtained from emlo-edit solr export.
+
+2. Tell the indexer that it needs to run
+
+   There needs to be a file named `need_index` within the `/data/csv_import_files` with the text `1`
+
+   ```
+   cd /data/csv_import_files
+   rm need_index
+   touch need_index
+   cat 1 >> need_index
+   ```
+
+### Run the indexer
+
+5. Run the indexer:
+   ```sh
+   ./index.sh
+   ```

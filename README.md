@@ -36,7 +36,6 @@
    source site-front-env/bin/activate
    ```
 
-
 2. Install the dependencies:
 
    ```sh

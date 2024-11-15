@@ -44,3 +44,13 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+
+  indexer:
+    build:
+      context: indexer
+      dockerfile: Dockerfile-indexer
+    env_file:
+      - .env
+    command: bash -c "/data/index.sh"
+    volumes:
+      - ${CSV_FOLDER_IMPORT_PATH}:/data/csv_import_files

@@ -1148,7 +1148,9 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
 
     // Clear the context if no filters are active
     if (ts.filters.length === 0) {
-      ts.context.html("<tr><td>None</td></tr>");
+      ts.context.html(
+        "<table class='facet'><tbody><tr><td>None</td></tr></tbody></table>"
+      );
       return;
     }
 

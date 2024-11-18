@@ -22,15 +22,10 @@ def solr_proxy(subpath):
         # Append the captured subpath
         full_url = urljoin(SOLR_URL, subpath)
 
-        # Convert query parameters to a query string for logging
-        query_params = request.args.to_dict()
+        query_string = request.query_string.decode("utf-8")
         full_url_with_params = full_url
-        if query_params:
-            query_string = urlencode(query_params)
-            full_url_with_params = f"{full_url}?{query_string}"
 
-        # Log the full URL with query parameters
-        # print(f"Requesting URL: {full_url_with_params}")
+        full_url_with_params = f"{full_url}?{query_string}"
 
         # Make the request to the external Solr API, including query parameters
         response = requests.request(

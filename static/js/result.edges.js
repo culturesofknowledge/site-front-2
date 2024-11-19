@@ -129,6 +129,81 @@ try {
       }),
 
       new emlo.Facet({
+        id: "recipient_sort",
+        category: "refine_search",
+        field: "recipient_sort",
+        display: "Recipient",
+        renderer: new emlo.FacetRenderer({
+          open: true,
+          title: "Recipient",
+          showSelected: false,
+          controls: false,
+          displayLimit: 5,
+          hideCount: 1,
+        }),
+      }),
+
+      new emlo.Facet({
+        id: "origin_sort",
+        category: "refine_search",
+        field: "origin_sort",
+        display: "Origin of letter",
+        renderer: new emlo.FacetRenderer({
+          open: true,
+          title: "Origin of letter",
+          showSelected: false,
+          controls: false,
+          displayLimit: 5,
+          hideCount: 1,
+        }),
+      }),
+
+      new emlo.Facet({
+        id: "destination_sort",
+        category: "refine_search",
+        field: "destination_sort",
+        display: "Destination of letter ",
+        renderer: new emlo.FacetRenderer({
+          open: true,
+          title: "Destination of letter ",
+          showSelected: false,
+          controls: false,
+          displayLimit: 5,
+          hideCount: 1,
+        }),
+      }),
+
+      new emlo.Facet({
+        id: "cito_Catalog",
+        category: "refine_search",
+        field: "cito_Catalog",
+        display: "Catalogue ",
+        renderer: new emlo.FacetRenderer({
+          open: true,
+          title: "Catalogue ",
+          showSelected: false,
+          controls: false,
+          displayLimit: 5,
+          hideCount: 1,
+        }),
+      }),
+
+      new emlo.Facet({
+        id: "dat_sin_year",
+        category: "refine_search",
+        field: "dat_sin_year",
+        display: " Year ",
+        renderer: new emlo.FacetRenderer({
+          open: true,
+          title: " Year ",
+          showSelected: false,
+          controls: false,
+          displayLimit: 5,
+          hideCount: 1,
+        }),
+      }),
+
+      new emlo.Facet({
         id: "selected",
         category: "selected_facets",
         renderer: new emlo.SelectedFacetRenderer({}),

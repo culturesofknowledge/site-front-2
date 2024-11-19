@@ -1383,7 +1383,7 @@ if __name__ == '__main__':
     if 'title_singular' in conv:
       title = conv['title_singular'].capitalize()
       print('')
-      print('************************' + title + '************************')
+      print(('************************' + title + '************************'))
     #endif
     for key, val in list(conv.items()):
       if key == 'translations':
@@ -1393,16 +1393,16 @@ if __name__ == '__main__':
         print('')
         for sql_column_name, translated in list(val.items()):
           if type( translated ) == dict:
-            print(title + ': SQL column name "' + sql_column_name + '" {') 
+            print((title + ': SQL column name "' + sql_column_name + '" {')) 
             for first_half, second_half in list(translated.items()):
               if str( first_half ) == 'predicate':
                 print('')
               #endif
-              print(indent + first_half.ljust( first_col_width ) + ' ' + str( second_half ))
+              print((indent + first_half.ljust( first_col_width ) + ' ' + str( second_half )))
               if type( second_half ) == str:
                 funclist = reversemap.get_functions_returning_value( second_half )
                 if len( funclist ) > 0:
-                  print(bigger_indent + 'Returned from fieldmap by: ' + str( funclist ))
+                  print((bigger_indent + 'Returned from fieldmap by: ' + str( funclist )))
                   print('')
                 #endif
 
@@ -1413,7 +1413,7 @@ if __name__ == '__main__':
                 if 'predicate' in second_half:
                   funclist = reversemap.get_functions_returning_value( second_half['predicate'] )
                   if len( funclist ) > 0:
-                    print(bigger_indent + 'Predicate returned from fieldmap by: ' + str(funclist))
+                    print((bigger_indent + 'Predicate returned from fieldmap by: ' + str(funclist)))
                     print('')
                   #endif
                 #endif
@@ -1426,7 +1426,7 @@ if __name__ == '__main__':
           # No mapping from SQL field to Solr
           #----------------------------------
           else:
-            print(title + ': SQL column name "' + sql_column_name + '": ' + str( translated ))
+            print((title + ': SQL column name "' + sql_column_name + '": ' + str( translated )))
             print('')
             print(fieldsep)
           #endif

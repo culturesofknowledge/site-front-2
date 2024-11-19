@@ -8,12 +8,11 @@ Created on 4 Nov 2010
 import codecs
 import csv
 import datetime
-import decimal
 import sys
 import time
 import urllib.request, urllib.parse, urllib.error
-import io
 import os.path
+import decimal
 
 import solr
 import csv
@@ -22,7 +21,6 @@ import csvtordf
 import relationships
 import solrconfig
 import sourceconfig_base
-# import imp
 
 fieldmap_path = 'lib'
 sys.path.append( fieldmap_path )
@@ -32,13 +30,11 @@ import fieldmap
 # imp.reload(sys)
 # sys.setdefaultencoding("utf8")
 
-
 lat_min = decimal.Decimal("-90")
 lat_max = decimal.Decimal("90")
 long_min = decimal.Decimal("-180")
 long_max = decimal.Decimal("180")
 
-   
 def plural_to_singular( plural ):
     if plural == 'people' :
         return "person"
@@ -254,9 +250,8 @@ def StoreRelations( _, red_rel, red_ids ):
 
     return error
 
-
 def generateAdditional(singular, record, solr_item):
-
+    
     if singular == "location" :
 
         if "latitude" in record and "longitude" in record:
@@ -281,13 +276,6 @@ def generateAdditional(singular, record, solr_item):
             country = record["location_name"]
         else :
             country = "unknown"
-
-
-def FillRdfAndSolr( indexing, _, red_temp, __ ):
-
-    # We no longer generate RDF.
-    FillSolr( indexing, red_temp )
-
 
 def FillSolr( indexing, red_temp ):
     """

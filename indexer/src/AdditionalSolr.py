@@ -20,7 +20,6 @@ from helpers import escape_colons
 # Convert ':' to '\:' for use in a Solr query
 escaped_uri_fieldname = escape_colons( f.get_uri_fieldname())
 escaped_uri_prefix = escape_colons( f.get_uri_value_prefix())
-join_with_or = " OR " + escaped_uri_prefix
 
 #================================================================
 

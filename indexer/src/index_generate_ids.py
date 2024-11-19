@@ -5,6 +5,6 @@ import redis
 import indexer
 import redisconfig
 
-print(redisconfig, redisconfig.host,)
-red_ids = redis.Redis(host=redisconfig.host, db=redisconfig.db_object_ids)
+print((redisconfig, redisconfig.host, redisconfig.port))
+red_ids = redis.Redis(host=redisconfig.host, port=redisconfig.port, db=redisconfig.db_object_ids)
 indexer.GenerateIds(None, red_ids)

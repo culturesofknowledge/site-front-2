@@ -9,6 +9,7 @@ from views.forms import forms_bp
 from views.errors import errors_bp
 from views.solr import solr_bp
 from config import Config
+import os
 
 def create_app():
     app = Flask(__name__)
@@ -29,7 +30,8 @@ def create_app():
 app = create_app()
 
 def main():
-    app.run(host='0.0.0.0', port=int(app.config['PORT']))
+    debug_mode = os.getenv('DEBUG', 'false').lower() == 'true'
+    app.run(host='0.0.0.0', port=int(app.config['PORT']), debug=debug_mode)
 
 if __name__ == '__main__':
     main()

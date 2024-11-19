@@ -1,6 +1,6 @@
 __author__ = 'sers0034'
-from dotenv import load_dotenv
-load_dotenv()
+# from dotenv import load_dotenv
+# load_dotenv()
 
 import sys
 import time
@@ -46,7 +46,7 @@ def GetSelection():
 	print("    x. exit")
 	print("")
 
-	response = input( "Enter your combination here (e.g. 247) : ")
+	response = eval(input( "Enter your combination here (e.g. 247) : "))
 	if response == 'x' or response == 'X' :
 		return [], False, "Exiting"
 
@@ -112,7 +112,7 @@ def RunIndexing( indexing=None, skip_id_generation=False, skip_store_relations=F
 
 			if os.path.isfile(csv_file_location) :
 
-				print("   -", csv_file_location)
+				print(("   -", csv_file_location))
 
 				stat_info = os.stat(csv_file_location)
 				with codecs.open( new_csv_file_location, encoding="utf-8", mode="w") as csv_file:
@@ -121,7 +121,7 @@ def RunIndexing( indexing=None, skip_id_generation=False, skip_store_relations=F
 
 						for line in csv_file_original:
 
-							line = line.replace( '\u000B', '' )  # U+000B : <control-000B> (LINE TABULATION) {VERTICAL TABULATION [VT]}
+							line = line.replace( '\\u000B', '' )  # U+000B : <control-000B> (LINE TABULATION) {VERTICAL TABULATION [VT]}
 							csv_file.write(line)
 
 				os.rename( csv_file_location, csv_file_location + '.bak' ) # original file to backup
@@ -129,7 +129,7 @@ def RunIndexing( indexing=None, skip_id_generation=False, skip_store_relations=F
 				os.chown( csv_file_location, stat_info.st_uid, stat_info.st_gid )
 
 		timeEnd = time.time()
-		print("  - Done (in %0.1f seconds)." % ( (timeEnd-timeStart)))
+		print(("  - Done (in %0.1f seconds)." % ( (timeEnd-timeStart))))
 
 
 	#
@@ -146,7 +146,7 @@ def RunIndexing( indexing=None, skip_id_generation=False, skip_store_relations=F
 			sys.exit( "Sorry couldnt generate ids - there may be errors with the csv files which will need to be fixed. (It could be unicode problems, try removing the invalid lines)")
 		else :
 			timeEnd = time.time()
-			print("  - Done (in %0.1f seconds)." % ( (timeEnd-timeStart)))
+			print(("  - Done (in %0.1f seconds)." % ( (timeEnd-timeStart))))
 
 	#
 	# Store relationships
@@ -162,7 +162,7 @@ def RunIndexing( indexing=None, skip_id_generation=False, skip_store_relations=F
 			sys.exit( "Sorry, relations problem. There maybe errors with the csv files which will need to be fixed. (It could be unicode problems, try removing the invalid lines)")
 		else:
 			timeEnd = time.time()
-			print("  - Done (in %0.1f seconds)." % (timeEnd-timeStart))
+			print(("  - Done (in %0.1f seconds)." % (timeEnd-timeStart)))
 
 
 	#
@@ -174,7 +174,7 @@ def RunIndexing( indexing=None, skip_id_generation=False, skip_store_relations=F
 	#
 	# open redis relations database
 	#
-	red_relations = redis.Redis(host=redisconfig.host, db=redisconfig.db_temp_cofk_create)
+	red_relations = redis.Redis(host=redisconfig.host, port=redisconfig.port, db=redisconfig.db_temp_cofk_create)
 
 	#
 	# Save the RDF and output to Solr
@@ -192,7 +192,7 @@ def RunIndexing( indexing=None, skip_id_generation=False, skip_store_relations=F
 		AdditionalSolr.AdditionalWorksData()
 
 		timeEnd = time.time()
-		print("  - Done (in %0.1f seconds)." % (timeEnd-timeStart))
+		print(("  - Done (in %0.1f seconds)." % (timeEnd-timeStart)))
 	#
 	# Switch from the staging cores to real ones.
 	#
@@ -209,7 +209,7 @@ def RunIndexing( indexing=None, skip_id_generation=False, skip_store_relations=F
 	# Done!
 	#
 	timeFinished = time.time()
-	print("Conversion completed in %0.1f seconds (%0.1f minutes)." % ( (timeFinished-timeBegin), (timeFinished-timeBegin)/60 ))
+	print(("Conversion completed in %0.1f seconds (%0.1f minutes)." % ( (timeFinished-timeBegin), (timeFinished-timeBegin)/60 )))
 
 
 def check_file_mark_processing() :

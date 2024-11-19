@@ -6,25 +6,6 @@ Consists of functions to map fields from the editing interface to RDF terms suit
 import sys
 import inspect
 
-# -----------------------------------------------------------------------------------------------------
-def get_all_main_displayable_fields():
-  
-  # These are the fields that seem to really sum up a record in an easily-readable way,
-  # and are used if there is only space to show one field's worth of data about a record.
-
-  displayfields = {
-    "work" :          { "display": "Description", "value": get_work_description_fieldname()},
-    "manifestation" : { "display": "Type" ,       "value": get_manifestation_type_fieldname()},
-    "person" :        { "display": 'Name',        "value": get_person_name_fieldname()},
-    "location" :      { "display": 'Name',        "value": get_location_name_fieldname()},
-    "institution" :   { "display": 'Name' ,       "value": get_repository_name_fieldname()},
-    "resource" :      { "display": "Name" ,       "value": get_resource_title_fieldname()},
-    "comment" :       { "display": 'Comment',     "value": get_comments_fieldname()},
-    "image" :         { "display": 'Image',       "value": get_image_source_fieldname()}
-  }
-  return displayfields
-  
-
 # --------------------------------------------------------------------------------------------------
 
 def get_core_id_fieldname():
@@ -45,13 +26,6 @@ def get_id_fieldname( object_type = 'work', get_integer_version = False ):
 
 
   return get_core_id_fieldname() + '-' + suffix
-
-# --------------------------------------------------------------------------------------------------
-
-def get_integer_id_fieldname( object_type = 'work' ):
-  
-  # Returns the *name within Solr* of the unique integer key field within the editing interface
-  return get_id_fieldname( object_type, True )
 
 # --------------------------------------------------------------------------------------------------
 def get_integer_id_value_prefix():
@@ -107,23 +81,6 @@ def get_uuid_value_prefix():
 
 # --------------------------------------------------------------------------------------------------
 
-def get_uuid_fieldname():
-  
-  # Gets prefixed to the actual value of the field, as well as being a suffix to the name.
-  suffix = get_uuid_value_prefix()
-  return get_core_id_fieldname() + '-' + suffix
-
-# --------------------------------------------------------------------------------------------------
-
-def get_main_displayable_fieldname( object_type = 'work' ):
-  
-  # Returns the *name within Solr* of the main descriptive/summary field 
-  # for a particular type of object, e.g. the 'description' field for a work.
-
-  displayfields = get_all_main_displayable_fields()
-  return displayfields[object_type]['value']
-
-# --------------------------------------------------------------------------------------------------
 def get_work_description_fieldname():
   return 'dcterms_description'
 
@@ -245,10 +202,6 @@ def get_authors_fieldname_start():
   return 'mail_authors'
 
 # --------------------------------------------------------------------------------------------------
-def get_author_as_marked_fieldname():
-  return get_authors_fieldname_start() + '-' + get_as_marked_fieldname_end()
-
-# --------------------------------------------------------------------------------------------------
 def get_addressee_uri_fieldname():
   return 'mail_recipient-person'
 
@@ -271,10 +224,6 @@ def get_addressee_roles_fieldname():
 # --------------------------------------------------------------------------------------------------
 def get_addressees_fieldname_start():
   return 'mail_addressees'
-
-# --------------------------------------------------------------------------------------------------
-def get_addressee_as_marked_fieldname():
-  return get_addressees_fieldname_start() + '-' + get_as_marked_fieldname_end()
 
 # --------------------------------------------------------------------------------------------------
 def get_details_of_agent_mentioned_fieldname():
@@ -307,10 +256,6 @@ def get_placename_of_origin_fieldname():
 # --------------------------------------------------------------------------------------------------
 def get_alternate_placename_of_origin_fieldname():
   return 'location-alternate-origin'   # this is used when copied into 'works' core
-                             
-# --------------------------------------------------------------------------------------------------
-def get_origin_as_marked_fieldname():
-  return get_origin_fieldname_start() + '-' + get_as_marked_fieldname_end()
 
 # --------------------------------------------------------------------------------------------------
 def get_destination_fieldname_start():
@@ -327,10 +272,6 @@ def get_placename_of_destination_fieldname():
 # --------------------------------------------------------------------------------------------------
 def get_alternate_placename_of_destination_fieldname():
   return 'alternate-location-destination'   # this is used when copied into 'works' core
-                                  
-# --------------------------------------------------------------------------------------------------
-def get_destination_as_marked_fieldname():
-  return get_destination_fieldname_start() + '-' + get_as_marked_fieldname_end()
 
 # --------------------------------------------------------------------------------------------------
 def get_placename_mentioned_fieldname():
@@ -361,30 +302,6 @@ def get_period_end_fieldname():
   return 'ox_completed'
 
 # --------------------------------------------------------------------------------------------------
-def get_start_day_fieldname():
-  return get_period_start_fieldname() + '-' + get_day_fieldname()
-
-# --------------------------------------------------------------------------------------------------
-def get_start_month_fieldname():
-  return get_period_start_fieldname() + '-' + get_month_fieldname()
-
-# --------------------------------------------------------------------------------------------------
-def get_start_year_fieldname():
-  return get_period_start_fieldname() + '-' + get_year_fieldname()
-
-# --------------------------------------------------------------------------------------------------
-def get_end_day_fieldname():
-  return get_period_end_fieldname() + '-' + get_day_fieldname()
-
-# --------------------------------------------------------------------------------------------------
-def get_end_month_fieldname():
-  return get_period_end_fieldname() + '-' + get_month_fieldname()
-
-# --------------------------------------------------------------------------------------------------
-def get_end_year_fieldname():
-  return get_period_end_fieldname() + '-' + get_year_fieldname()
-
-# --------------------------------------------------------------------------------------------------
 def get_date_range_fieldname():
   return 'ox_dateIsRange'
 
@@ -409,20 +326,12 @@ def get_postscript_fieldname():
   return 'mail_postScript'
 
 # --------------------------------------------------------------------------------------------------
-def get_editors_notes_fieldname():
-  return 'ox_editorNotes'
-
-# --------------------------------------------------------------------------------------------------
 def get_date_added_fieldname():
   return 'ox_internalAdded'
 
 # --------------------------------------------------------------------------------------------------
 def get_date_created_fieldname():
   return 'ox_internalCreated'
-
-# --------------------------------------------------------------------------------------------------
-def get_created_by_user_fieldname():
-  return 'ox_internalCreatedByUser'
 
 # --------------------------------------------------------------------------------------------------
 def get_date_changed_fieldname():
@@ -441,10 +350,6 @@ def get_keywords_fieldname():
   return 'ox_keywords'
 
 # --------------------------------------------------------------------------------------------------
-def get_edit_status_fieldname():
-  return 'ox_editStatus'
-
-# --------------------------------------------------------------------------------------------------
 def get_uncertainty_flag():
   return 'indef_'
 
@@ -461,100 +366,8 @@ def get_uncertainty_flag_approx():
   return get_uncertainty_flag() + 'approximate'
 
 # --------------------------------------------------------------------------------------------------
-def get_author_flags_fieldname_root():
-  return get_authors_fieldname_start() + '-' + get_uncertainty_flag()
-
-# --------------------------------------------------------------------------------------------------
-def get_author_uncertain_fieldname():
-  return get_authors_fieldname_start() + '-' + get_uncertainty_flag_uncertain()
-
-# --------------------------------------------------------------------------------------------------
-def get_author_inferred_fieldname():
-  return get_authors_fieldname_start() + '-' + get_uncertainty_flag_inferred()
-
-# --------------------------------------------------------------------------------------------------
-def get_addressee_flags_fieldname_root():
-  return get_addressees_fieldname_start() + '-' + get_uncertainty_flag()
-
-# --------------------------------------------------------------------------------------------------
-def get_addressee_uncertain_fieldname():
-  return get_addressees_fieldname_start() + '-' + get_uncertainty_flag_uncertain()
-
-# --------------------------------------------------------------------------------------------------
-def get_addressee_inferred_fieldname():
-  return get_addressees_fieldname_start() + '-' + get_uncertainty_flag_inferred()
-
-# --------------------------------------------------------------------------------------------------
-def get_origin_flags_fieldname_root():
-  return get_origin_fieldname_start() + '-' + get_uncertainty_flag()
-
-# --------------------------------------------------------------------------------------------------
-def get_origin_uncertain_fieldname():
-  return get_origin_fieldname_start() + '-' + get_uncertainty_flag_uncertain()
-
-# --------------------------------------------------------------------------------------------------
-def get_origin_inferred_fieldname():
-  return get_origin_fieldname_start() + '-' + get_uncertainty_flag_inferred()
-
-# --------------------------------------------------------------------------------------------------
-def get_destination_flags_fieldname_root():
-  return get_destination_fieldname_start() + '-' + get_uncertainty_flag()
-
-# --------------------------------------------------------------------------------------------------
-def get_destination_uncertain_fieldname():
-  return get_destination_fieldname_start() + '-' + get_uncertainty_flag_uncertain()
-
-# --------------------------------------------------------------------------------------------------
-def get_destination_inferred_fieldname():
-  return get_destination_fieldname_start() + '-' + get_uncertainty_flag_inferred()
-
-# --------------------------------------------------------------------------------------------------
-def get_date_flags_fieldname_root():
-  return get_period_start_fieldname() + '-' + get_uncertainty_flag()
-
-# --------------------------------------------------------------------------------------------------
-def get_date_uncertain_fieldname():
-  return get_period_start_fieldname() + '-' + get_uncertainty_flag_uncertain()
-
-# --------------------------------------------------------------------------------------------------
-def get_date_inferred_fieldname():
-  return get_period_start_fieldname() + '-' + get_uncertainty_flag_inferred()
-
-# --------------------------------------------------------------------------------------------------
-def get_date_approx_fieldname():
-  return get_period_start_fieldname() + '-' + get_uncertainty_flag_approx()
-
-# --------------------------------------------------------------------------------------------------
 def get_creation_date_fieldname():
   return 'dcterms_created'
-
-# --------------------------------------------------------------------------------------------------
-def get_creation_date_year_fieldname():
-  return get_creation_date_fieldname() + '-' + get_year_fieldname()
-
-# --------------------------------------------------------------------------------------------------
-def get_creation_date_month_fieldname():
-  return get_creation_date_fieldname() + '-' + get_month_fieldname()
-
-# --------------------------------------------------------------------------------------------------
-def get_creation_date_day_fieldname():
-  return get_creation_date_fieldname() + '-' + get_day_fieldname()
-
-# --------------------------------------------------------------------------------------------------
-def get_creation_date_flags_fieldname_root():
-  return get_creation_date_fieldname() + '-' + get_uncertainty_flag()
-
-# --------------------------------------------------------------------------------------------------
-def get_creation_date_uncertain_fieldname():
-  return get_creation_date_fieldname() + '-' + get_uncertainty_flag_uncertain()
-
-# --------------------------------------------------------------------------------------------------
-def get_creation_date_inferred_fieldname():
-  return get_creation_date_fieldname() + '-' + get_uncertainty_flag_inferred()
-
-# --------------------------------------------------------------------------------------------------
-def get_creation_date_approx_fieldname():
-  return get_creation_date_fieldname() + '-' + get_uncertainty_flag_approx()
 
 # --------------------------------------------------------------------------------------------------
 def get_manifestation_address_fieldname():
@@ -623,10 +436,6 @@ def get_person_name_fieldname():
 # ----------------------------------------------------------------------------------------------
 def get_person_further_reading_fieldname():
   return 'ox_furtherReading'
-
-# ----------------------------------------------------------------------------------------------
-def get_person_name_first_letter_fieldname():
-  return get_person_name_fieldname() + '-firstletter'
 
 # ----------------------------------------------------------------------------------------------
 def get_location_name_fieldname():
@@ -699,65 +508,9 @@ def get_alias_fieldname():
 def get_birth_fieldname():
   return 'bio_Birth'
 
-# ----------------------------------------------------------------------------------------------
-def get_birth_year_fieldname():
-  return get_birth_fieldname() + '-' + get_year_fieldname()
-
-# ----------------------------------------------------------------------------------------------
-def get_birth_month_fieldname():
-  return get_birth_fieldname() + '-' + get_month_fieldname()
-
-# --------------------------------------------------------------------------------------------------
-def get_birth_day_fieldname():
-  return get_birth_fieldname() + '-' + get_day_fieldname()
-
-# --------------------------------------------------------------------------------------------------
-def get_birth_date_flags_fieldname_root():
-  return get_birth_fieldname() + '-' + get_uncertainty_flag()
-
-# --------------------------------------------------------------------------------------------------
-def get_birth_date_uncertain_fieldname():
-  return get_birth_fieldname() + '-' + get_uncertainty_flag_uncertain()
-
-# --------------------------------------------------------------------------------------------------
-def get_birth_date_inferred_fieldname():
-  return get_birth_fieldname() + '-' + get_uncertainty_flag_inferred()
-
-# --------------------------------------------------------------------------------------------------
-def get_birth_date_approx_fieldname():
-  return get_birth_fieldname() + '-' + get_uncertainty_flag_approx()
-
 # --------------------------------------------------------------------------------------------------
 def get_death_fieldname():
   return 'bio_Death'
-
-# ----------------------------------------------------------------------------------------------
-def get_death_year_fieldname():
-  return get_death_fieldname() + '-' + get_year_fieldname()
-
-# ----------------------------------------------------------------------------------------------
-def get_death_month_fieldname():
-  return get_death_fieldname() + '-' + get_month_fieldname()
-
-# --------------------------------------------------------------------------------------------------
-def get_death_day_fieldname():
-  return get_death_fieldname() + '-' + get_day_fieldname()
-
-# --------------------------------------------------------------------------------------------------
-def get_death_date_flags_fieldname_root():
-  return get_death_fieldname() + '-' + get_uncertainty_flag()
-
-# --------------------------------------------------------------------------------------------------
-def get_death_date_uncertain_fieldname():
-  return get_death_fieldname() + '-' + get_uncertainty_flag_uncertain()
-
-# --------------------------------------------------------------------------------------------------
-def get_death_date_inferred_fieldname():
-  return get_death_fieldname() + '-' + get_uncertainty_flag_inferred()
-
-# --------------------------------------------------------------------------------------------------
-def get_death_date_approx_fieldname():
-  return get_death_fieldname() + '-' + get_uncertainty_flag_approx()
 
 # --------------------------------------------------------------------------------------------------
 def get_latitude_fieldname():
@@ -884,21 +637,6 @@ def get_works_with_origin_fieldname():
 # ----------------------------------------------------------------------------------------------
 def get_works_with_destination_fieldname():
   return 'mail_destinationOf-work'
-
-# ----------------------------------------------------------------------------------------------
-def get_related_works_fieldname():
-  # Duplicates get_work_related_to_resource_fieldname() so no need to hard-code twice
-  return get_work_related_to_resource_fieldname()
-
-# ----------------------------------------------------------------------------------------------
-def get_related_people_fieldname():
-  # Duplicates get_person_related_to_resource_fieldname() so no need to hard-code twice
-  return get_person_related_to_resource_fieldname()
-
-# ----------------------------------------------------------------------------------------------
-def get_related_places_fieldname():
-  # Duplicates get_place_related_to_resource_fieldname() so no need to hard-code twice
-  return get_place_related_to_resource_fieldname()
 
 # ----------------------------------------------------------------------------------------------
 def get_person_titles_or_roles_fieldname():
@@ -1158,7 +896,7 @@ if __name__ == '__main__':
     if inspect.isfunction( obj ):
       retval = obj()
       print(funcname)
-      print('  ' + str( retval ))
+      print(('  ' + str( retval )))
       print('')
 
 

@@ -26,20 +26,6 @@ sys.path.append( fieldmap_path )
 from fieldmap import *
 
 # ---------------------------------------------------------------------------------------------------
-
-namespaces = {
-	'dcterms' : 'http://dublincore.org/documents/dcmi-terms/',
-	'frbr' : 'http://purl.org/vocab/frbr/core#',
-	'mail' : 'http://vocab.ox.ac.uk/mail/',
-	'foaf': 'http://xmlns.com/foaf/0.1/',
-	'rel': 'http://purl.org/vocab/relationship/',
-	'rdfs' : 'http://www.w3.org/2000/01/rdf-schema#',
-	'ox' : 'http://vocab.ox.ac.uk/',
-	'bibo': 'http://purl.org/ontology/bibo/',
-	'owl' : 'http://www.w3.org/2002/07/owl#'
-}
-
-# ---------------------------------------------------------------------------------------------------
 #
 # This table is used when creating RDF data to link one object to another. The links
 # are extracted from the relations.csv file.
@@ -501,6 +487,6 @@ def getRdfRelationshipsLeftRight( thing1, rel_type, thing2 ):
 
 if __name__ == '__main__':
 	for key, value in list(relationships.items()):
-		print(key + ': ' + str( value ))
+		print((key + ': ' + str( value )))
 
 # ---------------------------------------------------------------------------------------------------

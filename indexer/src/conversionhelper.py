@@ -58,11 +58,6 @@ def convert_to_rdf_boolean( value ):
     
     return new_value
 
-def convert_to_solr_boolean(value):
-    # Just use rdf one!
-    return convert_to_rdf_boolean(value)
-
-
 def convert_people_gender( value ):
     valuelow = value.lower()
     if valuelow == 'male' or valuelow == 'm' or valuelow == 'man' or valuelow == 'men':
@@ -80,11 +75,6 @@ def convert_to_local_url( value ) :
    
    return value
 
-def convert_photo_url( value ) :
-   value = value.replace( 'cofk2.bodleian.ox.ac.uk', 'emlo-edit.bodleian.ox.ac.uk' )
-
-   return value
-  
 def convert_manifestation_type( value ):
    if value == 'Scribal copy' :
       return "Manuscript copy"

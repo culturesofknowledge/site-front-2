@@ -17,6 +17,7 @@ __pycache__/
 # re-indexer
 indexing/src/solr_reindexing
 indexing/src/solr_csv_export
+solr_reindexing/*
 
 # nodejs
 node_modules/
@@ -38,6 +39,7 @@ docker-emlo/redis
 !docker-emlo/solr-data/.keep
 docker-emlo/csv_inport_files
 !docker-emlo/csv_inport_files-data/.keep
+docker-emlo/*
 
 # ENV folder
 site-front-2

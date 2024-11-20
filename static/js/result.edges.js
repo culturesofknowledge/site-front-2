@@ -189,9 +189,9 @@ try {
       }),
 
       new emlo.Facet({
-        id: "dat_sin_year",
+        id: "ox_started-ox_year",
         category: "refine_search",
-        field: "dat_sin_year",
+        field: "ox_started-ox_year",
         display: " Year ",
         renderer: new emlo.FacetRenderer({
           open: true,

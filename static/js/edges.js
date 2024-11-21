@@ -1345,6 +1345,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       "No results to display"
     );
     this.contentTitle = edges.util.getParam(params, "contentTitle", "");
+    this.fields = edges.util.getParam(params, "fields", []);
     this.divider = edges.util.getParam(params, "divider", false); // Whether to include a divider
     this.namespace = "edges-custom-display";
   }
@@ -1371,6 +1372,12 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
           break;
         case "content":
           frag = this._renderContent();
+          break;
+        case "dates":
+          frag = this._renderDates();
+          break;
+        case "stats":
+          frag = this._renderStats();
           break;
         default:
           frag = this.noResultsText;
@@ -1426,6 +1433,66 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       .join("")}</ul>`;
   }
 
+  _renderDates() {
+    return `<div class="content">
+    ${this.fields
+      .map(
+        (field) =>
+          `
+             <strong> ${field.title} </strong>
+             <dd> ${edges.util.escapeHtml(
+               this.component.results[0][field.key] || ""
+             )} </dd> 
+          `
+      )
+      .join("")}</div>
+
+       <br/>
+
+      <hr class="yellow-divider" />
+    `;
+  }
+
+  _renderStats() {
+    // Collect stats and graph fields separately
+    const statsHtml = this.fields
+      .filter((field) => field.name !== "graph") // Exclude graph fields
+      .map((field) => {
+        const value = this.component.results[0][field.key] || 0;
+        const escapedValue = edges.util.escapeHtml(value);
+        const isClickable = value > 0;
+
+        return `
+          <span class="stat-item">
+            ${
+              isClickable
+                ? `<a href="#" onclick="handleStatClick('${field.key}')">${escapedValue}  ${field.title} </a>`
+                : `${escapedValue}  ${field.title}`
+            }
+          </span>
+        `;
+      })
+      .join(" ♦ ");
+
+    // Handle graph fields separately
+    const graphHtml = this.fields
+      .filter((field) => field.name === "graph")
+      .map((field) => {
+        this._renderBarGraph(field.key); // Call the graph rendering function
+        return ""; // Exclude graphs from stats string
+      })
+      .join("");
+
+    return `
+      <div class="content">
+        ${statsHtml}
+      </div>
+      ${graphHtml ? `<div class="graph-section">${graphHtml}</div>` : ""}
+      <br />
+      <hr class="yellow-divider" />
+    `;
+  }
+
   _renderContent() {
     let content = this.component.results[0][this.field]
       ? ` <div class="content">
@@ -1441,7 +1508,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     return `
       ${content}
       <br/>
-      
+
       <hr class="yellow-divider" />
     `;
   }

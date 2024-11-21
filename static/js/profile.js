@@ -48,12 +48,58 @@ function _getPeopleComponents(emlo) {
     }),
 
     new emlo.MultiFields({
-      id: "display",
+      id: "dates",
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
+        type: "dates",
+        sectionTitle: "Dates",
+        sectionTitleImage: "/static/img/icon-calendar.png",
+        fields: [
+          { title: "Date of birth", key: "bio_Birth-ox_year" },
+          { title: "Date of death", key: "bio_Death-ox_year" },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "stats",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "stats",
         sectionTitle: "Catalogue Statistics",
         sectionTitleImage: "/static/img/icon-statistics.png",
-        field: "ox_isOrganisation",
+        fields: [
+          {
+            name: "text",
+            title: " letters written",
+            key: "ox_totalWorksByAgent",
+          },
+          {
+            name: "text",
+            title: " letters received ",
+            key: "ox_totalWorksAddressedToAgent",
+          },
+          {
+            name: "text",
+            title: " letters mentioning",
+            key: "ox_totalWorksMentioningAgent",
+          },
+          {
+            name: "graph",
+            title: "",
+            key: "ox_totalWorksByAgent",
+          },
+          {
+            name: "graph",
+            title: "",
+            key: "ox_totalWorksAddressedToAgent",
+          },
+          {
+            name: "graph",
+            title: "",
+            key: "ox_totalWorksMentioningAgent",
+          },
+        ],
       }),
     }),
   ];

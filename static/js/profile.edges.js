@@ -40,7 +40,7 @@ try {
   };
 
   emlo.components = getComponents(collectioName, emlo);
-  console.log("COM", emlo.components);
+
   emlo.init();
 } catch (err) {
   console.error(err);

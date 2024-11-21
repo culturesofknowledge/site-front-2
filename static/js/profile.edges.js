@@ -22,6 +22,7 @@ try {
 
   //   Setting emlo object
   emlo.selector = "profile-display";
+  emlo.template = new emlo.ProfileTemplate();
   emlo.collection = `/solr/people/select`;
 
   emlo.openingQuery = {
@@ -34,6 +35,15 @@ try {
   };
 
   emlo.components = [
+    new emlo.MultiFields({
+      id: "page-title",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "heading",
+        field: "foaf_name",
+      }),
+    }),
+
     new emlo.MultiFields({
       id: "display",
       category: "results",

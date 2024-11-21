@@ -127,6 +127,62 @@ emlo.ResultTemplate = class extends edges.Template {
   }
 };
 
+emlo.ProfileTemplate = class extends edges.Template {
+  constructor(params) {
+    // TODO: Needs to be added for results page
+    // this.showControlSection = edges.util.getParam(
+    //   params,
+    //   "showControlSection",
+    //   false
+    // );
+    super(params);
+  }
+
+  draw(edge) {
+    this.edge = edge;
+    let results = "";
+
+    let resultComponents = edge.category("results");
+    for (let i = 0; i < resultComponents.length; i++) {
+      results += `<div id="${resultComponents[i].id}"></div>`;
+    }
+
+    let sidebar = "";
+    let sidebarComponents = edge.category("sidebar");
+    for (let i = 0; i < sidebarComponents.length; i++) {
+      sidebar += `<div id="${sidebarComponents[i].id}"></div>`;
+    }
+
+    let frag = `<div class="row">
+      <div class="side-nav"> 
+         <div>
+            ${sidebar}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="large-2 columns"><!-- dummy column -->&nbsp;</div>
+
+        <div class="large-10 columns" style="margin-left:25px">
+            <div id="profile">
+                <br/>
+                <h2 class="main">
+                    <span id="profile-header" class="font-18">
+                    </span>
+                </h2>
+            </div>
+   
+             <div id="" class="large-12 columns" style="margin-left:25px">
+              ${results}
+            </div>
+        </div>
+      </div>
+    </div>`;
+
+    this.edge.context.html(frag);
+  }
+};
+
 emlo.DropDown = class extends edges.Component {
   constructor(params) {
     super(params);
@@ -1289,6 +1345,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
     if (this.component.results && this.component.results.length > 0) {
       switch (this.type) {
+        case "heading":
+          frag = this._pageHeading();
+          break;
         case "list":
           frag = this._renderList();
           break;
@@ -1331,6 +1390,17 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     return `<${this.titleStyle} class="section-title">
       ${imageTag} ${edges.util.escapeHtml(this.title)}
     </${this.titleStyle}>`;
+  }
+
+  _pageHeading() {
+    console.log("he", this.component);
+
+    return `
+    <h2 class="main">
+      <span id="result-header" class="font-18">
+        ${edges.util.escapeHtml(this.component.results[0][this.field] || "")}
+      </span>
+    </h2>`;
   }
 
   _renderList() {

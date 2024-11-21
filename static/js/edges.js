@@ -1328,14 +1328,23 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     // Rendering configuration
     this.type = edges.util.getParam(params, "type", "list"); // Render type: list, table, bar, label
     this.field = edges.util.getParam(params, "field", ""); // Field value to display
-    this.title = edges.util.getParam(params, "title", "Results"); // Title for the section
-    this.titleStyle = edges.util.getParam(params, "titleStyle", "h3"); // Title style: h1, h2, etc.
-    this.titleImage = edges.util.getParam(params, "titleImage", null); // Optional image for title
+    this.sectionTitle = edges.util.getParam(params, "sectionTitle", ""); // Title for the section
+    this.sectionTitleStyle = edges.util.getParam(
+      params,
+      "sectionTitleStyle",
+      "h3"
+    ); // Title style: h1, h2, etc.
+    this.sectionTitleImage = edges.util.getParam(
+      params,
+      "sectionTitleImage",
+      null
+    ); // Optional image for title
     this.noResultsText = edges.util.getParam(
       params,
       "noResultsText",
       "No results to display"
     );
+    this.contentTitle = edges.util.getParam(params, "contentTitle", "");
     this.divider = edges.util.getParam(params, "divider", false); // Whether to include a divider
     this.namespace = "edges-custom-display";
   }
@@ -1360,12 +1369,15 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         case "label":
           frag = this._renderLabelValue();
           break;
+        case "content":
+          frag = this._renderContent();
+          break;
         default:
           frag = this.noResultsText;
       }
     }
 
-    const titleFrag = this._renderTitle();
+    const sectionTitleFrag = this._renderSectionTitle();
     const dividerFrag = this.divider ? '<hr class="divider">' : "";
 
     const containerClasses = edges.util.styleClasses(
@@ -1374,33 +1386,35 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       this.component.id
     );
     const container = `<div class="${containerClasses}">
-      ${titleFrag}
+      ${sectionTitleFrag}
       ${dividerFrag}
       ${frag}
     </div>`;
     this.component.context.html(container);
   }
 
-  _renderTitle() {
-    const imageTag = this.titleImage
+  _renderSectionTitle() {
+    const imageTag = this.sectionTitleImage
       ? `<img src="${edges.util.escapeHtml(
-          this.titleImage
-        )}" alt="${edges.util.escapeHtml(this.title)}" class="title-image">`
+          this.sectionTitleImage
+        )}" alt="${edges.util.escapeHtml(
+          this.sectionTitle
+        )}" class="title-image">`
       : "";
-    return `<${this.titleStyle} class="section-title">
-      ${imageTag} ${edges.util.escapeHtml(this.title)}
-    </${this.titleStyle}>`;
+
+    return `<${this.sectionTitleStyle} class="section-title">
+      ${imageTag} ${edges.util.escapeHtml(this.sectionTitle)}
+    </${this.sectionTitleStyle}>`;
   }
 
   _pageHeading() {
-    console.log("he", this.component);
-
     return `
     <h2 class="main">
       <span id="result-header" class="font-18">
         ${edges.util.escapeHtml(this.component.results[0][this.field] || "")}
       </span>
-    </h2>`;
+    </h2>
+    <hr class="yellow-divider" />`;
   }
 
   _renderList() {
@@ -1410,6 +1424,26 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
           `<li>${edges.util.escapeHtml(result[this.field] || "")}</li>`
       )
       .join("")}</ul>`;
+  }
+
+  _renderContent() {
+    let content = this.component.results[0][this.field]
+      ? ` <div class="content">
+      <dl>
+        <strong> ${this.contentTitle} </strong>
+      </dl>
+      <dd> ${edges.util.escapeHtml(
+        this.component.results[0][this.field] || ""
+      )} </dd> 
+    </div>`
+      : "";
+
+    return `
+      ${content}
+      <br/>
+      
+      <hr class="yellow-divider" />
+    `;
   }
 
   _renderTable() {

@@ -10166,3 +10166,7 @@ ul.pagination li {
   justify-content: space-between;
   align-items: center;
 }
+
+.content {
+  margin-left: 40px;
+}

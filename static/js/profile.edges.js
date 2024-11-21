@@ -1,4 +1,10 @@
 import emlo from "./edges.js";
+import { getComponents } from "./profile.js";
+const collectionMap = {
+  person: "people",
+  location: "locations",
+  work: "works",
+};
 
 try {
   let collectioName = "works"; // Setting default collectioName.
@@ -12,7 +18,7 @@ try {
   }
 
   //  Setting collection name from the split path
-  collectioName = splittedPath[2];
+  collectioName = collectionMap[splittedPath[2]];
   uuid = splittedPath[3];
 
   if (uuid == "") {
@@ -22,7 +28,7 @@ try {
   //   Setting emlo object
   emlo.selector = "profile-display";
   emlo.template = new emlo.ProfileTemplate();
-  emlo.collection = `/solr/people/select`;
+  emlo.collection = `/solr/${collectioName}/select`;
 
   emlo.openingQuery = {
     must: [
@@ -33,39 +39,8 @@ try {
     ],
   };
 
-  emlo.components = [
-    new emlo.MultiFields({
-      id: "page-title",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "heading",
-        field: "foaf_name",
-      }),
-    }),
-
-    new emlo.MultiFields({
-      id: "details",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "content",
-        sectionTitle: "Details",
-        sectionTitleImage: "/static/img/icon-people.png",
-        contentTitle: "Alternative names",
-        field: "skos_altLabel",
-      }),
-    }),
-
-    new emlo.MultiFields({
-      id: "display",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        sectionTitle: "Catalogue Statistics",
-        sectionTitleImage: "/static/img/icon-statistics.png",
-        field: "ox_isOrganisation",
-      }),
-    }),
-  ];
-
+  emlo.components = getComponents(collectioName, emlo);
+  console.log("COM", emlo.components);
   emlo.init();
 } catch (err) {
   console.error(err);

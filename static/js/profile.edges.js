@@ -5,7 +5,6 @@ try {
   let uuid = "";
   // Fetching collection name and ID
   let splittedPath = window.location.pathname.split("/");
-  console.log("splittedPath", splittedPath, splittedPath.length);
   if (splittedPath.length <= 3) {
     console.error(
       `something is wrong with the URL, we where expecting the path lenght to be more than 3.`
@@ -45,15 +44,27 @@ try {
     }),
 
     new emlo.MultiFields({
+      id: "details",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "content",
+        sectionTitle: "Details",
+        sectionTitleImage: "/static/img/icon-people.png",
+        contentTitle: "Alternative names",
+        field: "skos_altLabel",
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "display",
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
+        sectionTitle: "Catalogue Statistics",
+        sectionTitleImage: "/static/img/icon-statistics.png",
         field: "ox_isOrganisation",
       }),
     }),
   ];
-
-  console.log("hie", emlo);
 
   emlo.init();
 } catch (err) {

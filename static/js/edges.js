@@ -126,6 +126,7 @@ emlo.ResultTemplate = class extends edges.Template {
     this.edge.context.html(frag);
   }
 };
+
 emlo.DropDown = class extends edges.Component {
   constructor(params) {
     super(params);
@@ -1232,6 +1233,156 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
 
     this.component.removeFilter(field, term);
     this.draw(); // Redraw the component to reflect the changes
+  }
+};
+
+emlo.MultiFields = class extends edges.Component {
+  constructor(params) {
+    super(params);
+    this.results = [];
+    this.hitCount = 0;
+  }
+
+  synchronise() {
+    this.results = [];
+    this.hitCount = 0;
+
+    const source = this.edge.result;
+
+    if (!source) {
+      return;
+    }
+
+    const results = source.results();
+    this._appendResults({ results: results });
+
+    this.hitCount = source.total();
+  }
+
+  _appendResults(params) {
+    const results = params.results;
+    this.results = this.results.concat(results);
+  }
+};
+
+emlo.MultiFieldsRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+
+    // Rendering configuration
+    this.type = edges.util.getParam(params, "type", "list"); // Render type: list, table, bar, label
+    this.field = edges.util.getParam(params, "field", ""); // Field value to display
+    this.title = edges.util.getParam(params, "title", "Results"); // Title for the section
+    this.titleStyle = edges.util.getParam(params, "titleStyle", "h3"); // Title style: h1, h2, etc.
+    this.titleImage = edges.util.getParam(params, "titleImage", null); // Optional image for title
+    this.noResultsText = edges.util.getParam(
+      params,
+      "noResultsText",
+      "No results to display"
+    );
+    this.divider = edges.util.getParam(params, "divider", false); // Whether to include a divider
+    this.namespace = "edges-custom-display";
+  }
+
+  draw() {
+    let frag = this.noResultsText;
+
+    if (this.component.results && this.component.results.length > 0) {
+      switch (this.type) {
+        case "list":
+          frag = this._renderList();
+          break;
+        case "table":
+          frag = this._renderTable();
+          break;
+        case "bar":
+          frag = this._renderBarGraph();
+          break;
+        case "label":
+          frag = this._renderLabelValue();
+          break;
+        default:
+          frag = this.noResultsText;
+      }
+    }
+
+    const titleFrag = this._renderTitle();
+    const dividerFrag = this.divider ? '<hr class="divider">' : "";
+
+    const containerClasses = edges.util.styleClasses(
+      this.namespace,
+      "container",
+      this.component.id
+    );
+    const container = `<div class="${containerClasses}">
+      ${titleFrag}
+      ${dividerFrag}
+      ${frag}
+    </div>`;
+    this.component.context.html(container);
+  }
+
+  _renderTitle() {
+    const imageTag = this.titleImage
+      ? `<img src="${edges.util.escapeHtml(
+          this.titleImage
+        )}" alt="${edges.util.escapeHtml(this.title)}" class="title-image">`
+      : "";
+    return `<${this.titleStyle} class="section-title">
+      ${imageTag} ${edges.util.escapeHtml(this.title)}
+    </${this.titleStyle}>`;
+  }
+
+  _renderList() {
+    return `<ul>${this.component.results
+      .map(
+        (result) =>
+          `<li>${edges.util.escapeHtml(result[this.field] || "")}</li>`
+      )
+      .join("")}</ul>`;
+  }
+
+  _renderTable() {
+    return `
+      <table class="table table-striped">
+        <thead><tr><th>${edges.util.escapeHtml(this.field)}</th></tr></thead>
+        <tbody>${this.component.results
+          .map(
+            (result) =>
+              `<tr><td>${edges.util.escapeHtml(
+                result[this.field] || ""
+              )}</td></tr>`
+          )
+          .join("")}</tbody>
+      </table>
+    `;
+  }
+
+  _renderBarGraph() {
+    return `<div class="bar-graph">${this.component.results
+      .map((result) => {
+        const value = parseInt(result[this.field] || 0, 10);
+        return `
+          <div class="bar-container">
+            <div class="bar-label">${edges.util.escapeHtml(
+              result.label || ""
+            )}</div>
+            <div class="bar" style="width: ${value}%;">${value}</div>
+          </div>
+        `;
+      })
+      .join("")}</div>`;
+  }
+
+  _renderLabelValue() {
+    return `<div>${this.component.results
+      .map(
+        (result) =>
+          `<div><strong>${edges.util.escapeHtml(
+            this.field
+          )}:</strong> ${edges.util.escapeHtml(result[this.field] || "")}</div>`
+      )
+      .join("")}</div>`;
   }
 };
 

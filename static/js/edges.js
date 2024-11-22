@@ -153,9 +153,33 @@ emlo.ProfileTemplate = class extends edges.Template {
       sidebar += `<div id="${sidebarComponents[i].id}"></div>`;
     }
 
+    let sidebarTitle = "";
+    let sidebarTitleComponents = edge.category("sidebarTitle");
+    for (let i = 0; i < sidebarTitleComponents.length; i++) {
+      sidebarTitle += `<div id="${sidebarTitleComponents[i].id}"></div>`;
+    }
+
     let frag = `<div class="row">
       <div class="side-nav"> 
-         <div>
+        <div id="sidebar-title">
+          ${sidebarTitle}
+        </div>
+        
+        <div id="sidebar-actions">
+            <div>
+              <img src="../../static/img/icon-short-url.png" alt="short-url" />
+              Short URL:
+              <span id="shor-url-link">
+              </span>
+            </div>
+
+            <div id="send-comment">
+              <img src="../../static/img/icon-send-comment.png" alt="short-url" />
+              <a> Send Comment </a>
+            </div>
+        </div>
+        
+        <div id="more-options">
             ${sidebar}
         </div>
       </div>
@@ -180,6 +204,10 @@ emlo.ProfileTemplate = class extends edges.Template {
     </div>`;
 
     this.edge.context.html(frag);
+  }
+
+  _sendComment() {
+    alert("sending");
   }
 };
 
@@ -1345,6 +1373,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       "No results to display"
     );
     this.contentTitle = edges.util.getParam(params, "contentTitle", "");
+    this.contentTitleImage = edges.util.getParam(
+      params,
+      "contentTitleImage",
+      null
+    );
     this.fields = edges.util.getParam(params, "fields", []);
     this.divider = edges.util.getParam(params, "divider", false); // Whether to include a divider
     this.namespace = "edges-custom-display";
@@ -1357,6 +1390,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       switch (this.type) {
         case "heading":
           frag = this._pageHeading();
+          break;
+        case "side-title":
+          frag = this._sideTitle();
           break;
         case "list":
           frag = this._renderList();
@@ -1421,6 +1457,23 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         ${edges.util.escapeHtml(this.component.results[0][this.field] || "")}
       </span>
     </h2>
+    <hr class="yellow-divider" />`;
+  }
+
+  _sideTitle() {
+    const imageTag = this.contentTitleImage
+      ? `<img src="${edges.util.escapeHtml(
+          this.contentTitleImage
+        )}" alt="${edges.util.escapeHtml(
+          this.contentTitle
+        )}" class="title-image">`
+      : "";
+
+    return `
+    <h4 class="main">
+      ${imageTag}
+      ${edges.util.escapeHtml(this.contentTitle)}
+    </h4>
     <hr class="yellow-divider" />`;
   }
 

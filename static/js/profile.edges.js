@@ -45,3 +45,31 @@ try {
 } catch (err) {
   console.error(err);
 }
+
+// TODO: Complete tiny URL
+function genrateShortURL(elementID) {
+  let ele = document.getElementById(elementID);
+}
+
+window.onload = () => {
+  // Call the function initially
+  genrateShortURL("short-url-link");
+};
+
+$(document).ready(function () {
+  // Attach a click event listener to the element with id 'specificId'
+  $("#send-comment").on("click", function () {
+    const currentPath = window.location.pathname;
+
+    // Split the path by "/" and extract the last segment
+    const pathSegments = currentPath.split("/");
+    const id = pathSegments[pathSegments.length - 1]; // Assumes the ID is the last segment
+
+    if (id) {
+      // Redirect to a different page, e.g., '/new-page/{id}'
+      window.location.href = `/comment/index?id=${id}`;
+    } else {
+      console.error("No ID found in the current URL path.");
+    }
+  });
+});

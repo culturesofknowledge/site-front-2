@@ -27,6 +27,16 @@ export function getComponents(collectionName, emlo) {
 function _getPeopleComponents(emlo) {
   return [
     new emlo.MultiFields({
+      id: "title",
+      category: "sidebarTitle",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "side-title",
+        contentTitle: "Person",
+        sectionTitleImage: "/static/img/person-icon.png",
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "page-title",
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({

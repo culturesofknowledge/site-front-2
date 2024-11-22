@@ -1415,6 +1415,12 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         case "stats":
           frag = this._renderStats();
           break;
+        case "text":
+          frag = this._renderText();
+          break;
+        case "location":
+          frag = this._renderLocation();
+          break;
         default:
           frag = this.noResultsText;
       }
@@ -1475,6 +1481,17 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       ${edges.util.escapeHtml(this.contentTitle)}
     </h4>
     <hr class="yellow-divider" />`;
+  }
+
+  _renderText() {
+    return `
+        <pre class="content" style="white-space: preserve-breaks;font-size:14px;">
+          ${edges.util.escapeHtml(this.component.results[0][this.field] || "")}
+        </pre>
+      
+      <br/>
+      <hr class="yellow-divider" />
+    `;
   }
 
   _renderList() {
@@ -1552,9 +1569,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       <dl>
         <strong> ${this.contentTitle} </strong>
       </dl>
-      <dd> ${edges.util.escapeHtml(
-        this.component.results[0][this.field] || ""
-      )} </dd> 
+      <dd>  
+      ${edges.util.escapeHtml(this.component.results[0][this.field] || "")}
+      </dd> 
     </div>`
       : "";
 
@@ -1599,14 +1616,25 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   }
 
   _renderLabelValue() {
-    return `<div>${this.component.results
+    return `<div class="content">
+    ${this.fields
       .map(
-        (result) =>
-          `<div><strong>${edges.util.escapeHtml(
-            this.field
-          )}:</strong> ${edges.util.escapeHtml(result[this.field] || "")}</div>`
+        (field) =>
+          `
+             <div>
+              <strong> ${field.title} </strong> 
+              ${edges.util.escapeHtml(
+                this.component.results[0][field.key] || ""
+              )}
+            </div>
+          `
       )
-      .join("")}</div>`;
+      .join("")}</div>
+
+       <br/>
+
+      <hr class="yellow-divider" />
+    `;
   }
 };
 

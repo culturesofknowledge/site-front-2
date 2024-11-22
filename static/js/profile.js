@@ -1,4 +1,4 @@
-const validCollections = ["people", "locations", "works"];
+const validCollections = ["people", "locations", "works", "institutions"];
 
 export function getComponents(collectionName, emlo) {
   try {
@@ -10,6 +10,9 @@ export function getComponents(collectionName, emlo) {
           break;
         case "locations":
           components = _getLocationComponents(emlo);
+          break;
+        case "institutions":
+          components = _getInstitutionComponents(emlo);
           break;
         default:
           components = _getWorkComponents(emlo);
@@ -181,6 +184,54 @@ function _getLocationComponents(emlo) {
         sectionTitle: "Position",
         sectionTitleImage: "/static/img/icon-globe.png",
         field: "ox_locationAlternateName",
+      }),
+    }),
+  ];
+}
+
+function _getInstitutionComponents(emlo) {
+  return [
+    new emlo.MultiFields({
+      id: "title",
+      category: "sidebarTitle",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "side-title",
+        contentTitle: "Institution",
+        sectionTitleImage: "/static/img/person-icon.png",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "page-title",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "heading",
+        field: "browse",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "alternative-names",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "text",
+        sectionTitle: "Alternative names",
+        sectionTitleImage: "/static/img/icon-repository.png",
+        field: "geonames_alternateName",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "locations",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "label",
+        sectionTitle: "Location",
+        sectionTitleImage: "/static/img/icon-globe.png",
+        fields: [
+          { title: "City", key: "geonames_locatedIn" },
+          { title: "Country", key: "geonames_inCountry" },
+        ],
       }),
     }),
   ];

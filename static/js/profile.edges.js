@@ -4,6 +4,7 @@ const collectionMap = {
   person: "people",
   location: "locations",
   work: "works",
+  institution: "institutions",
 };
 
 try {
@@ -38,7 +39,7 @@ try {
       },
     ],
   };
-
+  console.log("collection name", collectioName);
   emlo.components = getComponents(collectioName, emlo);
 
   emlo.init();

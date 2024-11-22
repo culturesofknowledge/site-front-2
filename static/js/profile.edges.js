@@ -51,6 +51,10 @@ function genrateShortURL(elementID) {
   let ele = document.getElementById(elementID);
 }
 
+function handleStatClick(key) {
+  console.log("hei");
+}
+
 window.onload = () => {
   // Call the function initially
   genrateShortURL("short-url-link");

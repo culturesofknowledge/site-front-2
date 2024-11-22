@@ -1519,8 +1519,8 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
           <span class="stat-item">
             ${
               isClickable
-                ? `<a href="#" onclick="handleStatClick('${field.key}')">${escapedValue}  ${field.title} </a>`
-                : `${escapedValue}  ${field.title}`
+                ? `<a href='#' id="stats" data-key='${field.key}'>${escapedValue}  ${field.title} </a>`
+                : `${escapedValue} ${field.title}`
             }
           </span>
         `;

@@ -41,7 +41,7 @@ function _getPeopleComponents(emlo) {
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
         type: "heading",
-        field: "foaf_name",
+        field: "browse",
       }),
     }),
 
@@ -116,7 +116,74 @@ function _getPeopleComponents(emlo) {
 }
 
 function _getLocationComponents(emlo) {
-  return [];
+  return [
+    new emlo.MultiFields({
+      id: "title",
+      category: "sidebarTitle",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "side-title",
+        contentTitle: "Location",
+        sectionTitleImage: "/static/img/person-icon.png",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "page-title",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "heading",
+        field: "browse",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "stats",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "stats",
+        sectionTitle: "Catalogue Statistics",
+        sectionTitleImage: "/static/img/icon-statistics.png",
+        fields: [
+          {
+            name: "text",
+            title: " letters sent from",
+            key: "ox_totalWorksSentFromPlace",
+          },
+          {
+            name: "text",
+            title: " letters sent to ",
+            key: "ox_totalWorksSentToPlace",
+          },
+          {
+            name: "text",
+            title: " letters mentioning",
+            key: "ox_totalWorksMentioningPlace",
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "synonyms",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "content",
+        sectionTitle: "Synonyms",
+        field: "ox_locationAlternateName",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "position",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "content",
+        sectionTitle: "Position",
+        sectionTitleImage: "/static/img/icon-globe.png",
+        field: "ox_locationAlternateName",
+      }),
+    }),
+  ];
 }
 
 function _getWorkComponents(emlo) {

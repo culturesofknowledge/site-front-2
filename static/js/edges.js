@@ -1320,14 +1320,49 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
   }
 };
 
+// emlo.MultiFields = class extends edges.Component {
+//   constructor(params) {
+//     super(params);
+//     this.results = [];
+//     this.hitCount = 0;
+//   }
+
+//   synchronise() {
+//     this.results = [];
+//     this.hitCount = 0;
+
+//     const source = this.edge.result;
+
+//     if (!source) {
+//       return;
+//     }
+
+//     const results = source.results();
+//     this._appendResults({ results: results });
+
+//     this.hitCount = source.total();
+//   }
+
+//   _appendResults(params) {
+//     const results = params.results;
+//     this.results = this.results.concat(results);
+//   }
+// };
+
 emlo.MultiFields = class extends edges.Component {
   constructor(params) {
     super(params);
     this.results = [];
     this.hitCount = 0;
+    this.primaryField = edges.util.getParam(params, "primaryField", "");
+    this.fetchSecondaryData = edges.util.getParam(
+      params,
+      "fetchSecondaryData",
+      false
+    ); // Enable/disable secondary data fetch
   }
 
-  synchronise() {
+  async synchronise() {
     this.results = [];
     this.hitCount = 0;
 
@@ -1338,14 +1373,54 @@ emlo.MultiFields = class extends edges.Component {
     }
 
     const results = source.results();
-    this._appendResults({ results: results });
+    await this._appendResults({ results: results });
 
     this.hitCount = source.total();
   }
 
-  _appendResults(params) {
+  async _appendResults(params) {
     const results = params.results;
+
+    if (this.fetchSecondaryData) {
+      for (const result of results) {
+        const fieldData = result[this.primaryField];
+        if (fieldData && Array.isArray(fieldData)) {
+          // Fetching secondary data for each fieldData URL
+          const secondaryResults = await Promise.all(
+            fieldData.map((url) => {
+              const collectionName = url.split("/")[3];
+              const id = url.split("/")[4];
+              return this._fetchAndExtractSecondaryData(collectionName, id); // Await the result
+            })
+          );
+
+          result[this.primaryField] = secondaryResults; // Replace with fetched data
+        }
+      }
+    }
+
     this.results = this.results.concat(results);
+    console.log("jd", this.results);
+  }
+
+  async _fetchAndExtractSecondaryData(collectionName, ID) {
+    try {
+      const url = `/solr/${collectionName}s/select?q=uuid:${ID}&wt=json`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        console.error(
+          `Error fetching data from ${url}: ${response.statusText}`
+        );
+        return null;
+      }
+      const data = await response.json();
+
+      // Extract and return the relevant field from secondary data
+      return data.response.docs[0] || null;
+    } catch (error) {
+      console.error(`Error fetching data from ${url}: ${error}`);
+      return null;
+    }
   }
 };
 
@@ -1495,12 +1570,37 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   }
 
   _renderList() {
-    return `<ul>${this.component.results
-      .map(
-        (result) =>
-          `<li>${edges.util.escapeHtml(result[this.field] || "")}</li>`
-      )
-      .join("")}</ul>`;
+    console.log("this.component.results", this.component.results);
+    const items = this.component.results
+      .map((result) => {
+        const fieldValue = Array.isArray(result[this.field])
+          ? result[this.field]
+              .filter((subResult) => this._isNotEmpty(subResult)) // Filter out empty or null values
+              .map((subResult) => {
+                if (typeof subResult === "object") {
+                  // Render multiple fields from secondary data
+                  const content = Object.entries(subResult)
+                    .filter(([_, value]) => this._isNotEmpty(value)) // Exclude empty subfields
+                    .map(
+                      ([key, value]) =>
+                        `${key}: ${edges.util.escapeHtml(value)}`
+                    )
+                    .join(", ");
+                  return content ? `<li>${content}</li>` : ""; // Add only non-empty content
+                }
+                return `<li>${edges.util.escapeHtml(subResult)}</li>`;
+              })
+              .filter((item) => item) // Remove empty <li> elements
+              .join("")
+          : this._isNotEmpty(result[this.field])
+          ? `<li>${edges.util.escapeHtml(result[this.field])}</li>`
+          : ""; // Skip empty values
+        return fieldValue;
+      })
+      .filter((item) => item) // Remove empty top-level <li> elements
+      .join("");
+
+    return items ? `<ul>${items}</ul>` : this.noResultsText; // Return list or no results text
   }
 
   _renderDates() {

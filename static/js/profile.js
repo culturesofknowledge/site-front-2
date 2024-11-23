@@ -115,6 +115,19 @@ function _getPeopleComponents(emlo) {
         ],
       }),
     }),
+
+    new emlo.MultiFields({
+      id: "list",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "mail_recipientOf-work",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "list",
+        sectionTitle: "Letters",
+        sectionTitleImage: "/static/img/icon-calendar.png",
+        field: "mail_recipientOf-work",
+      }),
+    }),
   ];
 }
 

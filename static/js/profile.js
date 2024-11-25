@@ -468,7 +468,7 @@ function _getWorkComponents(emlo) {
       fetchSecondaryData: true,
       primaryField: "frbr_creator-person",
       renderer: new emlo.MultiFieldsRenderer({
-        type: "nested",
+        type: "nested-label",
         sectionTitle: "Author",
         primaryField: "frbr_creator-person",
         fields: [
@@ -489,7 +489,7 @@ function _getWorkComponents(emlo) {
       fetchSecondaryData: true,
       primaryField: "mail_recipient-person",
       renderer: new emlo.MultiFieldsRenderer({
-        type: "nested",
+        type: "nested-label",
         sectionTitle: "Recipient",
         primaryField: "mail_recipient-person",
         fields: [
@@ -521,7 +521,7 @@ function _getWorkComponents(emlo) {
       fetchSecondaryData: true,
       primaryField: "mail_origin-location",
       renderer: new emlo.MultiFieldsRenderer({
-        type: "nested",
+        type: "nested-label",
         sectionTitle: "Origin",
         primaryField: "mail_origin-location",
         fields: [
@@ -530,6 +530,31 @@ function _getWorkComponents(emlo) {
             key: "geonames_name",
             clickable: true,
             collectionName: "location",
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "resources",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "resources",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested-label",
+        sectionTitle: "Related Resources",
+        sectionTitleImage: "/static/img/icon-related-resources.png",
+        divider: true,
+        primaryField: "resources",
+        fields: [
+          {
+            title: "",
+            key: "ox_titleOfResource",
+            clickable: true,
+          },
+          {
+            title: "",
+            key: "ox_detailsOfResource",
           },
         ],
       }),

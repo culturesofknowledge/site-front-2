@@ -646,6 +646,15 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
             return `<td>${this._formatDate(val)}</td>`;
           }
 
+          if (field.type == "pre") {
+            return `
+            <td>
+              <pre>
+                ${val}
+              </pre>
+            </td>`;
+          }
+
           if (field.type == "link") {
             // Setting href for the link tag in the table
             let href = "#";

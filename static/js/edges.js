@@ -680,7 +680,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
                 prefix = field.linkHrefPrefix;
               }
             }
-            console.log("prefix", prefix);
+
             return `<td><a href="${prefix}/${href}">${linkText}</a></td>`;
           }
 

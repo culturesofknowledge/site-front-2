@@ -1573,11 +1573,13 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
   _renderContent() {
     // Render custom content
-    return `
+    return this.component.results[0][this.field]
+      ? ` 
     <div class="custom-content">
-      ${edges.util.escapeHtml(this.component.results[0][this.field] || "")}
+      ${edges.util.escapeHtml(this.component.results[0][this.field])}
     </div>
-    `;
+    `
+      : "";
   }
 
   _renderLocation() {

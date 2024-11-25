@@ -17,7 +17,6 @@ export function getComponents(collectionName, emlo) {
         default:
           components = _getWorkComponents(emlo);
       }
-
       return components;
     } else {
       return components;
@@ -117,15 +116,19 @@ function _getPeopleComponents(emlo) {
     }),
 
     new emlo.MultiFields({
-      id: "list",
+      id: "letters-recevied",
       category: "results",
       fetchSecondaryData: true,
       primaryField: "mail_recipientOf-work",
       renderer: new emlo.MultiFieldsRenderer({
-        type: "list",
+        type: "nested",
         sectionTitle: "Letters",
         sectionTitleImage: "/static/img/icon-calendar.png",
-        field: "mail_recipientOf-work",
+        primaryField: "mail_recipientOf-work",
+        fields: [
+          { title: "", key: "ox_started-ox_year" },
+          { title: "", key: "dcterms_description", clickable: true },
+        ],
       }),
     }),
   ];

@@ -75,7 +75,7 @@ try {
               field: "",
               pre: "",
               post: "",
-              valueFunction: null,
+              valueFunction: _getAllMatchingFieldsHTML,
             },
             {
               header: "",
@@ -397,5 +397,35 @@ function _getBriefDetails(val, res, fieldName) {
     return res["dcterms_description"];
   }
 
-  return null;
+  return "";
+}
+function _getAllMatchingFieldsHTML(val, res, fieldName) {
+  if (typeof res !== "object" || res === null) {
+    console.log("Invalid input: res is not an object");
+    return "<div>Invalid input</div>";
+  }
+
+  let currentVal = val;
+
+  if (!currentVal) {
+    currentVal = _getBriefDetails("", res, "_name");
+  }
+
+  const results = [];
+  for (const key in res) {
+    if (Object.hasOwn(res, key)) {
+      if (
+        currentVal != "" &&
+        typeof res[key] == "string" &&
+        res[key].includes(currentVal)
+      ) {
+        results.push(
+          `Found in <strong>${key}</strong>: ${key} = ${currentVal}`
+        );
+      }
+    }
+  }
+
+  // Join results with \n\n and wrap in a div
+  return `<div>${results.join("\n\n")}</div>`;
 }

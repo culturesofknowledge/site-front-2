@@ -1929,8 +1929,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       .filter((row) => row) // Remove empty rows
       .join(""); // Combine all rows into a single HTML string
 
-    console.log("LALA", rows);
-
     const labelsList = `
       <div class="content">
         ${rows}

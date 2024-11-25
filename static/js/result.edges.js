@@ -65,9 +65,23 @@ try {
             },
             {
               header: "Further details",
-              field: "author_sort",
+              field: "uuid",
               pre: "",
               post: "",
+              type: "multiple",
+              multipleFields: [
+                { label: "Latitude", field: "geo_lat" },
+                { label: "Longitude", field: "geo_long" },
+                { label: "Alternative names", field: "skos_altLabel" },
+                {
+                  label: "Titles or roles",
+                  field: "ox_titlesRolesOccupations",
+                },
+                {
+                  label: "Year",
+                  field: "ox_started-ox_year",
+                },
+              ],
               valueFunction: null,
             },
             {

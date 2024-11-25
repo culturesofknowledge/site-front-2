@@ -130,7 +130,12 @@ function _getPeopleComponents(emlo) {
         primaryField: "mail_recipientOf-work",
         fields: [
           { title: "", key: "ox_started-ox_year" },
-          { title: "", key: "dcterms_description", clickable: true },
+          {
+            title: "",
+            key: "dcterms_description",
+            clickable: true,
+            collectionName: "work",
+          },
         ],
         divider: true,
       }),
@@ -148,7 +153,12 @@ function _getPeopleComponents(emlo) {
         primaryField: "frbr_creatorOf-work",
         fields: [
           { title: "", key: "ox_started-ox_year" },
-          { title: "", key: "dcterms_description", clickable: true },
+          {
+            title: "",
+            key: "dcterms_description",
+            clickable: true,
+            collectionName: "work",
+          },
         ],
         divider: true,
       }),
@@ -166,7 +176,12 @@ function _getPeopleComponents(emlo) {
         primaryField: "dcterms_isReferencedBy-work",
         fields: [
           { title: "", key: "ox_started-ox_year" },
-          { title: "", key: "dcterms_description", clickable: true },
+          {
+            title: "",
+            key: "dcterms_description",
+            clickable: true,
+            collectionName: "work",
+          },
         ],
         divider: true,
       }),
@@ -273,7 +288,12 @@ function _getLocationComponents(emlo) {
         primaryField: "mail_originOf-work",
         fields: [
           { title: "", key: "ox_started-ox_year" },
-          { title: "", key: "dcterms_description", clickable: true },
+          {
+            title: "",
+            key: "dcterms_description",
+            clickable: true,
+            collectionName: "work",
+          },
         ],
         divider: true,
       }),
@@ -291,7 +311,12 @@ function _getLocationComponents(emlo) {
         primaryField: "mail_destinationOf-work",
         fields: [
           { title: "", key: "ox_started-ox_year" },
-          { title: "", key: "dcterms_description", clickable: true },
+          {
+            title: "",
+            key: "dcterms_description",
+            clickable: true,
+            collectionName: "work",
+          },
         ],
         divider: true,
       }),
@@ -309,7 +334,12 @@ function _getLocationComponents(emlo) {
         primaryField: "dcterms_isReferencedBy-work",
         fields: [
           { title: "", key: "ox_started-ox_year" },
-          { title: "", key: "dcterms_description", clickable: true },
+          {
+            title: "",
+            key: "dcterms_description",
+            clickable: true,
+            collectionName: "work",
+          },
         ],
         divider: true,
       }),
@@ -442,7 +472,12 @@ function _getWorkComponents(emlo) {
         sectionTitle: "Author",
         primaryField: "frbr_creator-person",
         fields: [
-          { title: "", key: "browse", clickable: true },
+          {
+            title: "",
+            key: "browse",
+            clickable: true,
+            collectionName: "person",
+          },
           { title: "", key: "ox_titlesRolesOccupations" },
         ],
       }),
@@ -458,7 +493,12 @@ function _getWorkComponents(emlo) {
         sectionTitle: "Recipient",
         primaryField: "mail_recipient-person",
         fields: [
-          { title: "", key: "browse", clickable: true },
+          {
+            title: "",
+            key: "browse",
+            clickable: true,
+            collectionName: "person",
+          },
           { title: "", key: "ox_titlesRolesOccupations" },
         ],
       }),
@@ -484,7 +524,14 @@ function _getWorkComponents(emlo) {
         type: "nested",
         sectionTitle: "Origin",
         primaryField: "mail_origin-location",
-        fields: [{ title: "", key: "geonames_name", clickable: true }],
+        fields: [
+          {
+            title: "",
+            key: "geonames_name",
+            clickable: true,
+            collectionName: "location",
+          },
+        ],
       }),
     }),
   ];

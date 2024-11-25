@@ -1426,6 +1426,8 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     );
     this.fields = edges.util.getParam(params, "fields", []);
     this.primaryField = edges.util.getParam(params, "primaryField", "");
+    this.lat_field = edges.util.getParam(params, "lat_field", "");
+    this.long_field = edges.util.getParam(params, "long_field", "");
     this.divider = edges.util.getParam(params, "divider", false); // Whether to include a divider
     this.namespace = "edges-custom-display";
   }
@@ -1582,13 +1584,61 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       : "";
   }
 
+  // _renderLocation() {
+  //   // Render a location
+  //   return `<div class="location">
+  //     <span>${edges.util.escapeHtml(
+  //       this.component.results[0][this.field] || ""
+  //     )}</span>
+  //   </div>`;
+  // }
+
   _renderLocation() {
-    // Render a location
+    // Extract the latitude and longitude from your component's results
+    const lat = this.component.results[0][this.lat_field];
+    const lon = this.component.results[0][this.long_field];
+
+    // Generate a unique ID for the map container (to avoid clashes if multiple maps are rendered)
+    const mapContainerId = `map-${Math.random().toString(36).substr(2, 9)}`;
+
+    // Render the location and include a map container
     return `<div class="location">
-      <span>${edges.util.escapeHtml(
-        this.component.results[0][this.field] || ""
-      )}</span>
-    </div>`;
+        <span>  
+            <div>
+              <dl> 
+                <strong> Latitude </strong>
+              </dl>
+              <dd>
+                ${lat}
+              </dd>
+            </div>
+            <div>
+              <dl> 
+                <strong> Longitude </strong>
+              </dl>
+              <dd>
+                ${lat}
+              </dd>
+            </div>
+        </span>
+        <div id="${mapContainerId}" style="height: 300px; width: 100%; margin-top: 10px;"></div>
+    </div>
+    <script>
+        // Initialize the map after rendering the HTML
+        document.addEventListener('DOMContentLoaded', function() {
+            const map = L.map('${mapContainerId}').setView([${lat}, ${lon}], 13);
+
+            // Add OpenStreetMap tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // Add a marker at the provided latitude and longitude
+            L.marker([${lat}, ${lon}]).addTo(map)
+                .bindPopup('Here')
+                .openPopup();
+        });
+    </script>`;
   }
 
   _renderDates() {

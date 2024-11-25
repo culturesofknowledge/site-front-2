@@ -1562,15 +1562,30 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   _renderLabelValue() {
     // Render label-value pairs
     return this.fields
-      .map((field) => {
-        const value = this.component.results[0][field.key];
-        return `
+      ? this.fields
+          .map((field) => {
+            let value = "";
+
+            if (field.type == "date") {
+              const rawDate = new Date(this.component.results[0][field.key]);
+              const formattedDate = rawDate.toLocaleDateString("en-US", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              });
+
+              value = formattedDate;
+            } else {
+              value = this.component.results[0][field.key];
+            }
+            return `
         <div class="content">
-          <span>${edges.util.escapeHtml(field.title)}:</span>
+          <span>${edges.util.escapeHtml(field.title)} </span>
           <span>${edges.util.escapeHtml(value || "")}</span>
         </div>`;
-      })
-      .join("");
+          })
+          .join("")
+      : "";
   }
 
   _renderContent() {

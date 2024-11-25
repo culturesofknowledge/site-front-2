@@ -386,5 +386,54 @@ function _getInstitutionComponents(emlo) {
 }
 
 function _getWorkComponents(emlo) {
-  return [];
+  return [
+    new emlo.MultiFields({
+      id: "title",
+      category: "sidebarTitle",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "side-title",
+        contentTitle: "Letter",
+        sectionTitleImage: "/static/img/person-icon.png",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "page-title",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "heading",
+        field: "dcterms_description",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "dates",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "label",
+        sectionTitle: "Dates",
+        sectionTitleImage: "/static/img/icon-calendar.png",
+        divider: true,
+        fields: [
+          { title: "", key: "started_date_sort", type: "date" },
+          { title: "Calendar    ", key: "ox_originalCalendar" },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "people",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "label-details",
+        sectionTitle: "People",
+        sectionTitleImage: "/static/img/icon-people.png",
+        divider: true,
+        fields: [
+          { title: "", key: "started_date_sort", type: "date" },
+          { title: "Calendar    ", key: "ox_originalCalendar" },
+        ],
+      }),
+    }),
+  ];
 }

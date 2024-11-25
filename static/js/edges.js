@@ -1839,9 +1839,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                   // Create clickable cell
                   cells.push(`
                     <li>
-                      <a href="#" class="clickable-row">${edges.util.escapeHtml(
-                        value || ""
-                      )}</a>
+                      <a href="/profile/${subField.collectionName}/${
+                    parentObject["uuid"]
+                  }" class="clickable-row">${edges.util.escapeHtml(
+                    value || ""
+                  )}</a>
                     </li>
                   `);
                 } else {
@@ -1907,9 +1909,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                   // Create clickable cell
                   cells.push(`
                     <div>
-                      <a href="#" class="clickable-row">${edges.util.escapeHtml(
-                        value || ""
-                      )}</a>
+                      <a href="/profile/${subField.collectionName}/${
+                    parentObject["uuid"]
+                  }" class="clickable-row">${edges.util.escapeHtml(
+                    value || ""
+                  )}</a>
                     </div>
                   `);
                 } else {

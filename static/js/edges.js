@@ -1767,9 +1767,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                   // Create clickable cell
                   cells.push(`
                     <td>
-                      <a href="#" class="clickable-row">${edges.util.escapeHtml(
-                        value || ""
-                      )}</a>
+                      <a href="/profile/${subField.collectionName}/${
+                    parentObject["uuid"]
+                  }" class="clickable-row">${edges.util.escapeHtml(
+                    value || ""
+                  )}</a>
                     </td>
                   `);
                 } else {

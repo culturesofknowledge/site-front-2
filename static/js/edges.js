@@ -1565,9 +1565,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       .map((field) => {
         const value = this.component.results[0][field.key];
         return `
-        <div class="label-value">
-          <span class="label">${edges.util.escapeHtml(field.title)}:</span>
-          <span class="value">${edges.util.escapeHtml(value || "")}</span>
+        <div class="content">
+          <span>${edges.util.escapeHtml(field.title)}:</span>
+          <span>${edges.util.escapeHtml(value || "")}</span>
         </div>`;
       })
       .join("");
@@ -1856,6 +1856,16 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       <thead><tr>${headers}</tr></thead>
       <tbody>${rows}</tbody>
     </table>`;
+  }
+
+  _renderText() {
+    return `
+          <pre class="content" style="white-space: preserve-breaks;font-size:14px;">
+            ${edges.util.escapeHtml(
+              this.component.results[0][this.field] || ""
+            )}
+          </pre>
+      `;
   }
 };
 

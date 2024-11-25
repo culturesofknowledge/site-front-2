@@ -216,6 +216,7 @@ function _getLocationComponents(emlo) {
         type: "stats",
         sectionTitle: "Catalogue Statistics",
         sectionTitleImage: "/static/img/icon-statistics.png",
+        divider: true,
         fields: [
           {
             name: "text",
@@ -242,6 +243,7 @@ function _getLocationComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "content",
         sectionTitle: "Synonyms",
+        divider: true,
         field: "ox_locationAlternateName",
       }),
     }),
@@ -252,8 +254,63 @@ function _getLocationComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "content",
         sectionTitle: "Position",
+        divider: true,
         sectionTitleImage: "/static/img/icon-globe.png",
         field: "ox_locationAlternateName",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "letters-sent-from",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "mail_originOf-work",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested",
+        sectionTitle: "Letters Sent From",
+        sectionTitleImage: "/static/img/icon-quill.png",
+        primaryField: "mail_originOf-work",
+        fields: [
+          { title: "", key: "ox_started-ox_year" },
+          { title: "", key: "dcterms_description", clickable: true },
+        ],
+        divider: true,
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "letters-sent-to",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "mail_destinationOf-work",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested",
+        sectionTitle: "Letters Sent To",
+        sectionTitleImage: "/static/img/icon-quill.png",
+        primaryField: "mail_destinationOf-work",
+        fields: [
+          { title: "", key: "ox_started-ox_year" },
+          { title: "", key: "dcterms_description", clickable: true },
+        ],
+        divider: true,
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "letters-mentioned",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "dcterms_isReferencedBy-work",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested",
+        sectionTitle: "Letters Mentioning",
+        sectionTitleImage: "/static/img/icon-quill.png",
+        primaryField: "dcterms_isReferencedBy-work",
+        fields: [
+          { title: "", key: "ox_started-ox_year" },
+          { title: "", key: "dcterms_description", clickable: true },
+        ],
+        divider: true,
       }),
     }),
   ];

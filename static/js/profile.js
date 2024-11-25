@@ -44,7 +44,6 @@ function _getPeopleComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "heading",
         field: "browse",
-        divider: true,
       }),
     }),
 
@@ -56,6 +55,7 @@ function _getPeopleComponents(emlo) {
         sectionTitle: "Details",
         sectionTitleImage: "/static/img/icon-people.png",
         contentTitle: "Alternative names",
+        divider: true,
         field: "skos_altLabel",
       }),
     }),
@@ -67,6 +67,7 @@ function _getPeopleComponents(emlo) {
         type: "dates",
         sectionTitle: "Dates",
         sectionTitleImage: "/static/img/icon-calendar.png",
+        divider: true,
         fields: [
           { title: "Date of birth", key: "bio_Birth-ox_year" },
           { title: "Date of death", key: "bio_Death-ox_year" },
@@ -81,6 +82,7 @@ function _getPeopleComponents(emlo) {
         type: "stats",
         sectionTitle: "Catalogue Statistics",
         sectionTitleImage: "/static/img/icon-statistics.png",
+        divider: true,
         fields: [
           {
             name: "text",
@@ -123,13 +125,64 @@ function _getPeopleComponents(emlo) {
       primaryField: "mail_recipientOf-work",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",
-        sectionTitle: "Letters",
-        sectionTitleImage: "/static/img/icon-calendar.png",
+        sectionTitle: "Letters Received",
+        sectionTitleImage: "/static/img/icon-quill.png",
         primaryField: "mail_recipientOf-work",
         fields: [
           { title: "", key: "ox_started-ox_year" },
           { title: "", key: "dcterms_description", clickable: true },
         ],
+        divider: true,
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "letters-written",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "frbr_creatorOf-work",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested",
+        sectionTitle: "Letters Written",
+        sectionTitleImage: "/static/img/icon-quill.png",
+        primaryField: "frbr_creatorOf-work",
+        fields: [
+          { title: "", key: "ox_started-ox_year" },
+          { title: "", key: "dcterms_description", clickable: true },
+        ],
+        divider: true,
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "letters-mentioned",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "dcterms_isReferencedBy-work",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested",
+        sectionTitle: "Letters Mentioning",
+        sectionTitleImage: "/static/img/icon-quill.png",
+        primaryField: "dcterms_isReferencedBy-work",
+        fields: [
+          { title: "", key: "ox_started-ox_year" },
+          { title: "", key: "dcterms_description", clickable: true },
+        ],
+        divider: true,
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "comments",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "ox_isAnnotatedBy-comment",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested-list",
+        sectionTitle: "Comments",
+        primaryField: "ox_isAnnotatedBy-comment",
+        fields: [{ title: "", key: "bibo_Note" }],
+        divider: true,
       }),
     }),
   ];

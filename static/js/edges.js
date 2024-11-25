@@ -1445,6 +1445,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
           frag = this._renderList();
           break;
         case "nested":
+          frag = this._renderNestedTable();
+          break;
+        case "nested-list":
           frag = this._renderNestedList();
           break;
         case "table":
@@ -1489,10 +1492,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
     if (frag) {
       container = `<div class="${containerClasses}">
+        ${dividerFrag}  
         ${sectionTitleFrag}
         ${frag}
-
-        ${dividerFrag}
       </div>`;
     }
 
@@ -1575,7 +1577,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     <div class="custom-content">
       ${edges.util.escapeHtml(this.component.results[0][this.field] || "")}
     </div>
-    <hr class="yellow-divider" />
     `;
   }
 
@@ -1601,10 +1602,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
             `
         )
         .join("")}</div>
-
-         <br/>
-
-        <hr class="yellow-divider" />
       `;
   }
 
@@ -1643,12 +1640,10 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
           ${statsHtml}
         </div>
         ${graphHtml ? `<div class="graph-section">${graphHtml}</div>` : ""}
-        <br />
-        <hr class="yellow-divider" />
       `;
   }
 
-  _renderNestedList() {
+  _renderNestedTable() {
     const parentField = this.primaryField;
     const field = this.field;
     const subFields = this.fields;
@@ -1716,6 +1711,76 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     `;
 
     return rows ? table : ""; // Return table or no results
+  }
+
+  _renderNestedList() {
+    const parentField = this.primaryField;
+    const field = this.field;
+    const subFields = this.fields;
+    console.log("render");
+    // Validate required fields
+    if (!parentField || (!field && !(subFields && subFields.length > 0))) {
+      return "";
+    }
+
+    // Iterate through results and build rows
+    const rows = this.component.results
+      .map((result) => {
+        const parentObjects = result[parentField]; // Get all objects in the primary field array
+        if (!parentObjects || parentObjects.length === 0) return ""; // Skip if no data in primary field
+
+        // Iterate over each object in the parent field array
+        return parentObjects
+          .map((parentObject) => {
+            if (!parentObject) return ""; // Skip if the object is invalid
+
+            // Generate row content
+            const cells = [];
+            if (field) {
+              // Handle single field
+              const value = parentObject[field];
+              cells.push(`<li>${edges.util.escapeHtml(value || "")}</li>`);
+            }
+
+            if (subFields) {
+              // Handle multiple fields
+              subFields.forEach((subField) => {
+                const value = parentObject[subField.key]; // Access value directly using the key
+
+                if (subField.clickable) {
+                  // Create clickable cell
+                  cells.push(`
+                    <li>
+                      <a href="#" class="clickable-row">${edges.util.escapeHtml(
+                        value || ""
+                      )}</a>
+                    </li>
+                  `);
+                } else {
+                  // Create non-clickable cell
+                  cells.push(`<li>${edges.util.escapeHtml(value || "")}</li>`);
+                }
+              });
+            }
+
+            // Return the row
+            return `<tr>${cells.join("")}</tr>`;
+          })
+          .join(""); // Combine all rows for the parent objects
+      })
+      .filter((row) => row) // Remove empty rows
+      .join(""); // Combine all rows into a single HTML string
+
+    // Wrap rows into table structure
+    const list = `
+      <ul>
+        ${rows}
+      </ul>
+    `;
+
+    console.log("list", list);
+
+    return rows ? list : ""; // Return table or no results
   }
 
   _renderTable() {

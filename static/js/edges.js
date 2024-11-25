@@ -1360,8 +1360,17 @@ emlo.MultiFields = class extends edges.Component {
           // Fetching secondary data for each fieldData URL
           const secondaryResults = await Promise.all(
             fieldData.map((url) => {
-              const collectionName = url.split("/")[3];
+              const collection = url.split("/")[3];
+              let collectionName = "";
+
+              if (collection == "person") {
+                collectionName = "people";
+              } else {
+                collectionName = collection;
+              }
+
               const id = url.split("/")[4];
+
               return this._fetchAndExtractSecondaryData(collectionName, id); // Await the result
             })
           );
@@ -1376,7 +1385,14 @@ emlo.MultiFields = class extends edges.Component {
 
   async _fetchAndExtractSecondaryData(collectionName, ID) {
     try {
-      const url = `/solr/${collectionName}s/select?q=uuid:${ID}&wt=json`;
+      let url = "";
+
+      if (collectionName == "people") {
+        url = `/solr/${collectionName}/select?q=uuid:${ID}&wt=json`;
+      } else {
+        url = `/solr/${collectionName}s/select?q=uuid:${ID}&wt=json`;
+      }
+
       const response = await fetch(url);
       if (!response.ok) {
         console.error(
@@ -1449,6 +1465,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         case "nested":
           frag = this._renderNestedTable();
           break;
+        case "nested-label":
+          frag = this._renderNestedLabel();
+          break;
         case "nested-list":
           frag = this._renderNestedList();
           break;
@@ -1477,7 +1496,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
           frag = this._renderLocation();
           break;
         default:
-          frag = this.noResultsText;
+          frag = "<div></div>";
       }
     }
 
@@ -1848,6 +1867,73 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     console.log("list", list);
 
     return rows ? list : ""; // Return table or no results
+  }
+
+  _renderNestedList() {
+    const parentField = this.primaryField;
+    const field = this.field;
+    const subFields = this.fields;
+
+    // Validate required fields
+    if (!parentField || (!field && !(subFields && subFields.length > 0))) {
+      return "";
+    }
+
+    // Iterate through results and build rows
+    const rows = this.component.results
+      .map((result) => {
+        const parentObjects = result[parentField]; // Get all objects in the primary field array
+        if (!parentObjects || parentObjects.length === 0) return ""; // Skip if no data in primary field
+
+        // Iterate over each object in the parent field array
+        return parentObjects
+          .map((parentObject) => {
+            if (!parentObject) return ""; // Skip if the object is invalid
+
+            // Generate row content
+            const cells = [];
+            if (field) {
+              // Handle single field
+              const value = parentObject[field];
+              cells.push(`<li>${edges.util.escapeHtml(value || "")}</li>`);
+            }
+
+            if (subFields) {
+              // Handle multiple fields
+              subFields.forEach((subField) => {
+                const value = parentObject[subField.key]; // Access value directly using the key
+
+                if (subField.heading) {
+                  cells.push(`
+                    <h2>${edges.util.escapeHtml(value)} </h2>
+                    `);
+                }
+
+                if (subField.clickable) {
+                  // Create clickable cell
+                  cells.push(`
+                    <p>
+                      <a href="#" class="clickable-row">${edges.util.escapeHtml(
+                        value || ""
+                      )}</a>
+                    </p>
+                  `);
+                } else {
+                  // Create non-clickable cell
+                  cells.push(`<p>${edges.util.escapeHtml(value || "")}</p>`);
+                }
+              });
+            }
+
+            // Return the row
+            return `<tr>${cells.join("")}</tr>`;
+          })
+          .join(""); // Combine all rows for the parent objects
+      })
+      .filter((row) => row) // Remove empty rows
+      .join("");
+
+    return rows ? rows : "";
   }
 
   _renderTable() {

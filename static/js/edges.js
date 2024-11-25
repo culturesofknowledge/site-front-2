@@ -634,7 +634,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
           val = edges.util.escapeHtml(val);
         }
         if (field.valueFunction) {
-          val = field.valueFunction(val, res, this);
+          val = field.valueFunction(val, res, field.field, this);
         }
         if (!val && this.omitFieldIfEmpty) {
           return "<td></td>";
@@ -668,10 +668,20 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
             let prefix = "";
 
             if (field.linkHrefPrefix) {
-              prefix = field.linkHrefPrefix;
+              // TODO: Hotfix will not work for all the cases, find  better code for this
+              if (
+                field.field &&
+                field.field != "uuid" &&
+                field.linkHrefPrefix.split("/").length <= 2
+              ) {
+                const new_val = this._getValue(field.field, res, val);
+                prefix = `${field.linkHrefPrefix}/${new_val}`;
+              } else {
+                prefix = field.linkHrefPrefix;
+              }
             }
-
-            return `<td><a href="${prefix}${href}">${linkText}</a></td>`;
+            console.log("prefix", prefix);
+            return `<td><a href="${prefix}/${href}">${linkText}</a></td>`;
           }
 
           if (field.type == "multiple") {

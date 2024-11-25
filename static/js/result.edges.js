@@ -51,14 +51,17 @@ try {
               field: "object_type",
               pre: "",
               post: "",
-              valueFunction: null,
+              type: "link",
+              linkHref: "uuid",
+              linkHrefPrefix: "/profile",
+              valueFunction: _getTypeOfRecord,
             },
             {
               header: "Brief details",
-              field: "bibo_Note",
+              field: "_name",
               pre: "",
               post: "",
-              valueFunction: null,
+              valueFunction: _getBriefDetails,
             },
             {
               header: "Further details",
@@ -226,7 +229,7 @@ try {
               pre: "",
               post: "",
               type: "link",
-              linkHrefPrefix: "/profile/work/",
+              linkHrefPrefix: "/profile/work",
               linkText: "Letter",
               valueFunction: null,
             },
@@ -350,3 +353,49 @@ $(document).ready(function () {
     $("#modify_search").show();
   }
 });
+
+function _testValueFunction(val, res, self) {
+  // console.log("got vals", val, res, self);
+}
+
+function _getTypeOfRecord(val, res, fieldName) {
+  const objectMap = {
+    comment: "Document commented on ",
+    person: " Person or organisation ",
+    location: "Location",
+    work: "Letter",
+  };
+
+  if (objectMap[val]) {
+    return objectMap[val];
+  }
+
+  return val;
+}
+
+function _getBriefDetails(val, res, fieldName) {
+  if (typeof res !== "object" || res === null) {
+    console.log("Invalid input: res is not an object");
+    return null;
+  }
+
+  for (const key in res) {
+    if (Object.hasOwn(res, key)) {
+      if (key.endsWith(fieldName)) {
+        return res[key];
+      }
+    }
+  }
+
+  // TODO:L write a better code to handle this values from the object not hardcoded
+  // Returning hardcoded bibo_Note - this is default in case of comment, since rest of the object have _name and for work
+  if (res["bibo_Note"]) {
+    return res["bibo_Note"];
+  }
+
+  if (res["dcterms_description"]) {
+    return res["dcterms_description"];
+  }
+
+  return null;
+}

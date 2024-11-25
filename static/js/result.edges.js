@@ -15,7 +15,7 @@ try {
     emlo.components = [
       new edges.components.Pager({
         id: "top-pager",
-        category: "top-pager",
+        category: "results",
         renderer: new edges.renderers.bs3.Pager({
           scrollSelector: "#results",
           showSizeSelector: false,
@@ -26,7 +26,7 @@ try {
 
       new edges.components.Pager({
         id: "bottom-pager",
-        category: "bottom-pager",
+        category: "results",
         renderer: new edges.renderers.bs3.Pager({
           scrollSelector: "#results",
           showSizeSelector: false,
@@ -93,7 +93,7 @@ try {
     emlo.components = [
       new edges.components.Pager({
         id: "top-pager",
-        category: "top-pager",
+        category: "results",
         renderer: new edges.renderers.bs3.Pager({
           scrollSelector: "#results",
           showSizeSelector: false,
@@ -104,7 +104,7 @@ try {
 
       new edges.components.Pager({
         id: "bottom-pager",
-        category: "bottom-pager",
+        category: "results",
         renderer: new edges.renderers.bs3.Pager({
           scrollSelector: "#results",
           showSizeSelector: false,

@@ -76,6 +76,18 @@ emlo.ResultTemplate = class extends edges.Template {
       refine_search += `<div id="${refineSearchComponents[i].id}"></div>`;
     }
 
+    let top = "";
+    let topComponents = edge.category("top");
+    for (let i = 0; i < topComponents.length; i++) {
+      top += `<div id="${topComponents[i].id}"></div>`;
+    }
+
+    let bottom = "";
+    let bottomComponents = edge.category("bottom");
+    for (let i = 0; i < bottomComponents.length; i++) {
+      bottom += `<div id="${bottomComponents[i].id}"></div>`;
+    }
+
     let frag = `<div class="row">
       <div class="side-nav"> 
         <h2 class="main">Search</h2>
@@ -117,7 +129,17 @@ emlo.ResultTemplate = class extends edges.Template {
             </div>
    
              <div id="" class="large-12 columns" style="margin-left:25px">
-              ${results}
+              <div>
+                ${top}
+              </div>
+
+              <div>
+                ${results}
+              </div>
+
+              <div>
+                ${bottom}
+              </div>
             </div>
         </div>
       </div>
@@ -947,7 +969,9 @@ emlo.FacetRenderer = class extends edges.Renderer {
       `;
     }
 
-    const filterTerms = ts.filters.map((filter) => filter.term.toString());
+    const filterTerms = ts.filters.map((filter) =>
+      filter.term ? filter.term.toString() : ""
+    );
 
     if (ts.values && ts.values.length > 0) {
       results = "";

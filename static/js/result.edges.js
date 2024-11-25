@@ -15,7 +15,7 @@ try {
     emlo.components = [
       new edges.components.Pager({
         id: "top-pager",
-        category: "results",
+        category: "top",
         renderer: new edges.renderers.bs3.Pager({
           scrollSelector: "#results",
           showSizeSelector: false,
@@ -26,13 +26,49 @@ try {
 
       new edges.components.Pager({
         id: "bottom-pager",
-        category: "results",
+        category: "bottom",
         renderer: new edges.renderers.bs3.Pager({
           scrollSelector: "#results",
           showSizeSelector: false,
           showRecordCount: false,
           showChevrons: true,
         }),
+      }),
+
+      new emlo.Facet({
+        id: "cito_Catalog",
+        category: "refine_search",
+        field: "cito_Catalog",
+        display: "Catalogue  ",
+        renderer: new emlo.FacetRenderer({
+          open: true,
+          title: "Catalogue ",
+          showSelected: false,
+          controls: false,
+          displayLimit: 5,
+          hideCount: 1,
+        }),
+      }),
+
+      new emlo.Facet({
+        id: "object_type",
+        category: "refine_search",
+        field: "object_type",
+        display: "  Record Type  ",
+        renderer: new emlo.FacetRenderer({
+          open: true,
+          title: "  Record Type  ",
+          showSelected: false,
+          controls: false,
+          displayLimit: 5,
+          hideCount: 1,
+        }),
+      }),
+
+      new emlo.Facet({
+        id: "selected",
+        category: "selected_facets",
+        renderer: new emlo.SelectedFacetRenderer({}),
       }),
 
       new emlo.ResultTable({
@@ -110,7 +146,7 @@ try {
     emlo.components = [
       new edges.components.Pager({
         id: "top-pager",
-        category: "results",
+        category: "top",
         renderer: new edges.renderers.bs3.Pager({
           scrollSelector: "#results",
           showSizeSelector: false,
@@ -121,7 +157,7 @@ try {
 
       new edges.components.Pager({
         id: "bottom-pager",
-        category: "results",
+        category: "bottom",
         renderer: new edges.renderers.bs3.Pager({
           scrollSelector: "#results",
           showSizeSelector: false,

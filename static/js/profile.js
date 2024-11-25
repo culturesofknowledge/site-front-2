@@ -44,6 +44,7 @@ function _getPeopleComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "heading",
         field: "browse",
+        divider: true,
       }),
     }),
 

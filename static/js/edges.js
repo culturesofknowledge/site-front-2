@@ -1320,35 +1320,6 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
   }
 };
 
-// emlo.MultiFields = class extends edges.Component {
-//   constructor(params) {
-//     super(params);
-//     this.results = [];
-//     this.hitCount = 0;
-//   }
-
-//   synchronise() {
-//     this.results = [];
-//     this.hitCount = 0;
-
-//     const source = this.edge.result;
-
-//     if (!source) {
-//       return;
-//     }
-
-//     const results = source.results();
-//     this._appendResults({ results: results });
-
-//     this.hitCount = source.total();
-//   }
-
-//   _appendResults(params) {
-//     const results = params.results;
-//     this.results = this.results.concat(results);
-//   }
-// };
-
 emlo.MultiFields = class extends edges.Component {
   constructor(params) {
     super(params);
@@ -1423,458 +1394,6 @@ emlo.MultiFields = class extends edges.Component {
     }
   }
 };
-
-// emlo.MultiFieldsRenderer = class extends edges.Renderer {
-//   constructor(params) {
-//     super(params);
-
-//     // Rendering configuration
-//     this.type = edges.util.getParam(params, "type", "list"); // Render type: list, table, bar, label
-//     this.field = edges.util.getParam(params, "field", ""); // Field value to display
-//     this.sectionTitle = edges.util.getParam(params, "sectionTitle", ""); // Title for the section
-//     this.sectionTitleStyle = edges.util.getParam(
-//       params,
-//       "sectionTitleStyle",
-//       "h3"
-//     ); // Title style: h1, h2, etc.
-//     this.sectionTitleImage = edges.util.getParam(
-//       params,
-//       "sectionTitleImage",
-//       null
-//     ); // Optional image for title
-//     this.noResultsText = edges.util.getParam(
-//       params,
-//       "noResultsText",
-//       "No results to display"
-//     );
-//     this.contentTitle = edges.util.getParam(params, "contentTitle", "");
-//     this.contentTitleImage = edges.util.getParam(
-//       params,
-//       "contentTitleImage",
-//       null
-//     );
-//     this.fields = edges.util.getParam(params, "fields", []);
-//     this.primaryField = edges.util.getParam(params, "primaryField", "");
-//     this.divider = edges.util.getParam(params, "divider", false); // Whether to include a divider
-//     this.namespace = "edges-custom-display";
-//   }
-
-//   draw() {
-//     let frag = this.noResultsText;
-//     // console.log("type", this.component, this.type);
-
-//     if (this.component.results && this.component.results.length > 0) {
-//       switch (this.type) {
-//         case "heading":
-//           frag = this._pageHeading();
-//           break;
-//         case "side-title":
-//           frag = this._sideTitle();
-//           break;
-//         case "list":
-//           frag = this._renderList();
-//           break;
-//         case "nested":
-//           frag = this._renderNestedList();
-//           break;
-//         case "table":
-//           frag = this._renderTable();
-//           break;
-//         case "bar":
-//           frag = this._renderBarGraph();
-//           break;
-//         case "label":
-//           frag = this._renderLabelValue();
-//           break;
-//         case "content":
-//           frag = this._renderContent();
-//           break;
-//         case "dates":
-//           frag = this._renderDates();
-//           break;
-//         case "stats":
-//           frag = this._renderStats();
-//           break;
-//         case "text":
-//           frag = this._renderText();
-//           break;
-//         case "location":
-//           frag = this._renderLocation();
-//           break;
-//         default:
-//           frag = this.noResultsText;
-//       }
-//     }
-
-//     const sectionTitleFrag = this._renderSectionTitle();
-//     const dividerFrag = this.divider ? '<hr class="divider">' : "";
-
-//     const containerClasses = edges.util.styleClasses(
-//       this.namespace,
-//       "container",
-//       this.component.id
-//     );
-//     const container = `<div class="${containerClasses}">
-//       ${sectionTitleFrag}
-//       ${dividerFrag}
-//       ${frag}
-//     </div>`;
-//     this.component.context.html(container);
-//   }
-
-//   _renderSectionTitle() {
-//     const imageTag = this.sectionTitleImage
-//       ? `<img src="${edges.util.escapeHtml(
-//           this.sectionTitleImage
-//         )}" alt="${edges.util.escapeHtml(
-//           this.sectionTitle
-//         )}" class="title-image">`
-//       : "";
-
-//     return `<${this.sectionTitleStyle} class="section-title">
-//       ${imageTag} ${edges.util.escapeHtml(this.sectionTitle)}
-//     </${this.sectionTitleStyle}>`;
-//   }
-
-//   _pageHeading() {
-//     return `
-//     <h2 class="main">
-//       <span id="result-header" class="font-18">
-//         ${edges.util.escapeHtml(this.component.results[0][this.field] || "")}
-//       </span>
-//     </h2>
-//     <hr class="yellow-divider" />`;
-//   }
-
-//   _sideTitle() {
-//     const imageTag = this.contentTitleImage
-//       ? `<img src="${edges.util.escapeHtml(
-//           this.contentTitleImage
-//         )}" alt="${edges.util.escapeHtml(
-//           this.contentTitle
-//         )}" class="title-image">`
-//       : "";
-
-//     return `
-//     <h4 class="main">
-//       ${imageTag}
-//       ${edges.util.escapeHtml(this.contentTitle)}
-//     </h4>
-//     <hr class="yellow-divider" />`;
-//   }
-
-//   _renderText() {
-//     return `
-//         <pre class="content" style="white-space: preserve-breaks;font-size:14px;">
-//           ${edges.util.escapeHtml(this.component.results[0][this.field] || "")}
-//         </pre>
-
-//       <br/>
-//       <hr class="yellow-divider" />
-//     `;
-//   }
-
-//   _renderList() {
-//     const items = this.component.results
-//       .map((result) => {
-//         const fieldValue = Array.isArray(result[this.field])
-//           ? result[this.field]
-//               .filter((subResult) => this._isNotEmpty(subResult)) // Filter out empty or null values
-//               .map((subResult) => {
-//                 console.log("result", subResult);
-//                 if (typeof subResult === "object") {
-//                   // Render multiple fields from secondary data
-//                   const content = Object.entries(subResult)
-//                     .filter(([_, value]) => this._isNotEmpty(value)) // Exclude empty subfields
-//                     .map(
-//                       ([key, value]) =>
-//                         `${key}: ${edges.util.escapeHtml(value)}`
-//                     )
-//                     .join(", ");
-//                   return content ? `<li>${content}</li>` : ""; // Add only non-empty content
-//                 }
-//                 return `<li>${edges.util.escapeHtml(subResult)}</li>`;
-//               })
-//               .filter((item) => item) // Remove empty <li> elements
-//               .join("")
-//           : this._isNotEmpty(result[this.field])
-//           ? `<li>${edges.util.escapeHtml(result[this.field])}</li>`
-//           : ""; // Skip empty values
-//         return fieldValue;
-//       })
-//       .filter((item) => item) // Remove empty top-level <li> elements
-//       .join("");
-
-//     return items ? `<ul>${items}</ul>` : this.noResultsText; // Return list or no results text
-//   }
-
-//   // _renderNestedList() {
-//   //   // Helper to safely get a nested field's value
-//   //   const getNestedValue = (obj, path) => {
-//   //     return path
-//   //       .split(".")
-//   //       .reduce(
-//   //         (acc, key) => (acc && acc[key] !== undefined ? acc[key] : null),
-//   //         obj
-//   //       );
-//   //   };
-
-//   //   // Determine the parent field (primaryField) and subfields (fields)
-//   //   const parentField = this.primaryField;
-//   //   const subFields = this.fields;
-
-//   //   if (!parentField && !this.field && !(subFields && subFields.length > 0)) {
-//   //     return this.noResultsText; // No valid field found, return no results text
-//   //   }
-
-//   //   const items = this.component.results
-//   //     .map((result) => {
-//   //       const parentValue = parentField
-//   //         ? getNestedValue(result, parentField)
-//   //         : result;
-
-//   //       if (!parentValue) return ""; // Skip if parent field is not found
-
-//   //       const fieldValue = Array.isArray(parentValue)
-//   //         ? parentValue
-//   //             .filter((subResult) => {
-//   //               this._isNotEmpty(subResult);
-//   //             }) // Filter out empty or null values
-//   //             .map((subResult) => {
-//   //               console.log("typeof subResult", typeof subResult);
-//   //               if (typeof subResult === "object") {
-//   //                 console.log("here");
-//   //                 // Handle subfields if present
-//   //                 const subFieldValues = this.fields
-//   //                   ? this.fields
-//   //                       .map((field) => {
-//   //                         const key = field.key; // Extract field key
-//   //                         const value = subResult[key];
-//   //                         return this._isNotEmpty(value)
-//   //                           ? `${key}: ${edges.util.escapeHtml(value)}`
-//   //                           : "";
-//   //                       })
-//   //                       .filter((content) => content) // Exclude empty content
-//   //                       .join(", ")
-//   //                   : null;
-//   //                 console.log("subFieldValues", subFieldValues);
-//   //                 return subFieldValues ? `<li>${subFieldValues}</li>` : ""; // Add only non-empty content
-//   //               }
-//   //               return `<li>${edges.util.escapeHtml(subResult)}</li>`;
-//   //             })
-//   //             .filter((item) => item) // Remove empty <li> elements
-//   //             .join("")
-//   //         : this._isNotEmpty(parentValue)
-//   //         ? `<li>${edges.util.escapeHtml(parentValue)}</li>`
-//   //         : ""; // Skip empty values
-//   //       return fieldValue;
-//   //     })
-//   //     .filter((item) => item) // Remove empty top-level <li> elements
-//   //     .join("");
-
-//   //   return items ? `<ul>${items}</ul>` : this.noResultsText; // Return list or no results text
-//   // }
-
-//   _renderNestedList() {
-//     const parentField = this.primaryField;
-//     const field = this.field;
-//     const subFields = this.fields;
-
-//     if (!parentField || (!field && !(subFields && subFields.length > 0))) {
-//       return this.noResultsText; // No valid data to render
-//     }
-
-//     // Iterate through results and build rows
-//     const rows = this.component.results
-//       .map((result) => {
-//         const parentObject = result[parentField][0]; // Directly access the primary field (e.g., `result["users"]`)
-
-//         if (!parentObject) return ""; // Skip if the primary field is not found
-
-//         // Generate row content
-//         const cells = [];
-//         let isRowClickable = false;
-//         if (field) {
-//           // Handle single field
-//           const value = parentObject[field];
-//           cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
-//         }
-
-//         if (subFields) {
-//           // Handle multiple fields
-//           subFields.forEach((subField) => {
-//             const value = parentObject[subField.key]; // Access value directly using the key
-//             cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
-//             if (subField.clickable) {
-//               isRowClickable = true; // Check if any subField is clickable
-//             }
-//           });
-//         }
-
-//         // Wrap the row in a link if it's clickable - TODO add link
-//         const rowContent = `<tr>${cells.join("")}</tr>`;
-//         return isRowClickable
-//           ? `<a href="#" class="clickable-row">${rowContent}</a>`
-//           : rowContent;
-//       })
-//       .filter((row) => row) // Remove empty rows
-//       .join("");
-
-//     // Wrap rows into table structure
-//     const table = `
-//         <table>
-//             <tbody>
-//                 ${rows}
-//             </tbody>
-//         </table>
-//     `;
-
-//     return rows ? table : this.noResultsText; // Return table or no results
-//   }
-
-//   _isNotEmpty(obj) {
-//     // Check if the input is an object and not null
-//     if (typeof obj === "object" && obj !== null) {
-//       // Check if the object has any keys
-//       return Object.keys(obj).length > 0;
-//     }
-//     return false;
-//   }
-
-//   _renderDates() {
-//     return `<div class="content">
-//     ${this.fields
-//       .map(
-//         (field) =>
-//           `
-//              <strong> ${field.title} </strong>
-//              <dd> ${edges.util.escapeHtml(
-//                this.component.results[0][field.key] || ""
-//              )} </dd>
-//           `
-//       )
-//       .join("")}</div>
-
-//        <br/>
-
-//       <hr class="yellow-divider" />
-//     `;
-//   }
-
-//   _renderStats() {
-//     // Collect stats and graph fields separately
-//     const statsHtml = this.fields
-//       .filter((field) => field.name !== "graph") // Exclude graph fields
-//       .map((field) => {
-//         const value = this.component.results[0][field.key] || 0;
-//         const escapedValue = edges.util.escapeHtml(value);
-//         const isClickable = value > 0;
-
-//         return `
-//           <span class="stat-item">
-//             ${
-//               isClickable
-//                 ? `<a href='#' id="stats" data-key='${field.key}'>${escapedValue}  ${field.title} </a>`
-//                 : `${escapedValue} ${field.title}`
-//             }
-//           </span>
-//         `;
-//       })
-//       .join(" ♦ ");
-
-//     // Handle graph fields separately
-//     const graphHtml = this.fields
-//       .filter((field) => field.name === "graph")
-//       .map((field) => {
-//         this._renderBarGraph(field.key); // Call the graph rendering function
-//         return ""; // Exclude graphs from stats string
-//       })
-//       .join("");
-
-//     return `
-//       <div class="content">
-//         ${statsHtml}
-//       </div>
-//       ${graphHtml ? `<div class="graph-section">${graphHtml}</div>` : ""}
-//       <br />
-//       <hr class="yellow-divider" />
-//     `;
-//   }
-
-//   _renderContent() {
-//     let content = this.component.results[0][this.field]
-//       ? ` <div class="content">
-//       <dl>
-//         <strong> ${this.contentTitle} </strong>
-//       </dl>
-//       <dd>
-//       ${edges.util.escapeHtml(this.component.results[0][this.field] || "")}
-//       </dd>
-//     </div>`
-//       : "";
-
-//     return `
-//       ${content}
-//       <br/>
-
-//       <hr class="yellow-divider" />
-//     `;
-//   }
-
-//   _renderTable() {
-//     return `
-//       <table class="table table-striped">
-//         <thead><tr><th>${edges.util.escapeHtml(this.field)}</th></tr></thead>
-//         <tbody>${this.component.results
-//           .map(
-//             (result) =>
-//               `<tr><td>${edges.util.escapeHtml(
-//                 result[this.field] || ""
-//               )}</td></tr>`
-//           )
-//           .join("")}</tbody>
-//       </table>
-//     `;
-//   }
-
-//   _renderBarGraph() {
-//     return `<div class="bar-graph">${this.component.results
-//       .map((result) => {
-//         const value = parseInt(result[this.field] || 0, 10);
-//         return `
-//           <div class="bar-container">
-//             <div class="bar-label">${edges.util.escapeHtml(
-//               result.label || ""
-//             )}</div>
-//             <div class="bar" style="width: ${value}%;">${value}</div>
-//           </div>
-//         `;
-//       })
-//       .join("")}</div>`;
-//   }
-
-//   _renderLabelValue() {
-//     return `<div class="content">
-//     ${this.fields
-//       .map(
-//         (field) =>
-//           `
-//              <div>
-//               <strong> ${field.title} </strong>
-//               ${edges.util.escapeHtml(
-//                 this.component.results[0][field.key] || ""
-//               )}
-//             </div>
-//           `
-//       )
-//       .join("")}</div>
-
-//        <br/>
-
-//       <hr class="yellow-divider" />
-//     `;
-//   }
-// };
 
 emlo.MultiFieldsRenderer = class extends edges.Renderer {
   constructor(params) {
@@ -1958,33 +1477,42 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     }
 
     const sectionTitleFrag = this._renderSectionTitle();
-    const dividerFrag = this.divider ? '<hr class="divider">' : "";
+    const dividerFrag = this.divider ? ' <hr class="yellow-divider" />' : "";
 
     const containerClasses = edges.util.styleClasses(
       this.namespace,
       "container",
       this.component.id
     );
-    const container = `<div class="${containerClasses}">
-      ${sectionTitleFrag}
-      ${dividerFrag}
-      ${frag}
-    </div>`;
+
+    let container = "";
+
+    if (frag) {
+      container = `<div class="${containerClasses}">
+        ${sectionTitleFrag}
+        ${frag}
+
+        ${dividerFrag}
+      </div>`;
+    }
+
     this.component.context.html(container);
   }
 
   _renderSectionTitle() {
-    const imageTag = this.sectionTitleImage
-      ? `<img src="${edges.util.escapeHtml(
-          this.sectionTitleImage
-        )}" alt="${edges.util.escapeHtml(
-          this.sectionTitle
-        )}" class="title-image">`
-      : "";
+    if (this.component.results && this.component.results.length > 0) {
+      const imageTag = this.sectionTitleImage
+        ? `<img src="${edges.util.escapeHtml(
+            this.sectionTitleImage
+          )}" alt="${edges.util.escapeHtml(
+            this.sectionTitle
+          )}" class="title-image">`
+        : "";
 
-    return `<${this.sectionTitleStyle} class="section-title">
+      return `<${this.sectionTitleStyle} class="section-title">
       ${imageTag} ${edges.util.escapeHtml(this.sectionTitle)}
     </${this.sectionTitleStyle}>`;
+    }
   }
 
   _pageHeading() {
@@ -1993,8 +1521,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         <span id="result-header" class="font-18">
           ${edges.util.escapeHtml(this.component.results[0][this.field] || "")}
         </span>
-      </h2>
-      <hr class="yellow-divider" />`;
+      </h2>`;
   }
 
   _sideTitle() {
@@ -2121,69 +1648,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       `;
   }
 
-  // _renderNestedList() {
-  //   const parentField = this.primaryField;
-  //   const field = this.field;
-  //   const subFields = this.fields;
-
-  //   if (!parentField || (!field && !(subFields && subFields.length > 0))) {
-  //     return this.noResultsText; // No valid data to render
-  //   }
-
-  //   // Iterate through results and build rows
-  //   const rows = this.component.results
-  //     .map((result) => {
-  //       const parentObject = result[parentField][0]; // Directly access the primary field (e.g., `result["users"]`)
-
-  //       if (!parentObject) return ""; // Skip if the primary field is not found
-
-  //       // Generate row content
-  //       const cells = [];
-  //       let isRowClickable = false;
-  //       if (field) {
-  //         // Handle single field
-  //         const value = parentObject[field];
-  //         cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
-  //       }
-
-  //       if (subFields) {
-  //         // Handle multiple fields
-  //         subFields.forEach((subField) => {
-  //           const value = parentObject[subField.key]; // Access value directly using the key
-
-  //           if (subField.clickable) {
-  //             cells.push(`
-  //               <td>
-  //                 <a href="#" class="clickable-row">${edges.util.escapeHtml(
-  //                   value || ""
-  //                 )}
-  //                 </a>
-  //               </td>
-  //               `);
-  //           } else {
-  //             console.log("non click", value);
-  //             cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
-  //           }
-  //         });
-  //       }
-  //       console.log("cells", cells);
-  //       return `<tr>${cells.join("")}</tr>`;
-  //     })
-  //     .filter((row) => row) // Remove empty rows
-  //     .join("");
-
-  //   // Wrap rows into table structure
-  //   const table = `
-  //       <table>
-  //           <tbody>
-  //               ${rows}
-  //           </tbody>
-  //       </table>
-  //   `;
-
-  //   return rows ? table : this.noResultsText; // Return table or no results
-  // }
-
   _renderNestedList() {
     const parentField = this.primaryField;
     const field = this.field;
@@ -2191,7 +1655,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
     // Validate required fields
     if (!parentField || (!field && !(subFields && subFields.length > 0))) {
-      return this.noResultsText; // No valid data to render
+      return "";
     }
 
     // Iterate through results and build rows
@@ -2251,7 +1715,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       </table>
     `;
 
-    return rows ? table : this.noResultsText; // Return table or no results
+    return rows ? table : ""; // Return table or no results
   }
 
   _renderTable() {

@@ -252,11 +252,12 @@ function _getLocationComponents(emlo) {
       id: "position",
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
-        type: "content",
+        type: "location",
         sectionTitle: "Position",
         divider: true,
         sectionTitleImage: "/static/img/icon-globe.png",
-        field: "ox_locationAlternateName",
+        lat_field: "geo_lat",
+        long_field: "geo_long",
       }),
     }),
 

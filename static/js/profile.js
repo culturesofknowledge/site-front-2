@@ -346,6 +346,7 @@ function _getInstitutionComponents(emlo) {
         sectionTitle: "Alternative names",
         sectionTitleImage: "/static/img/icon-repository.png",
         field: "geonames_alternateName",
+        divider: true,
       }),
     }),
 
@@ -356,10 +357,29 @@ function _getInstitutionComponents(emlo) {
         type: "label",
         sectionTitle: "Location",
         sectionTitleImage: "/static/img/icon-globe.png",
+        divider: true,
         fields: [
           { title: "City", key: "geonames_locatedIn" },
           { title: "Country", key: "geonames_inCountry" },
         ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "contents",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "ox_hasResource-manifestation",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested",
+        sectionTitle: "Content",
+        sectionTitleImage: "/static/img/icon-quill.png",
+        primaryField: "ox_hasResource-manifestation",
+        fields: [
+          { title: "", key: "ox_started-ox_year" },
+          { title: "", key: "dcterms_description", clickable: true },
+        ],
+        divider: true,
       }),
     }),
   ];

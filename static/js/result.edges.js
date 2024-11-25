@@ -37,7 +37,7 @@ try {
 
       new emlo.ResultTable({
         id: "results",
-        category: "main",
+        category: "results",
         secondaryResults: false,
         infiniteScroll: true,
         size: 20,

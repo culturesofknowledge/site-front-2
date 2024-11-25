@@ -425,14 +425,66 @@ function _getWorkComponents(emlo) {
       id: "people",
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
-        type: "label-details",
+        type: "",
         sectionTitle: "People",
         sectionTitleImage: "/static/img/icon-people.png",
         divider: true,
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "people-author",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "frbr_creator-person",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested",
+        sectionTitle: "Author",
+        primaryField: "frbr_creator-person",
         fields: [
-          { title: "", key: "started_date_sort", type: "date" },
-          { title: "Calendar    ", key: "ox_originalCalendar" },
+          { title: "", key: "browse", clickable: true },
+          { title: "", key: "ox_titlesRolesOccupations" },
         ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "people-recipient",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "mail_recipient-person",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested",
+        sectionTitle: "Recipient",
+        primaryField: "mail_recipient-person",
+        fields: [
+          { title: "", key: "browse", clickable: true },
+          { title: "", key: "ox_titlesRolesOccupations" },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "places",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "",
+        sectionTitle: "Places",
+        sectionTitleImage: "/static/img/icon-globe.png",
+        divider: true,
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "places-recipient",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "mail_origin-location",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested",
+        sectionTitle: "Origin",
+        primaryField: "mail_origin-location",
+        fields: [{ title: "", key: "geonames_name", clickable: true }],
       }),
     }),
   ];

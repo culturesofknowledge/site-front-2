@@ -1805,7 +1805,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const parentField = this.primaryField;
     const field = this.field;
     const subFields = this.fields;
-    console.log("render");
+
     // Validate required fields
     if (!parentField || (!field && !(subFields && subFields.length > 0))) {
       return "";
@@ -1866,12 +1866,10 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       </ul>
     `;
 
-    console.log("list", list);
-
     return rows ? list : ""; // Return table or no results
   }
 
-  _renderNestedList() {
+  _renderNestedLabel() {
     const parentField = this.primaryField;
     const field = this.field;
     const subFields = this.fields;
@@ -1897,7 +1895,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
             if (field) {
               // Handle single field
               const value = parentObject[field];
-              cells.push(`<li>${edges.util.escapeHtml(value || "")}</li>`);
+              cells.push(`<div>${edges.util.escapeHtml(value || "")}</div>`);
             }
 
             if (subFields) {
@@ -1905,37 +1903,40 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
               subFields.forEach((subField) => {
                 const value = parentObject[subField.key]; // Access value directly using the key
 
-                if (subField.heading) {
-                  cells.push(`
-                    <h2>${edges.util.escapeHtml(value)} </h2>
-                    `);
-                }
-
                 if (subField.clickable) {
                   // Create clickable cell
                   cells.push(`
-                    <p>
+                    <div>
                       <a href="#" class="clickable-row">${edges.util.escapeHtml(
                         value || ""
                       )}</a>
-                    </p>
+                    </div>
                   `);
                 } else {
                   // Create non-clickable cell
-                  cells.push(`<p>${edges.util.escapeHtml(value || "")}</p>`);
+                  cells.push(
+                    `<div>${edges.util.escapeHtml(value || "")}</div>`
+                  );
                 }
               });
             }
 
             // Return the row
-            return `<tr>${cells.join("")}</tr>`;
+            return `<div>${cells.join("")}</div>`;
           })
           .join(""); // Combine all rows for the parent objects
       })
       .filter((row) => row) // Remove empty rows
-      .join("");
+      .join(""); // Combine all rows into a single HTML string
 
-    return rows ? rows : "";
+    console.log("LALA", rows);
+
+    const labelsList = `
+      <div class="content">
+        ${rows}
+      </div>
+    `;
+    return rows ? labelsList : ""; // Return table or no results
   }
 
   _renderTable() {

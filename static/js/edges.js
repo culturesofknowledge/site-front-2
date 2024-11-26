@@ -2110,17 +2110,31 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                   ? `<p>${edges.util.escapeHtml(otherInfo)} </p>`
                   : "";
                 if (subField.linkKey) {
-                  // Create clickable cell
-                  cells.push(`
-                    <div>
-                      <a target="_blank" href="${edges.util.escapeHtml(
-                        parentObject[subField.linkKey]
-                      )}" class="clickable-row">${edges.util.escapeHtml(
-                    value || ""
-                  )}</a>
-                    ${otherInfoDiv}
-                    </div>
-                  `);
+                  if (subField.linkKey == "uuid") {
+                    const collectionName = parentObject["object_type"];
+
+                    cells.push(`
+                      <div>
+                        <a  href="/profile/${collectionName}/${
+                      parentObject["uuid"]
+                    }" class="clickable-row">${edges.util.escapeHtml(
+                      value || ""
+                    )}</a>
+                      ${otherInfoDiv}
+                      </div>
+                    `);
+                  } else {
+                    cells.push(`
+                      <div>
+                        <a target="_blank" href="${edges.util.escapeHtml(
+                          parentObject[subField.linkKey]
+                        )}" class="clickable-row">${edges.util.escapeHtml(
+                      value || ""
+                    )}</a>
+                      ${otherInfoDiv}
+                      </div>
+                    `);
+                  }
                 } else {
                   // Create non-clickable cell
                   cells.push(

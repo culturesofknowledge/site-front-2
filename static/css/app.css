@@ -9890,6 +9890,11 @@ select {
   border: #efc319 2px solid;
 }
 
+.stats-row {
+  display: flex;
+  justify-content: space-between;
+  list-style: none;
+}
 .stats-text {
   font-size: 0.75em;
   line-height: 0.85rem;

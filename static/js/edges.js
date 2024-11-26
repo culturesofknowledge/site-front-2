@@ -2390,11 +2390,55 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   }
 };
 
+// emlo.Stats = class extends edges.Component {
+//   constructor(params) {
+//     super(params);
+//     this.hitCount = 0;
+//     this.solrCore = edges.util.getParam(params, "solrCore", "");
+//   }
+
+//   async synchronise() {
+//     this.hitCount = 0;
+
+//     // Fetch data from Solr and update the hit count
+//     const hitCount = await this._fetchHitCount(this.solrCore);
+//     if (hitCount !== null) {
+//       this.hitCount = hitCount;
+//     }
+
+//     console.log("soirce", this.edge.result);
+
+//     this.renderer.draw();
+//   }
+
+//   async _fetchHitCount(collectionName) {
+//     const url = `/solr/${collectionName}/select?q=*:*&rows=0&wt=json`;
+
+//     try {
+//       const response = await fetch(url);
+//       if (!response.ok) {
+//         console.error(
+//           `Error fetching data from ${url}: ${response.statusText}`
+//         );
+//         return null;
+//       }
+
+//       const data = await response.json();
+//       console.log("fa", data);
+//       return data.response.numFound || 0; // Return hit count
+//     } catch (error) {
+//       console.error(`Error fetching data from ${url}: ${error}`);
+//       return null;
+//     }
+//   }
+// };
 emlo.Stats = class extends edges.Component {
   constructor(params) {
     super(params);
     this.hitCount = 0;
     this.solrCore = edges.util.getParam(params, "solrCore", "");
+    this.facetFields = edges.util.getParam(params, "facetFields", []);
+    this.facetField = edges.util.getParam(params, "facetField", "");
   }
 
   async synchronise() {
@@ -2410,7 +2454,20 @@ emlo.Stats = class extends edges.Component {
   }
 
   async _fetchHitCount(collectionName) {
-    const url = `/solr/${collectionName}/select?q=*:*&rows=0&wt=json`;
+    // Base Solr query
+    let url = `/solr/${collectionName}/select?q=*:*&rows=0&wt=json`;
+
+    // Add facet fields to the query if they exist, in case multiple facet field support is needed
+    // if (this.facetFields.length > 0) {
+    //   const facetQuery = this.facetFields
+    //     .map((field) => ``)
+    //     .join("&");
+    //   url += `&facet=true&${facetQuery}`;
+    // }
+
+    if (this.facetField) {
+      url += `&facet=true&facet.field=${encodeURIComponent(this.facetField)}`;
+    }
 
     try {
       const response = await fetch(url);
@@ -2422,6 +2479,40 @@ emlo.Stats = class extends edges.Component {
       }
 
       const data = await response.json();
+
+      // Log facet counts if available
+      if (data.facet_counts && data.facet_counts.facet_fields) {
+        if (
+          this.facetField &&
+          data.facet_counts.facet_fields[this.facetField]
+        ) {
+          if (this.facetField == "cito_Catalog") {
+            return data.facet_counts.facet_fields["cito_Catalog"].length / 2;
+          } else if (this.facetField == "ox_isOrganisation") {
+            for (
+              let i = 0;
+              i < data.facet_counts.facet_fields["ox_isOrganisation"].length;
+              i += 2
+            ) {
+              if (
+                data.facet_counts.facet_fields["ox_isOrganisation"][i] ===
+                "true"
+              ) {
+                return data.facet_counts.facet_fields["ox_isOrganisation"][
+                  i + 1
+                ];
+              }
+            }
+          }
+        }
+        // for (const field of this.facetFields) {
+        //   console.log(
+        //     `Counts for facet field "${field}":`,
+        //     data.facet_counts.facet_fields[field]
+        //   );
+        // }
+      }
+
       return data.response.numFound || 0; // Return hit count
     } catch (error) {
       console.error(`Error fetching data from ${url}: ${error}`);

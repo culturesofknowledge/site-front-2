@@ -1881,6 +1881,78 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       `;
   }
 
+  // _renderNestedTable() {
+  //   const parentField = this.primaryField;
+  //   const field = this.field;
+  //   const subFields = this.fields;
+
+  //   // Validate required fields
+  //   if (!parentField || (!field && !(subFields && subFields.length > 0))) {
+  //     return "";
+  //   }
+
+  //   // Iterate through results and build rows
+  //   const rows = this.component.results
+  //     .map((result) => {
+  //       const parentObjects = result[parentField]; // Get all objects in the primary field array
+  //       if (!parentObjects || parentObjects.length === 0) return ""; // Skip if no data in primary field
+
+  //       // Iterate over each object in the parent field array
+  //       return parentObjects
+  //         .map((parentObject) => {
+  //           if (!parentObject) return ""; // Skip if the object is invalid
+
+  //           // Generate row content
+  //           const cells = [];
+  //           if (field) {
+  //             // Handle single field
+  //             const value = parentObject[field];
+  //             cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
+  //           }
+
+  //           if (subFields) {
+  //             // Handle multiple fields
+  //             subFields.forEach((subField) => {
+  //               const value = parentObject[subField.key]; // Access value directly using the key
+
+  //               if (subField.clickable) {
+  //                 // Create clickable cell
+  //                 cells.push(`
+  //                   <td>
+  //                     <a href="/profile/${subField.collectionName}/${
+  //                   parentObject["uuid"]
+  //                 }" class="clickable-row">${edges.util.escapeHtml(
+  //                   value || ""
+  //                 )}</a>
+  //                   </td>
+  //                 `);
+  //               } else {
+  //                 // Create non-clickable cell
+  //                 cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
+  //               }
+  //             });
+  //           }
+
+  //           // Return the row
+  //           return `<tr>${cells.join("")}</tr>`;
+  //         })
+  //         .join(""); // Combine all rows for the parent objects
+  //     })
+  //     .filter((row) => row) // Remove empty rows
+  //     .join(""); // Combine all rows into a single HTML string
+
+  //   // Wrap rows into table structure
+  //   const table = `
+  //     <table class="nested-table">
+  //       <tbody>
+  //         ${rows}
+  //       </tbody>
+  //     </table>
+  //   `;
+
+  //   return rows ? table : ""; // Return table or no results
+  // }
+
   _renderNestedTable() {
     const parentField = this.primaryField;
     const field = this.field;
@@ -1891,32 +1963,88 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       return "";
     }
 
-    // Iterate through results and build rows
+    // Flatten all parentObjects for row count
+    const allParentObjects = this.component.results.flatMap(
+      (result) => result[parentField] || []
+    );
+
+    // Check if total parentObject count exceeds 30
+    if (allParentObjects.length > 30) {
+      // Summarized format for large datasets
+      let aut = "";
+      const decadeSummary = allParentObjects.reduce((acc, parentObject) => {
+        if (!parentObject) return acc;
+
+        const year = parentObject["ox_started-ox_year"];
+        aut = parentObject["author_sort"];
+
+        if (year) {
+          const decade = Math.floor(year / 10) * 10; // Calculate decade
+          if (!acc[decade]) acc[decade] = {};
+          acc[decade][year] = (acc[decade][year] || 0) + 1;
+        } else {
+          console.log("Unkown year");
+        }
+
+        return acc;
+      }, {});
+
+      // Generate summarized table rows
+      const rows = Object.entries(decadeSummary)
+        .map(([decade, years]) => {
+          const yearCounts = Object.entries(years)
+            .map(
+              ([year, count]) =>
+                `<a href="/forms/advance?aut=${aut}&dat_sin_year=${year}"> ${year}: ${count} </a>`
+            )
+            .join(" ♦ ");
+          return `
+          <tr>
+            <td>${decade}</td>
+            <td> ${yearCounts} </td>
+          </tr>`;
+        })
+        .join("");
+
+      return `
+        <table class="nested-table">
+          <thead>
+            <tr>
+              <th>
+                Decade
+              </th>
+              <th>
+                Letters per year
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      `;
+    }
+
+    // Current format for datasets with parentObject count <= 30
     const rows = this.component.results
       .map((result) => {
-        const parentObjects = result[parentField]; // Get all objects in the primary field array
-        if (!parentObjects || parentObjects.length === 0) return ""; // Skip if no data in primary field
+        const parentObjects = result[parentField];
+        if (!parentObjects || parentObjects.length === 0) return "";
 
-        // Iterate over each object in the parent field array
         return parentObjects
           .map((parentObject) => {
-            if (!parentObject) return ""; // Skip if the object is invalid
+            if (!parentObject) return "";
 
-            // Generate row content
             const cells = [];
             if (field) {
-              // Handle single field
               const value = parentObject[field];
               cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
             }
 
             if (subFields) {
-              // Handle multiple fields
               subFields.forEach((subField) => {
-                const value = parentObject[subField.key]; // Access value directly using the key
-
+                const value = parentObject[subField.key];
                 if (subField.clickable) {
-                  // Create clickable cell
                   cells.push(`
                     <td>
                       <a href="/profile/${subField.collectionName}/${
@@ -1927,21 +2055,18 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                     </td>
                   `);
                 } else {
-                  // Create non-clickable cell
                   cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
                 }
               });
             }
 
-            // Return the row
             return `<tr>${cells.join("")}</tr>`;
           })
-          .join(""); // Combine all rows for the parent objects
+          .join("");
       })
-      .filter((row) => row) // Remove empty rows
-      .join(""); // Combine all rows into a single HTML string
+      .filter((row) => row)
+      .join("");
 
-    // Wrap rows into table structure
     const table = `
       <table class="nested-table">
         <tbody>
@@ -1950,7 +2075,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       </table>
     `;
 
-    return rows ? table : ""; // Return table or no results
+    return rows ? table : "";
   }
 
   _renderNestedList() {

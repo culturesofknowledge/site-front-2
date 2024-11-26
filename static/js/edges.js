@@ -1675,6 +1675,40 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
           .map((field) => {
             let value = "";
 
+            let additionalInfo = "";
+
+            if (field.additonalInfo && field.additonalInfo.length > 0) {
+              // Handle additionalInfo array
+              additionalInfo = field.additonalInfo
+                .map((info) => {
+                  let displayValue = "";
+                  if (info.mainKey in this.component.results[0]) {
+                    const mainValue = this.component.results[0][info.mainKey];
+                    if (typeof mainValue === "boolean") {
+                      displayValue = mainValue ? info.text : "";
+                    } else if (mainValue) {
+                      displayValue = `Marked as:   ${mainValue}`;
+                    }
+                  }
+
+                  if (
+                    !displayValue &&
+                    info.secondaryKey in this.component.results[0]
+                  ) {
+                    const secondaryValue =
+                      this.component.results[0][info.secondaryKey];
+                    if (typeof secondaryValue === "boolean") {
+                      displayValue = secondaryValue ? info.text : "";
+                    } else if (secondaryValue) {
+                      displayValue = `Marked as:   ${secondaryValue}`;
+                    }
+                  }
+
+                  return edges.util.escapeHtml(displayValue || "");
+                })
+                .join("<br/>");
+            }
+
             if (field.type == "date") {
               const rawDate = new Date(this.component.results[0][field.key]);
               const formattedDate = rawDate.toLocaleDateString("en-US", {
@@ -1687,11 +1721,19 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
             } else {
               value = this.component.results[0][field.key];
             }
-            return `
-        <div class="content">
-          <span>${edges.util.escapeHtml(field.title)} </span>
-          <span>${edges.util.escapeHtml(value || "")}</span>
-        </div>`;
+
+            return additionalInfo || value
+              ? `<div class="content">
+                 ${
+                   value
+                     ? `<span>${edges.util.escapeHtml(
+                         field.title
+                       )} </span><span>${edges.util.escapeHtml(value)}</span>`
+                     : ""
+                 }
+                 ${additionalInfo ? `<span>${additionalInfo}</span>` : ""}
+               </div>`
+              : "";
           })
           .join("")
       : "";

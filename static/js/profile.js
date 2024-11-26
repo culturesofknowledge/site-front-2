@@ -565,7 +565,17 @@ function _getWorkComponents(emlo) {
         fields: [
           { title: "", key: "started_date_sort", type: "date" },
           { title: "Calendar", key: "ox_originalCalendar" },
-          { title: "Marked as", key: "ox_dateMarked" },
+          {
+            title: "Marked as",
+            key: "ox_dateMarked",
+            additonalInfo: [
+              {
+                mainKey: "ox_started-indef_approximate",
+                secondaryKey: "",
+                text: "(Date is approximate)",
+              },
+            ],
+          },
         ],
       }),
     }),
@@ -597,7 +607,17 @@ function _getWorkComponents(emlo) {
             clickable: true,
             collectionName: "person",
           },
-          { title: "", key: "ox_titlesRolesOccupations" },
+          {
+            title: "",
+            key: "ox_titlesRolesOccupations",
+            additonalInfo: [
+              {
+                mainKey: "mail_authors-indef_inferred",
+                secondaryKey: "",
+                text: "(Authors is inferred)",
+              },
+            ],
+          },
         ],
       }),
     }),
@@ -618,7 +638,17 @@ function _getWorkComponents(emlo) {
             clickable: true,
             collectionName: "person",
           },
-          { title: "", key: "ox_titlesRolesOccupations" },
+          {
+            title: "",
+            key: "ox_titlesRolesOccupations",
+            additonalInfo: [
+              {
+                mainKey: "mail_addressees-indef_inferred",
+                secondaryKey: "",
+                text: "(Recipient is inferred)",
+              },
+            ],
+          },
         ],
       }),
     }),

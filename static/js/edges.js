@@ -1006,6 +1006,10 @@ emlo.FacetRenderer = class extends edges.Renderer {
       filter.term ? filter.term.toString() : ""
     );
 
+    const filterFields = ts.filters.map((filter) =>
+      filter.field ? filter.field.toString() : ""
+    );
+
     if (ts.values && ts.values.length > 0) {
       results = "";
 
@@ -1098,7 +1102,11 @@ emlo.FacetRenderer = class extends edges.Renderer {
 
     let isHideCount = false;
 
-    if (filterTerms.length >= this.hideCount && this.hideCount > 0) {
+    const filterFieldsCount = filterFields.reduce((acc, item) => {
+      return item === this.component.field ? acc + 1 : acc;
+    }, 0);
+
+    if (filterFieldsCount >= this.hideCount && this.hideCount > 0) {
       isHideCount = true;
     }
 

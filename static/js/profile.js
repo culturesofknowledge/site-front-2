@@ -781,6 +781,46 @@ function _getWorkComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "content-reply-to",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "mail_replyTo-work",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested-label",
+        sectionTitle: "Reply To",
+        primaryField: "mail_replyTo-work",
+        fields: [
+          {
+            title: "",
+            key: "dcterms_description",
+            clickable: true,
+            collectionName: "work",
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "content-has-reply",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "mail_hasReply-work",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested-label",
+        sectionTitle: "Answered by",
+        primaryField: "mail_hasReply-work",
+        fields: [
+          {
+            title: "",
+            key: "dcterms_description",
+            clickable: true,
+            collectionName: "work",
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "comments",
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({

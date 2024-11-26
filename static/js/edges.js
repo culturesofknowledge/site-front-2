@@ -1500,7 +1500,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     super(params);
 
     // Rendering configuration
-    this.type = edges.util.getParam(params, "type", "list"); // Render type: list, table, bar, label
+    this.type = edges.util.getParam(params, "type", ""); // Render type: list, table, bar, label
     this.field = edges.util.getParam(params, "field", ""); // Field value to display
     this.sectionTitle = edges.util.getParam(params, "sectionTitle", ""); // Title for the section
     this.sectionTitleStyle = edges.util.getParam(
@@ -1575,6 +1575,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
           break;
         case "text":
           frag = this._renderText();
+          break;
+        case "plain-text":
+          frag = this._renderPlainText();
           break;
         case "location":
           frag = this._renderLocation();
@@ -2205,6 +2208,18 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
             )}
           </pre>
       `;
+  }
+
+  _renderPlainText() {
+    return this.component.results[0][this.field]
+      ? `
+          <p>
+            ${edges.util.escapeHtml(
+              this.component.results[0][this.field] || ""
+            )}
+          </p>
+      `
+      : "";
   }
 };
 

@@ -710,6 +710,105 @@ function _getWorkComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "contents",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "",
+        sectionTitle: "Contents",
+        sectionTitleImage: "/static/img/icon-quill.png",
+        divider: true,
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "content-abs",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "plain-text",
+        sectionTitle: "Abstract",
+        field: "dcterms_abstract",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "content-keywords",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "plain-text",
+        sectionTitle: "Keywords",
+        field: "ox_keywords",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "content-lang",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "plain-text",
+        sectionTitle: "Language",
+        field: "dcterms_language",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "content-implict",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "plain-text",
+        sectionTitle: "Incipit",
+        field: "ox_incipit",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "content-excipit",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "plain-text",
+        sectionTitle: "Excipit",
+        field: "ox_excipit",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "content-postscript",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "plain-text",
+        sectionTitle: "Postscript",
+        field: "mail_postScript",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "comments",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        divider: true,
+        sectionTitle: "Comments",
+        sectionTitleImage: "/static/img/icon-comment.png",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "comments-general",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "comments",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested-list",
+        sectionTitle: "General",
+        primaryField: "comments",
+        fields: [
+          {
+            title: "",
+            key: "bibo_Note",
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "resources",
       category: "results",
       fetchSecondaryData: true,

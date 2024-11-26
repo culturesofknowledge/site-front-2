@@ -9890,6 +9890,10 @@ select {
   border: #efc319 2px solid;
 }
 
+#main-content {
+  min-height: 500px;
+}
+
 .stats-row {
   display: flex;
   justify-content: space-between;

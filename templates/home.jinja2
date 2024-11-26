@@ -30,7 +30,7 @@
 
     {# START Catalogue statistics #}
     <div id="home-stats">
-        {% include './components/home/stats.jinja2' %}
+        {# {% include './components/home/stats.jinja2' %} #}
     </div>
     {# End Catalogue statistics #}
 
@@ -44,6 +44,9 @@
 
 
 {% block extra_js_bottom %}
+{% include "_edges_common_js.jinja2" %}
+<script type="module" src="../static/js/home.edges.js"></script>
+
 <script>
 function changeEventOnFrom(val){
     dat_to_year = document.getElementById("dat_to_year")

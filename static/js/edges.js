@@ -233,6 +233,39 @@ emlo.ProfileTemplate = class extends edges.Template {
   }
 };
 
+emlo.HomeStatsTemplate = class extends edges.Template {
+  constructor(params) {
+    // TODO: Needs to be added for results page
+    // this.showControlSection = edges.util.getParam(
+    //   params,
+    //   "showControlSection",
+    //   false
+    // );
+    super(params);
+  }
+
+  draw(edge) {
+    this.edge = edge;
+    let stats = "";
+
+    let statsComponents = edge.category("stats");
+    for (let i = 0; i < statsComponents.length; i++) {
+      stats += `<div id="${statsComponents[i].id}"></div>`;
+    }
+
+    let frag = `
+    <div class="row">
+      <div class="large-12 columns">
+          <ul class="stats-row small-block-grid-2 medium-block-grid-5 large-block-grid-10">
+              ${stats}
+          </ul>
+      </div>
+    </div>
+    `;
+    this.edge.context.html(frag);
+  }
+};
+
 emlo.DropDown = class extends edges.Component {
   constructor(params) {
     super(params);
@@ -2015,6 +2048,93 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
             )}
           </pre>
       `;
+  }
+};
+
+emlo.Stats = class extends edges.Component {
+  constructor(params) {
+    super(params);
+    this.hitCount = 0;
+    this.solrCore = edges.util.getParam(params, "solrCore", "");
+  }
+
+  async synchronise() {
+    this.hitCount = 0;
+
+    // Fetch data from Solr and update the hit count
+    const hitCount = await this._fetchHitCount(this.solrCore);
+    if (hitCount !== null) {
+      this.hitCount = hitCount;
+    }
+
+    this.renderer.draw();
+  }
+
+  async _fetchHitCount(collectionName) {
+    const url = `/solr/${collectionName}/select?q=*:*&rows=0&wt=json`;
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        console.error(
+          `Error fetching data from ${url}: ${response.statusText}`
+        );
+        return null;
+      }
+
+      const data = await response.json();
+      return data.response.numFound || 0; // Return hit count
+    } catch (error) {
+      console.error(`Error fetching data from ${url}: ${error}`);
+      return null;
+    }
+  }
+};
+
+emlo.StatsRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+    this.title = edges.util.getParam(params, "title", ""); // Title for the section
+    this.titleImage = edges.util.getParam(params, "titleImage", null); // Optional image for title
+    this.redirectURL = edges.util.getParam(params, "redirectURL", ""); // This URL will be provided in jinja format
+    this.namespace = "edges-stats-display";
+  }
+
+  draw() {
+    let container = "";
+
+    const imageTag = this.titleImage
+      ? `<img src="${edges.util.escapeHtml(
+          this.titleImage
+        )}" alt="${edges.util.escapeHtml(this.title)}" class="title-image">`
+      : "";
+
+    const redirectLink = this.redirectURL
+      ? `<a href="${edges.util.escapeHtml(this.redirectURL)}"> 
+      ${edges.util.escapeHtml(this.title)}
+      </a>`
+      : `<p style="font-size: inherit;"> 
+      ${edges.util.escapeHtml(this.title)}
+      </p>`;
+
+    container = `
+    <br />
+    <li class="stats-text text-center">
+        ${imageTag}
+        <br />
+        
+        <span>
+          ${edges.util.escapeHtml(this.component.hitCount)}
+        </span>
+        
+        <br />
+        
+        ${redirectLink}
+      </li>
+      <br />
+      `;
+
+    this.component.context.html(container);
   }
 };
 

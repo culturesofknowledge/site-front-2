@@ -294,7 +294,7 @@ function _getLocationComponents(emlo) {
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
         type: "stats",
-        sectionTitle: "Catalogue Statistics",
+        sectionTitle: "Stats",
         sectionTitleImage: "/static/img/icon-statistics.png",
         divider: true,
         fields: [

@@ -39,6 +39,27 @@ function _getPeopleComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "related-resources",
+      category: "sidebar",
+      fetchSecondaryData: true,
+      primaryField: "rdfs_seeAlso-resource",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "side-nested-links",
+        divider: true,
+        sectionTitle: "Related Resources ",
+        primaryField: "rdfs_seeAlso-resource",
+        fields: [
+          {
+            title: "",
+            key: "ox_titleOfResource",
+            otherInfo: "ox_detailsOfResource",
+            linkKey: "dcterms_relation",
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "page-title",
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
@@ -54,9 +75,12 @@ function _getPeopleComponents(emlo) {
         type: "content",
         sectionTitle: "Details",
         sectionTitleImage: "/static/img/icon-people.png",
-        contentTitle: "Alternative names",
+        contentTitle: "",
         divider: true,
-        field: "skos_altLabel",
+        fields: [
+          { title: "Alternate Names", key: "skos_altLabel" },
+          { title: "Titles or roles", key: "ox_titlesRolesOccupations" },
+        ],
       }),
     }),
 
@@ -119,15 +143,15 @@ function _getPeopleComponents(emlo) {
     }),
 
     new emlo.MultiFields({
-      id: "letters-recevied",
+      id: "letters-written",
       category: "results",
       fetchSecondaryData: true,
-      primaryField: "mail_recipientOf-work",
+      primaryField: "frbr_creatorOf-work",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",
-        sectionTitle: "Letters Received",
+        sectionTitle: "Letters Written",
         sectionTitleImage: "/static/img/icon-quill.png",
-        primaryField: "mail_recipientOf-work",
+        primaryField: "frbr_creatorOf-work",
         fields: [
           { title: "", key: "ox_started-ox_year" },
           {
@@ -142,15 +166,15 @@ function _getPeopleComponents(emlo) {
     }),
 
     new emlo.MultiFields({
-      id: "letters-written",
+      id: "letters-recevied",
       category: "results",
       fetchSecondaryData: true,
-      primaryField: "frbr_creatorOf-work",
+      primaryField: "mail_recipientOf-work",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",
-        sectionTitle: "Letters Written",
+        sectionTitle: "Letters Received",
         sectionTitleImage: "/static/img/icon-quill.png",
-        primaryField: "frbr_creatorOf-work",
+        primaryField: "mail_recipientOf-work",
         fields: [
           { title: "", key: "ox_started-ox_year" },
           {

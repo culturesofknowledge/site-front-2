@@ -1579,6 +1579,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         case "location":
           frag = this._renderLocation();
           break;
+        case "side-nested-links":
+          frag = this._sidebarNestedLinks();
+          break;
         default:
           frag = "<div></div>";
       }
@@ -1693,13 +1696,33 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
   _renderContent() {
     // Render custom content
-    return this.component.results[0][this.field]
-      ? ` 
+
+    if (this.field) {
+      return this.component.results[0][this.field]
+        ? ` 
     <div class="custom-content">
       ${edges.util.escapeHtml(this.component.results[0][this.field])}
     </div>
     `
-      : "";
+        : "";
+    }
+
+    if (this.fields.length > 0) {
+      return `<div class="content">
+      ${this.fields
+        .map(
+          (field) =>
+            `
+               <strong> ${field.title} </strong>
+               <dd> ${edges.util.escapeHtml(
+                 this.component.results[0][field.key] || ""
+               )} </dd>
+              <br/>
+            `
+        )
+        .join("")}</div>
+      `;
+    }
   }
 
   // _renderLocation() {
@@ -2046,6 +2069,83 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       <thead><tr>${headers}</tr></thead>
       <tbody>${rows}</tbody>
     </table>`;
+  }
+
+  _sidebarNestedLinks() {
+    const parentField = this.primaryField;
+    const field = this.field;
+    const subFields = this.fields;
+
+    // Validate required fields
+    if (!parentField || (!field && !(subFields && subFields.length > 0))) {
+      return "";
+    }
+
+    // Iterate through results and build rows
+    const rows = this.component.results
+      .map((result) => {
+        const parentObjects = result[parentField]; // Get all objects in the primary field array
+        if (!parentObjects || parentObjects.length === 0) return ""; // Skip if no data in primary field
+
+        // Iterate over each object in the parent field array
+        return parentObjects
+          .map((parentObject) => {
+            if (!parentObject) return ""; // Skip if the object is invalid
+
+            // Generate row content
+            const cells = [];
+            if (field) {
+              // Handle single field
+              const value = parentObject[field];
+              cells.push(`<div>${edges.util.escapeHtml(value || "")}</div>`);
+            }
+
+            if (subFields) {
+              // Handle multiple fields
+              subFields.forEach((subField) => {
+                const value = parentObject[subField.key]; // Access value directly using the key
+                const otherInfo = parentObject[subField.otherInfo];
+
+                const otherInfoDiv = otherInfo
+                  ? `<p>${edges.util.escapeHtml(otherInfo)} </p>`
+                  : "";
+                if (subField.linkKey) {
+                  // Create clickable cell
+                  cells.push(`
+                    <div>
+                      <a target="_blank" href="${edges.util.escapeHtml(
+                        parentObject[subField.linkKey]
+                      )}" class="clickable-row">${edges.util.escapeHtml(
+                    value || ""
+                  )}</a>
+                    ${otherInfoDiv}
+                    </div>
+                  `);
+                } else {
+                  // Create non-clickable cell
+                  cells.push(
+                    `<div>${edges.util.escapeHtml(
+                      value || ""
+                    )}</div> ${otherInfoDiv}`
+                  );
+                }
+              });
+            }
+
+            // Return the row
+            return `<div>${cells.join("")}</div>`;
+          })
+          .join(""); // Combine all rows for the parent objects
+      })
+      .filter((row) => row) // Remove empty rows
+      .join(""); // Combine all rows into a single HTML string
+
+    const labelsList = `
+      <div class="content">
+        ${rows}
+      </div>
+    `;
+    return rows ? labelsList : ""; // Return table or no results
   }
 
   _renderText() {

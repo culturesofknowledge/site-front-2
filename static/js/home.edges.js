@@ -30,7 +30,8 @@ try {
     new emlo.Stats({
       id: "organisations",
       category: "stats",
-      solrCore: "institutions",
+      solrCore: "all",
+      facetField: "ox_isOrganisation",
       renderer: new emlo.StatsRenderer({
         title: "Organisations",
         titleImage: "/static/img/icon-stats-organisations.png",
@@ -52,7 +53,8 @@ try {
     new emlo.Stats({
       id: "catalogues",
       category: "stats",
-      solrCore: "people",
+      solrCore: "all",
+      facetField: "cito_Catalog",
       renderer: new emlo.StatsRenderer({
         title: "Catalogues",
         titleImage: "/static/img/icon-stats-Catalogues.png",
@@ -76,7 +78,7 @@ try {
       category: "stats",
       solrCore: "manifestations",
       renderer: new emlo.StatsRenderer({
-        title: "Manifestations",
+        title: "Versions",
         titleImage: "/static/img/icon-stats-manifestations.png",
       }),
     }),

@@ -2012,6 +2012,39 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
               subFields.forEach((subField) => {
                 const value = parentObject[subField.key]; // Access value directly using the key
 
+                let additionalInfo = "";
+
+                if (
+                  subField.additonalInfo &&
+                  subField.additonalInfo.length > 0
+                ) {
+                  // Handle additionalInfo array
+                  additionalInfo = subField.additonalInfo
+                    .map((info) => {
+                      let displayValue = "";
+                      if (info.mainKey in result) {
+                        const mainValue = result[info.mainKey];
+                        if (typeof mainValue === "boolean") {
+                          displayValue = mainValue ? info.text : "";
+                        } else if (mainValue) {
+                          displayValue = `Marked as:   ${mainValue}`;
+                        }
+                      }
+
+                      if (!displayValue && info.secondaryKey in result) {
+                        const secondaryValue = result[info.secondaryKey];
+                        if (typeof secondaryValue === "boolean") {
+                          displayValue = secondaryValue ? info.text : "";
+                        } else if (secondaryValue) {
+                          displayValue = `Marked as:   ${secondaryValue}`;
+                        }
+                      }
+
+                      return edges.util.escapeHtml(displayValue || "");
+                    })
+                    .join("<br/>");
+                }
+
                 if (subField.clickable) {
                   // Create clickable cell
                   cells.push(`
@@ -2021,12 +2054,15 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                   }" class="clickable-row">${edges.util.escapeHtml(
                     value || ""
                   )}</a>
+                      <br/>
+                    ${additionalInfo}
                     </div>
                   `);
                 } else {
                   // Create non-clickable cell
                   cells.push(
-                    `<div>${edges.util.escapeHtml(value || "")}</div>`
+                    `<div>${edges.util.escapeHtml(value || "")}</div>  <br/>
+                    ${additionalInfo}`
                   );
                 }
               });
@@ -2145,7 +2181,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                 }
               });
             }
-
             // Return the row
             return `<div>${cells.join("")}</div>`;
           })

@@ -434,6 +434,27 @@ function _getInstitutionComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "related-resources",
+      category: "sidebar",
+      fetchSecondaryData: true,
+      primaryField: "rdfs_seeAlso-resource",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "side-nested-links",
+        divider: true,
+        sectionTitle: "Related Resources ",
+        primaryField: "rdfs_seeAlso-resource",
+        fields: [
+          {
+            title: "",
+            key: "ox_titleOfResource",
+            otherInfo: "ox_detailsOfResource",
+            linkKey: "dcterms_relation",
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "alternative-names",
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
@@ -502,6 +523,38 @@ function _getWorkComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "related-resources",
+      category: "sidebar",
+      fetchSecondaryData: true,
+      primaryField: "rdfs_seeAlso-resource",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "side-nested-links",
+        divider: true,
+        sectionTitle: "Related Resources ",
+        primaryField: "rdfs_seeAlso-resource",
+        fields: [
+          {
+            title: "",
+            key: "ox_titleOfResource",
+            otherInfo: "ox_detailsOfResource",
+            linkKey: "dcterms_relation",
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "source-record",
+      category: "sidebar",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "text",
+        divider: true,
+        sectionTitle: "Source of record",
+        field: "ox_sourceOfData",
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "dates",
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
@@ -511,7 +564,8 @@ function _getWorkComponents(emlo) {
         divider: true,
         fields: [
           { title: "", key: "started_date_sort", type: "date" },
-          { title: "Calendar    ", key: "ox_originalCalendar" },
+          { title: "Calendar", key: "ox_originalCalendar" },
+          { title: "Marked as", key: "ox_dateMarked" },
         ],
       }),
     }),
@@ -570,6 +624,27 @@ function _getWorkComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "people-mentions",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "dcterms_references-person",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested-label",
+        sectionTitle: "Mentions",
+        primaryField: "dcterms_references-person",
+        fields: [
+          {
+            title: "",
+            key: "browse",
+            clickable: true,
+            collectionName: "person",
+          },
+          { title: "", key: "ox_titlesRolesOccupations" },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "places",
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
@@ -595,6 +670,40 @@ function _getWorkComponents(emlo) {
             key: "geonames_name",
             clickable: true,
             collectionName: "location",
+            additonalInfo: [
+              {
+                mainKey: "mail_origin-indef_inferred",
+                secondaryKey: "mail_origin-rdf_value",
+                text: "(Origin is inferred)",
+              },
+            ],
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "places-destionation",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "mail_destination-location",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested-label",
+        sectionTitle: "Destination",
+        primaryField: "mail_destination-location",
+        fields: [
+          {
+            title: "",
+            key: "geonames_name",
+            clickable: true,
+            collectionName: "location",
+            additonalInfo: [
+              {
+                mainKey: "mail_destination-indef_inferred",
+                secondaryKey: "mail_destination-rdf_value",
+                text: "(Destination is inferred)",
+              },
+            ],
           },
         ],
       }),

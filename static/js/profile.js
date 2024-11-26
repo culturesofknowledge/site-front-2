@@ -240,6 +240,47 @@ function _getLocationComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "related-resources",
+      category: "sidebar",
+      fetchSecondaryData: true,
+      primaryField: "rdfs_seeAlso-resource",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "side-nested-links",
+        divider: true,
+        sectionTitle: "Related Resources ",
+        primaryField: "rdfs_seeAlso-resource",
+        fields: [
+          {
+            title: "",
+            key: "ox_titleOfResource",
+            otherInfo: "ox_detailsOfResource",
+            linkKey: "dcterms_relation",
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "related-people",
+      category: "sidebar",
+      fetchSecondaryData: true,
+      primaryField: "rel_wasBirthplaceOf-person",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "side-nested-links",
+        sectionTitle: "People born at place ",
+        primaryField: "rel_wasBirthplaceOf-person",
+        fields: [
+          {
+            title: "",
+            key: "browse",
+            otherInfo: "ox_titlesRolesOccupations",
+            linkKey: "uuid",
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "page-title",
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({

@@ -60,6 +60,66 @@ function _getPeopleComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "parent-of",
+      category: "sidebar",
+      fetchSecondaryData: true,
+      primaryField: "rel_childOf-person",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "side-nested-links",
+        sectionTitle: "Parent of ",
+        primaryField: "rel_childOf-person",
+        fields: [
+          {
+            title: "",
+            key: "browse",
+            otherInfo: "ox_titlesRolesOccupations",
+            linkKey: "uuid",
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "rel_relativeOf",
+      category: "sidebar",
+      fetchSecondaryData: true,
+      primaryField: "rel_relativeOf-person",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "side-nested-links",
+        sectionTitle: "Relative of ",
+        primaryField: "rel_relativeOf-person",
+        fields: [
+          {
+            title: "",
+            key: "browse",
+            otherInfo: "ox_titlesRolesOccupations",
+            linkKey: "uuid",
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "member-of-person",
+      category: "sidebar",
+      fetchSecondaryData: true,
+      primaryField: "foaf_member-person",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "side-nested-links",
+        sectionTitle: "Member of ",
+        primaryField: "foaf_member-person",
+        fields: [
+          {
+            title: "",
+            key: "browse",
+            otherInfo: "ox_titlesRolesOccupations",
+            linkKey: "uuid",
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "page-title",
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({

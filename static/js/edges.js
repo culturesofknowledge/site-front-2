@@ -88,7 +88,7 @@ emlo.ResultTemplate = class extends edges.Template {
       bottom += `<div id="${bottomComponents[i].id}"></div>`;
     }
 
-    let frag = `<div class="row">
+    let frag = `<div class="row row-with-side">
       <div class="side-nav"> 
         <h2 class="main">Search</h2>
        
@@ -107,8 +107,7 @@ emlo.ResultTemplate = class extends edges.Template {
         </div>
       </div>
 
-      <div class="row">
-        <div class="large-2 columns"><!-- dummy column -->&nbsp;</div>
+      <div class="row row-with-side">
 
         <div class="large-10 columns" style="margin-left:25px">
             <div id="about">
@@ -181,7 +180,7 @@ emlo.ProfileTemplate = class extends edges.Template {
       sidebarTitle += `<div id="${sidebarTitleComponents[i].id}"></div>`;
     }
 
-    let frag = `<div class="row">
+    let frag = `<div class="row row-with-side">
       <div class="side-nav"> 
         <div id="sidebar-title">
           ${sidebarTitle}
@@ -206,10 +205,8 @@ emlo.ProfileTemplate = class extends edges.Template {
         </div>
       </div>
 
-      <div class="row">
-        <div class="large-2 columns"><!-- dummy column -->&nbsp;</div>
-
-        <div class="large-10 columns" style="margin-left:25px">
+      <div class="row row-with-side">
+        <div class="large-12 columns" style="margin-left:25px">
             <div id="profile">
                 <br/>
                 <h2 class="main">

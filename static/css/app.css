@@ -10123,7 +10123,7 @@ ul.pagination li {
   flex-direction: column;
 }
 
-.side-nav {
+/* .side-nav {
   top: 263px;
   border-top: 1px solid #efc319;
   border-bottom: 1px solid #efc319;
@@ -10135,6 +10135,75 @@ ul.pagination li {
   line-height: 2.6;
   display: flex;
   flex-direction: column;
+} */
+
+/* General Row Layout */
+.row-with-side {
+  display: flex; /* Use flexbox for alignment */
+  flex-wrap: nowrap; /* No wrapping by default */
+  gap: 20px; /* Space between side-nav and content */
+}
+
+/* Side Navigation */
+.side-nav {
+  top: 265px;
+  flex: 0 0 222px; /* Fixed width for larger screens */
+  position: relative; /* Prevent overlap */
+  border-top: 1px solid #efc319;
+  border-bottom: 1px solid #efc319;
+  padding-top: 15px;
+  font-size: 1rem;
+  line-height: 2.6;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Content Section */
+.content {
+  flex: 1; /* Take the remaining space */
+  margin-left: 25px;
+}
+
+/* Responsive Layout for Smaller Screens */
+@media (max-width: 1024px) {
+  .row {
+    flex-direction: column; /* Stack side-nav and content vertically */
+  }
+
+  .side-nav {
+    order: 2; /* Move side-nav below content */
+    width: 100%; /* Take full width */
+    max-width: none;
+    top: 0px;
+    margin-bottom: 20px; /* Add spacing below side-nav */
+  }
+
+  .content {
+    order: 1; /* Ensure content comes first */
+    margin-left: 0; /* Reset margin */
+  }
+}
+
+@media (max-width: 768px) {
+  .side-nav {
+    padding: 10px; /* Reduce padding */
+    font-size: 0.9rem; /* Adjust font size for smaller screens */
+  }
+
+  .content {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .side-nav {
+    padding: 8px;
+    font-size: 0.8rem;
+  }
+
+  .content {
+    padding: 5px;
+  }
 }
 
 .yellow-divider {

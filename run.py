@@ -7,6 +7,7 @@ from views.contribute import contribute_bp
 from views.about import about_bp
 from views.forms import forms_bp
 from views.profile import profile_bp
+from views.comment import comment_bp
 from views.errors import errors_bp
 from views.solr import solr_bp
 from config import Config
@@ -24,6 +25,7 @@ def create_app():
     app.register_blueprint(about_bp)
     app.register_blueprint(forms_bp)
     app.register_blueprint(profile_bp)
+    app.register_blueprint(comment_bp)
     app.register_blueprint(errors_bp)
     app.register_blueprint(solr_bp)
 

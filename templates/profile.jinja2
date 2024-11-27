@@ -12,5 +12,35 @@
 
 {% include "_edges_common_js.jinja2" %}
 <script type="module" src="{{ url_for('static', filename='js/profile.edges.js') }}"></script>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+<script>
+        // Initialize the map after rendering the HTML
+        document.addEventListener('DOMContentLoaded', function(event) {
+          
+            const checkMapElement = setInterval(function() {
+                const mapElement = document.getElementById('location-map');
+             
+                if (mapElement) {
+                    clearInterval(checkMapElement);
+                    
+                    const lat = mapElement.getAttribute("data-lat")
+                    const long = mapElement.getAttribute("data-long")
+                    
+                    const map = L.map('location-map').setView([lat, long], 8); // Adjust zoom level as needed
+                   
+                    // Add OpenStreetMap tile layer
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }).addTo(map);
+
+                    // Add a marker at the given lat, long
+                    L.marker([lat, long]).addTo(map)
+                    .bindPopup("Location: " + lat + ", " + long)
+                    .openPopup();
+                }
+            }, 100);
+        })
+    </script>
 
 {% endblock extra_js_bottom %}

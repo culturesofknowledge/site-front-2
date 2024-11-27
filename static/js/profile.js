@@ -613,7 +613,7 @@ function _getWorkComponents(emlo) {
             additonalInfo: [
               {
                 mainKey: "mail_authors-indef_inferred",
-                secondaryKey: "",
+                secondaryKey: "mail_authors-rdf_value",
                 text: "(Authors is inferred)",
               },
             ],
@@ -644,7 +644,7 @@ function _getWorkComponents(emlo) {
             additonalInfo: [
               {
                 mainKey: "mail_addressees-indef_inferred",
-                secondaryKey: "",
+                secondaryKey: "mail_addressees-rdf_value",
                 text: "(Recipient is inferred)",
               },
             ],

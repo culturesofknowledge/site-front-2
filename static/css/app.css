@@ -10156,6 +10156,7 @@ ul.pagination li {
   line-height: 2.6;
   display: flex;
   flex-direction: column;
+  height: fit-content;
 }
 
 /* Content Section */

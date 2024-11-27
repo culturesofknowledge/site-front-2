@@ -1604,8 +1604,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         default:
           frag = "<div></div>";
       }
-    } else {
-      frag = "<div class='no-results-message'>No results found.</div>"; // Hide the section if no results
     }
 
     const sectionTitleFrag = this._renderSectionTitle();

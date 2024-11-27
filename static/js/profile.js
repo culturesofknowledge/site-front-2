@@ -555,6 +555,16 @@ function _getWorkComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "catalog",
+      category: "sidebar",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "text",
+        sectionTitle: "",
+        field: "cito_Catalog",
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "dates",
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({

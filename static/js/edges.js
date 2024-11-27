@@ -2371,13 +2371,26 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   }
 
   _renderText() {
-    return `
+    const value = this.component.results[0][this.field];
+
+    if (this.field == "cito_Catalog") {
+      return value
+        ? `
+        <em>
+          Collection details: 
+          <a href="http://emlo-portal.bodleian.ox.ac.uk/collections/?catalogue=${value}"> The Correspondence ${value} </a>
+        <em>
+      `
+        : "";
+    }
+
+    return value
+      ? `
           <pre class="content" style="white-space: preserve-breaks;font-size:14px;">
-            ${edges.util.escapeHtml(
-              this.component.results[0][this.field] || ""
-            )}
+            ${edges.util.escapeHtml(value)}
           </pre>
-      `;
+      `
+      : "";
   }
 
   _renderPlainText() {

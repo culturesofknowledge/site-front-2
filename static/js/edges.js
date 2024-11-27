@@ -1412,20 +1412,35 @@ emlo.MultiFields = class extends edges.Component {
       "fetchSecondaryData",
       false
     ); // Enable/disable secondary data fetch
+
+    this.loading = true; // Track loading state
+    this.errorMessage = ""; // Track error message
   }
 
   async synchronise() {
     this.results = [];
     this.hitCount = 0;
+    this.loading = true; // Start loading
+    this.errorMessage = ""; // Reset any previous error messages
 
     const source = this.edge.result;
 
     if (!source) {
+      this.loading = false; // Stop loading if no source
       return;
     }
 
     const results = source.results();
-    await this._appendResults({ results: results });
+
+    try {
+      await this._appendResults({ results: results });
+      this.hitCount = source.total();
+    } catch (error) {
+      this.errorMessage = "Error fetching data.";
+    } finally {
+      this.loading = false; // Stop loading
+    }
+
     this.renderer.draw();
 
     this.hitCount = source.total();
@@ -1530,9 +1545,13 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   }
 
   draw() {
-    let frag = this.noResultsText;
+    let frag = "";
 
-    if (this.component.results && this.component.results.length > 0) {
+    if (this.component.loading) {
+      frag = "<div class='loading-message'>Loading...</div>"; // Show loading message
+    } else if (this.component.errorMessage) {
+      frag = `<div class='error-message'>${this.component.errorMessage}</div>`; // Show error message
+    } else if (this.component.results && this.component.results.length > 0) {
       switch (this.type) {
         case "heading":
           frag = this._pageHeading();
@@ -1585,6 +1604,8 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         default:
           frag = "<div></div>";
       }
+    } else {
+      frag = "<div class='no-results-message'>No results found.</div>"; // Hide the section if no results
     }
 
     const sectionTitleFrag = this._renderSectionTitle();
@@ -1622,6 +1643,8 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       return `<${this.sectionTitleStyle} class="section-title">
       ${imageTag} ${edges.util.escapeHtml(this.sectionTitle)}
     </${this.sectionTitleStyle}>`;
+    } else {
+      return "";
     }
   }
 

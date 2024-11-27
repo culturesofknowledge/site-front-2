@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 import requests
 import os
 from dotenv import load_dotenv
-from urllib.parse import urljoin, urlencode
+from urllib.parse import urlencode
 
 load_dotenv()
 
@@ -20,7 +20,10 @@ def solr_proxy(subpath):
     try:
         # Construct the full URL for the external API request
         # Append the captured subpath
-        full_url = urljoin(SOLR_URL, subpath)
+        if not SOLR_URL.endswith("/"):
+            SOLR_URL = SOLR_URL + "/"
+        subpath = subpath.lstrip('/')
+        full_url = SOLR_URL + subpath
 
         query_string = request.query_string.decode("utf-8")
         full_url_with_params = full_url

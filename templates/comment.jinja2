@@ -45,7 +45,7 @@
                     <textarea name="comment" id="comment" rows="10" cols="50" class="floatleft;" style="margin-left:3px; padding:10px; font-family: 'coustard', 'times new roman', 'times', serif;"></textarea>
 
 
-				    <input type="hidden" name="id" value="">
+				    <input type="hidden" id="id" name="id" value="">
                     <input type="hidden" name="type" value="">
 
                     <!-- Google Captcha -->
@@ -64,6 +64,26 @@
 
 {% block extra_js_bottom %}
 <script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+        // Function to get query parameter by name
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Replace 'yourQueryParam' with the actual query parameter name
+        const queryValue = getQueryParam('id');
+        
+        // Replace 'yourFieldId' with the actual ID of the field
+        if (queryValue) {
+            const field = document.getElementById('id');
+            if (field) {
+            field.value = queryValue;
+            }
+        }
+    });
+
     function submitForm() {
         alert("Form functionality is pending")
     }

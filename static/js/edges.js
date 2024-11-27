@@ -1821,28 +1821,13 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                 <strong> Longitude </strong>
               </dl>
               <dd>
-                ${lat}
+                ${lon}
               </dd>
             </div>
         </span>
-        <div id="${mapContainerId}" style="height: 300px; width: 100%; margin-top: 10px;"></div>
+        <div id="location-map" data-lat="${lat}" data-long="${lon}" style="height: 300px; width: 100%; margin-top: 10px;"></div>
     </div>
-    <script>
-        // Initialize the map after rendering the HTML
-        document.addEventListener('DOMContentLoaded', function() {
-            const map = L.map('${mapContainerId}').setView([${lat}, ${lon}], 13);
-
-            // Add OpenStreetMap tile layer
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-
-            // Add a marker at the provided latitude and longitude
-            L.marker([${lat}, ${lon}]).addTo(map)
-                .bindPopup('Here')
-                .openPopup();
-        });
-    </script>`;
+    `;
   }
 
   _renderDates() {

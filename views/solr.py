@@ -10,33 +10,26 @@ solr_bp = Blueprint("solr", __name__)
 
 @solr_bp.route('/solr/<path:subpath>', methods=['GET'])  # Include methods you need
 def solr_proxy(subpath):
-    SOLR_URL = os.getenv('SOLR_URL', '')
-
-    if not SOLR_URL:
-        raise ValueError("SOLR_URL environment variable is not set. Please configure it before starting the app.")
-
-    # Construct the full URL for the external API request
-    # Append the captured subpath
-    print(f"Base URL: {SOLR_URL}")
-    print(f"Subpath: {subpath}")
-
-    if not SOLR_URL.endswith("/"):
-        SOLR_URL = SOLR_URL + "/"
-    subpath = subpath.lstrip('/')
-    full_url = SOLR_URL + subpath
-
-    print(f"Full URL: {full_url}")
-
-    query_string = request.query_string.decode("utf-8")
-    full_url_with_params = f"{full_url}?{query_string}"
-
-    print(f"Requesting URL: {full_url_with_params}")
-
     try:
+        SOLR_URL = os.getenv('SOLR_URL', '')
+
+        if not SOLR_URL:
+            raise ValueError("SOLR_URL environment variable is not set. Please configure it before starting the app.")
+
+        # Construct the full URL for the external API request
+        # Append the captured subpath
+        if not SOLR_URL.endswith("/"):
+            SOLR_URL = SOLR_URL + "/"
+        subpath = subpath.lstrip('/')
+        full_url = SOLR_URL + subpath
+
+        query_string = request.query_string.decode("utf-8")
+        full_url_with_params = f"{full_url}?{query_string}"
+
         # Make the request to the external Solr API, including query parameters
         response = requests.request(
             method=request.method,
-            url=full_url_with_params    
+            url=full_url_with_params
         )
 
         # Raise an error if the external request failed
@@ -51,4 +44,3 @@ def solr_proxy(subpath):
     except Exception as err:
         print(f"Got error: {err}")
         return jsonify({"error": str(err)}), 500
-

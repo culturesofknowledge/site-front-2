@@ -2316,7 +2316,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                 const otherInfo = parentObject[subField.otherInfo];
 
                 const otherInfoDiv = otherInfo
-                  ? `<p>${edges.util.escapeHtml(otherInfo)} </p>`
+                  ? `<span>- ${edges.util.escapeHtml(otherInfo)} </span>`
                   : "";
                 if (subField.linkKey) {
                   if (subField.linkKey == "uuid") {

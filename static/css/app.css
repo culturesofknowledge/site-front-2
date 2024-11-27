@@ -10146,7 +10146,7 @@ ul.pagination li {
 
 /* Side Navigation */
 .side-nav {
-  top: 265px;
+  margin-top: 265px;
   flex: 0 0 222px; /* Fixed width for larger screens */
   position: relative; /* Prevent overlap */
   border-top: 1px solid #efc319;

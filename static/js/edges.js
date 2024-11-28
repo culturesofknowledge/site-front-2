@@ -2244,7 +2244,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                 }
               });
             }
-            console.log("cells", cells);
+
             // Return the row
             return `<div>${cells.join("")}</div>`;
           })
@@ -2400,7 +2400,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   _renderPlainText() {
     return this.component.results[0][this.field]
       ? `
-          <p>
+          <p style="margin-left:40px">
             ${edges.util.escapeHtml(
               this.component.results[0][this.field] || ""
             )}

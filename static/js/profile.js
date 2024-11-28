@@ -1067,6 +1067,8 @@ function _getManifestation(emlo) {
       }),
     }),
 
+    // TODO: Add works once we have data
+
     new emlo.MultiFields({
       id: "enclosed-in",
       category: "results",
@@ -1090,6 +1092,140 @@ function _getManifestation(emlo) {
         sectionTitleImage: "/static/img/icon-quill.png",
         divider: true,
         field: "mail_enclosedBy-manifestation",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "non-letter-enclosures",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "text",
+        sectionTitle: "Non-letter enclosures",
+        divider: true,
+        field: "ox_nonLetterEnclosures",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "address",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "plain-text",
+        sectionTitle: "Address",
+        divider: true,
+        field: "mail_destination",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "seal",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "plain-text",
+        sectionTitle: "Seal",
+        divider: true,
+        field: "mail_seal",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "postage-mark",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "plain-text",
+        sectionTitle: "Postage mark",
+        divider: true,
+        field: "mail_postageMark",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "ox-endoursment",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "plain-text",
+        sectionTitle: "Endorsements",
+        divider: true,
+        field: "ox_endorsements",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "paper-size",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "plain-text",
+        sectionTitle: "Paper Size",
+        divider: true,
+        field: "mail_paperSize",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "mail-paper",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "plain-text",
+        sectionTitle: "Paper type or watermark",
+        divider: true,
+        field: "mail_paper",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "num-pages",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "plain-text",
+        sectionTitle: "Number of pages of document",
+        divider: true,
+        field: "bibo_numPages",
+      }),
+    }),
+
+    // ox_numPageText - dcterms_language
+
+    new emlo.MultiFields({
+      id: "num-pages-text",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "plain-text",
+        sectionTitle: "Number of pages of text",
+        divider: true,
+        field: "ox_numPageText",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "dcterms_language",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "plain-text",
+        sectionTitle: "Language",
+        divider: true,
+        field: "dcterms_language",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "ox_incipit",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "plain-text",
+        sectionTitle: "Incipit",
+        divider: true,
+        field: "ox_incipit",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "ox_excipit",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "plain-text",
+        sectionTitle: "Explicit",
+        divider: true,
+        field: "ox_excipit",
       }),
     }),
   ];

@@ -9973,6 +9973,12 @@ h5,
   background-color: #e4e4e4;
   padding: 5px;
 }
+.profile-icon {
+  float: left;
+  height: 25px;
+  width: 25px;
+  margin-right: 15px;
+}
 
 .profilepart {
   border-top: 1px solid #efc319;

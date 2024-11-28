@@ -1541,6 +1541,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     this.lat_field = edges.util.getParam(params, "lat_field", "");
     this.long_field = edges.util.getParam(params, "long_field", "");
     this.divider = edges.util.getParam(params, "divider", false); // Whether to include a divider
+    this.message = edges.util.getParam(params, "message", "");
     this.namespace = "edges-custom-display";
   }
 
@@ -1606,6 +1607,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
           break;
         case "img":
           frag = this._renderImage();
+          break;
+        case "dummy-message":
+          frag = this._renderDummyText();
           break;
         default:
           frag = "<div></div>";
@@ -2521,6 +2525,10 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
     // Default return for unsupported types
     return "";
+  }
+
+  _renderDummyText() {
+    return `${this.message}`;
   }
 };
 

@@ -2480,7 +2480,8 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const imageTag = this.component.results[0][this.field]
       ? `<img src="${edges.util.escapeHtml(
           this.component.results[0][this.field]
-        )}" alt="">`
+        )}" alt="">
+        `
       : "";
 
     return imageTag ? `${imageTag}` : "";

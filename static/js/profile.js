@@ -1264,5 +1264,26 @@ function _getImageComponents(emlo) {
         field: "dcterms_source",
       }),
     }),
+
+    new emlo.MultiFields({
+      id: "image-credit",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "text",
+        field: "ox_imageCredits",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "details",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "img",
+        sectionTitle: "Details",
+        sectionTitleImage: "/static/img/icon-quill.png",
+        divider: true,
+        field: "",
+      }),
+    }),
   ];
 }

@@ -1601,8 +1601,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         case "side-nested-links":
           frag = this._sidebarNestedLinks();
           break;
-        case "single-image":
-          frag = this._renderSingleImage();
+        case "images":
+          frag = this._renderImages();
+          break;
+        case "img":
+          frag = this._renderImage();
           break;
         default:
           frag = "<div></div>";
@@ -1664,7 +1667,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
           this.contentTitleImage
         )}" alt="${edges.util.escapeHtml(
           this.contentTitle
-        )}" class="title-image">`
+        )}" class="profile-icon">`
       : "";
 
     return `
@@ -2409,7 +2412,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       : "";
   }
 
-  _renderSingleImage() {
+  _renderImages() {
     const parentField = this.primaryField;
     const field = this.field;
 
@@ -2441,9 +2444,13 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                 cells.push(`
                   <div class="image-wrapper">
                     <span id="${imageId}-loading" class="loading-message">Loading...</span>
-                    <img id="${imageId}" src="${edges.util.escapeHtml(value)}" 
-                      onload="document.getElementById('${imageId}-loading').style.display='none';" 
-                      onerror="document.getElementById('${imageId}-loading').innerText='Failed to load';" />
+                    <a href="/profile/image/${parentObject["uuid"]}">
+                      <img id="${imageId}" src="${edges.util.escapeHtml(
+                  value
+                )}" 
+                        onload="document.getElementById('${imageId}-loading').style.display='none';" 
+                        onerror="document.getElementById('${imageId}-loading').innerText='Failed to load';" />
+                    </a>
                   </div>
                 `);
               }
@@ -2467,6 +2474,16 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       </div>
     `;
     return rows ? images : ""; // Return table or no results
+  }
+
+  _renderImage() {
+    const imageTag = this.component.results[0][this.field]
+      ? `<img src="${edges.util.escapeHtml(
+          this.component.results[0][this.field]
+        )}" alt="">`
+      : "";
+
+    return imageTag ? `${imageTag}` : "";
   }
 
   _renderLinks() {

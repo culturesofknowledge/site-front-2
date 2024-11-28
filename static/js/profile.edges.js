@@ -5,6 +5,7 @@ const collectionMap = {
   location: "locations",
   work: "works",
   institution: "institutions",
+  manifestation: "manifestations",
 };
 
 try {

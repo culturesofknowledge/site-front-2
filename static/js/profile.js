@@ -1,8 +1,15 @@
-const validCollections = ["people", "locations", "works", "institutions"];
+const validCollections = [
+  "people",
+  "locations",
+  "works",
+  "institutions",
+  "manifestations",
+];
 
 export function getComponents(collectionName, emlo) {
   try {
     let components = [];
+
     if (validCollections.includes(collectionName)) {
       switch (collectionName) {
         case "people":
@@ -13,6 +20,9 @@ export function getComponents(collectionName, emlo) {
           break;
         case "institutions":
           components = _getInstitutionComponents(emlo);
+          break;
+        case "manifestations":
+          components = _getManifestation(emlo);
           break;
         default:
           components = _getWorkComponents(emlo);
@@ -970,6 +980,116 @@ function _getWorkComponents(emlo) {
             key: "ox_detailsOfResource",
           },
         ],
+      }),
+    }),
+  ];
+}
+
+function _getManifestation(emlo) {
+  return [
+    new emlo.MultiFields({
+      id: "title",
+      category: "sidebarTitle",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "side-title",
+        contentTitle: "Document",
+        sectionTitleImage: "/static/img/person-icon.png",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "page-title",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "heading",
+        field: "frbr_Work-work",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "document-type",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "plain-text",
+        sectionTitle: "Document type",
+        sectionTitleImage: "/static/img/icon-quill.png",
+        divider: true,
+        field: "dcterms_type",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "shelfmark",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "plain-text",
+        sectionTitle: "Shelfmark",
+        sectionTitleImage: "/static/img/icon-related-resources.png",
+        divider: true,
+        field: "dcterms_identifier-shelf_",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "images",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "frbr_Image-image",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "single-image",
+        sectionTitle: "Images",
+        sectionTitleImage: "/static/img/icon-related-resources.png",
+        divider: true,
+        primaryField: "frbr_Image-image",
+        field: "dcterms_source",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "repos",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "ox_resourceAt-institution",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested-label",
+        sectionTitle: "Repository",
+        sectionTitleImage: "/static/img/icon-repository.png",
+        divider: true,
+        primaryField: "ox_resourceAt-institution",
+        fields: [
+          {
+            title: "",
+            key: "browse",
+            clickable: true,
+            collectionName: "institution",
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "enclosed-in",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "links",
+        sectionTitle: "Was enclosed in",
+        sectionTitleImage: "/static/img/icon-quill.png",
+        divider: true,
+        contentTitle: "Letter",
+        field: "mail_enclosureOf-manifestation",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "has-enclosed",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "links",
+        sectionTitle: "Had enclosure",
+        contentTitle: "Letter",
+        sectionTitleImage: "/static/img/icon-quill.png",
+        divider: true,
+        field: "mail_enclosedBy-manifestation",
       }),
     }),
   ];

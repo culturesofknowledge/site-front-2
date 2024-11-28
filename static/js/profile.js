@@ -4,6 +4,7 @@ const validCollections = [
   "works",
   "institutions",
   "manifestations",
+  "images",
 ];
 
 export function getComponents(collectionName, emlo) {
@@ -23,6 +24,9 @@ export function getComponents(collectionName, emlo) {
           break;
         case "manifestations":
           components = _getManifestation(emlo);
+          break;
+        case "images":
+          components = _getImageComponents(emlo);
           break;
         default:
           components = _getWorkComponents(emlo);
@@ -1036,7 +1040,7 @@ function _getManifestation(emlo) {
       fetchSecondaryData: true,
       primaryField: "frbr_Image-image",
       renderer: new emlo.MultiFieldsRenderer({
-        type: "single-image",
+        type: "images",
         sectionTitle: "Images",
         sectionTitleImage: "/static/img/icon-related-resources.png",
         divider: true,
@@ -1183,8 +1187,6 @@ function _getManifestation(emlo) {
       }),
     }),
 
-    // ox_numPageText - dcterms_language
-
     new emlo.MultiFields({
       id: "num-pages-text",
       category: "results",
@@ -1226,6 +1228,40 @@ function _getManifestation(emlo) {
         sectionTitle: "Explicit",
         divider: true,
         field: "ox_excipit",
+      }),
+    }),
+  ];
+}
+
+function _getImageComponents(emlo) {
+  return [
+    new emlo.MultiFields({
+      id: "title",
+      category: "sidebarTitle",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "side-title",
+        contentTitle: "Image",
+        contentTitleImage: "/static/img/images-icon.png",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "page-title",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "heading",
+        field: "frbr_Work-work",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "image",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "img",
+        sectionTitle: "Images",
+        divider: true,
+        field: "dcterms_source",
       }),
     }),
   ];

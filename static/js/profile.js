@@ -5,6 +5,8 @@ const validCollections = [
   "institutions",
   "manifestations",
   "images",
+  "resources",
+  "comments",
 ];
 
 export function getComponents(collectionName, emlo) {
@@ -27,6 +29,12 @@ export function getComponents(collectionName, emlo) {
           break;
         case "images":
           components = _getImageComponents(emlo);
+          break;
+        case "resources":
+          components = _getResourcesComponents(emlo);
+          break;
+        case "comments":
+          components = _getCommentsComponents(emlo);
           break;
         default:
           components = _getWorkComponents(emlo);
@@ -1283,6 +1291,74 @@ function _getImageComponents(emlo) {
         sectionTitleImage: "/static/img/icon-quill.png",
         divider: true,
         field: "",
+      }),
+    }),
+  ];
+}
+
+function _getCommentsComponents(emlo) {
+  return [
+    new emlo.MultiFields({
+      id: "title",
+      category: "sidebarTitle",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "side-title",
+        contentTitle: "Comment",
+        contentTitleImage: "/static/img/resources-icon.png",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "page-title",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "heading",
+        field: "bibo_Note",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "para",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "dummy-message",
+        divider: true,
+        message:
+          "Sorry, this record has not been found. It may have been deleted as a duplicate. ",
+      }),
+    }),
+  ];
+}
+
+function _getResourcesComponents(emlo) {
+  return [
+    new emlo.MultiFields({
+      id: "title",
+      category: "sidebarTitle",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "side-title",
+        contentTitle: "Related resource",
+        contentTitleImage: "/static/img/resources-icon.png",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "page-title",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "heading",
+        field: "ox_titleOfResource",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "para",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "dummy-message",
+        divider: true,
+        message:
+          "Sorry, this record has not been found. It may have been deleted as a duplicate. ",
       }),
     }),
   ];

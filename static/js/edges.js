@@ -1559,8 +1559,8 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         case "side-title":
           frag = this._sideTitle();
           break;
-        case "list":
-          frag = this._renderList();
+        case "links":
+          frag = this._renderLinks();
           break;
         case "nested":
           frag = this._renderNestedTable();
@@ -1600,6 +1600,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
           break;
         case "side-nested-links":
           frag = this._sidebarNestedLinks();
+          break;
+        case "single-image":
+          frag = this._renderSingleImage();
           break;
         default:
           frag = "<div></div>";
@@ -2165,6 +2168,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const rows = this.component.results
       .map((result) => {
         const parentObjects = result[parentField]; // Get all objects in the primary field array
+
         if (!parentObjects || parentObjects.length === 0) return ""; // Skip if no data in primary field
 
         // Iterate over each object in the parent field array
@@ -2240,7 +2244,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                 }
               });
             }
-
+            console.log("cells", cells);
             // Return the row
             return `<div>${cells.join("")}</div>`;
           })
@@ -2403,6 +2407,102 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
           </p>
       `
       : "";
+  }
+
+  _renderSingleImage() {
+    const parentField = this.primaryField;
+    const field = this.field;
+
+    // Validate required fields
+    if (!parentField || (!field && !(subFields && subFields.length > 0))) {
+      return "";
+    }
+
+    // Iterate through results and build rows
+    const rows = this.component.results
+      .map((result) => {
+        const parentObjects = result[parentField]; // Get all objects in the primary field array
+        if (!parentObjects || parentObjects.length === 0) return ""; // Skip if no data in primary field
+
+        // Iterate over each object in the parent field array
+        return parentObjects
+          .map((parentObject) => {
+            if (!parentObject) return ""; // Skip if the object is invalid
+
+            // Generate row content
+            const cells = [];
+            if (field) {
+              // Handle single field
+              const value = parentObject[field];
+              if (value) {
+                const imageId = `img-${Math.random()
+                  .toString(36)
+                  .substr(2, 9)}`; // Unique ID for the image
+                cells.push(`
+                  <div class="image-wrapper">
+                    <span id="${imageId}-loading" class="loading-message">Loading...</span>
+                    <img id="${imageId}" src="${edges.util.escapeHtml(value)}" 
+                      onload="document.getElementById('${imageId}-loading').style.display='none';" 
+                      onerror="document.getElementById('${imageId}-loading').innerText='Failed to load';" />
+                  </div>
+                `);
+              }
+            }
+
+            // Return the row
+            if (cells.length > 0) {
+              return `<div>${cells.join("")}</div>`;
+            } else {
+              return "";
+            }
+          })
+          .join(""); // Combine all rows for the parent objects
+      })
+      .filter((row) => row) // Remove empty rows
+      .join(""); // Combine all rows into a single HTML string
+
+    const images = `
+      <div class="content">
+        ${rows}
+      </div>
+    `;
+    return rows ? images : ""; // Return table or no results
+  }
+
+  _renderLinks() {
+    const fieldValue = this.component.results[0][this.field];
+
+    if (!fieldValue) return ""; // If no value, return empty string
+
+    // Check if the value is a string
+    if (typeof fieldValue === "string") {
+      return `
+        <div>
+          <a href="/profile/${this.component.results[0]["object_type"]}/${this.component.results[0]["uuid"]}">
+            ${this.contentTitle}
+          </a>
+        </div>`;
+    }
+
+    // If the value is an array, iterate and render links
+    if (Array.isArray(fieldValue)) {
+      return fieldValue
+        .map((value) => {
+          const parts = value.split("/");
+          if (parts.length < 4) return ""; // Ensure there are enough parts to avoid errors
+
+          return `
+            <p style="margin-left: 40px">
+              <a href="/profile/${parts[3]}/${parts[4]}">
+                ${this.contentTitle}
+              </a>
+            </p>`;
+        })
+        .join(""); // Combine all generated links into a single string
+    }
+
+    // Default return for unsupported types
+    return "";
   }
 };
 

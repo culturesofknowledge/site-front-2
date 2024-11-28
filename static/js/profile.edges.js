@@ -6,6 +6,7 @@ const collectionMap = {
   work: "works",
   institution: "institutions",
   manifestation: "manifestations",
+  image: "images",
 };
 
 try {

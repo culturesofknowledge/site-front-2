@@ -155,6 +155,12 @@ try {
         }),
       }),
 
+      // new emlo.CustomPaginationComponent({
+      //   id: "top-pager",
+      //   category: "top",
+      //   renderer: new emlo.CustomPaginationRenderer({}),
+      // }),
+
       new edges.components.Pager({
         id: "bottom-pager",
         category: "bottom",

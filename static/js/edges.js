@@ -832,38 +832,6 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
     super(params);
   }
 
-  synchronise() {
-    // reset the state of the internal variables
-    if (this.lifecycle === "update") {
-      // if we are in the "update" lifecycle, then reset and read all the values
-      this.values = [];
-      if (this.edge.result) {
-        this._readValues({ result: this.edge.result });
-      }
-    } else if (this.lifecycle === "static" && this.syncCounts) {
-      if (this.edge.result) {
-        this._syncCounts({ result: this.edge.result });
-      }
-    }
-    this.filters = [];
-
-    // extract all the filter values that pertain to this selector
-    let filters = this.edge.currentQuery.listMust(
-      new es.TermFilter({ field: this.field })
-    );
-
-    for (let i = 0; i < filters.length; i++) {
-      let val = filters[i].value;
-      let translate_val = this._translate(val);
-      let displayValue = val !== translate_val ? translate_val : val;
-
-      this.filters.push({
-        display: displayValue,
-        term: val,
-        field: filters[i].field,
-      });
-    }
-  }
   // synchronise() {
   //   // reset the state of the internal variables
   //   if (this.lifecycle === "update") {
@@ -879,18 +847,11 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
   //   }
   //   this.filters = [];
 
-  //   // Object containing the field mappings (example)
-  //   const fieldMapping = {
-  //     aut: "author_sort",
-  //     // Add more mappings as needed
-  //   };
-
-  //   // Extract all the filter values that pertain to this selector
+  //   // extract all the filter values that pertain to this selector
   //   let filters = this.edge.currentQuery.listMust(
   //     new es.TermFilter({ field: this.field })
   //   );
 
-  //   // Iterate through the existing filters
   //   for (let i = 0; i < filters.length; i++) {
   //     let val = filters[i].value;
   //     let translate_val = this._translate(val);
@@ -902,38 +863,109 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
   //       field: filters[i].field,
   //     });
   //   }
-
-  //   // Check if there are query parameters in the URL
-  //   const urlParams = new URLSearchParams(window.location.search);
-
-  //   // Loop through all URL query parameters
-  //   for (const [key, value] of urlParams.entries()) {
-  //     // Check if there is a field mapping for the query parameter
-  //     const mappedField = fieldMapping[key];
-
-  //     if (mappedField) {
-  //       // If a field mapping exists, use the mapped field
-  //       let translate_val = this._translate(value);
-  //       let displayValue = value !== translate_val ? translate_val : value;
-
-  //       this.filters.push({
-  //         display: displayValue,
-  //         term: value,
-  //         field: mappedField,
-  //       });
-  //     } else {
-  //       // If no mapping, add the query parameter as a filter
-  //       this.filters.push({
-  //         display: value,
-  //         term: value,
-  //         field: key,
-  //       });
-  //     }
-  //   }
   // }
 
+  synchronise() {
+    // reset the state of the internal variables
+    if (this.lifecycle === "update") {
+      // if we are in the "update" lifecycle, then reset and read all the values
+      this.values = [];
+      if (this.edge.result) {
+        this._readValues({ result: this.edge.result });
+      }
+    } else if (this.lifecycle === "static" && this.syncCounts) {
+      if (this.edge.result) {
+        this._syncCounts({ result: this.edge.result });
+      }
+    }
+    this.filters = [];
+
+    // Object containing the field mappings (example)
+    const fieldMapping = {
+      aut: "author_sort",
+      rec: "recipient_sort",
+      let_con: "Contents",
+      locations: "Locations",
+      // Add more mappings as needed
+    };
+
+    // Extract all the filter values that pertain to this selector
+    let filters = this.edge.currentQuery.listMust(
+      new es.TermFilter({ field: this.field })
+    );
+
+    // Iterate through the existing filters
+    for (let i = 0; i < filters.length; i++) {
+      let val = filters[i].value;
+      let translate_val = this._translate(val);
+      let displayValue = val !== translate_val ? translate_val : val;
+
+      this.filters.push({
+        display: displayValue,
+        term: val,
+        field: filters[i].field,
+      });
+    }
+
+    // Check if there are query parameters in the URL
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Loop through all URL query parameters
+    for (const [key, value] of urlParams.entries()) {
+      // Check if there is a field mapping for the query parameter
+      const mappedField = fieldMapping[key];
+
+      if (mappedField) {
+        // If a field mapping exists, use the mapped field
+        let translate_val = this._translate(value);
+        let displayValue = value !== translate_val ? translate_val : value;
+
+        this.filters.push({
+          display: displayValue,
+          term: value,
+          field: mappedField,
+        });
+      } else {
+        // If no mapping, add the query parameter as a filter
+        this.filters.push({
+          display: value,
+          term: value,
+          field: key,
+        });
+      }
+    }
+  }
+
+  // removeFilter(field, term) {
+  //   let nq = this.edge.cloneQuery();
+  //   nq.removeMust(
+  //     new es.TermFilter({
+  //       field: field,
+  //       value: term,
+  //     })
+  //   );
+
+  //   const removecount = nq.removeQueryStrings(
+  //     new es.TermFilter({
+  //       field: field,
+  //       value: term,
+  //     })
+  //   );
+
+  //   if (removecount > 0) {
+  //   }
+
+  //   console.log("this", removecount);
+
+  //   // reset the search page to the start and then trigger the next query
+  //   nq.from = 0;
+  //   this.edge.pushQuery(nq);
+  //   this.edge.cycle();
+  // }
   removeFilter(field, term) {
     let nq = this.edge.cloneQuery();
+
+    // Remove the filter from the "must" clause
     nq.removeMust(
       new es.TermFilter({
         field: field,
@@ -941,7 +973,32 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
       })
     );
 
-    // reset the search page to the start and then trigger the next query
+    // Remove matching query strings
+    const removecount = nq.removeQueryStrings(
+      new es.TermFilter({
+        field: field,
+        value: term,
+      })
+    );
+
+    if (removecount > 0) {
+      // Iterate through this.filters and remove any filter that matches the term
+      this.filters = this.filters.filter((filter) => {
+        // Check if the filter has a 'term' property and if it matches the term provided
+        if (filter.term && filter.term.toLowerCase() === term.toLowerCase()) {
+          return false; // Remove the filter
+        }
+
+        return true; // Keep the filter
+      });
+
+      // Now, update the URL by removing the query parameter matching this field and term
+      const url = new URL(window.location.href);
+      url.searchParams.delete(field); // Remove the field from the query string
+      window.history.replaceState({}, "", url.toString()); // Update the URL without reloading the page
+    }
+
+    // Reset the search page to the start and trigger the next query
     nq.from = 0;
     this.edge.pushQuery(nq);
     this.edge.cycle();
@@ -1434,7 +1491,7 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
           <td>
           ${this._getSelectedFieldLabel(filt.field)}
           </td>
-          <td>
+          <td style="min-width: 100px;">
             <a href="#" class="${filterRemoveClass} selected-facets" data-key="${edges.util.escapeHtml(
         filt.term
       )}" data-field="${edges.util.escapeHtml(filt.field)}" >

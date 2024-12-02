@@ -1363,10 +1363,11 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
     // Build the selected filters display
     let filterFrag = "";
     ts.filters.forEach((filt) => {
+      console.log("filt", filt);
       filterFrag += `
         <tr class="${resultClass}">
           <td>
-          ${typeof filt.term}
+          ${this._getSelectedFieldLabel(filt.field)}
           </td>
           <td>
             <a href="#" class="${filterRemoveClass} selected-facets" data-key="${edges.util.escapeHtml(
@@ -1411,6 +1412,25 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
 
     this.component.removeFilter(field, term);
     this.draw(); // Redraw the component to reflect the changes
+  }
+
+  _getSelectedFieldLabel(field) {
+    switch (field) {
+      case "author_sort":
+        return "Author";
+      case "recipient_sort":
+        return "Recipient";
+      case "origin_sort":
+        return "Origin of letter";
+      case "destination_sort":
+        return "Destination of letter";
+      case "cito_Catalog":
+        return "Catalogue";
+      case "ox_started-ox_year":
+        return "Year";
+      default:
+        return field;
+    }
   }
 };
 

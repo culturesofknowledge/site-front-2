@@ -911,273 +911,16 @@ emlo.FacetRenderer = class extends edges.Renderer {
     this.showAll = false; // Track whether to show all entries
   }
 
-  // draw() {
-  //   let ts = this.component;
-
-  //   if (!ts.active && this.hideInactive) {
-  //     ts.context.html("");
-  //     return;
-  //   }
-
-  //   const valClass = edges.util.allClasses(
-  //     this.namespace,
-  //     "value",
-  //     this.component.id
-  //   );
-  //   const filterRemoveClass = edges.util.allClasses(
-  //     this.namespace,
-  //     "filter-remove",
-  //     this.component.id
-  //   );
-
-  //   const resultsListClass = edges.util.styleClasses(
-  //     this.namespace,
-  //     "results-list",
-  //     this.component.id
-  //   );
-  //   const resultClass = edges.util.styleClasses(
-  //     this.namespace,
-  //     "result",
-  //     this.component.id
-  //   );
-  //   const controlClass = edges.util.styleClasses(
-  //     this.namespace,
-  //     "controls",
-  //     this.component.id
-  //   );
-  //   const facetClass = edges.util.styleClasses(
-  //     this.namespace,
-  //     "facet",
-  //     this.component.id
-  //   );
-  //   const headerClass = edges.util.styleClasses(
-  //     this.namespace,
-  //     "header",
-  //     this.component.id
-  //   );
-  //   const selectedClass = edges.util.styleClasses(
-  //     this.namespace,
-  //     "selected",
-  //     this.component.id
-  //   );
-
-  //   const controlId = edges.util.htmlID(
-  //     this.namespace,
-  //     "controls",
-  //     this.component.id
-  //   );
-  //   const sizeId = edges.util.htmlID(this.namespace, "size", this.component.id);
-  //   const orderId = edges.util.htmlID(
-  //     this.namespace,
-  //     "order",
-  //     this.component.id
-  //   );
-  //   const toggleId = edges.util.htmlID(
-  //     this.namespace,
-  //     "toggle",
-  //     this.component.id
-  //   );
-  //   const resultsId = edges.util.htmlID(
-  //     this.namespace,
-  //     "results",
-  //     this.component.id
-  //   );
-  //   const showMoreId = edges.util.htmlID(
-  //     this.namespace,
-  //     "show-more",
-  //     this.component.id
-  //   );
-
-  //   let results = "Loading...";
-  //   if (ts.values !== false) {
-  //     results = `
-  //       <tr>
-  //         <td>
-  //           None
-  //         </td>
-  //       </tr>
-  //     `;
-  //   }
-
-  //   const filterTerms = ts.filters.map((filter) =>
-  //     filter.term ? filter.term.toString() : ""
-  //   );
-
-  //   const filterFields = ts.filters.map((filter) =>
-  //     filter.field ? filter.field.toString() : ""
-  //   );
-
-  //   if (ts.values && ts.values.length > 0) {
-  //     results = "";
-
-  //     ts.values.forEach((val, idx) => {
-  //       if (!filterTerms.includes(val.term.toString())) {
-  //         let count = val.count;
-  //         if (this.countFormat) {
-  //           count = this.countFormat(count);
-  //         }
-  //         const isHidden = idx >= this.displayLimit && !this.showAll;
-  //         results += `
-  //           <tr style="${isHidden ? "display:none;" : ""}">
-  //             <td>
-  //               <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
-  //           val.term
-  //         )}">
-  //                 <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
-  //                 ${edges.util.escapeHtml(val.display)}
-  //               </a>
-  //             </td>
-  //             <td>
-  //               ${count}
-  //             </td>
-  //           </tr>
-  //           `;
-  //       }
-  //     });
-  //   }
-
-  //   // Add "Show more" button if there are more than 10 entries
-  //   let showMoreFrag = "";
-  //   if (ts.values.length > this.displayLimit) {
-  //     showMoreFrag = `
-  //       <tr>
-  //         <td id="${showMoreId}" class="btn btn-link">
-  //           ${this.showAll ? "Click to hide" : "Click to show more..."}
-  //         </td>
-  //         <td>
-  //         </td>
-  //       </tr>
-  //     `;
-  //   }
-
-  //   let tooltipFrag = "";
-  //   if (this.tooltipText) {
-  //     const tt = this._shortTooltip();
-  //     const tooltipClass = edges.util.styleClasses(
-  //       this.namespace,
-  //       "tooltip",
-  //       this.component.id
-  //     );
-  //     const tooltipId = edges.util.htmlID(
-  //       this.namespace,
-  //       "tooltip",
-  //       this.component.id
-  //     );
-  //     tooltipFrag = `<div id="${tooltipId}" class="${tooltipClass}" style="display:none"><div class="row"><div class="col-md-12">${tt}</div></div></div>`;
-  //   }
-
-  //   let controlFrag = "";
-  //   if (this.controls) {
-  //     controlFrag = `<div class="${controlClass}" style="display:none" id="${controlId}"><div class="row">
-  //                     <div class="col-md-12">
-  //                         <div class="btn-group">
-  //                             <button type="button" class="btn btn-default btn-sm" id="${sizeId}" title="List Size">0</button>
-  //                             <button type="button" class="btn btn-default btn-sm" id="${orderId}" title="List Order"></button>
-  //                         </div>
-  //                     </div>
-  //                 </div></div>`;
-  //   }
-
-  //   let filterFrag = "";
-  //   if (ts.filters.length > 0 && this.showSelected) {
-  //     ts.filters.forEach((filt) => {
-  //       filterFrag += `<div class="${resultClass}"><strong>${edges.util.escapeHtml(
-  //         filt.display
-  //       )}&nbsp;`;
-  //       filterFrag += `<a href="#" class="${filterRemoveClass}" data-key="${edges.util.escapeHtml(
-  //         filt.term
-  //       )}">`;
-  //       filterFrag += '<i class="fas fa-times"></i></a>';
-  //       filterFrag += "</strong></a></div>";
-  //     });
-  //   }
-
-  //   let tog = this.title;
-  //   if (this.togglable) {
-  //     tog = `<p class="main">${this.title}</p>`;
-  //   }
-
-  //   let isHideCount = false;
-
-  //   const filterFieldsCount = filterFields.reduce((acc, item) => {
-  //     return item === this.component.field ? acc + 1 : acc;
-  //   }, 0);
-
-  //   if (filterFieldsCount >= this.hideCount && this.hideCount > 0) {
-  //     isHideCount = true;
-  //   }
-
-  //   let frag = `<div class="${facetClass}" style="${
-  //     isHideCount ? "display:none;" : ""
-  //   }">
-  //                     <div class="${headerClass}"><div class="row">
-  //                         <div class="col-md-12">
-  //                             ${tog}
-  //                         </div>
-  //                     </div></div>
-  //                     ${tooltipFrag}
-  //                     {{CONTROLS}}
-  //                     <div class="row" style="display:none" id="${resultsId}">
-  //                         <div class="col-md-12">
-  //                           <table class="facet">
-  //                             <tbody>
-  //                               {{RESULTS}}
-  //                               {{SHOWMOREFRAG}}
-  //                             </tbody>
-  //                           </table>
-  //                         </div>
-  //                     </div></div>`;
-
-  //   frag = frag
-  //     .replace(/{{RESULTS}}/g, results)
-  //     .replace(/{{CONTROLS}}/g, controlFrag)
-  //     .replace(/{{SELECTED}}/g, filterFrag)
-  //     .replace(/{{SHOWMOREFRAG}}/g, showMoreFrag);
-
-  //   ts.context.html(frag);
-
-  //   this.setUISize();
-  //   this.setUISort();
-  //   this.setUIOpen();
-
-  //   const valueSelector = edges.util.jsClassSelector(
-  //     this.namespace,
-  //     "value",
-  //     this.component.id
-  //   );
-  //   const filterRemoveSelector = edges.util.jsClassSelector(
-  //     this.namespace,
-  //     "filter-remove",
-  //     this
-  //   );
-  //   const toggleSelector = edges.util.idSelector(
-  //     this.namespace,
-  //     "toggle",
-  //     this
-  //   );
-  //   const sizeSelector = edges.util.idSelector(this.namespace, "size", this);
-  //   const orderSelector = edges.util.idSelector(this.namespace, "order", this);
-  //   const showMoreSelector = edges.util.idSelector(
-  //     this.namespace,
-  //     "show-more",
-  //     this
-  //   );
-
-  //   edges.on(valueSelector, "click", this, "termSelected");
-  //   edges.on(toggleSelector, "click", this, "toggleOpen");
-  //   edges.on(filterRemoveSelector, "click", this, "removeFilter");
-  //   edges.on(sizeSelector, "click", this, "changeSize");
-  //   edges.on(orderSelector, "click", this, "changeSort");
-
-  //   if (this.component.jq(showMoreSelector).length > 0) {
-  //     edges.on(showMoreSelector, "click", this, "showMoreEntries");
-  //   }
-  // }
-
   draw() {
     let ts = this.component;
 
     if (!ts.active && this.hideInactive) {
+      ts.context.html("");
+      return;
+    }
+
+    // If there are no values for the facet, hide the entire facet
+    if (!ts.values || ts.values.length === 0) {
       ts.context.html("");
       return;
     }
@@ -1298,6 +1041,12 @@ emlo.FacetRenderer = class extends edges.Renderer {
           `;
         }
       });
+    }
+
+    // If no results were found, hide the facet altogether
+    if (results === "Loading..." || results === "" || ts.values.length === 0) {
+      ts.context.html(""); // Remove the entire facet from the DOM
+      return; // Stop execution as no content is needed
     }
 
     // Add "Show more" button if there are more than 10 entries

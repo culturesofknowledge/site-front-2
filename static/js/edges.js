@@ -3255,4 +3255,104 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
   }
 };
 
+// emlo.CustomPaginationComponent = class extends edges.Component {
+//   constructor(params) {
+//     super(params);
+//     this.hitCount = 0;
+//     this.pageSize = edges.util.getParam(params, "pageSize", 20); // Page size (default 10)
+//     this.currentPage = edges.util.getParam(params, "currentPage", 1); // Current page (default: 1)
+//   }
+
+//   synchronise() {
+//     this.results = [];
+//     this.hitCount = 0;
+
+//     var source = this.edge.result;
+
+//     // If there are no sources to pull results from, leave us with an empty result set
+//     if (!source) {
+//       return;
+//     }
+
+//     // Filter the results
+//     var results = source.results(); // Assuming results are fetched from the edge.result
+//     this._appendResults({ results: results });
+
+//     // Record the hit count for later use
+//     this.hitCount = source.total(); // Assuming total is available
+//     this.renderer.draw(); // Trigger the renderer to update the UI
+//   }
+// };
+
+// emlo.CustomPaginationRenderer = class extends edges.Renderer {
+//   constructor(params) {
+//     super(params);
+//     this.namespace = "edges-pagination-display"; // Namespace for the pagination container
+//   }
+
+//   draw() {
+//     let container = "";
+
+//     // Results count display (you can add more styling or content as needed)
+//     container = `
+//     <br />
+//     <li class="pagination-text text-center">
+//         <span>Results: ${edges.util.escapeHtml(this.component.hitCount)}</span>
+//       </li>
+//       <br />
+//   `;
+
+//     // Pagination logic
+//     if (this.component.hitCount > 0) {
+//       const totalPages = Math.ceil(
+//         this.component.hitCount / this.component.pageSize
+//       );
+//       const currentPage = this.component.currentPage;
+
+//       if (totalPages > 1) {
+//         let paginationHTML = `<div class="pagination-controls">`;
+
+//         // "First" and "Previous" buttons
+//         paginationHTML +=
+//           currentPage > 1
+//             ? `<button class="first-page">First</button><button class="previous-10"><<<</button>`
+//             : "";
+
+//         // Ellipsis before current pages if needed
+//         if (currentPage > 3) {
+//           paginationHTML += `<span class="ellipsis">...</span>`;
+//         }
+
+//         // Page numbers (display 5 pages around current page)
+//         for (
+//           let i = Math.max(1, currentPage - 2);
+//           i <= Math.min(totalPages, currentPage + 2);
+//           i++
+//         ) {
+//           paginationHTML += `<button class="page-number">${i}</button>`;
+//         }
+
+//         // Ellipsis after current pages if needed
+//         if (currentPage < totalPages - 2) {
+//           paginationHTML += `<span class="ellipsis">...</span>`;
+//         }
+
+//         // "Next" and "Last" buttons
+//         paginationHTML +=
+//           currentPage < totalPages
+//             ? `<button class="next-10">>>></button><button class="last-page">Last</button>`
+//             : "";
+
+//         paginationHTML += `</div>`;
+
+//         // Append pagination to the container
+//         container += paginationHTML;
+//       }
+//     }
+
+//     // Update the HTML
+//     this.component.context.html(container);
+//   }
+// };
+
 export default emlo;

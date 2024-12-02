@@ -2710,4 +2710,359 @@ emlo.StatsRenderer = class extends edges.Renderer {
   }
 };
 
+emlo.BarGraph = class extends edges.Component {
+  constructor(params) {
+    super(params);
+    this.solrCore = "";
+    this.fieldKeys = edges.util.getParam(params, "fieldKeys", []);
+    this.xAxisField = edges.util.getParam(params, "xAxisField", "");
+    this.results = [];
+    this.graphData = {};
+    this.cache = {};
+    this.loading = false; // To track loading state
+  }
+
+  // async synchronise() {
+  //   this.graphData = {};
+  //   this.loading = true; // Set loading to true
+  //   this.renderer.draw(); // Trigger the loading state
+
+  //   const source = this.edge.result;
+
+  //   if (!source) {
+  //     this.loading = false; // Stop loading if no source
+  //     return;
+  //   }
+
+  //   this.results = source.results();
+
+  //   const solrCoreMap = new Map();
+
+  //   // Collect UUIDs grouped by solrCore
+  //   for (const fieldKey of this.fieldKeys) {
+  //     const value = this.results[0]?.[fieldKey];
+
+  //     if (!value) {
+  //       console.warn(`No value found for fieldKey: ${fieldKey}`);
+  //       continue;
+  //     }
+
+  //     // Handle both string and array cases
+  //     const valuesArray = Array.isArray(value) ? value : [value];
+
+  //     for (const val of valuesArray) {
+  //       const [solrCore, uuid] = val.split("/").slice(-2);
+
+  //       if (this.cache[uuid]) {
+  //         this.graphData[fieldKey] = this.cache[uuid];
+  //       } else {
+  //         if (!solrCoreMap.has(solrCore)) {
+  //           solrCoreMap.set(solrCore, new Set());
+  //         }
+  //         solrCoreMap.get(solrCore).add(uuid);
+  //       }
+  //     }
+  //   }
+
+  //   // Make batched calls for each solrCore
+  //   for (const [solrCore, uuids] of solrCoreMap.entries()) {
+  //     const uuidQuery = Array.from(uuids)
+  //       .map((uuid) => `${uuid}`)
+  //       .join(" OR ");
+  //     const fieldData = await this._fetchGraphData(solrCore, uuidQuery);
+
+  //     console.log("fieldData", fieldData.response);
+
+  //     for (const uuid in fieldData) {
+  //       console.log("UUID", uuid);
+  //       this.cache[uuid] = fieldData[uuid];
+  //       const fieldKey = this.fieldKeys.find((key) =>
+  //         this.results[0]?.[key]?.includes(uuid)
+  //       );
+  //       if (fieldKey) {
+  //         this.graphData[fieldKey] = fieldData[uuid];
+  //       }
+  //     }
+  //   }
+
+  //   this.loading = false; // Set loading to false after data is loaded
+  //   this.renderer.draw();
+  // }
+
+  // async synchronise() {
+  //   this.graphData = {};
+  //   this.loading = true; // Set loading to true
+  //   this.renderer.draw(); // Trigger the loading state
+
+  //   const source = this.edge.result;
+
+  //   if (!source) {
+  //     this.loading = false; // Stop loading if no source
+  //     return;
+  //   }
+
+  //   this.results = source.results();
+
+  //   const solrCoreMap = new Map();
+  //   const uuidToFieldKeyMap = new Map(); // Map to track UUIDs to fieldKeys
+
+  //   // Collect UUIDs grouped by solrCore and track fieldKeys
+  //   for (const fieldKey of this.fieldKeys) {
+  //     const value = this.results[0]?.[fieldKey];
+
+  //     if (!value) {
+  //       console.warn(`No value found for fieldKey: ${fieldKey}`);
+  //       continue;
+  //     }
+
+  //     const valuesArray = Array.isArray(value) ? value : [value];
+
+  //     for (const val of valuesArray) {
+  //       const [solrCore, uuid] = val.split("/").slice(-2);
+
+  //       // Associate UUID with fieldKey
+  //       uuidToFieldKeyMap.set(uuid, fieldKey);
+
+  //       if (this.cache[uuid]) {
+  //         this.graphData[fieldKey] = this.cache[uuid];
+  //       } else {
+  //         if (!solrCoreMap.has(solrCore)) {
+  //           solrCoreMap.set(solrCore, new Set());
+  //         }
+  //         solrCoreMap.get(solrCore).add(uuid);
+  //       }
+  //     }
+  //   }
+
+  //   // Make batched calls for each solrCore
+  //   for (const [solrCore, uuids] of solrCoreMap.entries()) {
+  //     const uuidQuery = Array.from(uuids).join(" OR ");
+  //     const fieldData = await this._fetchGraphData(solrCore, uuidQuery);
+
+  //     console.log("fieldData", fieldData.response);
+
+  //     for (const doc of fieldData.response.docs) {
+  //       const uuid = doc.uuid; // Ensure this matches your Solr response field
+  //       const fieldKey = uuidToFieldKeyMap.get(uuid);
+
+  //       if (fieldKey) {
+  //         this.cache[uuid] = doc;
+  //         this.graphData[fieldKey] = doc;
+  //       }
+  //     }
+  //   }
+
+  //   this.loading = false; // Set loading to false after data is loaded
+  //   this.renderer.draw();
+  // }
+
+  // async _fetchGraphData(solrCore, uuidQuery) {
+  //   const url = `/solr/${solrCore}s/select?q=uuid:(${encodeURIComponent(
+  //     uuidQuery
+  //   )})&wt=json`;
+  //   try {
+  //     const response = await fetch(url);
+  //     if (!response.ok) {
+  //       console.error(
+  //         `Error fetching data from ${url}: ${response.statusText}`
+  //       );
+  //       return {};
+  //     }
+
+  //     return await response.json();
+  //   } catch (error) {
+  //     console.error(`Error in Solr fetch: ${error}`);
+  //     return {};
+  //   }
+  // }
+
+  async synchronise() {
+    this.graphData = {};
+    this.loading = true; // Set loading to true
+    this.renderer.draw(); // Trigger the loading state
+
+    const source = this.edge.result;
+
+    if (!source) {
+      this.loading = false; // Stop loading if no source
+      return;
+    }
+
+    this.results = source.results();
+
+    const solrCoreMap = new Map();
+    const uuidToFieldKeyMap = new Map(); // Map to track UUIDs to fieldKeys
+
+    // Collect UUIDs grouped by solrCore and track fieldKeys
+    for (const fieldKey of this.fieldKeys) {
+      const value = this.results[0]?.[fieldKey];
+
+      if (!value) {
+        console.warn(`No value found for fieldKey: ${fieldKey}`);
+        continue;
+      }
+
+      const valuesArray = Array.isArray(value) ? value : [value];
+
+      for (const val of valuesArray) {
+        const [solrCore, uuid] = val.split("/").slice(-2);
+
+        // Associate UUID with fieldKey
+        uuidToFieldKeyMap.set(uuid, fieldKey);
+
+        if (this.cache[uuid]) {
+          this.graphData[fieldKey] = this.cache[uuid];
+        } else {
+          if (!solrCoreMap.has(solrCore)) {
+            solrCoreMap.set(solrCore, new Set());
+          }
+          solrCoreMap.get(solrCore).add(uuid);
+        }
+      }
+    }
+
+    // Make batched calls for each solrCore using the new Flask API
+    for (const [solrCore, uuids] of solrCoreMap.entries()) {
+      const uuidArray = Array.from(uuids);
+      const fieldData = await this._fetchGraphData(solrCore, uuidArray);
+
+      console.log("fieldData", fieldData.response);
+
+      for (const doc of fieldData.response.docs) {
+        const uuid = doc.uuid; // Ensure this matches your Solr response field
+        const fieldKey = uuidToFieldKeyMap.get(uuid);
+
+        if (fieldKey) {
+          this.cache[uuid] = doc;
+          this.graphData[fieldKey] = doc;
+        }
+      }
+    }
+
+    this.loading = false; // Set loading to false after data is loaded
+    this.renderer.draw();
+  }
+
+  async _fetchGraphData(solrCore, uuidArray) {
+    const payload = {
+      solrCore: solrCore,
+      uuids: uuidArray,
+      filter: "", // Adjust if a filter is required
+    };
+
+    try {
+      console.log("Sending payload", payload);
+
+      const response = await fetch("/stats", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        console.error(
+          `Error fetching data for ${solrCore}: ${response.statusText}`
+        );
+        return {};
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error(`Error in fetchSolrData API call: ${error}`);
+      return {};
+    }
+  }
+};
+
+emlo.BarGraphRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+    this.namespace = "edges-bargraph-display";
+    this.fullScreen = false;
+    this.currentView = "separate"; // Default view for graphs
+  }
+
+  draw() {
+    let container = "";
+
+    if (this.component.loading) {
+      container = `<div class="loading-indicator">Loading, please wait...</div>`;
+    } else {
+      container = `
+        <div id="${this.namespace}-container" class="bar-graph-container"></div>
+        <div class="graph-controls">
+          <button onclick="toggleView('separate')">Separate Charts</button>
+          <button onclick="toggleView('stacked')">Stacked Bar</button>
+          <button onclick="toggleView('split')">Split Bar</button>
+          <button onclick="toggleFullscreen('${this.namespace}')">Full Screen</button>
+        </div>`;
+    }
+
+    this.component.context.html(container);
+
+    if (!this.component.loading) {
+      this._renderGraphs();
+    }
+  }
+
+  _renderGraphs() {
+    const graphContainer = document.getElementById(
+      `${this.namespace}-container`
+    );
+    graphContainer.innerHTML = "";
+    console.log(" this.component.graphData", this.component.graphData);
+    const datasets = [];
+    for (const [fieldKey, fieldData] of Object.entries(
+      this.component.graphData
+    )) {
+      datasets.push({
+        label: fieldKey,
+        data: fieldData.filter((_, i) => i % 2 !== 0),
+        backgroundColor: this._generateRandomColor(),
+      });
+    }
+
+    if (this.currentView === "separate") {
+      datasets.forEach((dataset, index) => {
+        const graphId = `${this.namespace}-${index}`;
+        graphContainer.innerHTML += `<div id="${graphId}" class="graph"></div>`;
+        new Chart(document.getElementById(graphId), {
+          type: "bar",
+          data: {
+            labels: this.component.graphData[fieldKey].filter(
+              (_, i) => i % 2 === 0
+            ),
+            datasets: [dataset],
+          },
+          options: {
+            responsive: true,
+          },
+        });
+      });
+    } else {
+      const graphId = `${this.namespace}-combined`;
+      graphContainer.innerHTML = `<div id="${graphId}" class="graph"></div>`;
+      new Chart(document.getElementById(graphId), {
+        type: this.currentView === "stacked" ? "bar" : "horizontalBar",
+        data: {
+          labels: datasets[0].data,
+          datasets: datasets,
+        },
+        options: {
+          scales: {
+            x: { stacked: this.currentView === "stacked" },
+            y: { stacked: this.currentView === "stacked" },
+          },
+        },
+      });
+    }
+  }
+
+  _generateRandomColor() {
+    return "#" + Math.floor(Math.random() * 16777215).toString(16);
+  }
+};
+
 export default emlo;

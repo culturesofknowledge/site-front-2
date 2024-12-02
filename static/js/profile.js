@@ -205,23 +205,20 @@ function _getPeopleComponents(emlo) {
             title: " letters mentioning",
             key: "ox_totalWorksMentioningAgent",
           },
-          {
-            name: "graph",
-            title: "",
-            key: "ox_totalWorksByAgent",
-          },
-          {
-            name: "graph",
-            title: "",
-            key: "ox_totalWorksAddressedToAgent",
-          },
-          {
-            name: "graph",
-            title: "",
-            key: "ox_totalWorksMentioningAgent",
-          },
         ],
       }),
+    }),
+
+    new emlo.BarGraph({
+      id: "graph",
+      category: "results",
+      fieldKeys: [
+        "frbr_creatorOf-work",
+        "mail_recipientOf-work",
+        "dcterms_isReferencedBy-work",
+      ],
+      xAxisField: "ox_started-ox_year",
+      renderer: new emlo.BarGraphRenderer({}),
     }),
 
     new emlo.MultiFields({

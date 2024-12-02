@@ -864,10 +864,76 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
       });
     }
   }
+  // synchronise() {
+  //   // reset the state of the internal variables
+  //   if (this.lifecycle === "update") {
+  //     // if we are in the "update" lifecycle, then reset and read all the values
+  //     this.values = [];
+  //     if (this.edge.result) {
+  //       this._readValues({ result: this.edge.result });
+  //     }
+  //   } else if (this.lifecycle === "static" && this.syncCounts) {
+  //     if (this.edge.result) {
+  //       this._syncCounts({ result: this.edge.result });
+  //     }
+  //   }
+  //   this.filters = [];
+
+  //   // Object containing the field mappings (example)
+  //   const fieldMapping = {
+  //     aut: "author_sort",
+  //     // Add more mappings as needed
+  //   };
+
+  //   // Extract all the filter values that pertain to this selector
+  //   let filters = this.edge.currentQuery.listMust(
+  //     new es.TermFilter({ field: this.field })
+  //   );
+
+  //   // Iterate through the existing filters
+  //   for (let i = 0; i < filters.length; i++) {
+  //     let val = filters[i].value;
+  //     let translate_val = this._translate(val);
+  //     let displayValue = val !== translate_val ? translate_val : val;
+
+  //     this.filters.push({
+  //       display: displayValue,
+  //       term: val,
+  //       field: filters[i].field,
+  //     });
+  //   }
+
+  //   // Check if there are query parameters in the URL
+  //   const urlParams = new URLSearchParams(window.location.search);
+
+  //   // Loop through all URL query parameters
+  //   for (const [key, value] of urlParams.entries()) {
+  //     // Check if there is a field mapping for the query parameter
+  //     const mappedField = fieldMapping[key];
+
+  //     if (mappedField) {
+  //       // If a field mapping exists, use the mapped field
+  //       let translate_val = this._translate(value);
+  //       let displayValue = value !== translate_val ? translate_val : value;
+
+  //       this.filters.push({
+  //         display: displayValue,
+  //         term: value,
+  //         field: mappedField,
+  //       });
+  //     } else {
+  //       // If no mapping, add the query parameter as a filter
+  //       this.filters.push({
+  //         display: value,
+  //         term: value,
+  //         field: key,
+  //       });
+  //     }
+  //   }
+  // }
 
   removeFilter(field, term) {
     let nq = this.edge.cloneQuery();
-
     nq.removeMust(
       new es.TermFilter({
         field: field,

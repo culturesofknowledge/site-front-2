@@ -44,3 +44,54 @@ def solr_proxy(subpath):
     except Exception as err:
         print(f"Got error: {err}")
         return jsonify({"error": str(err)}), 500
+    
+@solr_bp.route('/stats', methods=['POST'])  # Include methods you need
+def fetchStats():
+    try:
+
+        SOLR_URL = os.getenv('SOLR_URL', '')
+
+        if not SOLR_URL:
+            raise ValueError("SOLR_URL environment variable is not set. Please configure it before starting the app.")
+
+        # Construct the full URL for the external API request
+        # Append the captured subpath
+        if not SOLR_URL.endswith("/"):
+            SOLR_URL = SOLR_URL + "/"
+
+        # Get data from the request
+        data = request.json
+        solr_core = data.get('solrCore')
+        uuids = data.get('uuids', [])
+        filter_query = data.get('filter', '')
+
+        if not solr_core or not uuids:
+            return jsonify({'error': 'solrCore and uuids are required'}), 400
+
+        # Construct the Solr query
+        uuid_query = ' OR '.join([f'{uuid}' for uuid in uuids])
+
+        solr_query = f'uuid:({uuid_query})'
+
+        if filter_query:
+            solr_query += f' AND ({filter_query})'
+
+        solr_url = f'{SOLR_URL}{solr_core}s/select'
+        params = {
+            'q': solr_query,
+            'wt': 'json',
+            'rows': len(uuids)  # Assuming you want a result for each UUID
+        }
+
+        # Make the request to Solr
+        response = requests.get(solr_url, params=params)
+        response.raise_for_status()
+
+        # Return Solr response
+        solr_data = response.json()
+        return jsonify(solr_data)
+
+    except requests.RequestException as e:
+        return jsonify({'error': 'Error fetching data from Solr', 'details': str(e)}), 500
+    except Exception as e:
+        return jsonify({'error': 'Internal Server Error', 'details': str(e)}), 500

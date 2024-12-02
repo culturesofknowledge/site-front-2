@@ -209,17 +209,18 @@ function _getPeopleComponents(emlo) {
       }),
     }),
 
-    new emlo.BarGraph({
-      id: "graph",
-      category: "results",
-      fieldKeys: [
-        "frbr_creatorOf-work",
-        "mail_recipientOf-work",
-        "dcterms_isReferencedBy-work",
-      ],
-      xAxisField: "ox_started-ox_year",
-      renderer: new emlo.BarGraphRenderer({}),
-    }),
+    // TODO: Temp removal of graphs
+    // new emlo.BarGraph({
+    //   id: "graph",
+    //   category: "results",
+    //   fieldKeys: [
+    //     "frbr_creatorOf-work",
+    //     "mail_recipientOf-work",
+    //     "dcterms_isReferencedBy-work",
+    //   ],
+    //   xAxisField: "ox_started-ox_year",
+    //   renderer: new emlo.BarGraphRenderer({}),
+    // }),
 
     new emlo.MultiFields({
       id: "letters-written",

@@ -1363,7 +1363,6 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
     // Build the selected filters display
     let filterFrag = "";
     ts.filters.forEach((filt) => {
-      console.log("filt", filt);
       filterFrag += `
         <tr class="${resultClass}">
           <td>

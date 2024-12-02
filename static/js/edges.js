@@ -2722,176 +2722,22 @@ emlo.BarGraph = class extends edges.Component {
     this.loading = false; // To track loading state
   }
 
-  // async synchronise() {
-  //   this.graphData = {};
-  //   this.loading = true; // Set loading to true
-  //   this.renderer.draw(); // Trigger the loading state
-
-  //   const source = this.edge.result;
-
-  //   if (!source) {
-  //     this.loading = false; // Stop loading if no source
-  //     return;
-  //   }
-
-  //   this.results = source.results();
-
-  //   const solrCoreMap = new Map();
-
-  //   // Collect UUIDs grouped by solrCore
-  //   for (const fieldKey of this.fieldKeys) {
-  //     const value = this.results[0]?.[fieldKey];
-
-  //     if (!value) {
-  //       console.warn(`No value found for fieldKey: ${fieldKey}`);
-  //       continue;
-  //     }
-
-  //     // Handle both string and array cases
-  //     const valuesArray = Array.isArray(value) ? value : [value];
-
-  //     for (const val of valuesArray) {
-  //       const [solrCore, uuid] = val.split("/").slice(-2);
-
-  //       if (this.cache[uuid]) {
-  //         this.graphData[fieldKey] = this.cache[uuid];
-  //       } else {
-  //         if (!solrCoreMap.has(solrCore)) {
-  //           solrCoreMap.set(solrCore, new Set());
-  //         }
-  //         solrCoreMap.get(solrCore).add(uuid);
-  //       }
-  //     }
-  //   }
-
-  //   // Make batched calls for each solrCore
-  //   for (const [solrCore, uuids] of solrCoreMap.entries()) {
-  //     const uuidQuery = Array.from(uuids)
-  //       .map((uuid) => `${uuid}`)
-  //       .join(" OR ");
-  //     const fieldData = await this._fetchGraphData(solrCore, uuidQuery);
-
-  //     console.log("fieldData", fieldData.response);
-
-  //     for (const uuid in fieldData) {
-  //       console.log("UUID", uuid);
-  //       this.cache[uuid] = fieldData[uuid];
-  //       const fieldKey = this.fieldKeys.find((key) =>
-  //         this.results[0]?.[key]?.includes(uuid)
-  //       );
-  //       if (fieldKey) {
-  //         this.graphData[fieldKey] = fieldData[uuid];
-  //       }
-  //     }
-  //   }
-
-  //   this.loading = false; // Set loading to false after data is loaded
-  //   this.renderer.draw();
-  // }
-
-  // async synchronise() {
-  //   this.graphData = {};
-  //   this.loading = true; // Set loading to true
-  //   this.renderer.draw(); // Trigger the loading state
-
-  //   const source = this.edge.result;
-
-  //   if (!source) {
-  //     this.loading = false; // Stop loading if no source
-  //     return;
-  //   }
-
-  //   this.results = source.results();
-
-  //   const solrCoreMap = new Map();
-  //   const uuidToFieldKeyMap = new Map(); // Map to track UUIDs to fieldKeys
-
-  //   // Collect UUIDs grouped by solrCore and track fieldKeys
-  //   for (const fieldKey of this.fieldKeys) {
-  //     const value = this.results[0]?.[fieldKey];
-
-  //     if (!value) {
-  //       console.warn(`No value found for fieldKey: ${fieldKey}`);
-  //       continue;
-  //     }
-
-  //     const valuesArray = Array.isArray(value) ? value : [value];
-
-  //     for (const val of valuesArray) {
-  //       const [solrCore, uuid] = val.split("/").slice(-2);
-
-  //       // Associate UUID with fieldKey
-  //       uuidToFieldKeyMap.set(uuid, fieldKey);
-
-  //       if (this.cache[uuid]) {
-  //         this.graphData[fieldKey] = this.cache[uuid];
-  //       } else {
-  //         if (!solrCoreMap.has(solrCore)) {
-  //           solrCoreMap.set(solrCore, new Set());
-  //         }
-  //         solrCoreMap.get(solrCore).add(uuid);
-  //       }
-  //     }
-  //   }
-
-  //   // Make batched calls for each solrCore
-  //   for (const [solrCore, uuids] of solrCoreMap.entries()) {
-  //     const uuidQuery = Array.from(uuids).join(" OR ");
-  //     const fieldData = await this._fetchGraphData(solrCore, uuidQuery);
-
-  //     console.log("fieldData", fieldData.response);
-
-  //     for (const doc of fieldData.response.docs) {
-  //       const uuid = doc.uuid; // Ensure this matches your Solr response field
-  //       const fieldKey = uuidToFieldKeyMap.get(uuid);
-
-  //       if (fieldKey) {
-  //         this.cache[uuid] = doc;
-  //         this.graphData[fieldKey] = doc;
-  //       }
-  //     }
-  //   }
-
-  //   this.loading = false; // Set loading to false after data is loaded
-  //   this.renderer.draw();
-  // }
-
-  // async _fetchGraphData(solrCore, uuidQuery) {
-  //   const url = `/solr/${solrCore}s/select?q=uuid:(${encodeURIComponent(
-  //     uuidQuery
-  //   )})&wt=json`;
-  //   try {
-  //     const response = await fetch(url);
-  //     if (!response.ok) {
-  //       console.error(
-  //         `Error fetching data from ${url}: ${response.statusText}`
-  //       );
-  //       return {};
-  //     }
-
-  //     return await response.json();
-  //   } catch (error) {
-  //     console.error(`Error in Solr fetch: ${error}`);
-  //     return {};
-  //   }
-  // }
-
   async synchronise() {
     this.graphData = {};
-    this.loading = true; // Set loading to true
-    this.renderer.draw(); // Trigger the loading state
+    this.loading = true;
+    this.renderer.draw();
 
     const source = this.edge.result;
 
     if (!source) {
-      this.loading = false; // Stop loading if no source
+      this.loading = false;
       return;
     }
 
     this.results = source.results();
 
     const solrCoreMap = new Map();
-    const uuidToFieldKeyMap = new Map(); // Map to track UUIDs to fieldKeys
+    const uuidToFieldKeyMap = new Map();
 
     // Collect UUIDs grouped by solrCore and track fieldKeys
     for (const fieldKey of this.fieldKeys) {
@@ -2907,39 +2753,31 @@ emlo.BarGraph = class extends edges.Component {
       for (const val of valuesArray) {
         const [solrCore, uuid] = val.split("/").slice(-2);
 
-        // Associate UUID with fieldKey
         uuidToFieldKeyMap.set(uuid, fieldKey);
 
-        if (this.cache[uuid]) {
-          this.graphData[fieldKey] = this.cache[uuid];
-        } else {
-          if (!solrCoreMap.has(solrCore)) {
-            solrCoreMap.set(solrCore, new Set());
-          }
-          solrCoreMap.get(solrCore).add(uuid);
+        if (!solrCoreMap.has(solrCore)) {
+          solrCoreMap.set(solrCore, new Set());
         }
+        solrCoreMap.get(solrCore).add(uuid);
       }
     }
 
-    // Make batched calls for each solrCore using the new Flask API
     for (const [solrCore, uuids] of solrCoreMap.entries()) {
       const uuidArray = Array.from(uuids);
       const fieldData = await this._fetchGraphData(solrCore, uuidArray);
 
-      console.log("fieldData", fieldData.response);
-
       for (const doc of fieldData.response.docs) {
-        const uuid = doc.uuid; // Ensure this matches your Solr response field
-        const fieldKey = uuidToFieldKeyMap.get(uuid);
-
+        const fieldKey = uuidToFieldKeyMap.get(doc.uuid);
         if (fieldKey) {
-          this.cache[uuid] = doc;
-          this.graphData[fieldKey] = doc;
+          if (!this.graphData[fieldKey]) {
+            this.graphData[fieldKey] = [];
+          }
+          this.graphData[fieldKey].push(doc);
         }
       }
     }
 
-    this.loading = false; // Set loading to false after data is loaded
+    this.loading = false;
     this.renderer.draw();
   }
 
@@ -2951,8 +2789,6 @@ emlo.BarGraph = class extends edges.Component {
     };
 
     try {
-      console.log("Sending payload", payload);
-
       const response = await fetch("/stats", {
         method: "POST",
         headers: {
@@ -2975,6 +2811,171 @@ emlo.BarGraph = class extends edges.Component {
     }
   }
 };
+// emlo.BarGraphRenderer = class extends edges.Renderer {
+//   constructor(params) {
+//     super(params);
+//     this.namespace = "edges-bargraph-display";
+//     this.fullScreen = false;
+//     this.currentView = "separate"; // Default view for graphs
+//   }
+
+//   draw() {
+//     let container = "";
+
+//     if (this.component.loading) {
+//       container = `<div class="loading-indicator">Loading, please wait...</div>`;
+//     } else {
+//       const graphDataKeys = Object.keys(this.component.graphData);
+//       const showGraphControls = graphDataKeys.length > 1;
+
+//       container = `
+//         <div id="${this.namespace}-container" class="bar-graph-container"></div>
+//         ${
+//           showGraphControls
+//             ? `
+//           <div class="graph-controls">
+//             <button onclick="window.edges_bargraph_display.toggleView('separate')">Separate Charts</button>
+//             <button onclick="window.edges_bargraph_display.toggleView('stacked')">Stacked Bar</button>
+//             <button onclick="window.edges_bargraph_display.toggleView('split')">Split Bar</button>
+//           </div>
+//         `
+//             : ""
+//         }
+//         <button onclick="window.edges_bargraph_display.toggleFullscreen('${
+//           this.namespace
+//         }-container')">Full Screen</button>
+//       `;
+//     }
+
+//     this.component.context.html(container);
+
+//     if (!this.component.loading) {
+//       this._renderGraphs();
+//     }
+//   }
+
+//   _renderGraphs() {
+//     const graphContainer = document.getElementById(
+//       `${this.namespace}-container`
+//     );
+//     graphContainer.innerHTML = ""; // Clear existing graphs
+
+//     const datasets = [];
+//     const labelsSet = new Set();
+
+//     for (const [fieldKey, fieldData] of Object.entries(
+//       this.component.graphData
+//     )) {
+//       const valueCounts = this._countOccurrences(
+//         fieldData,
+//         this.component.xAxisField
+//       );
+
+//       datasets.push({
+//         label: fieldKey,
+//         data: Object.values(valueCounts),
+//         backgroundColor: this._generateBarColor(fieldKey),
+//       });
+
+//       Object.keys(valueCounts).forEach((label) => labelsSet.add(label));
+
+//       if (this.currentView === "separate") {
+//         const graphId = `${this.namespace}-${fieldKey}`;
+//         graphContainer.innerHTML += `<canvas id="${graphId}" class="graph"></canvas>`;
+
+//         new Chart(document.getElementById(graphId), {
+//           type: "bar",
+//           data: {
+//             labels: Object.keys(valueCounts),
+//             datasets: [
+//               {
+//                 label: fieldKey,
+//                 data: Object.values(valueCounts),
+//                 backgroundColor: this._generateBarColor(fieldKey),
+//               },
+//             ],
+//           },
+//           options: {
+//             responsive: true,
+//           },
+//         });
+//       }
+//     }
+
+//     if (this.currentView !== "separate") {
+//       const combinedGraphId = `${this.namespace}-combined`;
+//       graphContainer.innerHTML = `<canvas id="${combinedGraphId}" class="graph"></canvas>`;
+
+//       const isStacked = this.currentView === "stacked";
+
+//       new Chart(document.getElementById(combinedGraphId), {
+//         type: "bar",
+//         data: {
+//           labels: Array.from(labelsSet),
+//           datasets: datasets,
+//         },
+//         options: {
+//           responsive: true,
+//           plugins: {
+//             tooltip: { mode: "index", intersect: false },
+//           },
+//           scales: {
+//             x: {
+//               stacked: isStacked,
+//               title: { display: true, text: "Categories" },
+//             },
+//             y: {
+//               stacked: isStacked,
+//               title: { display: true, text: "Counts" },
+//             },
+//           },
+//         },
+//       });
+//     }
+//   }
+
+//   toggleView(view) {
+//     this.currentView = view;
+//     this.draw();
+//   }
+
+//   toggleFullscreen(containerId) {
+//     const container = document.getElementById(containerId);
+//     if (!document.fullscreenElement) {
+//       container.requestFullscreen().catch((err) => {
+//         console.warn(
+//           `Error attempting to enable full-screen mode: ${err.message}`
+//         );
+//       });
+//     } else {
+//       document.exitFullscreen();
+//     }
+//   }
+
+//   _countOccurrences(data, xAxis) {
+//     const counts = {};
+//     for (const item of data) {
+//       const value = item[xAxis];
+//       counts[value] = (counts[value] || 0) + 1;
+//     }
+//     return counts;
+//   }
+
+//   _generateBarColor(xAxis) {
+//     if (xAxis) {
+//       switch (xAxis) {
+//         case "frbr_creatorOf-work":
+//           return "#2E527E";
+//         case "mail_recipientOf-work":
+//           return "#5A7CA5";
+//         default:
+//           return "#A7BFD6";
+//       }
+//     }
+
+//     return "#" + Math.floor(Math.random() * 16777215).toString(16);
+//   }
+// };
 
 emlo.BarGraphRenderer = class extends edges.Renderer {
   constructor(params) {
@@ -2982,6 +2983,9 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
     this.namespace = "edges-bargraph-display";
     this.fullScreen = false;
     this.currentView = "separate"; // Default view for graphs
+    this.chartInstances = []; // To store active Chart.js instances
+    this.graphHeight = 150; // Fixed height for the graphs (can adjust this value)
+    this.graphWidth = 600; // Fixed width for the graphs (can adjust this value)
   }
 
   draw() {
@@ -2990,14 +2994,26 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
     if (this.component.loading) {
       container = `<div class="loading-indicator">Loading, please wait...</div>`;
     } else {
+      const graphDataKeys = Object.keys(this.component.graphData);
+      const showGraphControls = graphDataKeys.length > 1;
+
       container = `
         <div id="${this.namespace}-container" class="bar-graph-container"></div>
-        <div class="graph-controls">
-          <button onclick="toggleView('separate')">Separate Charts</button>
-          <button onclick="toggleView('stacked')">Stacked Bar</button>
-          <button onclick="toggleView('split')">Split Bar</button>
-          <button onclick="toggleFullscreen('${this.namespace}')">Full Screen</button>
-        </div>`;
+        ${
+          showGraphControls
+            ? `
+          <div class="graph-controls">
+            <button onclick="window.edges_bargraph_display.toggleView('separate')">Separate Charts</button>
+            <button onclick="window.edges_bargraph_display.toggleView('stacked')">Stacked Bar</button>
+            <button onclick="window.edges_bargraph_display.toggleView('split')">Split Bar</button>
+          </div>
+        `
+            : ""
+        }
+        <button onclick="window.edges_bargraph_display.toggleFullscreen('${
+          this.namespace
+        }-container')">Full Screen</button>
+      `;
     }
 
     this.component.context.html(container);
@@ -3011,53 +3027,129 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
     const graphContainer = document.getElementById(
       `${this.namespace}-container`
     );
-    graphContainer.innerHTML = "";
-    console.log(" this.component.graphData", this.component.graphData);
+    graphContainer.innerHTML = ""; // Clear existing graphs
+
+    // Destroy previous charts to free memory and prevent duplication
+    this.chartInstances.forEach((chart) => chart.destroy());
+    this.chartInstances = []; // Clear chart instances
+
     const datasets = [];
+    const labelsSet = new Set();
+
     for (const [fieldKey, fieldData] of Object.entries(
       this.component.graphData
     )) {
+      const valueCounts = this._countOccurrences(
+        fieldData,
+        this.component.xAxisField
+      );
+
       datasets.push({
         label: fieldKey,
-        data: fieldData.filter((_, i) => i % 2 !== 0),
+        data: Object.values(valueCounts),
         backgroundColor: this._generateRandomColor(),
       });
-    }
 
-    if (this.currentView === "separate") {
-      datasets.forEach((dataset, index) => {
-        const graphId = `${this.namespace}-${index}`;
-        graphContainer.innerHTML += `<div id="${graphId}" class="graph"></div>`;
-        new Chart(document.getElementById(graphId), {
+      Object.keys(valueCounts).forEach((label) => labelsSet.add(label));
+
+      if (this.currentView === "separate") {
+        const graphId = `${this.namespace}-${fieldKey}`;
+        const canvas = document.createElement("canvas");
+        canvas.id = graphId;
+        canvas.className = "graph";
+        canvas.style.height = `${this.graphHeight}px`; // Set fixed height
+        canvas.style.width = `${this.graphWidth}px`; // Set fixed width
+        graphContainer.appendChild(canvas);
+
+        const chartInstance = new Chart(canvas, {
           type: "bar",
           data: {
-            labels: this.component.graphData[fieldKey].filter(
-              (_, i) => i % 2 === 0
-            ),
-            datasets: [dataset],
+            labels: Object.keys(valueCounts),
+            datasets: [
+              {
+                label: fieldKey,
+                data: Object.values(valueCounts),
+                backgroundColor: this._generateRandomColor(),
+              },
+            ],
           },
           options: {
             responsive: true,
+            scales: {
+              x: { title: { display: true, text: "Categories" } },
+              y: { title: { display: true, text: "Counts" } },
+            },
           },
         });
-      });
-    } else {
-      const graphId = `${this.namespace}-combined`;
-      graphContainer.innerHTML = `<div id="${graphId}" class="graph"></div>`;
-      new Chart(document.getElementById(graphId), {
-        type: this.currentView === "stacked" ? "bar" : "horizontalBar",
+
+        this.chartInstances.push(chartInstance); // Save instance
+      }
+    }
+
+    if (this.currentView !== "separate") {
+      const combinedGraphId = `${this.namespace}-combined`;
+      const combinedCanvas = document.createElement("canvas");
+      combinedCanvas.id = combinedGraphId;
+      combinedCanvas.className = "graph";
+      combinedCanvas.style.height = `${this.graphHeight}px`; // Set fixed height
+      combinedCanvas.style.width = `${this.graphWidth}px`; // Set fixed width
+      graphContainer.appendChild(combinedCanvas);
+
+      const isStacked = this.currentView === "stacked";
+
+      const chartInstance = new Chart(combinedCanvas, {
+        type: "bar",
         data: {
-          labels: datasets[0].data,
+          labels: Array.from(labelsSet),
           datasets: datasets,
         },
         options: {
+          responsive: true,
+          plugins: {
+            tooltip: { mode: "index", intersect: false },
+          },
           scales: {
-            x: { stacked: this.currentView === "stacked" },
-            y: { stacked: this.currentView === "stacked" },
+            x: {
+              stacked: isStacked,
+              title: { display: true, text: "Categories" },
+            },
+            y: {
+              stacked: isStacked,
+              title: { display: true, text: "Counts" },
+            },
           },
         },
       });
+
+      this.chartInstances.push(chartInstance); // Save combined chart instance
     }
+  }
+
+  toggleView(view) {
+    this.currentView = view;
+    this.draw();
+  }
+
+  toggleFullscreen(containerId) {
+    const container = document.getElementById(containerId);
+    if (!document.fullscreenElement) {
+      container.requestFullscreen().catch((err) => {
+        console.warn(
+          `Error attempting to enable full-screen mode: ${err.message}`
+        );
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+  _countOccurrences(data, xAxis) {
+    const counts = {};
+    for (const item of data) {
+      const value = item[xAxis];
+      counts[value] = (counts[value] || 0) + 1;
+    }
+    return counts;
   }
 
   _generateRandomColor() {

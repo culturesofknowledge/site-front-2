@@ -13,25 +13,19 @@ try {
     emlo.collection = queryObj.collection;
 
     emlo.components = [
-      new edges.components.Pager({
+      new emlo.Pagination({
         id: "top-pager",
         category: "top",
-        renderer: new edges.renderers.bs3.Pager({
+        renderer: new emlo.PaginationRenderer({
           scrollSelector: "#results",
-          showSizeSelector: false,
-          showRecordCount: false,
-          showChevrons: true,
         }),
       }),
 
-      new edges.components.Pager({
+      new emlo.Pagination({
         id: "bottom-pager",
         category: "bottom",
-        renderer: new edges.renderers.bs3.Pager({
+        renderer: new emlo.PaginationRenderer({
           scrollSelector: "#results",
-          showSizeSelector: false,
-          showRecordCount: false,
-          showChevrons: true,
         }),
       }),
 
@@ -144,31 +138,19 @@ try {
     emlo.collection = "/solr/works/select";
 
     emlo.components = [
-      new edges.components.Pager({
+      new emlo.Pagination({
         id: "top-pager",
         category: "top",
-        renderer: new edges.renderers.bs3.Pager({
+        renderer: new emlo.PaginationRenderer({
           scrollSelector: "#results",
-          showSizeSelector: false,
-          showRecordCount: false,
-          showChevrons: true,
         }),
       }),
 
-      // new emlo.CustomPaginationComponent({
-      //   id: "top-pager",
-      //   category: "top",
-      //   renderer: new emlo.CustomPaginationRenderer({}),
-      // }),
-
-      new edges.components.Pager({
+      new emlo.Pagination({
         id: "bottom-pager",
         category: "bottom",
-        renderer: new edges.renderers.bs3.Pager({
+        renderer: new emlo.PaginationRenderer({
           scrollSelector: "#results",
-          showSizeSelector: false,
-          showRecordCount: false,
-          showChevrons: true,
         }),
       }),
 

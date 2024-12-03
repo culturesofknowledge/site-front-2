@@ -3333,7 +3333,7 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
 
 //     // Filter the results
 //     var results = source.results(); // Assuming results are fetched from the edge.result
-//     this._appendResults({ results: results });
+//     // this._appendResults({ results: results });
 
 //     // Record the hit count for later use
 //     this.hitCount = source.total(); // Assuming total is available
@@ -3341,75 +3341,529 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
 //   }
 // };
 
-// emlo.CustomPaginationRenderer = class extends edges.Renderer {
+// emlo.PagerRenderer = class extends edges.renderers.bs3.Pager {
+//   constructor(params) {
+//     super(params); // Initialize the parent constructor for necessary functionality
+//     this.namespace = "edges-custom-pager"; // Custom namespace for our custom pager
+//   }
+
+//   // Overriding the draw method to customize the rendering of pagination controls
+//   draw() {
+//     const component = this.component;
+
+//     if (component.total === false || component.total === 0) {
+//       component.context.html(""); // If no results, clear the pagination container
+//       return;
+//     }
+
+//     // Prepare classes for different elements
+//     const containerClass = edges.util.allClasses(
+//       this.namespace,
+//       "container",
+//       this
+//     );
+//     const totalClass = edges.util.allClasses(this.namespace, "total", this);
+//     const navClass = edges.util.allClasses(this.namespace, "nav", this);
+//     const firstClass = edges.util.allClasses(this.namespace, "first", this);
+//     const prevClass = edges.util.allClasses(this.namespace, "prev", this);
+//     const pageClass = edges.util.allClasses(this.namespace, "page", this);
+//     const nextClass = edges.util.allClasses(this.namespace, "next", this);
+//     const sizeSelectClass = edges.util.allClasses(this.namespace, "size", this);
+
+//     // Record count display
+//     let recordCount = "";
+//     if (this.showRecordCount) {
+//       let total = component.total;
+//       if (this.numberFormat) {
+//         total = this.numberFormat(total);
+//       }
+//       recordCount = `<span class="${totalClass}">${total}</span> results found`;
+//     }
+
+//     // Page size selector logic
+//     let sizer = "";
+//     if (this.showSizeSelector) {
+//       sizer = `<div class="form-inline">${recordCount} ${this.sizePrefix}<div class="form-group"><select class="form-control input-sm ${sizeSelectClass}" name="${component.id}-page-size">{{SIZES}}</select></div>${this.sizeSuffix}</div>`;
+
+//       // Generate size options
+//       let sizeOpts = "";
+//       let options = this.sizeOptions.slice(0);
+//       if (!options.includes(component.pageSize)) {
+//         options.push(component.pageSize);
+//       }
+//       options.sort((a, b) => a - b); // Sort numerically
+//       options.forEach((size) => {
+//         const selected =
+//           size === component.pageSize ? "selected='selected'" : "";
+//         sizeOpts += `<option value="${size}" ${selected}>${size}</option>`;
+//       });
+//       sizer = sizer.replace(/{{SIZES}}/g, sizeOpts);
+//     }
+
+//     // Page navigation controls logic
+//     let nav = "";
+//     if (this.showPageNavigation) {
+//       // First and Previous page
+//       let first = `<a href="#" class="${firstClass}">First</a>`;
+//       let prev = `<a href="#" class="${prevClass}"><<<</a>`;
+//       if (component.page === 1) {
+//         first = `<span class="${firstClass} disabled">First</span>`;
+//         prev = `<span class="${prevClass} disabled"><<<</span>`;
+//       }
+
+//       // Next and Last page
+//       let next = `<a href="#" class="${nextClass}">>>></a>`;
+//       let last = `<a href="#" class="${firstClass}">Last</a>`;
+//       if (component.page === component.totalPages) {
+//         next = `<span class="${nextClass} disabled">>>></span>`;
+//         last = `<span class="${firstClass} disabled">Last</span>`;
+//       }
+
+//       // Pagination: Ellipses and current page range
+//       let pageNumbers = "";
+//       const totalPages = component.totalPages;
+//       const currentPage = component.page;
+//       const startPage = Math.max(1, currentPage - 2);
+//       const endPage = Math.min(totalPages, currentPage + 2);
+
+//       if (currentPage > 3) {
+//         pageNumbers += `<span class="${pageClass}">...</span>`;
+//       }
+
+//       for (let i = startPage; i <= endPage; i++) {
+//         let pageClassName =
+//           i === currentPage ? `${pageClass} current` : pageClass;
+//         pageNumbers += `<a href="#" class="${pageClassName}">${i}</a>`;
+//       }
+
+//       if (currentPage < totalPages - 2) {
+//         pageNumbers += `<span class="${pageClass}">...</span>`;
+//       }
+
+//       // Assemble navigation
+//       nav = `<div class="${navClass}">${first} ${prev} ${pageNumbers} ${next} ${last}</div>`;
+//     }
+
+//     // Combine record count, page size selector, and page navigation controls
+//     let frag = "";
+//     if (this.showSizeSelector && !this.showPageNavigation) {
+//       frag = `<div class="${containerClass}"><div class="row"><div class="col-md-12">{{COUNT}}</div></div></div>`;
+//     } else if (!this.showSizeSelector && this.showPageNavigation) {
+//       frag = `<div class="${containerClass}"><div class="row"><div class="col-md-12">{{NAV}}</div></div></div>`;
+//     } else {
+//       frag = `<div class="${containerClass}"><div class="row"><div class="col-md-6">{{COUNT}}</div><div class="col-md-6">{{NAV}}</div></div></div>`;
+//     }
+//     frag = frag.replace(/{{COUNT}}/g, sizer).replace(/{{NAV}}/g, nav);
+
+//     // Insert the HTML into the component's context
+//     component.context.html(frag);
+
+//     // Bind the pagination controls to their respective actions
+//     this.bindPaginationActions();
+//   }
+
+//   // Bind events to pagination controls (First, Prev, Next, Last, Page Numbers)
+//   bindPaginationActions() {
+//     const component = this.component;
+
+//     // First Page
+//     component.context.find(`.${this.namespace}-first`).on("click", (e) => {
+//       e.preventDefault();
+//       if (component.page !== 1) {
+//         component.setFrom(1); // Navigate to the first page
+//       }
+//     });
+
+//     // Previous 10 Pages
+//     component.context.find(`.${this.namespace}-prev`).on("click", (e) => {
+//       e.preventDefault();
+//       if (component.page > 10) {
+//         component.setFrom((component.page - 11) * component.pageSize + 1); // Navigate to 10 pages back
+//       } else {
+//         component.setFrom(1); // Navigate to the first page
+//       }
+//     });
+
+//     // Next 10 Pages
+//     component.context.find(`.${this.namespace}-next`).on("click", (e) => {
+//       e.preventDefault();
+//       if (component.page < component.totalPages - 10) {
+//         component.setFrom((component.page + 10) * component.pageSize + 1); // Navigate to 10 pages ahead
+//       } else {
+//         component.setFrom((component.totalPages - 1) * component.pageSize + 1); // Navigate to the last page
+//       }
+//     });
+
+//     // Last Page
+//     component.context.find(`.${this.namespace}-last`).on("click", (e) => {
+//       e.preventDefault();
+//       console.log("Clicked");
+//       if (component.page !== component.totalPages) {
+//         component.setFrom((component.totalPages - 1) * component.pageSize + 1); // Navigate to the last page
+//       }
+//     });
+
+//     // Page Number Click
+//     component.context.find(`.${this.namespace}-page`).each((index, button) => {
+//       $(button).on("click", (e) => {
+//         e.preventDefault();
+//         const selectedPage = parseInt($(button).text(), 10);
+//         component.goToPage({ page: selectedPage }); // Navigate to the clicked page
+//       });
+//     });
+
+//     // Handle page size change if enabled
+//     if (this.showSizeSelector) {
+//       component.context.find(`.${this.namespace}-size`).on("change", (e) => {
+//         const newSize = $(e.target).val();
+//         component.setSize(newSize); // Change the page size
+//       });
+//     }
+//   }
+
+//   // Custom scroll behavior (if enabled)
+//   doScroll() {
+//     $("html, body").animate(
+//       {
+//         scrollTop: $(this.scrollSelector).offset().top,
+//       },
+//       1
+//     );
+//   }
+// };
+
+emlo.Pagination = class extends edges.Component {
+  constructor(params) {
+    super(params);
+
+    this.from = false;
+    this.to = false;
+    this.total = false;
+    this.page = false;
+    this.pageSize = false;
+    this.totalPages = false;
+  }
+
+  synchronise() {
+    this.from = false;
+    this.to = false;
+    this.total = false;
+    this.page = false;
+    this.pageSize = false;
+    this.totalPages = false;
+
+    if (this.edge.currentQuery) {
+      this.from = parseInt(this.edge.currentQuery.getFrom()) + 1;
+      this.pageSize = parseInt(this.edge.currentQuery.getSize());
+    }
+    if (this.edge.result) {
+      this.total = this.edge.result.total();
+    }
+    if (this.from !== false && this.total !== false) {
+      this.to = this.from + this.pageSize - 1;
+      this.page = Math.ceil((this.from - 1) / this.pageSize) + 1;
+      this.totalPages = Math.ceil(this.total / this.pageSize);
+    }
+  }
+
+  setFrom(from) {
+    const nq = this.edge.cloneQuery();
+    nq.from = from - 1; // 0-indexed for internal
+    if (nq.from < 0) nq.from = 0;
+    this.edge.pushQuery(nq);
+    this.edge.cycle();
+  }
+
+  setSize(size) {
+    const nq = this.edge.cloneQuery();
+    nq.size = size;
+    this.edge.pushQuery(nq);
+    this.edge.cycle();
+  }
+
+  decrementPage() {
+    const from = Math.max(this.from - 10 * this.pageSize, 1);
+    this.setFrom(from);
+  }
+
+  incrementPage() {
+    const from = Math.min(
+      this.from + 10 * this.pageSize,
+      (this.totalPages - 1) * this.pageSize + 1
+    );
+    this.setFrom(from);
+  }
+
+  goToPage(params) {
+    const page = params.page;
+    const nf = (page - 1) * this.pageSize + 1;
+    this.setFrom(nf);
+  }
+
+  goToFirst() {
+    this.setFrom(1);
+  }
+
+  goToLast() {
+    this.setFrom((this.totalPages - 1) * this.pageSize + 1);
+  }
+};
+
+// emlo.PaginationRenderer = class extends edges.Renderer {
 //   constructor(params) {
 //     super(params);
-//     this.namespace = "edges-pagination-display"; // Namespace for the pagination container
+
+//     this.scroll = edges.util.getParam(params, "scroll", true);
+//     this.scrollSelector = edges.util.getParam(params, "scrollSelector", "body");
+//     this.namespace = "edges-bs3-pager";
 //   }
 
 //   draw() {
-//     let container = "";
-
-//     // Results count display (you can add more styling or content as needed)
-//     container = `
-//     <br />
-//     <li class="pagination-text text-center">
-//         <span>Results: ${edges.util.escapeHtml(this.component.hitCount)}</span>
-//       </li>
-//       <br />
-//   `;
-
-//     // Pagination logic
-//     if (this.component.hitCount > 0) {
-//       const totalPages = Math.ceil(
-//         this.component.hitCount / this.component.pageSize
-//       );
-//       const currentPage = this.component.currentPage;
-
-//       if (totalPages > 1) {
-//         let paginationHTML = `<div class="pagination-controls">`;
-
-//         // "First" and "Previous" buttons
-//         paginationHTML +=
-//           currentPage > 1
-//             ? `<button class="first-page">First</button><button class="previous-10"><<<</button>`
-//             : "";
-
-//         // Ellipsis before current pages if needed
-//         if (currentPage > 3) {
-//           paginationHTML += `<span class="ellipsis">...</span>`;
-//         }
-
-//         // Page numbers (display 5 pages around current page)
-//         for (
-//           let i = Math.max(1, currentPage - 2);
-//           i <= Math.min(totalPages, currentPage + 2);
-//           i++
-//         ) {
-//           paginationHTML += `<button class="page-number">${i}</button>`;
-//         }
-
-//         // Ellipsis after current pages if needed
-//         if (currentPage < totalPages - 2) {
-//           paginationHTML += `<span class="ellipsis">...</span>`;
-//         }
-
-//         // "Next" and "Last" buttons
-//         paginationHTML +=
-//           currentPage < totalPages
-//             ? `<button class="next-10">>>></button><button class="last-page">Last</button>`
-//             : "";
-
-//         paginationHTML += `</div>`;
-
-//         // Append pagination to the container
-//         container += paginationHTML;
-//       }
+//     if (this.component.total === false || this.component.total === 0) {
+//       this.component.context.html("");
+//       return;
 //     }
 
-//     // Update the HTML
-//     this.component.context.html(container);
+//     const containerClass = edges.util.allClasses(
+//       this.namespace,
+//       "container",
+//       this
+//     );
+//     const navClass = edges.util.allClasses(this.namespace, "nav", this);
+
+//     const pageNum = this.component.page;
+//     const totalPages = this.component.totalPages;
+
+//     const nav = `
+//       <div class="page-indicator">Page ${pageNum} of ${totalPages}. (The arrows will jump blocks of 10 pages.) </div>
+//       <br/>
+//       <div class="${navClass}">
+//           ${this.button("First", pageNum > 1, this.goToFirst.bind(this))}
+//           ${this.button("<<<", pageNum > 10, this.decrementBlock.bind(this))}
+//           ${this.pageIndicators()}
+//           ${this.button(
+//             ">>>",
+//             pageNum <= totalPages - 10,
+//             this.incrementBlock.bind(this)
+//           )}
+//           ${this.button("Last", pageNum < totalPages, this.goToLast.bind(this))}
+//       </div>`;
+
+//     const frag = `<div class="${containerClass}">${nav}</div>`;
+//     this.component.context.html(frag);
+
+//     this.bindEvents();
+//   }
+
+//   pageIndicators() {
+//     const startPage = Math.max(1, this.component.page - 2);
+//     const endPage = Math.min(
+//       this.component.totalPages,
+//       this.component.page + 2
+//     );
+//     let html = "";
+
+//     if (startPage > 1) {
+//       html += '<span class="disabled">...</span>';
+//     }
+
+//     for (let i = startPage; i <= endPage; i++) {
+//       const isActive = i === this.component.page;
+//       html += this.pageButton(i, isActive);
+//     }
+
+//     if (endPage < this.component.totalPages) {
+//       html += '<span class="disabled">...</span>';
+//     }
+
+//     return html;
+//   }
+
+//   pageButton(page, isActive) {
+//     const classes = isActive ? "btn btn-primary active" : "btn btn-secondary";
+//     return `<button class="${classes}" data-page="${page}">${page}</button>`;
+//   }
+
+//   button(label, enabled, action) {
+//     const disabledClass = enabled ? "" : "disabled";
+//     const onClick = enabled ? `data-action="${action.name}"` : "";
+//     return `<button class="btn btn-link ${disabledClass}" ${onClick}>${label}</button>`;
+//   }
+
+//   bindEvents() {
+//     const context = this.component.context;
+
+//     // Bind for numbered page buttons
+//     context.find("button[data-page]").click((event) => {
+//       const page = parseInt($(event.target).data("page"));
+//       this.component.goToPage({ page });
+//     });
+
+//     // Bind for nav buttons
+//     context.find("button[data-action]").click((event) => {
+//       const action = $(event.target).data("action");
+//       if (typeof this[action] === "function") {
+//         this[action]();
+//       }
+//     });
+//   }
+
+//   goToFirst() {
+//     this.component.goToFirst();
+//   }
+
+//   goToLast() {
+//     this.component.goToLast();
+//   }
+
+//   decrementBlock() {
+//     const newPage = Math.max(1, this.component.page - 10);
+//     this.component.goToPage({ page: newPage });
+//   }
+
+//   incrementBlock() {
+//     const newPage = Math.min(
+//       this.component.totalPages,
+//       this.component.page + 10
+//     );
+//     console.log("new page", newPage);
+//     this.component.goToPage({ page: newPage });
 //   }
 // };
+
+emlo.PaginationRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+    this.scroll = edges.util.getParam(params, "scroll", true);
+    this.scrollSelector = edges.util.getParam(params, "scrollSelector", "body");
+    this.namespace = "edges-bs3-pager";
+  }
+
+  draw() {
+    // Sync the pagination data from the component
+    this.component.synchronise();
+
+    // Render the navigation UI with page information
+    var nav = this._renderNavigation();
+    var pageInfo = `<p>Page ${this.component.page} of ${this.component.totalPages}. (The arrows will jump blocks of 10 pages.)  </p>`;
+    var container = `
+          <div>${pageInfo}</div>
+          <div class="${this.namespace}-container">
+              ${nav}
+          </div>
+      `;
+    this.component.context.html(container);
+    this.bindEvents();
+  }
+
+  _renderNavigation() {
+    var firstClass = edges.util.allClasses(this.namespace, "first", this);
+    var prevBlockClass = edges.util.allClasses(
+      this.namespace,
+      "prev-block",
+      this
+    );
+    var pageNumClass = edges.util.allClasses(this.namespace, "page-num", this);
+    var nextBlockClass = edges.util.allClasses(
+      this.namespace,
+      "next-block",
+      this
+    );
+    var lastClass = edges.util.allClasses(this.namespace, "last", this);
+    var ellipsisClass = edges.util.allClasses(this.namespace, "ellipsis", this);
+
+    // Generate first, prev, next, last buttons
+    var firstBtn = `<div class="button-wrapper ${firstClass}">First</div>`;
+    var prevBlockBtn = `<div class="button-wrapper ${prevBlockClass}"><<<</div>`;
+    var nextBlockBtn = `<div class="button-wrapper ${nextBlockClass}">>>></div>`;
+    var lastBtn = `<div class="button-wrapper ${lastClass}">Last</div>`;
+
+    // Ellipsis buttons for indicating more pages to the back or forward
+    var prevEllipsis =
+      this.component.page > 3
+        ? `<div class="button-wrapper ${ellipsisClass}">...</div>`
+        : "";
+    var nextEllipsis =
+      this.component.page < this.component.totalPages - 2
+        ? `<div class="button-wrapper ${ellipsisClass}">...</div>`
+        : "";
+
+    // Dynamically create page number buttons based on the current page and total pages
+    var pageBtns = "";
+    const pageCount = this.component.totalPages;
+    const currentPage = this.component.page;
+
+    // Ensure we always have at least 5 pages to display
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(pageCount, currentPage + 2);
+
+    // Generate page number buttons with appropriate range
+    if (startPage > 1) {
+      pageBtns += prevEllipsis; // Show ellipsis if there are pages before the current range
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      let activeClass = i === currentPage ? "active" : "";
+      pageBtns += `<div class="button-wrapper ${pageNumClass} ${activeClass}" data-page="${i}">${i}</div>`;
+    }
+
+    if (endPage < pageCount) {
+      pageBtns += nextEllipsis; // Show ellipsis if there are pages after the current range
+    }
+
+    return `${firstBtn} ${prevBlockBtn} ${pageBtns} ${nextBlockBtn} ${lastBtn}`;
+  }
+
+  bindEvents() {
+    var firstSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "first",
+      this
+    );
+    var lastSelector = edges.util.jsClassSelector(this.namespace, "last", this);
+    var prevBlockSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "prev-block",
+      this
+    );
+    var nextBlockSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "next-block",
+      this
+    );
+    var pageSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "page-num",
+      this
+    );
+
+    edges.on(firstSelector, "click", this, "goToFirst");
+    edges.on(lastSelector, "click", this, "goToLast");
+    edges.on(prevBlockSelector, "click", this, "decrementPage");
+    edges.on(nextBlockSelector, "click", this, "incrementPage");
+    edges.on(pageSelector, "click", this, "goToPage");
+  }
+
+  goToFirst() {
+    this.component.goToFirst();
+  }
+
+  goToLast() {
+    this.component.goToLast();
+  }
+
+  incrementPage() {
+    this.component.incrementPage();
+  }
+
+  decrementPage() {
+    this.component.decrementPage();
+  }
+
+  goToPage(element) {
+    var page = parseInt($(element).attr("data-page"));
+    this.component.goToPage({ page });
+  }
+};
 
 export default emlo;

@@ -10256,3 +10256,60 @@ ul.pagination li {
   margin-left: 40px;
   margin-bottom: 20px;
 }
+
+/* Pagination container */
+.edges-bs3-pager-container {
+  display: flex;
+  justify-content: flex-start; /* Aligns buttons to the left */
+  white-space: nowrap; /* Prevent wrapping of buttons */
+  padding: 5px 0; /* Optional padding for some space */
+  width: 100%; /* Full width of the parent container */
+  height: 24px; /* Height of the container */
+  margin-bottom: 20px; /* Adds margin to the bottom of the container */
+}
+
+/* General button styles applied to the div that wraps the button */
+.edges-bs3-pager-container .button-wrapper {
+  display: flex; /* Flexbox for centering content */
+  justify-content: center; /* Horizontally center button text */
+  align-items: center; /* Vertically center button text */
+  width: 60px; /* Set button width to 50px */
+  height: 24px; /* Set button height to 24px */
+  font-size: 14px; /* Font size */
+  text-align: center; /* Center align text */
+  border: 1px solid #ddd; /* Border color */
+  background-color: #ddd; /* Default background color */
+  color: black; /* Text color */
+  margin: 0 2px; /* Space between buttons */
+  border-radius: 4px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s, color 0.3s; /* Smooth transition for background and text color */
+  white-space: nowrap; /* Prevent text from breaking inside the button */
+}
+
+/* Active button styles applied to the div that wraps the button */
+.edges-bs3-pager-container .button-wrapper.active {
+  background-color: #008cba; /* Active button background color */
+  color: white; /* Active button text color */
+}
+
+/* Hover effect for buttons */
+.edges-bs3-pager-container .button-wrapper:hover {
+  background-color: #ccc; /* Background color when hovering */
+}
+
+/* Styles for '...' (ellipsis) buttons */
+.edges-bs3-pager-container .button-wrapper.ellipsis {
+  background-color: transparent; /* Transparent background for ellipsis */
+  color: #888; /* Gray color for ellipsis */
+  font-size: 16px; /* Slightly larger font for ellipsis */
+  font-weight: bold; /* Bold font for ellipsis */
+  border: none; /* Remove border for ellipsis */
+}
+
+/* Disabled buttons (e.g., when you can't go back from the first page) */
+.edges-bs3-pager-container .button-wrapper:disabled {
+  background-color: #f2f2f2; /* Disabled button background */
+  color: #bbb; /* Disabled button text color */
+  cursor: not-allowed; /* Not-allowed cursor on disabled buttons */
+}

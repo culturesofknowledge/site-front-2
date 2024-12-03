@@ -350,7 +350,6 @@ try {
 function generateResultHeader(selector) {
   try {
     let currentDoc = document.getElementById("result-header");
-
     // Check if the fetching process is active
     if (!emlo || !emlo.active || !emlo.active[selector]) {
       currentDoc.innerHTML = "Loading results...";

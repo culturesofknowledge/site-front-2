@@ -608,6 +608,33 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
     );
     const container = `<div class="${containerClasses}">${frag}</div>`;
     this.component.context.html(container);
+    this._updateHeader();
+  }
+
+  _updateHeader() {
+    let currentDoc = document.getElementById("result-header");
+
+    if (!this) {
+      currentDoc.innerHTML = "Loading results...";
+      return;
+    }
+
+    if (
+      this.result &&
+      this.result.data &&
+      this.result.data.response &&
+      this.result.data.response.numFound
+    ) {
+      const numFound = this.result.data.response.numFound;
+      if (numFound > 50) {
+        currentDoc.innerHTML = `${numFound} results (50 results per page)`;
+      } else {
+        currentDoc.innerHTML = `${numFound} results`;
+      }
+    } else {
+      // Fallback message when results are not fetched
+      currentDoc.innerHTML = "Loading results...";
+    }
   }
 
   // _renderResult(res, index) {

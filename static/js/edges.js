@@ -474,8 +474,12 @@ emlo.ResultTable = class extends edges.Component {
   _updateHeader() {
     try {
       let currentDoc = document.getElementById(this.headerSelector);
-      // Check if the fetching process is active
 
+      if (!currentDoc) {
+        return;
+      }
+
+      // Check if the fetching process is active
       if (!this.hitCount) {
         currentDoc.innerHTML = "Loading results...";
         return;
@@ -604,7 +608,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
   draw() {
     let frag = this.noResultsText;
     if (this.component.results === false) {
-      frag = "";
+      frag = "Loading results... Please wait";
     }
 
     const results = this.component.results;
@@ -3124,12 +3128,14 @@ emlo.PaginationRenderer = class extends edges.Renderer {
     // Render the navigation UI with page information
     var nav = this._renderNavigation();
     var pageInfo = `<p>Page ${this.component.page} of ${this.component.totalPages}. (The arrows will jump blocks of 10 pages.)  </p>`;
-    var container = `
+    var container = this.component.page
+      ? `
           <div>${pageInfo}</div>
           <div class="${this.namespace}-container">
               ${nav}
           </div>
-      `;
+      `
+      : "";
     this.component.context.html(container);
     this.bindEvents();
   }

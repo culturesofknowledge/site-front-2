@@ -138,6 +138,26 @@ try {
     emlo.collection = "/solr/works/select";
 
     emlo.components = [
+      // new emlo.SortSelect({
+      //   id: "sorting",
+      //   category: "top",
+      //   sortOptions: [
+      //     {
+      //       display: "Name Ascending",
+      //       value: "name_asc",
+      //       field: "started_date_sort",
+      //       order: "asc",
+      //     },
+      //     {
+      //       display: "Name Descending",
+      //       value: "name_desc",
+      //       field: "started_date_sort",
+      //       order: "desc",
+      //     },
+      //   ],
+      //   renderer: new emlo.SortSelectRenderer({}),
+      // }),
+
       new emlo.Pagination({
         id: "top-pager",
         category: "top",

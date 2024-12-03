@@ -3250,4 +3250,108 @@ emlo.PaginationRenderer = class extends edges.Renderer {
   }
 };
 
+emlo.SortSelect = class extends edges.Component {
+  constructor(params) {
+    super(params);
+
+    // The options that will populate the dropdown
+    this.sortOptions = edges.util.getParam(params, "sortOptions", []);
+    // The selected sort option
+    this.selectedOption = null;
+  }
+
+  // Synchronize the component state
+  synchronise() {
+    if (!this.selectedOption && this.sortOptions.length > 0) {
+      // Default to the first option if no selection is made
+      this.selectedOption = this.sortOptions[0];
+    }
+  }
+
+  // Set the selected sort option and trigger the sorting logic
+  setSortOption(option) {
+    this.selectedOption = option;
+    this.applySort(); // Apply the sorting based on the selected option
+  }
+
+  // Apply the sort (logic based on field and order)
+  applySort() {
+    if (this.selectedOption) {
+      const { field, order } = this.selectedOption;
+      // You can modify this logic to apply sorting to your dataset
+      console.log(`Sorting by ${field} in ${order} order.`);
+      // Trigger sorting functionality here
+    }
+  }
+};
+
+emlo.SortSelectRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+    this.namespace = "edges-sort-select"; // Namespace for the sort select
+  }
+
+  draw() {
+    // Sync the sort options data from the component
+    this.component.synchronise();
+
+    // Render the sort select UI
+    var selectUI = this._renderSortSelect();
+    var container =
+      this.component.sortOptions.length > 0
+        ? `
+      <div class="${this.namespace}-container">
+        ${selectUI}
+      </div>
+    `
+        : "";
+    this.component.context.html(container);
+    this.bindEvents();
+  }
+
+  _renderSortSelect() {
+    // Get the currently selected sort option
+    var selectedValue = this.component.selectedOption
+      ? this.component.selectedOption.value
+      : "";
+
+    // Generate the dropdown with the options from the component
+    var optionsHTML = this.component.sortOptions
+      .map((option) => {
+        return `<option value="${option.value}" ${
+          selectedValue === option.value ? "selected" : ""
+        }>
+                  ${option.display}
+                </option>`;
+      })
+      .join("");
+
+    return `
+      <label for="sortOptions">Sort by:</label>
+      <select id="sortOptions" class="${this.namespace}-dropdown">
+        ${optionsHTML}
+      </select>
+    `;
+  }
+
+  bindEvents() {
+    var selectSelector = `#sortOptions`;
+
+    // Bind the change event to the dropdown
+    edges.on(selectSelector, "change", this, "onSortChange");
+  }
+
+  // Event handler for when the user selects a new sort option
+  onSortChange(event) {
+    console.log("hie", event.target);
+    const selectedValue = event.target.value;
+    const selectedOption = this.component.sortOptions.find(
+      (option) => option.value === selectedValue
+    );
+    if (selectedOption) {
+      this.component.setSortOption(selectedOption); // Set the selected sort option
+    }
+  }
+};
+
 export default emlo;

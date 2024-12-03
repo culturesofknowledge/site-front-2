@@ -72,6 +72,8 @@ try {
         infiniteScroll: true,
         size: 20,
         infiniteScrollPageSize: 50,
+        updateHeader: true,
+        headerSelector: "result-header",
         renderer: new emlo.ResultTableRenderer({
           noResultsText: "No results to display",
           serialHeader: "",

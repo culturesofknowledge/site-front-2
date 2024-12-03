@@ -421,6 +421,13 @@ emlo.ResultTable = class extends edges.Component {
       10
     );
 
+    this.updateHeader = edges.util.getParam(params, "updateHeader", false);
+    this.headerSelector = edges.util.getParam(
+      params,
+      "headerSelector",
+      "header"
+    );
+
     //////////////////////////////////////
     // variables for tracking internal state
 
@@ -458,6 +465,36 @@ emlo.ResultTable = class extends edges.Component {
 
     // record the hit count for later use
     this.hitCount = source.total();
+
+    if (this.updateHeader) {
+      this._updateHeader();
+    }
+  }
+
+  _updateHeader() {
+    try {
+      let currentDoc = document.getElementById(this.headerSelector);
+      // Check if the fetching process is active
+
+      if (!this.hitCount) {
+        currentDoc.innerHTML = "Loading results...";
+        return;
+      }
+
+      // Check if results are fetched correctly
+      if (this.hitCount && this.hitCount >= 0) {
+        if (this.hitCount > 50) {
+          currentDoc.innerHTML = `${this.hitCount} results (50 results per page)`;
+        } else {
+          currentDoc.innerHTML = `${this.hitCount} results`;
+        }
+      } else {
+        // Fallback message when results are not fetched
+        currentDoc.innerHTML = "No results found.";
+      }
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   _appendResults(params) {
@@ -608,77 +645,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
     );
     const container = `<div class="${containerClasses}">${frag}</div>`;
     this.component.context.html(container);
-    this._updateHeader();
   }
-
-  _updateHeader() {
-    let currentDoc = document.getElementById("result-header");
-
-    if (!this) {
-      currentDoc.innerHTML = "Loading results...";
-      return;
-    }
-
-    if (
-      this.result &&
-      this.result.data &&
-      this.result.data.response &&
-      this.result.data.response.numFound
-    ) {
-      const numFound = this.result.data.response.numFound;
-      if (numFound > 50) {
-        currentDoc.innerHTML = `${numFound} results (50 results per page)`;
-      } else {
-        currentDoc.innerHTML = `${numFound} results`;
-      }
-    } else {
-      // Fallback message when results are not fetched
-      currentDoc.innerHTML = "Loading results...";
-    }
-  }
-
-  // _renderResult(res, index) {
-  //   const rowClasses = edges.util.styleClasses(
-  //     this.namespace,
-  //     "row",
-  //     this.component.id
-  //   );
-  //   const row = this.tableDisplay
-  //     .map((field) => {
-  //       let val = "";
-  //       if (field.field) {
-  //         val = this._getValue(field.field, res, val);
-  //       }
-  //       if (val) {
-  //         val = edges.util.escapeHtml(val);
-  //       }
-  //       if (field.valueFunction) {
-  //         val = field.valueFunction(val, res, this);
-  //       }
-  //       if (!val && this.omitFieldIfEmpty) {
-  //         return "<td></td>";
-  //       }
-
-  //       if (field.type) {
-  //         if (field.type == "date") {
-  //           return `<td>${this._formatDate(val)}</td>`;
-  //         } else if (field.type == "link") {
-  //           if (field.linkText) {
-  //             return `<td><a href=${val}>${field.linkText}</a></td>`;
-  //           } else {
-  //             return `<td><a href=${val}>Link</a></td>`;
-  //           }
-  //         }
-  //       }
-
-  //       return `<td>${field.pre || ""}${val}${field.post || ""}</td>`;
-  //     })
-  //     .join("");
-
-  //   return this.showIndex
-  //     ? `<tr class="${rowClasses}"><td>${index + 1}</td>${row}</tr>`
-  //     : `<tr class="${rowClasses}">${row}</tr>`;
-  // }
 
   _renderResult(res, index) {
     const rowClasses = edges.util.styleClasses(
@@ -3274,110 +3241,6 @@ emlo.PaginationRenderer = class extends edges.Renderer {
   goToPage(element) {
     var page = parseInt($(element).attr("data-page"));
     this.component.goToPage({ page });
-  }
-};
-
-emlo.SortSelect = class extends edges.Component {
-  constructor(params) {
-    super(params);
-
-    // The options that will populate the dropdown
-    this.sortOptions = edges.util.getParam(params, "sortOptions", []);
-    // The selected sort option
-    this.selectedOption = null;
-  }
-
-  // Synchronize the component state
-  synchronise() {
-    if (!this.selectedOption && this.sortOptions.length > 0) {
-      // Default to the first option if no selection is made
-      this.selectedOption = this.sortOptions[0];
-    }
-  }
-
-  // Set the selected sort option and trigger the sorting logic
-  setSortOption(option) {
-    this.selectedOption = option;
-    this.applySort(); // Apply the sorting based on the selected option
-  }
-
-  // Apply the sort (logic based on field and order)
-  applySort() {
-    if (this.selectedOption) {
-      const { field, order } = this.selectedOption;
-      // You can modify this logic to apply sorting to your dataset
-      console.log(`Sorting by ${field} in ${order} order.`);
-      // Trigger sorting functionality here
-    }
-  }
-};
-
-emlo.SortSelectRenderer = class extends edges.Renderer {
-  constructor(params) {
-    super(params);
-    this.namespace = "edges-sort-select"; // Namespace for the sort select
-  }
-
-  draw() {
-    // Sync the sort options data from the component
-    this.component.synchronise();
-
-    // Render the sort select UI
-    var selectUI = this._renderSortSelect();
-    var container =
-      this.component.sortOptions.length > 0
-        ? `
-      <div class="${this.namespace}-container">
-        ${selectUI}
-      </div>
-    `
-        : "";
-    this.component.context.html(container);
-    this.bindEvents();
-  }
-
-  _renderSortSelect() {
-    // Get the currently selected sort option
-    var selectedValue = this.component.selectedOption
-      ? this.component.selectedOption.value
-      : "";
-
-    // Generate the dropdown with the options from the component
-    var optionsHTML = this.component.sortOptions
-      .map((option) => {
-        return `<option value="${option.value}" ${
-          selectedValue === option.value ? "selected" : ""
-        }>
-                  ${option.display}
-                </option>`;
-      })
-      .join("");
-
-    return `
-      <label for="sortOptions">Sort by:</label>
-      <select id="sortOptions" class="${this.namespace}-dropdown">
-        ${optionsHTML}
-      </select>
-    `;
-  }
-
-  bindEvents() {
-    var selectSelector = `#sortOptions`;
-
-    // Bind the change event to the dropdown
-    edges.on(selectSelector, "change", this, "onSortChange");
-  }
-
-  // Event handler for when the user selects a new sort option
-  onSortChange(event) {
-    console.log("hie", event.target);
-    const selectedValue = event.target.value;
-    const selectedOption = this.component.sortOptions.find(
-      (option) => option.value === selectedValue
-    );
-    if (selectedOption) {
-      this.component.setSortOption(selectedOption); // Set the selected sort option
-    }
   }
 };
 

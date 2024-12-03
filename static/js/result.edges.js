@@ -275,6 +275,8 @@ try {
         category: "results",
         secondaryResults: false,
         infiniteScroll: true,
+        updateHeader: true,
+        headerSelector: "result-header",
         size: 20,
         infiniteScrollPageSize: 50,
         renderer: new emlo.ResultTableRenderer({
@@ -346,60 +348,6 @@ try {
 } catch (error) {
   console.error(error.message);
 }
-
-function generateResultHeader(selector) {
-  try {
-    let currentDoc = document.getElementById("result-header");
-    // Check if the fetching process is active
-    if (!emlo || !emlo.active || !emlo.active[selector]) {
-      currentDoc.innerHTML = "Loading results...";
-      return;
-    }
-
-    const activeRes = emlo.active[selector];
-
-    // Check if results are fetched correctly
-    if (
-      activeRes.result &&
-      activeRes.result.data &&
-      activeRes.result.data.response &&
-      activeRes.result.data.response.numFound
-    ) {
-      const numFound = activeRes.result.data.response.numFound;
-      if (numFound > 50) {
-        currentDoc.innerHTML = `${numFound} results (50 results per page)`;
-      } else {
-        currentDoc.innerHTML = `${numFound} results`;
-      }
-    } else {
-      // Fallback message when results are not fetched
-      currentDoc.innerHTML = "No results found.";
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-// Retry fetching results after a delay
-function checkResultsWithRetry(selector, retries = 5, delay = 2000) {
-  let attempt = 0;
-
-  const intervalId = setInterval(() => {
-    generateResultHeader(selector);
-    attempt++;
-    if (attempt >= retries) {
-      clearInterval(intervalId);
-    }
-  }, delay);
-}
-
-window.onload = () => {
-  // Call the function initially
-  generateResultHeader("emlo-results");
-
-  // Set up a retry mechanism to check results
-  checkResultsWithRetry("emlo-results");
-};
 
 $(document).ready(function () {
   // Get the current URL's search parameters

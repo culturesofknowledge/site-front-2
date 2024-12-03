@@ -832,39 +832,6 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
     super(params);
   }
 
-  // synchronise() {
-  //   // reset the state of the internal variables
-  //   if (this.lifecycle === "update") {
-  //     // if we are in the "update" lifecycle, then reset and read all the values
-  //     this.values = [];
-  //     if (this.edge.result) {
-  //       this._readValues({ result: this.edge.result });
-  //     }
-  //   } else if (this.lifecycle === "static" && this.syncCounts) {
-  //     if (this.edge.result) {
-  //       this._syncCounts({ result: this.edge.result });
-  //     }
-  //   }
-  //   this.filters = [];
-
-  //   // extract all the filter values that pertain to this selector
-  //   let filters = this.edge.currentQuery.listMust(
-  //     new es.TermFilter({ field: this.field })
-  //   );
-
-  //   for (let i = 0; i < filters.length; i++) {
-  //     let val = filters[i].value;
-  //     let translate_val = this._translate(val);
-  //     let displayValue = val !== translate_val ? translate_val : val;
-
-  //     this.filters.push({
-  //       display: displayValue,
-  //       term: val,
-  //       field: filters[i].field,
-  //     });
-  //   }
-  // }
-
   synchronise() {
     // reset the state of the internal variables
     if (this.lifecycle === "update") {
@@ -936,32 +903,6 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
     }
   }
 
-  // removeFilter(field, term) {
-  //   let nq = this.edge.cloneQuery();
-  //   nq.removeMust(
-  //     new es.TermFilter({
-  //       field: field,
-  //       value: term,
-  //     })
-  //   );
-
-  //   const removecount = nq.removeQueryStrings(
-  //     new es.TermFilter({
-  //       field: field,
-  //       value: term,
-  //     })
-  //   );
-
-  //   if (removecount > 0) {
-  //   }
-
-  //   console.log("this", removecount);
-
-  //   // reset the search page to the start and then trigger the next query
-  //   nq.from = 0;
-  //   this.edge.pushQuery(nq);
-  //   this.edge.cycle();
-  // }
   removeFilter(field, term) {
     let nq = this.edge.cloneQuery();
 

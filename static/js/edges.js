@@ -3250,4 +3250,141 @@ emlo.PaginationRenderer = class extends edges.Renderer {
   }
 };
 
+emlo.Sort = class extends edges.Component {
+  constructor(params) {
+    super(params);
+
+    // Sorting options array: {display, value, field, order}
+    this.sortOptions = edges.util.getParam(params, "sortOptions", false);
+
+    // Current sorting field and order
+    this.sortBy = false;
+    this.sortDir = "desc"; // Default to descending order
+  }
+
+  synchronise() {
+    this.sortDir = "desc"; // Default to descending
+    this.sortBy = false;
+
+    if (this.edge.currentQuery) {
+      const sorts = this.edge.currentQuery.getSortBy();
+
+      if (sorts.length > 0) {
+        this.sortBy = sorts[0].field;
+        this.sortDir = sorts[0].order;
+      }
+    }
+  }
+
+  setSortBy(field) {
+    var nq = this.edge.cloneQuery();
+
+    // If no field is provided, default to "score"
+    if (!field || field === "") {
+      field = "score";
+    }
+
+    // Set the sort by field and order (based on current sortDir)
+    nq.setSortBy(
+      new es.Sort({
+        field: field,
+        order: this.sortDir, // Use the stored sortDir (asc/desc)
+      })
+    );
+
+    // Reset the search page to the start and trigger the next query
+    nq.from = 0;
+    this.edge.pushQuery(nq);
+    this.edge.cycle();
+  }
+};
+
+emlo.SortRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+    this.label = edges.util.getParam(params, "label", "Sort");
+    this.namespace = "edges-sort-renderer";
+  }
+
+  draw() {
+    // Get the component and its state
+    const comp = this.component;
+
+    if (comp.sortOptions && comp.sortOptions.length > 0) {
+      // Build the sorting dropdown
+      const dropdownClass = edges.util.allClasses(
+        this.namespace,
+        "dropdown",
+        this
+      );
+
+      const dropdown = `
+      <label> ${this.label} </label>
+      <select class="${dropdownClass} form-control">
+          ${comp.sortOptions
+            .map(
+              (opt, index) =>
+                `<option value="${opt.value}" data-field="${
+                  opt.field
+                }" data-order="${opt.order}">
+                    ${edges.util.escapeHtml(opt.display)}
+                </option>`
+            )
+            .join("")}
+      </select>`;
+
+      // Render the dropdown into the component context
+      comp.context.html(dropdown);
+
+      // Set the selectedIndex to reflect the current sortBy and sortDir
+      this.setUISortField(comp);
+
+      // Attach the event listener for the dropdown change
+      const dropdownSelector = edges.util.jsClassSelector(
+        this.namespace,
+        "dropdown",
+        this
+      );
+      edges.on(dropdownSelector, "change", this, "changeSortBy");
+    }
+  }
+
+  // This function sets the selected index based on the current sortBy field and order
+  setUISortField(comp) {
+    // Ensure the component has sort options and the current field/order
+    if (!comp.sortOptions || comp.sortOptions.length === 0 || !comp.sortBy) {
+      return;
+    }
+
+    // Find the index of the selected sort option based on field and order
+    const selectedIndex = comp.sortOptions.findIndex(
+      (option) => option.field === comp.sortBy && option.order === comp.sortDir
+    );
+
+    // Get the dropdown element and set the selected index
+    const dropdownSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "dropdown",
+      this
+    );
+    const dropdown = comp.jq(dropdownSelector);
+    if (dropdown) {
+      dropdown[0].selectedIndex = selectedIndex;
+    }
+  }
+
+  // This function is called when the user changes the sort option
+  changeSortBy = function (element) {
+    const selectedIndex = element.selectedIndex;
+    const selectedOption = this.component.sortOptions[selectedIndex];
+
+    // Update the component's sortBy and sortDir based on the selected option
+    this.component.sortBy = selectedOption.field;
+    this.component.sortDir = selectedOption.order;
+
+    // Trigger the sort logic (update the query or API call)
+    this.component.setSortBy(selectedOption.field);
+  };
+};
+
 export default emlo;

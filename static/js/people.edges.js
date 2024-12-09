@@ -82,6 +82,10 @@ try {
       infiniteScrollPageSize: 999999999,
       renderer: new emlo.ResultTableRenderer({
         noResultsText: "No results to display",
+        // showIndex: false,
+        // enableRowSelection: true,
+        // selectionLimit: 10,
+        // selectionField: "uuid",
         serialHeader: "",
         tableDisplay: [
           {

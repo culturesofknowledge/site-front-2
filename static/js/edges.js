@@ -825,6 +825,270 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
   }
 };
 
+//  With enable of row selection
+// emlo.ResultTable = class extends edges.Component {
+//   constructor(params) {
+//     super(params);
+
+//     // other properties
+//     this.secondaryResults = edges.util.getParam(
+//       params,
+//       "secondaryResults",
+//       false
+//     );
+//     this.filter = edges.util.getParam(params, "filter", false);
+//     this.sort = edges.util.getParam(params, "sort", false);
+//     this.limit = edges.util.getParam(params, "limit", false);
+//     this.infiniteScroll = edges.util.getParam(params, "infiniteScroll", false);
+//     this.infiniteScrollPageSize = edges.util.getParam(
+//       params,
+//       "infiniteScrollPageSize",
+//       10
+//     );
+//     this.updateHeader = edges.util.getParam(params, "updateHeader", false);
+//     this.headerSelector = edges.util.getParam(
+//       params,
+//       "headerSelector",
+//       "header"
+//     );
+
+//     // variables for tracking internal state
+//     this.results = false;
+//     this.infiniteScrollQuery = false;
+//     this.hitCount = 0;
+//   }
+
+//   synchronise() {
+//     this.results = [];
+//     this.infiniteScrollQuery = false;
+//     this.hitCount = 0;
+
+//     var source = this.edge.result;
+//     if (this.secondaryResults !== false) {
+//       source = this.edge.secondaryResults[this.secondaryResults];
+//     }
+
+//     if (!source) {
+//       return;
+//     }
+
+//     var results = source.results();
+//     this._appendResults({ results: results });
+//     this.hitCount = source.total();
+
+//     if (this.updateHeader) {
+//       this._updateHeader();
+//     }
+//   }
+
+//   _appendResults(params) {
+//     var results = params.results;
+
+//     if (this.filter) {
+//       results = this.filter({ results: results });
+//     }
+
+//     if (this.sort) {
+//       results.sort(this.sort);
+//     }
+
+//     if (this.limit !== false) {
+//       results = results.slice(0, this.limit);
+//     }
+
+//     this.results = this.results.concat(results);
+//   }
+// };
+
+// emlo.ResultTableRenderer = class extends edges.Renderer {
+//   constructor(params) {
+//     super(params);
+
+//     // parameters for new functionality
+//     this.enableRowSelection = edges.util.getParam(
+//       params,
+//       "enableRowSelection",
+//       false
+//     );
+//     this.selectionLimit = edges.util.getParam(
+//       params,
+//       "selectionLimit",
+//       Infinity
+//     );
+//     this.selectionField = edges.util.getParam(params, "selectionField", "");
+
+//     // parameters for existing functionality
+//     this.noResultsText = edges.util.getParam(
+//       params,
+//       "noResultsText",
+//       "No results to display"
+//     );
+//     this.tableDisplay = edges.util.getParam(params, "tableDisplay", []);
+//     this.showIndex = edges.util.getParam(params, "showIndex", true);
+//     this.serialHeader = edges.util.getParam(params, "serialHeader", "#");
+//     this.arrayValueJoin = edges.util.getParam(params, "arrayValueJoin", ", ");
+//     this.omitFieldIfEmpty = edges.util.getParam(
+//       params,
+//       "omitFieldIfEmpty",
+//       true
+//     );
+
+//     // internal state for row selection
+//     this.selectedRows = [];
+//     this.namespace = "edges-bs3-results-fields-by-table";
+//   }
+
+//   draw() {
+//     let frag = this.noResultsText;
+//     if (this.component.results === false) {
+//       frag = "Loading results... Please wait";
+//     }
+
+//     const results = this.component.results;
+//     if (results && results.length > 0) {
+//       const headers = this.tableDisplay
+//         .map((field) => `<th>${edges.util.escapeHtml(field.header)}</th>`)
+//         .join("");
+//       const headerRow = this.showIndex
+//         ? `<tr><th>${this.serialHeader}</th>${
+//             this.enableRowSelection ? "<th>Select</th>" : ""
+//           }${headers}</tr>`
+//         : `<tr>${
+//             this.enableRowSelection ? "<th>Select</th>" : ""
+//           }${headers}</tr>`;
+
+//       let rows = results
+//         .map((result, index) => this._renderResult(result, index))
+//         .join("");
+
+//       frag = `
+//             <table class="table table-bordered">
+//                 <thead>
+//                     ${headerRow}
+//                 </thead>
+//                 <tbody>
+//                     ${rows}
+//                 </tbody>
+//             </table>
+//         `;
+//     }
+
+//     const containerClasses = edges.util.styleClasses(
+//       this.namespace,
+//       "container",
+//       this.component.id
+//     );
+//     const container = `<div class="${containerClasses}">${frag}</div>`;
+//     this.component.context.html(container);
+
+//     // Draw side-nav for selected rows
+//     this._drawSideNav();
+//     this.bindEvents();
+//   }
+
+//   _renderResult(res, index) {
+//     const continuousIndex = index + 1;
+//     const rowCheckbox = this.enableRowSelection
+//       ? `<td><input type="checkbox" class="row-select" data-index="${index}" /></td>`
+//       : "";
+
+//     const row = this.tableDisplay
+//       .map((field) => {
+//         let val = this._getValue(field.field, res, "");
+//         if (val) {
+//           val = edges.util.escapeHtml(val);
+//         }
+//         if (field.valueFunction) {
+//           val = field.valueFunction(val, res, field.field, this);
+//         }
+//         return `<td>${field.pre || ""}${val}${field.post || ""}</td>`;
+//       })
+//       .join("");
+
+//     return this.showIndex
+//       ? `<tr><td>${continuousIndex}</td>${rowCheckbox}${row}</tr>`
+//       : `<tr>${rowCheckbox}${row}</tr>`;
+//   }
+
+//   _getValue(path, rec, def) {
+//     const bits = path.split(".");
+//     let val = rec;
+//     for (let i = 0; i < bits.length; i++) {
+//       const field = bits[i];
+//       if (field in val) {
+//         val = val[field];
+//       } else {
+//         return def;
+//       }
+//     }
+//     if (Array.isArray(val)) {
+//       val = val.join(this.arrayValueJoin);
+//     }
+//     return val;
+//   }
+
+//   _drawSideNav() {
+//     let sideNav = document.getElementById("side-nav");
+//     if (!sideNav) {
+//       sideNav = document.createElement("div");
+//       sideNav.id = "side-nav";
+//       sideNav.style.position = "fixed";
+//       sideNav.style.top = "0";
+//       sideNav.style.left = "0";
+//       sideNav.style.width = "250px";
+//       sideNav.style.height = "100%";
+//       sideNav.style.backgroundColor = "#f9f9f9";
+//       sideNav.style.borderRight = "1px solid #ccc";
+//       sideNav.style.overflowY = "auto";
+//       sideNav.style.padding = "10px";
+//       sideNav.style.display = "none"; // Initially hidden
+//       document.body.appendChild(sideNav);
+//     }
+
+//     sideNav.innerHTML = `<h4>Selected Rows</h4><ul>${this.selectedRows
+//       .map((row) => `<li>${row}</li>`)
+//       .join("")}</ul>`;
+//     sideNav.style.display = this.selectedRows.length > 0 ? "block" : "none";
+
+//     const container = document.querySelector(
+//       ".edges-bs3-results-fields-by-table-container"
+//     );
+//     if (container) {
+//       container.style.marginLeft = this.selectedRows.length > 0 ? "260px" : "0";
+//     }
+//   }
+
+//   bindEvents() {
+//     if (this.enableRowSelection) {
+//       const checkboxes = document.querySelectorAll(".row-select");
+//       checkboxes.forEach((checkbox) => {
+//         checkbox.addEventListener("change", (e) => {
+//           const rowIndex = parseInt(e.target.getAttribute("data-index"), 10);
+//           const fieldValue = this._getValue(
+//             this.selectionField,
+//             this.component.results[rowIndex],
+//             ""
+//           );
+
+//           if (e.target.checked) {
+//             if (this.selectedRows.length < this.selectionLimit) {
+//               this.selectedRows.push(fieldValue);
+//             } else {
+//               e.target.checked = false;
+//               alert(`Selection limit of ${this.selectionLimit} reached!`);
+//             }
+//           } else {
+//             this.selectedRows = this.selectedRows.filter(
+//               (val) => val !== fieldValue
+//             );
+//           }
+//           this._drawSideNav();
+//         });
+//       });
+//     }
+//   }
+// };
+
 emlo.Facet = class extends edges.components.RefiningANDTermSelector {
   constructor(params) {
     super(params);

@@ -109,8 +109,8 @@ emlo.ResultTemplate = class extends edges.Template {
 
       <div class="row row-with-side">
 
-        <div class="large-10 columns" style="margin-left:25px">
-            <div id="about">
+        <div class="large-12 columns">
+            <div id="about" class="large-12 columns">
                 <br/>
                 <h2 class="main">
                     <span id="result-header" class="font-18">
@@ -127,7 +127,7 @@ emlo.ResultTemplate = class extends edges.Template {
                 </h2>
             </div>
    
-             <div id="" class="large-12 columns" style="margin-left:25px">
+             <div id="" class="large-12 columns">
               <div>
                 ${top}
               </div>

@@ -10147,12 +10147,12 @@ ul.pagination li {
 .row-with-side {
   display: flex; /* Use flexbox for alignment */
   flex-wrap: nowrap; /* No wrapping by default */
-  gap: 20px; /* Space between side-nav and content */
+  gap: 10px; /* Space between side-nav and content */
 }
 
 /* Side Navigation */
 .side-nav {
-  margin-top: 265px;
+  margin-top: 200px;
   flex: 0 0 222px; /* Fixed width for larger screens */
   position: relative; /* Prevent overlap */
   border-top: 1px solid #efc319;

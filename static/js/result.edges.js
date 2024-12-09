@@ -140,25 +140,73 @@ try {
     emlo.collection = "/solr/works/select";
 
     emlo.components = [
-      // new emlo.SortSelect({
-      //   id: "sorting",
-      //   category: "top",
-      //   sortOptions: [
-      //     {
-      //       display: "Name Ascending",
-      //       value: "name_asc",
-      //       field: "started_date_sort",
-      //       order: "asc",
-      //     },
-      //     {
-      //       display: "Name Descending",
-      //       value: "name_desc",
-      //       field: "started_date_sort",
-      //       order: "desc",
-      //     },
-      //   ],
-      //   renderer: new emlo.SortSelectRenderer({}),
-      // }),
+      new emlo.Sort({
+        id: "sorting",
+        category: "top",
+        sortOptions: [
+          {
+            display: "Date Ascending",
+            field: "started_date_sort",
+            value: "date-a",
+            order: "asc",
+          },
+          {
+            display: "Date Descending",
+            field: "started_date_sort",
+            value: "date-d",
+            order: "desc",
+          },
+          {
+            display: "Author Ascending",
+            field: "author_sort",
+            value: "author-a",
+            order: "asc",
+          },
+          {
+            display: "Author Descending",
+            field: "author_sort",
+            value: "author-d",
+            order: "desc",
+          },
+          {
+            display: "Recipient Ascending",
+            field: "recipient_sort",
+            value: "recipient-a",
+            order: "asc",
+          },
+          {
+            display: "Recipient Descending",
+            field: "recipient_sort",
+            value: "recipient-d",
+            order: "desc",
+          },
+          {
+            display: "Origin Ascending",
+            field: "origin_sort",
+            value: "origin-a",
+            order: "asc",
+          },
+          {
+            display: "Origin Descending",
+            field: "origin_sort",
+            value: "origin-d",
+            order: "desc",
+          },
+          {
+            display: "Destination Ascending",
+            field: "destination_sort",
+            value: "destination-a",
+            order: "asc",
+          },
+          {
+            display: "Destination Descending",
+            field: "destination_sort",
+            value: "destination-d",
+            order: "desc",
+          },
+        ],
+        renderer: new emlo.SortRenderer({}),
+      }),
 
       new emlo.Pagination({
         id: "top-pager",

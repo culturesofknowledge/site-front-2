@@ -2870,28 +2870,36 @@ emlo.BarGraph = class extends edges.Component {
     }
   }
 };
-
 emlo.BarGraphRenderer = class extends edges.Renderer {
   constructor(params) {
     super(params);
     this.namespace = "edges-custom-bargraph-display";
     this.currentView = "separate"; // Default view
     this.maxPoints = 20; // Max number of data points
-    this.graphHeight = 300;
+    this.graphHeight = 64;
     this.graphWidth = 600;
     this.barColor = "#007bff"; // Default bar color
-    this.hoverColor = "#ff5722"; // Hover bar color
+    this.hoverColor = "#EFC319"; // Hover bar color
     this.marginAbove = 10; // Margin above the max value
+    this.margin = { top: 50, right: 20, bottom: 40, left: 40 }; // Margins for the chart
+    this.graphConfig = edges.util.getParam(params, "graphConfig", {});
+  }
+
+  // You can set this graphConfig object externally
+  setGraphConfig(config) {
+    this.graphConfig = config;
   }
 
   draw() {
     const container = this.component.loading
       ? `<div class="loading-indicator">Loading, please wait...</div>`
       : `
+      ${this._renderControls()}
         <div id="${
           this.namespace
-        }-container" class="custom-bar-graph-container"></div>
-        ${this._renderControls()}
+        }-container" class="custom-bar-graph-container">
+          <div id="${this.namespace}-chart"></div>
+        </div>
       `;
 
     this.component.context.html(container);
@@ -2916,9 +2924,7 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
   }
 
   _renderGraphs() {
-    const graphContainer = document.getElementById(
-      `${this.namespace}-container`
-    );
+    const graphContainer = document.getElementById(`${this.namespace}-chart`);
     graphContainer.innerHTML = ""; // Clear existing graphs
 
     const datasets = [];
@@ -2934,10 +2940,15 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
         this.component.xAxisField
       );
 
+      // Get the configuration for this fieldKey, or use defaults if not found
+      const config = this.graphConfig[fieldKey] || {
+        barColor: this.barColor,
+        graphTitle: fieldKey,
+      }; // Default to fieldKey as title and default bar color
+
       // Update x-axis labels to ensure they are uniform and sorted
       for (const label in valueCounts) {
         if (!labels.includes(label)) {
-          // Insert the label in sorted order
           let i = 0;
           while (i < labels.length && labels[i] < label) {
             i++;
@@ -2952,16 +2963,17 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       datasets.push({
         label: fieldKey,
         data: valueCounts,
+        config: config, // Include the config for this dataset
       });
 
       if (this.currentView === "separate") {
         this._drawGraph(
-          `${this.namespace}-${fieldKey}`,
           valueCounts,
           labels,
           maxYValue,
           fieldKey,
-          graphContainer
+          graphContainer,
+          config
         );
       }
     }
@@ -2971,123 +2983,76 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
     }
   }
 
-  _drawGraph(graphId, valueCounts, labels, maxYValue, fieldKey, container) {
-    const canvas = document.createElement("canvas");
-    canvas.width = this.graphWidth;
-    canvas.height = this.graphHeight;
-    container.appendChild(canvas);
+  _drawGraph(valueCounts, labels, maxYValue, fieldKey, container, config) {
+    // Set up SVG for the D3 chart
+    const svg = d3
+      .select(container)
+      .append("svg")
+      .attr("width", this.graphWidth + this.margin.left + this.margin.right)
+      .attr("height", this.graphHeight + this.margin.top + this.margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
 
-    const context = canvas.getContext("2d");
+    // Define scales
+    const x = d3
+      .scaleBand()
+      .domain(labels)
+      .range([0, this.graphWidth])
+      .padding(0.1);
 
-    // Adjust Y-axis value to make sure the scale fits properly and is rounded
-    // const adjustedMaxY = Math.ceil(maxYValue / 5) * 5 + this.marginAbove;
-    const adjustedMaxY =
-      Math.floor(maxYValue / 2) * 2 +
-      (maxYValue % 2 === 0 ? this.marginAbove : 0);
+    const y = d3
+      .scaleLinear()
+      .domain([0, maxYValue])
+      .nice()
+      .range([this.graphHeight, 0]);
 
-    this._renderBarChart(context, valueCounts, labels, adjustedMaxY, fieldKey);
+    // Add X-axis
+    svg
+      .append("g")
+      .attr("transform", `translate(0,${this.graphHeight})`)
+      .call(d3.axisBottom(x));
 
-    // Add hover interaction
-    canvas.addEventListener("mousemove", (event) => {
-      const rect = canvas.getBoundingClientRect();
-      const mouseX = event.clientX - rect.left;
-      const mouseY = event.clientY - rect.top;
+    // Add Y-axis (with no decimal values)
+    svg.append("g").call(d3.axisLeft(y).ticks(Math.ceil(maxYValue / 10))); // Adjust number of ticks based on the max value
 
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      this._renderBarChart(
-        context,
-        valueCounts,
-        labels,
-        adjustedMaxY,
-        fieldKey,
-        mouseX,
-        mouseY,
-        canvas
-      );
-    });
-  }
-
-  _renderBarChart(
-    context,
-    valueCounts,
-    labels,
-    maxYValue,
-    fieldKey,
-    hoverX,
-    hoverY,
-    canvas
-  ) {
-    const barWidth = (this.graphWidth - 40) / labels.length;
-
-    this._drawAxes(context, labels, maxYValue);
-
-    labels.forEach((label, index) => {
-      const value = valueCounts[label] || 0;
-      const barHeight = (value / maxYValue) * (this.graphHeight - 50);
-      const x = 20 + index * barWidth;
-      const y = this.graphHeight - barHeight - 20;
-
-      // Detect hover
-      const isHovered =
-        hoverX &&
-        hoverY &&
-        hoverX > x &&
-        hoverX < x + barWidth - 5 &&
-        hoverY > y &&
-        hoverY < y + barHeight;
-
-      context.fillStyle = isHovered ? this.hoverColor : this.barColor;
-      context.fillRect(x, y, barWidth - 5, barHeight);
-
-      // Show tooltip on hover
-      if (isHovered) {
-        context.fillStyle = "#000";
-        context.font = "12px Arial";
-        context.fillText(
-          `${label}: ${value} (${fieldKey})`,
-          hoverX + 10,
-          hoverY - 10
+    // Draw bars
+    svg
+      .selectAll(".bar")
+      .data(labels)
+      .enter()
+      .append("rect")
+      .attr("class", "bar")
+      .attr("x", (d) => x(d))
+      .attr("y", (d) => y(valueCounts[d] || 0))
+      .attr("width", x.bandwidth())
+      .attr("height", (d) => this.graphHeight - y(valueCounts[d] || 0))
+      .attr("fill", config.barColor) // Use the custom bar color (or default)
+      .on("mouseover", (event, d) => {
+        // Hover effect
+        d3.select(event.target).attr("fill", this.hoverColor);
+        this._showTooltip(
+          event,
+          `${d}: ${valueCounts[d]} ${config.graphTitle}`
         );
-      }
-    });
+      })
+      .on("mouseout", (event) => {
+        // Reset hover effect
+        d3.select(event.target).attr("fill", config.barColor);
+        this._hideTooltip();
+      });
 
-    context.textAlign = "center";
-    context.fillStyle = "#000";
-    context.fillText(fieldKey, this.graphWidth / 2, 10);
+    // Title
+    svg
+      .append("text")
+      .attr("class", "chart-title")
+      .attr("x", -10)
+      .attr("y", -20)
+      .attr("text-anchor", "left")
+      .text(config.graphTitle); // Use the custom graph title (or default to fieldKey)
   }
 
-  _drawAxes(context, labels, maxYValue) {
-    context.strokeStyle = "#000";
-    context.beginPath();
-    context.moveTo(20, 20);
-    context.lineTo(20, this.graphHeight - 20);
-    context.lineTo(this.graphWidth - 20, this.graphHeight - 20);
-    context.stroke();
-
-    // Draw horizontal grid lines and Y-axis labels
-    context.textAlign = "right";
-    context.fillStyle = "#000";
-    const step = maxYValue / 5;
-    for (let i = 0; i <= 5; i++) {
-      const value = Math.ceil(step * i); // Round to the nearest integer
-      const y =
-        this.graphHeight - 20 - (value / maxYValue) * (this.graphHeight - 50);
-      context.fillText(value, 15, y);
-
-      // Grid line
-      context.strokeStyle = "#e0e0e0";
-      context.beginPath();
-      context.moveTo(20, y);
-      context.lineTo(this.graphWidth - 20, y);
-      context.stroke();
-    }
-
-    // Draw X-axis labels
-    context.textAlign = "center";
-    labels.forEach((label, index) => {
-      const x = 20 + (index + 0.5) * ((this.graphWidth - 40) / labels.length);
-      context.fillText(label, x, this.graphHeight - 5);
-    });
+  _drawCombinedGraph(datasets, labels, maxYValue, container) {
+    // Create a combined bar chart if needed
   }
 
   toggleView(view) {
@@ -3121,7 +3086,22 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       return acc;
     }, {});
   }
+
+  _showTooltip(event, text) {
+    const tooltip = d3
+      .select("body")
+      .append("div")
+      .attr("class", "graph-tooltip")
+      .text(text)
+      .style("left", `${event.pageX + 10}px`)
+      .style("top", `${event.pageY - 10}px`);
+  }
+
+  _hideTooltip() {
+    d3.select(".graph-tooltip").remove();
+  }
 };
+
 emlo.Pagination = class extends edges.Component {
   constructor(params) {
     super(params);

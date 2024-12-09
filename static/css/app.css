@@ -10165,6 +10165,17 @@ ul.pagination li {
   height: fit-content;
 }
 
+.graph-tooltip {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  padding: 5px;
+  border-radius: 4px;
+  pointer-events: none; /* Ensures the tooltip won't interfere with other elements */
+  opacity: 1; /* Ensure it’s visible */
+  z-index: 9999; /* Make sure it's above other elements */
+}
+
 /* Content Section */
 .content {
   flex: 1; /* Take the remaining space */

@@ -210,17 +210,33 @@ function _getPeopleComponents(emlo) {
     }),
 
     // TODO: Temp removal of graphs
-    // new emlo.BarGraph({
-    //   id: "graph",
-    //   category: "results",
-    //   fieldKeys: [
-    //     "frbr_creatorOf-work",
-    //     "mail_recipientOf-work",
-    //     "dcterms_isReferencedBy-work",
-    //   ],
-    //   xAxisField: "ox_started-ox_year",
-    //   renderer: new emlo.BarGraphRenderer({}),
-    // }),
+    new emlo.BarGraph({
+      id: "graph",
+      category: "results",
+      fieldKeys: [
+        "frbr_creatorOf-work",
+        "mail_recipientOf-work",
+        "dcterms_isReferencedBy-work",
+      ],
+      xAxisField: "ox_started-ox_year",
+      renderer: new emlo.BarGraphRenderer({
+        barColor: "#2E527E",
+        graphConfig: {
+          "frbr_creatorOf-work": {
+            barColor: "#2E527E",
+            graphTitle: "Letters written",
+          },
+          "mail_recipientOf-work": {
+            barColor: "#5A7CA5",
+            graphTitle: "Letters received",
+          },
+          "dcterms_isReferencedBy-work": {
+            barColor: "#A7BFD6",
+            graphTitle: "Letters mentioning",
+          },
+        },
+      }),
+    }),
 
     new emlo.MultiFields({
       id: "letters-written",

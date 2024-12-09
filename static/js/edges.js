@@ -2781,6 +2781,13 @@ emlo.BarGraph = class extends edges.Component {
 
     this.results = source.results();
 
+    if (this.results.length === 0) {
+      console.warn("No results found.");
+      this.loading = false;
+      this.renderer.draw();
+      return;
+    }
+
     const solrCoreMap = new Map();
     const uuidToFieldKeyMap = new Map();
 
@@ -2807,7 +2814,9 @@ emlo.BarGraph = class extends edges.Component {
       }
     }
 
+    // Iterate over solrCoreMap and fetch data
     for (const [solrCore, uuids] of solrCoreMap.entries()) {
+      if (uuids.size === 0) continue; // Skip empty UUID sets
       const uuidArray = Array.from(uuids);
       const fieldData = await this._fetchGraphData(solrCore, uuidArray);
 
@@ -2827,6 +2836,11 @@ emlo.BarGraph = class extends edges.Component {
   }
 
   async _fetchGraphData(solrCore, uuidArray) {
+    if (uuidArray.length === 0) {
+      console.warn("No UUIDs provided for Solr core:", solrCore);
+      return {};
+    }
+
     const payload = {
       solrCore: solrCore,
       uuids: uuidArray,
@@ -2856,44 +2870,29 @@ emlo.BarGraph = class extends edges.Component {
     }
   }
 };
+
 emlo.BarGraphRenderer = class extends edges.Renderer {
   constructor(params) {
     super(params);
-    this.namespace = "edges-bargraph-display";
-    this.fullScreen = false;
-    this.currentView = "separate"; // Default view for graphs
-    this.chartInstances = []; // To store active Chart.js instances
-    this.graphHeight = 150; // Fixed height for the graphs (can adjust this value)
-    this.graphWidth = 600; // Fixed width for the graphs (can adjust this value)
+    this.namespace = "edges-custom-bargraph-display";
+    this.currentView = "separate"; // Default view
+    this.maxPoints = 20; // Max number of data points
+    this.graphHeight = 300;
+    this.graphWidth = 600;
+    this.barColor = "#007bff"; // Default bar color
+    this.hoverColor = "#ff5722"; // Hover bar color
+    this.marginAbove = 10; // Margin above the max value
   }
 
   draw() {
-    let container = "";
-
-    if (this.component.loading) {
-      container = `<div class="loading-indicator">Loading, please wait...</div>`;
-    } else {
-      const graphDataKeys = Object.keys(this.component.graphData);
-      const showGraphControls = graphDataKeys.length > 1;
-
-      container = `
-        <div id="${this.namespace}-container" class="bar-graph-container"></div>
-        ${
-          showGraphControls
-            ? `
-          <div class="graph-controls">
-            <button onclick="window.edges_bargraph_display.toggleView('separate')">Separate Charts</button>
-            <button onclick="window.edges_bargraph_display.toggleView('stacked')">Stacked Bar</button>
-            <button onclick="window.edges_bargraph_display.toggleView('split')">Split Bar</button>
-          </div>
-        `
-            : ""
-        }
-        <button onclick="window.edges_bargraph_display.toggleFullscreen('${
+    const container = this.component.loading
+      ? `<div class="loading-indicator">Loading, please wait...</div>`
+      : `
+        <div id="${
           this.namespace
-        }-container')">Full Screen</button>
+        }-container" class="custom-bar-graph-container"></div>
+        ${this._renderControls()}
       `;
-    }
 
     this.component.context.html(container);
 
@@ -2902,106 +2901,193 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
     }
   }
 
+  _renderControls() {
+    const graphDataKeys = Object.keys(this.component.graphData);
+    if (graphDataKeys.length <= 1) return "";
+
+    return `
+      <div class="graph-controls">
+        <button onclick="window.edges_custom_bargraph_display.toggleView('separate')">Separate Charts</button>
+        <button onclick="window.edges_custom_bargraph_display.toggleView('stacked')">Stacked Bar</button>
+        <button onclick="window.edges_custom_bargraph_display.toggleView('split')">Split Bar</button>
+      </div>
+      <button onclick="window.edges_custom_bargraph_display.toggleFullscreen('${this.namespace}-container')">Full Screen</button>
+    `;
+  }
+
   _renderGraphs() {
     const graphContainer = document.getElementById(
       `${this.namespace}-container`
     );
     graphContainer.innerHTML = ""; // Clear existing graphs
 
-    // Destroy previous charts to free memory and prevent duplication
-    this.chartInstances.forEach((chart) => chart.destroy());
-    this.chartInstances = []; // Clear chart instances
-
     const datasets = [];
-    const labelsSet = new Set();
+    const labels = []; // Unified x-axis labels
+    let maxYValue = 0; // Unified y-axis max value
 
     for (const [fieldKey, fieldData] of Object.entries(
       this.component.graphData
     )) {
+      const reducedData = this._reduceData(fieldData);
       const valueCounts = this._countOccurrences(
-        fieldData,
+        reducedData,
         this.component.xAxisField
       );
 
+      // Update x-axis labels to ensure they are uniform and sorted
+      for (const label in valueCounts) {
+        if (!labels.includes(label)) {
+          // Insert the label in sorted order
+          let i = 0;
+          while (i < labels.length && labels[i] < label) {
+            i++;
+          }
+          labels.splice(i, 0, label); // Insert at position i
+        }
+      }
+
+      const localMax = Math.max(...Object.values(valueCounts));
+      maxYValue = Math.max(maxYValue, localMax);
+
       datasets.push({
         label: fieldKey,
-        data: Object.values(valueCounts),
-        backgroundColor: this._generateRandomColor(),
+        data: valueCounts,
       });
 
-      Object.keys(valueCounts).forEach((label) => labelsSet.add(label));
-
       if (this.currentView === "separate") {
-        const graphId = `${this.namespace}-${fieldKey}`;
-        const canvas = document.createElement("canvas");
-        canvas.id = graphId;
-        canvas.className = "graph";
-        canvas.style.height = `${this.graphHeight}px`; // Set fixed height
-        canvas.style.width = `${this.graphWidth}px`; // Set fixed width
-        graphContainer.appendChild(canvas);
-
-        const chartInstance = new Chart(canvas, {
-          type: "bar",
-          data: {
-            labels: Object.keys(valueCounts),
-            datasets: [
-              {
-                label: fieldKey,
-                data: Object.values(valueCounts),
-                backgroundColor: this._generateRandomColor(),
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            scales: {
-              x: { title: { display: true, text: "Categories" } },
-              y: { title: { display: true, text: "Counts" } },
-            },
-          },
-        });
-
-        this.chartInstances.push(chartInstance); // Save instance
+        this._drawGraph(
+          `${this.namespace}-${fieldKey}`,
+          valueCounts,
+          labels,
+          maxYValue,
+          fieldKey,
+          graphContainer
+        );
       }
     }
 
     if (this.currentView !== "separate") {
-      const combinedGraphId = `${this.namespace}-combined`;
-      const combinedCanvas = document.createElement("canvas");
-      combinedCanvas.id = combinedGraphId;
-      combinedCanvas.className = "graph";
-      combinedCanvas.style.height = `${this.graphHeight}px`; // Set fixed height
-      combinedCanvas.style.width = `${this.graphWidth}px`; // Set fixed width
-      graphContainer.appendChild(combinedCanvas);
-
-      const isStacked = this.currentView === "stacked";
-
-      const chartInstance = new Chart(combinedCanvas, {
-        type: "bar",
-        data: {
-          labels: Array.from(labelsSet),
-          datasets: datasets,
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            tooltip: { mode: "index", intersect: false },
-          },
-          scales: {
-            x: {
-              stacked: isStacked,
-              title: { display: true, text: "Categories" },
-            },
-            y: {
-              stacked: isStacked,
-              title: { display: true, text: "Counts" },
-            },
-          },
-        },
-      });
-
-      this.chartInstances.push(chartInstance); // Save combined chart instance
+      this._drawCombinedGraph(datasets, labels, maxYValue, graphContainer);
     }
+  }
+
+  _drawGraph(graphId, valueCounts, labels, maxYValue, fieldKey, container) {
+    const canvas = document.createElement("canvas");
+    canvas.width = this.graphWidth;
+    canvas.height = this.graphHeight;
+    container.appendChild(canvas);
+
+    const context = canvas.getContext("2d");
+
+    // Adjust Y-axis value to make sure the scale fits properly and is rounded
+    // const adjustedMaxY = Math.ceil(maxYValue / 5) * 5 + this.marginAbove;
+    const adjustedMaxY =
+      Math.floor(maxYValue / 2) * 2 +
+      (maxYValue % 2 === 0 ? this.marginAbove : 0);
+
+    this._renderBarChart(context, valueCounts, labels, adjustedMaxY, fieldKey);
+
+    // Add hover interaction
+    canvas.addEventListener("mousemove", (event) => {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left;
+      const mouseY = event.clientY - rect.top;
+
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      this._renderBarChart(
+        context,
+        valueCounts,
+        labels,
+        adjustedMaxY,
+        fieldKey,
+        mouseX,
+        mouseY,
+        canvas
+      );
+    });
+  }
+
+  _renderBarChart(
+    context,
+    valueCounts,
+    labels,
+    maxYValue,
+    fieldKey,
+    hoverX,
+    hoverY,
+    canvas
+  ) {
+    const barWidth = (this.graphWidth - 40) / labels.length;
+
+    this._drawAxes(context, labels, maxYValue);
+
+    labels.forEach((label, index) => {
+      const value = valueCounts[label] || 0;
+      const barHeight = (value / maxYValue) * (this.graphHeight - 50);
+      const x = 20 + index * barWidth;
+      const y = this.graphHeight - barHeight - 20;
+
+      // Detect hover
+      const isHovered =
+        hoverX &&
+        hoverY &&
+        hoverX > x &&
+        hoverX < x + barWidth - 5 &&
+        hoverY > y &&
+        hoverY < y + barHeight;
+
+      context.fillStyle = isHovered ? this.hoverColor : this.barColor;
+      context.fillRect(x, y, barWidth - 5, barHeight);
+
+      // Show tooltip on hover
+      if (isHovered) {
+        context.fillStyle = "#000";
+        context.font = "12px Arial";
+        context.fillText(
+          `${label}: ${value} (${fieldKey})`,
+          hoverX + 10,
+          hoverY - 10
+        );
+      }
+    });
+
+    context.textAlign = "center";
+    context.fillStyle = "#000";
+    context.fillText(fieldKey, this.graphWidth / 2, 10);
+  }
+
+  _drawAxes(context, labels, maxYValue) {
+    context.strokeStyle = "#000";
+    context.beginPath();
+    context.moveTo(20, 20);
+    context.lineTo(20, this.graphHeight - 20);
+    context.lineTo(this.graphWidth - 20, this.graphHeight - 20);
+    context.stroke();
+
+    // Draw horizontal grid lines and Y-axis labels
+    context.textAlign = "right";
+    context.fillStyle = "#000";
+    const step = maxYValue / 5;
+    for (let i = 0; i <= 5; i++) {
+      const value = Math.ceil(step * i); // Round to the nearest integer
+      const y =
+        this.graphHeight - 20 - (value / maxYValue) * (this.graphHeight - 50);
+      context.fillText(value, 15, y);
+
+      // Grid line
+      context.strokeStyle = "#e0e0e0";
+      context.beginPath();
+      context.moveTo(20, y);
+      context.lineTo(this.graphWidth - 20, y);
+      context.stroke();
+    }
+
+    // Draw X-axis labels
+    context.textAlign = "center";
+    labels.forEach((label, index) => {
+      const x = 20 + (index + 0.5) * ((this.graphWidth - 40) / labels.length);
+      context.fillText(label, x, this.graphHeight - 5);
+    });
   }
 
   toggleView(view) {
@@ -3012,30 +3098,30 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
   toggleFullscreen(containerId) {
     const container = document.getElementById(containerId);
     if (!document.fullscreenElement) {
-      container.requestFullscreen().catch((err) => {
-        console.warn(
-          `Error attempting to enable full-screen mode: ${err.message}`
+      container
+        .requestFullscreen()
+        .catch((err) =>
+          console.warn(`Error enabling fullscreen: ${err.message}`)
         );
-      });
     } else {
       document.exitFullscreen();
     }
   }
 
-  _countOccurrences(data, xAxis) {
-    const counts = {};
-    for (const item of data) {
-      const value = item[xAxis];
-      counts[value] = (counts[value] || 0) + 1;
-    }
-    return counts;
+  _reduceData(data) {
+    if (data.length <= this.maxPoints) return data;
+    const step = Math.ceil(data.length / this.maxPoints);
+    return data.filter((_, index) => index % step === 0);
   }
 
-  _generateRandomColor() {
-    return "#" + Math.floor(Math.random() * 16777215).toString(16);
+  _countOccurrences(data, field) {
+    return data.reduce((acc, item) => {
+      const value = item[field];
+      acc[value] = (acc[value] || 0) + 1;
+      return acc;
+    }, {});
   }
 };
-
 emlo.Pagination = class extends edges.Component {
   constructor(params) {
     super(params);

@@ -1108,6 +1108,7 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
       }
     }
     this.filters = [];
+    let keys = []; // to keep the url in sync
 
     // Object containing the field mappings (example)
     const fieldMapping = {
@@ -1129,11 +1130,15 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
       let translate_val = this._translate(val);
       let displayValue = val !== translate_val ? translate_val : val;
 
-      this.filters.push({
-        display: displayValue,
-        term: val,
-        field: filters[i].field,
-      });
+      if (!keys.includes(filters[i].field)) {
+        keys.push(filters[i].field);
+
+        this.filters.push({
+          display: displayValue,
+          term: val,
+          field: filters[i].field,
+        });
+      }
     }
 
     // Check if there are query parameters in the URL
@@ -1141,21 +1146,9 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
 
     // Loop through all URL query parameters
     for (const [key, value] of urlParams.entries()) {
-      // Check if there is a field mapping for the query parameter
-      const mappedField = fieldMapping[key];
+      if (!keys.includes(key)) {
+        keys.push(key);
 
-      if (mappedField) {
-        // If a field mapping exists, use the mapped field
-        let translate_val = this._translate(value);
-        let displayValue = value !== translate_val ? translate_val : value;
-
-        this.filters.push({
-          display: displayValue,
-          term: value,
-          field: mappedField,
-        });
-      } else {
-        // If no mapping, add the query parameter as a filter
         this.filters.push({
           display: value,
           term: value,
@@ -1177,29 +1170,14 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
     );
 
     // Remove matching query strings
-    const removecount = nq.removeQueryStrings(
+    nq.removeQueryStrings(
       new es.TermFilter({
         field: field,
         value: term,
       })
     );
 
-    if (removecount > 0) {
-      // Iterate through this.filters and remove any filter that matches the term
-      this.filters = this.filters.filter((filter) => {
-        // Check if the filter has a 'term' property and if it matches the term provided
-        if (filter.term && filter.term.toLowerCase() === term.toLowerCase()) {
-          return false; // Remove the filter
-        }
-
-        return true; // Keep the filter
-      });
-
-      // Now, update the URL by removing the query parameter matching this field and term
-      const url = new URL(window.location.href);
-      url.searchParams.delete(field); // Remove the field from the query string
-      window.history.replaceState({}, "", url.toString()); // Update the URL without reloading the page
-    }
+    _removeUrlParam(field);
 
     // Reset the search page to the start and trigger the next query
     nq.from = 0;
@@ -1580,6 +1558,7 @@ emlo.FacetRenderer = class extends edges.Renderer {
 
   termSelected(element) {
     var term = this.component.jq(element).attr("data-key");
+    _addUrlParam(this.component.field, term);
     this.component.selectTerm(term);
   }
 
@@ -3716,5 +3695,23 @@ emlo.SortRenderer = class extends edges.Renderer {
     this.component.setSortBy(selectedOption.field);
   };
 };
+
+function _addUrlParam(field, term) {
+  const url = new URL(window.location.href);
+  const currentValue = url.searchParams.get(field);
+  if (currentValue !== term) {
+    url.searchParams.set(field, term); // Update or add the parameter
+    window.history.replaceState(null, "", url); // Update the browser URL without reloading
+  }
+}
+
+function _removeUrlParam(field) {
+  const url = new URL(window.location.href);
+
+  if (url.searchParams.has(field)) {
+    url.searchParams.delete(field); // Remove the parameter
+    window.history.replaceState(null, "", url); // Update the browser URL without reloading
+  }
+}
 
 export default emlo;

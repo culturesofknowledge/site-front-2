@@ -1146,7 +1146,7 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
 
     // Loop through all URL query parameters
     for (const [key, value] of urlParams.entries()) {
-      const notToBeAdded = ["start"];
+      const notToBeAdded = ["start", "sort"];
       if (!keys.includes(key) && !notToBeAdded.includes(key)) {
         keys.push(key);
 
@@ -3589,23 +3589,82 @@ emlo.Sort = class extends edges.Component {
     this.sortDir = "desc"; // Default to descending order
   }
 
+  // synchronise() {
+  //   this.sortDir = "desc"; // Default to descending
+  //   this.sortBy = false;
+
+  //   // Creating map for fetching value
+  //   const sortLookUpMap = new Map(
+  //     this.sortOptions.map((sort) => [sort.value, sort])
+  //   );
+
+  //   if (this.edge.currentQuery) {
+  //     const sorts = this.edge.currentQuery.getSortBy();
+  //     // Checking if start value is present in URL
+  //     const url = new URL(window.location.href);
+  //     const val = url.searchParams.get("sort");
+  //     let selectedOption = null;
+
+  //     if (val) {
+  //       selectedOption = sortLookUpMap.get(val);
+  //     }
+
+  //     if (sorts.length > 0 && selectedOption == null) {
+  //       this.sortBy = sorts[0].field;
+  //       this.sortDir = sorts[0].order;
+  //     } else {
+  //       this.sortBy = selectedOption.field;
+  //       this.sortDir = selectedOption.order;
+  //       console.log("here", selectedOption, this.sortDir);
+  //       this.setSortBy(selectedOption.field);
+  //     }
+  //   }
+  // }
+
   synchronise() {
     this.sortDir = "desc"; // Default to descending
     this.sortBy = false;
 
-    if (this.edge.currentQuery) {
-      const sorts = this.edge.currentQuery.getSortBy();
+    // Create a lookup map for sortOptions
+    const sortLookUpMap = new Map(
+      this.sortOptions.map((sort) => [sort.value, sort])
+    );
 
+    let selectedOption = null; // Initialize selectedOption
+    const url = new URL(window.location.href); // Get the current URL
+    const urlSortValue = url.searchParams.get("sort"); // Get 'sort' param from URL
+
+    // Check if a sort value exists in the URL
+    if (urlSortValue && sortLookUpMap.has(urlSortValue)) {
+      selectedOption = sortLookUpMap.get(urlSortValue);
+    } else if (this.edge.currentQuery) {
+      // Get sorts from the query
+      const sorts = this.edge.currentQuery.getSortBy();
       if (sorts.length > 0) {
-        this.sortBy = sorts[0].field;
-        this.sortDir = sorts[0].order;
+        // Use the first sort value from the query
+        selectedOption = {
+          field: sorts[0].field,
+          order: sorts[0].order,
+        };
       }
     }
+
+    // Fallback to the first sortOption if no sort is found
+    if (!selectedOption) {
+      selectedOption = this.sortOptions[0];
+    }
+
+    // Set the sort values
+    this.sortBy = selectedOption.field;
+    this.sortDir = selectedOption.order || "desc"; // Default to "desc" if order is not provided
+
+    // Apply the selected sort
+    this.setSortBy(this.sortBy);
   }
 
   setSortBy(field) {
     var nq = this.edge.cloneQuery();
-
+    console.log("q", nq);
     // If no field is provided, default to "score"
     if (!field || field === "") {
       field = "score";
@@ -3620,7 +3679,7 @@ emlo.Sort = class extends edges.Component {
     );
 
     // Reset the search page to the start and trigger the next query
-    nq.from = 0;
+    // nq.from = 0;
     this.edge.pushQuery(nq);
     this.edge.cycle();
   }
@@ -3709,6 +3768,7 @@ emlo.SortRenderer = class extends edges.Renderer {
     this.component.sortBy = selectedOption.field;
     this.component.sortDir = selectedOption.order;
 
+    _addUrlParam("sort", selectedOption.value);
     // Trigger the sort logic (update the query or API call)
     this.component.setSortBy(selectedOption.field);
   };

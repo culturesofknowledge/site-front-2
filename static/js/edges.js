@@ -3373,10 +3373,10 @@ emlo.Pagination = class extends edges.Component {
       const start = parseInt(val);
       const from = parseInt(this.edge.currentQuery.getFrom());
 
-      if (start > from && start != 0) {
-        this.from = start + 1;
-      } else {
+      if (start != from) {
         this.from = parseInt(this.edge.currentQuery.getFrom()) + 1;
+      } else {
+        this.from = start + 1;
       }
 
       this.pageSize = parseInt(this.edge.currentQuery.getSize());

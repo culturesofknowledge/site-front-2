@@ -3366,16 +3366,33 @@ emlo.Pagination = class extends edges.Component {
     this.totalPages = false;
 
     if (this.edge.currentQuery) {
-      this.from = parseInt(this.edge.currentQuery.getFrom()) + 1;
+      // Checking if start value is present in URL
+      const url = new URL(window.location.href);
+      const val = url.searchParams.get("start");
+      const start = parseInt(val);
+      const from = parseInt(this.edge.currentQuery.getFrom());
+
+      if (start > from && start != 0) {
+        this.from = start + 1;
+      } else {
+        this.from = parseInt(this.edge.currentQuery.getFrom()) + 1;
+      }
+
       this.pageSize = parseInt(this.edge.currentQuery.getSize());
     }
+
     if (this.edge.result) {
       this.total = this.edge.result.total();
     }
+
     if (this.from !== false && this.total !== false) {
       this.to = this.from + this.pageSize - 1;
       this.page = Math.ceil((this.from - 1) / this.pageSize) + 1;
       this.totalPages = Math.ceil(this.total / this.pageSize);
+    }
+
+    if (typeof this.from === "number") {
+      _addUrlParam("start", this.from - 1);
     }
   }
 

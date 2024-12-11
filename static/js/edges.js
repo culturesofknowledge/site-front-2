@@ -1146,7 +1146,8 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
 
     // Loop through all URL query parameters
     for (const [key, value] of urlParams.entries()) {
-      if (!keys.includes(key)) {
+      const notToBeAdded = ["start"];
+      if (!keys.includes(key) && !notToBeAdded.includes(key)) {
         keys.push(key);
 
         this.filters.push({

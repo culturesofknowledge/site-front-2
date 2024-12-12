@@ -62,6 +62,7 @@ try {
       renderer: new emlo.ResultTableRenderer({
         noResultsText: "No results to display",
         serialHeader: "",
+        showIndex: false,
         tableDisplay: [
           {
             header: "Name",

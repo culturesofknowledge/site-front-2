@@ -82,6 +82,9 @@ try {
       renderer: new emlo.ResultTableRenderer({
         noResultsText: "No results to display",
         serialHeader: "",
+        showIndex: false,
+        showCheckbox: true,
+        displayField: "browse",
         tableDisplay: [
           {
             header: "Location name",

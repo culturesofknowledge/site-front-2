@@ -1,18 +1,51 @@
 {% extends "/base/browse_base.jinja2" %}
 
 {% block browse_content %}
-    <div class="small-12 columns">
-        <h2>Locations</h2>
+    <div class="row row-with-side">
+      <div id="side-nav" class="side-nav" style="display: none;"> 
+        <h2 class="main">Current Selection</h2>
 
-        <br/>
+        <div id="selected-items-list"></div>
 
-        <div class="pagination-centered">
-            {% include '/components/common/alphabet_pagination.jinja2' %}
+        <div>
+            <button onclick="searchLetters('locations')">Show letters</button>
         </div>
+      </div>
 
-        <div class="row">
-             <div id="browse-locations-results"></div>
+      <div class="row row-with-side" style="margin-left: 20px;">
+
+        <div class="large-12 columns">
+            <div id="locations" class="large-12 columns">
+                <br/>
+                <h2 class="main">
+                    <span id="result-header" class="font-18">
+                        Locations
+                    </span>
+
+                    <br><br>
+                </h2>
+            </div>
+   
+             <div id="" class="large-12 columns">
+                <div class="pagination-centered">
+                    {% include '/components/common/alphabet_pagination.jinja2' %}
+                </div>
+                
+                <div data-alert="" class="alert-box info radius">
+				 
+				 You can select up to 10 locations using the checkboxes below, and then display associated letters.
+		                To save your selection for later use, bookmark this page.
+				   
+				  <a href="#" class="close">×</a>
+				</div>
+				
+
+                <div class="row">
+                    <div id="browse-locations-results"></div>
+                </div>
+            </div>
         </div>
+      </div>
     </div>
 {% endblock %}
 

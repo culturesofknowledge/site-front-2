@@ -20,6 +20,16 @@
                 console.error(err)
             } 
         }
+
+        // Controlling the search letters centrally for browse page
+        function searchLetters() {
+            const baseURL = `${window.location.origin}/forms/advance`;
+            const urlParams = new URLSearchParams(window.location.search);
+            const uuids = urlParams.get("uuids");
+            if (uuids) {
+                window.location.href = `${baseURL}?uuids=${uuids}`;
+            }
+        }
     </script>
 </head>
 <body>

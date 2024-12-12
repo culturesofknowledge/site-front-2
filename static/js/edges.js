@@ -574,6 +574,258 @@ emlo.ResultTable = class extends edges.Component {
   }
 };
 
+// emlo.ResultTableRenderer = class extends edges.Renderer {
+//   constructor(params) {
+//     super(params);
+
+//     // parameters that can be passed in
+//     this.noResultsText = edges.util.getParam(
+//       params,
+//       "noResultsText",
+//       "No results to display"
+//     );
+
+//     // ordered list of fields with headers, pre and post wrappers, and a value function
+//     this.tableDisplay = edges.util.getParam(params, "tableDisplay", []);
+
+//     // flag to control whether the index column is displayed
+//     this.showIndex = edges.util.getParam(params, "showIndex", true);
+//     this.serialHeader = edges.util.getParam(params, "serialHeader", "#");
+//     // if a multi-value field is found that needs to be displayed, which character to use to join
+//     this.arrayValueJoin = edges.util.getParam(params, "arrayValueJoin", ", ");
+
+//     // if a field does not have a value, don't display anything from its part of the render
+//     this.omitFieldIfEmpty = edges.util.getParam(
+//       params,
+//       "omitFieldIfEmpty",
+//       true
+//     );
+
+//     // variables for internal state
+//     this.namespace = "edges-bs3-results-fields-by-table";
+//   }
+
+//   draw() {
+//     let frag = this.noResultsText;
+//     if (this.component.results === false) {
+//       frag = "Loading results... Please wait";
+//     }
+
+//     const results = this.component.results;
+//     if (results && results.length > 0) {
+//       const recordClasses = edges.util.styleClasses(
+//         this.namespace,
+//         "record",
+//         this.component.id
+//       );
+
+//       // create table headers
+//       const headers = this.tableDisplay
+//         .map((field) => `<th>${edges.util.escapeHtml(field.header)}</th>`)
+//         .join("");
+//       const headerRow = this.showIndex
+//         ? `<tr><th>${this.serialHeader}</th>${headers}</tr>`
+//         : `<tr>${headers}</tr>`;
+//       let rows = results
+//         .map((result, index) => this._renderResult(result, index))
+//         .join("");
+
+//       frag = `
+//               <table class="table table-bordered">
+//                   <thead>
+//                       ${headerRow}
+//                   </thead>
+//                   <tbody>
+//                       ${rows}
+//                   </tbody>
+//               </table>
+//           `;
+//     }
+
+//     const containerClasses = edges.util.styleClasses(
+//       this.namespace,
+//       "container",
+//       this.component.id
+//     );
+//     const container = `<div class="${containerClasses}">${frag}</div>`;
+//     this.component.context.html(container);
+//   }
+
+//   _renderResult(res, index) {
+//     const rowClasses = edges.util.styleClasses(
+//       this.namespace,
+//       "row",
+//       this.component.id
+//     );
+
+//     // Default page size if not defined
+//     const pageSize = this.component.infiniteScrollPageSize || 50;
+
+//     // Safely retrieve the pagination component
+//     let pageNumber = 1; // Default to the first page
+
+//     const paginationComponent = this.component.edge.components.find(
+//       (comp) => comp.id === "top-pager"
+//     );
+//     if (paginationComponent && paginationComponent.page) {
+//       pageNumber = paginationComponent.page;
+//     }
+
+//     // Calculate the continuous serial number using the pageNumber and pageSize
+//     const continuousIndex = (pageNumber - 1) * pageSize + index + 1;
+
+//     const row = this.tableDisplay
+//       .map((field) => {
+//         let val = "";
+//         if (field.field) {
+//           val = this._getValue(field.field, res, val);
+//         }
+//         if (val) {
+//           val = edges.util.escapeHtml(val);
+//         }
+//         if (field.valueFunction) {
+//           val = field.valueFunction(val, res, field.field, this);
+//         }
+//         if (!val && this.omitFieldIfEmpty) {
+//           return "<td></td>";
+//         }
+
+//         if (field.type) {
+//           const type = field.type;
+//           if (field.type == "date") {
+//             return `<td>${this._formatDate(val)}</td>`;
+//           }
+
+//           if (field.type == "pre") {
+//             return `
+//               <td>
+//                 <pre>
+//                   ${val}
+//                 </pre>
+//               </td>`;
+//           }
+
+//           if (field.type == "link") {
+//             // Setting href for the link tag in the table
+//             let href = "#";
+//             if (field.linkHref) {
+//               href = this._getValue(field.linkHref, res, val);
+//             } else {
+//               href = val;
+//             }
+
+//             // Setting the display name for the link
+//             let linkText = "Link";
+
+//             if (field.linkText) {
+//               linkText = field.linkText;
+//             } else if (val) {
+//               linkText = val;
+//             }
+
+//             // Setting link prefix
+//             let prefix = "";
+
+//             if (field.linkHrefPrefix) {
+//               // TODO: Hotfix will not work for all the cases, find  better code for this
+//               if (
+//                 field.field &&
+//                 field.field != "uuid" &&
+//                 field.linkHrefPrefix.split("/").length <= 2
+//               ) {
+//                 const new_val = this._getValue(field.field, res, val);
+//                 prefix = `${field.linkHrefPrefix}/${new_val}`;
+//               } else {
+//                 prefix = field.linkHrefPrefix;
+//               }
+//             }
+
+//             return `<td><a href="${prefix}/${href}">${linkText}</a></td>`;
+//           }
+
+//           if (field.type == "multiple") {
+//             if (field.multipleFields && field.multipleFields.length > 0) {
+//               const self = this;
+//               const multipleFieldDisplay = field.multipleFields
+//                 .map((item) => {
+//                   const value = this._getValue(item.field, res, "");
+//                   return value ? `<div>${item.label}: ${value}</div>` : "";
+//                 })
+//                 .join(""); // Join without separators for a stacked display
+
+//               return `<td>${multipleFieldDisplay}</td>`;
+//             }
+//           }
+//         }
+
+//         return `<td>${field.pre || ""}${val}${field.post || ""}</td>`;
+//       })
+//       .join("");
+
+//     // Add continuous serial number as the first cell in the row if showIndex is enabled
+//     return this.showIndex
+//       ? `<tr class="${rowClasses}"><td>${continuousIndex}</td>${row}</tr>`
+//       : `<tr class="${rowClasses}">${row}</tr>`;
+//   }
+
+//   _getValue(path, rec, def) {
+//     if (def === undefined) {
+//       def = false;
+//     }
+//     const bits = path.split(".");
+//     let val = rec;
+//     for (let i = 0; i < bits.length; i++) {
+//       const field = bits[i];
+//       if (field in val) {
+//         val = val[field];
+//       } else {
+//         return def;
+//       }
+//     }
+//     if ($.isArray(val)) {
+//       val = val.join(this.arrayValueJoin);
+//     } else if ($.isPlainObject(val)) {
+//       val = def;
+//     }
+//     return val;
+//   }
+
+//   _formatDate(timestamp) {
+//     // Create a new Date object using the timestamp
+//     const date = new Date(timestamp);
+
+//     // Check if the date is invalid
+//     if (isNaN(date.getTime())) {
+//       return ""; // Return empty string if date is invalid
+//     }
+
+//     // Define an array of month names
+//     const months = [
+//       "January",
+//       "February",
+//       "March",
+//       "April",
+//       "May",
+//       "June",
+//       "July",
+//       "August",
+//       "September",
+//       "October",
+//       "November",
+//       "December",
+//     ];
+
+//     // Extract day, month, and year
+//     const day = date.getDate().toString().padStart(2, "0");
+//     const month = months[date.getMonth()];
+//     const year = date.getFullYear();
+
+//     // Format date as dd month yyyy
+//     return `${day} ${month} ${year}`;
+//   }
+// };
+
+//  With enable of row selection
 emlo.ResultTableRenderer = class extends edges.Renderer {
   constructor(params) {
     super(params);
@@ -585,24 +837,27 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       "No results to display"
     );
 
-    // ordered list of fields with headers, pre and post wrappers, and a value function
     this.tableDisplay = edges.util.getParam(params, "tableDisplay", []);
-
-    // flag to control whether the index column is displayed
     this.showIndex = edges.util.getParam(params, "showIndex", true);
     this.serialHeader = edges.util.getParam(params, "serialHeader", "#");
-    // if a multi-value field is found that needs to be displayed, which character to use to join
     this.arrayValueJoin = edges.util.getParam(params, "arrayValueJoin", ", ");
-
-    // if a field does not have a value, don't display anything from its part of the render
     this.omitFieldIfEmpty = edges.util.getParam(
       params,
       "omitFieldIfEmpty",
       true
     );
 
-    // variables for internal state
+    // New parameters for selection functionality
+    this.defaultSelected = edges.util.getParam(params, "defaultSelected", []);
+    this.showCheckbox = edges.util.getParam(params, "showCheckbox", false);
+    this.checkboxLimit = edges.util.getParam(params, "checkboxLimit", 10);
+    this.displayField = edges.util.getParam(params, "displayField", "");
+
+    this.selectedRows = new Set(); // Track selected rows by UUID
     this.namespace = "edges-bs3-results-fields-by-table";
+
+    // Restore selection from URL on page load
+    this._restoreSelectionFromURL();
   }
 
   draw() {
@@ -624,8 +879,11 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
         .map((field) => `<th>${edges.util.escapeHtml(field.header)}</th>`)
         .join("");
       const headerRow = this.showIndex
-        ? `<tr><th>${this.serialHeader}</th>${headers}</tr>`
-        : `<tr>${headers}</tr>`;
+        ? `<tr>${this.showCheckbox ? "<th></th>" : ""}<th>${
+            this.serialHeader
+          }</th>${headers}</tr>`
+        : `<tr>${this.showCheckbox ? "<th></th>" : ""}${headers}</tr>`;
+
       let rows = results
         .map((result, index) => this._renderResult(result, index))
         .join("");
@@ -640,6 +898,8 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
                 </tbody>
             </table>
         `;
+
+      this._renderSideNav();
     }
 
     const containerClasses = edges.util.styleClasses(
@@ -649,6 +909,11 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
     );
     const container = `<div class="${containerClasses}">${frag}</div>`;
     this.component.context.html(container);
+
+    // Attach event handlers for row selection
+    if (this.showCheckbox) {
+      this._attachRowSelectionHandlers();
+    }
   }
 
   _renderResult(res, index) {
@@ -658,11 +923,8 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       this.component.id
     );
 
-    // Default page size if not defined
     const pageSize = this.component.infiniteScrollPageSize || 50;
-
-    // Safely retrieve the pagination component
-    let pageNumber = 1; // Default to the first page
+    let pageNumber = 1;
 
     const paginationComponent = this.component.edge.components.find(
       (comp) => comp.id === "top-pager"
@@ -671,7 +933,6 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       pageNumber = paginationComponent.page;
     }
 
-    // Calculate the continuous serial number using the pageNumber and pageSize
     const continuousIndex = (pageNumber - 1) * pageSize + index + 1;
 
     const row = this.tableDisplay
@@ -691,70 +952,31 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
         }
 
         if (field.type) {
-          const type = field.type;
-          if (field.type == "date") {
+          if (field.type === "date") {
             return `<td>${this._formatDate(val)}</td>`;
           }
 
-          if (field.type == "pre") {
-            return `
-            <td>
-              <pre>
-                ${val}
-              </pre>
-            </td>`;
+          if (field.type === "pre") {
+            return `<td><pre>${val}</pre></td>`;
           }
 
-          if (field.type == "link") {
-            // Setting href for the link tag in the table
-            let href = "#";
-            if (field.linkHref) {
-              href = this._getValue(field.linkHref, res, val);
-            } else {
-              href = val;
-            }
-
-            // Setting the display name for the link
-            let linkText = "Link";
-
-            if (field.linkText) {
-              linkText = field.linkText;
-            } else if (val) {
-              linkText = val;
-            }
-
-            // Setting link prefix
-            let prefix = "";
-
-            if (field.linkHrefPrefix) {
-              // TODO: Hotfix will not work for all the cases, find  better code for this
-              if (
-                field.field &&
-                field.field != "uuid" &&
-                field.linkHrefPrefix.split("/").length <= 2
-              ) {
-                const new_val = this._getValue(field.field, res, val);
-                prefix = `${field.linkHrefPrefix}/${new_val}`;
-              } else {
-                prefix = field.linkHrefPrefix;
-              }
-            }
-
+          if (field.type === "link") {
+            let href = field.linkHref
+              ? this._getValue(field.linkHref, res, val)
+              : val;
+            let linkText = field.linkText || val;
+            let prefix = field.linkHrefPrefix || "";
             return `<td><a href="${prefix}/${href}">${linkText}</a></td>`;
           }
 
-          if (field.type == "multiple") {
-            if (field.multipleFields && field.multipleFields.length > 0) {
-              const self = this;
-              const multipleFieldDisplay = field.multipleFields
-                .map((item) => {
-                  const value = this._getValue(item.field, res, "");
-                  return value ? `<div>${item.label}: ${value}</div>` : "";
-                })
-                .join(""); // Join without separators for a stacked display
-
-              return `<td>${multipleFieldDisplay}</td>`;
-            }
+          if (field.type === "multiple" && field.multipleFields) {
+            const multipleFieldDisplay = field.multipleFields
+              .map((item) => {
+                const value = this._getValue(item.field, res, "");
+                return value ? `<div>${item.label}: ${value}</div>` : "";
+              })
+              .join("");
+            return `<td>${multipleFieldDisplay}</td>`;
           }
         }
 
@@ -762,10 +984,112 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       })
       .join("");
 
-    // Add continuous serial number as the first cell in the row if showIndex is enabled
+    const isChecked = this.defaultSelected.includes(res.uuid) ? "checked" : "";
+    if (isChecked) {
+      this.selectedRows.add(res.uuid);
+    }
+
+    const checkboxCell = this.showCheckbox
+      ? `<td><input type="checkbox" class="select-row" data-uuid="${
+          res.uuid
+        }" data-display="${res[this.displayField]}" ${isChecked}></td>`
+      : "";
+
     return this.showIndex
-      ? `<tr class="${rowClasses}"><td>${continuousIndex}</td>${row}</tr>`
-      : `<tr class="${rowClasses}">${row}</tr>`;
+      ? `<tr class="${rowClasses}">${checkboxCell}<td>${continuousIndex}</td>${row}</tr>`
+      : `<tr class="${rowClasses}">${checkboxCell}${row}</tr>`;
+  }
+
+  _renderSideNav() {
+    const selectedItems = Array.from(this.selectedRows)
+      .slice(0, this.checkboxLimit)
+      .map((uuid) => {
+        const displayName = this._getDisplayName(uuid) || uuid;
+        return `<div><input type="checkbox" class="side-nav-item" data-uuid="${uuid}" checked> ${displayName}</div>`;
+      })
+      .join("");
+
+    const selectedList = document.getElementById("selected-items-list");
+    const sideNavDoc = document.getElementById("side-nav");
+    if (selectedList) {
+      selectedList.innerHTML = selectedItems;
+    }
+
+    if (sideNavDoc) {
+      if (this.selectedRows.size > 0) {
+        sideNavDoc.style.display = "inline";
+      } else {
+        sideNavDoc.style.display = "none";
+      }
+
+      // Update the URL
+      this._updateURL();
+
+      // Attach event handlers for side nav items
+      this._attachSideNavHandlers();
+    }
+  }
+
+  _attachRowSelectionHandlers() {
+    const context = this.component.context;
+    const renderer = this;
+
+    context.find(".select-row").on("change", function () {
+      const uuid = $(this).data("uuid");
+      const displayName = $(this).data("display");
+
+      // Check the current selection count
+      if ($(this).is(":checked")) {
+        if (renderer.selectedRows.size >= renderer.checkboxLimit) {
+          // Prevent additional selections if limit is reached
+          $(this).prop("checked", false);
+
+          // Display a message to the user
+          alert(`You can only select up to ${renderer.checkboxLimit} items.`);
+          return;
+        }
+
+        // Add the UUID to the selected set
+        renderer.selectedRows.add(uuid);
+      } else {
+        // Remove the UUID from the selected set if unchecked
+        renderer.selectedRows.delete(uuid);
+      }
+
+      // Update the side navigation and URL
+      renderer._renderSideNav();
+    });
+  }
+
+  _attachSideNavHandlers() {
+    const renderer = this;
+
+    // Attach event handlers to the side navigation items
+    const sideNavItems = document.querySelectorAll(".side-nav-item");
+
+    sideNavItems.forEach((item) => {
+      item.addEventListener("change", function () {
+        const uuid = this.getAttribute("data-uuid");
+
+        if (!this.checked) {
+          // Remove the UUID from the selected set
+          renderer.selectedRows.delete(uuid);
+
+          // Uncheck the corresponding checkbox in the table
+          const tableCheckbox = renderer.component.context.find(
+            `.select-row[data-uuid='${uuid}']`
+          );
+          if (tableCheckbox.length) {
+            tableCheckbox.prop("checked", false);
+          }
+
+          // Update the URL to reflect the change
+          renderer._updateURL();
+
+          renderer._renderSideNav();
+        }
+      });
+    });
   }
 
   _getValue(path, rec, def) {
@@ -790,16 +1114,38 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
     return val;
   }
 
-  _formatDate(timestamp) {
-    // Create a new Date object using the timestamp
-    const date = new Date(timestamp);
+  _getDisplayName(uuid) {
+    const results = this.component.results || [];
+    const result = results.find((res) => res.uuid === uuid);
+    return result ? result[this.displayField] : null;
+  }
 
-    // Check if the date is invalid
-    if (isNaN(date.getTime())) {
-      return ""; // Return empty string if date is invalid
+  _updateURL() {
+    const uuids = Array.from(this.selectedRows).join(",");
+    const url = new URL(window.location);
+    if (uuids) {
+      url.searchParams.set("uuids", uuids);
+    } else {
+      url.searchParams.delete("uuids");
     }
 
-    // Define an array of month names
+    window.history.replaceState({}, "", url);
+  }
+
+  _restoreSelectionFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const uuids = urlParams.get("uuids");
+    if (uuids) {
+      this.defaultSelected = uuids.split(",");
+    }
+  }
+
+  _formatDate(timestamp) {
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) {
+      return "";
+    }
+
     const months = [
       "January",
       "February",
@@ -815,279 +1161,13 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       "December",
     ];
 
-    // Extract day, month, and year
     const day = date.getDate().toString().padStart(2, "0");
     const month = months[date.getMonth()];
     const year = date.getFullYear();
 
-    // Format date as dd month yyyy
     return `${day} ${month} ${year}`;
   }
 };
-
-//  With enable of row selection
-// emlo.ResultTable = class extends edges.Component {
-//   constructor(params) {
-//     super(params);
-
-//     // other properties
-//     this.secondaryResults = edges.util.getParam(
-//       params,
-//       "secondaryResults",
-//       false
-//     );
-//     this.filter = edges.util.getParam(params, "filter", false);
-//     this.sort = edges.util.getParam(params, "sort", false);
-//     this.limit = edges.util.getParam(params, "limit", false);
-//     this.infiniteScroll = edges.util.getParam(params, "infiniteScroll", false);
-//     this.infiniteScrollPageSize = edges.util.getParam(
-//       params,
-//       "infiniteScrollPageSize",
-//       10
-//     );
-//     this.updateHeader = edges.util.getParam(params, "updateHeader", false);
-//     this.headerSelector = edges.util.getParam(
-//       params,
-//       "headerSelector",
-//       "header"
-//     );
-
-//     // variables for tracking internal state
-//     this.results = false;
-//     this.infiniteScrollQuery = false;
-//     this.hitCount = 0;
-//   }
-
-//   synchronise() {
-//     this.results = [];
-//     this.infiniteScrollQuery = false;
-//     this.hitCount = 0;
-
-//     var source = this.edge.result;
-//     if (this.secondaryResults !== false) {
-//       source = this.edge.secondaryResults[this.secondaryResults];
-//     }
-
-//     if (!source) {
-//       return;
-//     }
-
-//     var results = source.results();
-//     this._appendResults({ results: results });
-//     this.hitCount = source.total();
-
-//     if (this.updateHeader) {
-//       this._updateHeader();
-//     }
-//   }
-
-//   _appendResults(params) {
-//     var results = params.results;
-
-//     if (this.filter) {
-//       results = this.filter({ results: results });
-//     }
-
-//     if (this.sort) {
-//       results.sort(this.sort);
-//     }
-
-//     if (this.limit !== false) {
-//       results = results.slice(0, this.limit);
-//     }
-
-//     this.results = this.results.concat(results);
-//   }
-// };
-
-// emlo.ResultTableRenderer = class extends edges.Renderer {
-//   constructor(params) {
-//     super(params);
-
-//     // parameters for new functionality
-//     this.enableRowSelection = edges.util.getParam(
-//       params,
-//       "enableRowSelection",
-//       false
-//     );
-//     this.selectionLimit = edges.util.getParam(
-//       params,
-//       "selectionLimit",
-//       Infinity
-//     );
-//     this.selectionField = edges.util.getParam(params, "selectionField", "");
-
-//     // parameters for existing functionality
-//     this.noResultsText = edges.util.getParam(
-//       params,
-//       "noResultsText",
-//       "No results to display"
-//     );
-//     this.tableDisplay = edges.util.getParam(params, "tableDisplay", []);
-//     this.showIndex = edges.util.getParam(params, "showIndex", true);
-//     this.serialHeader = edges.util.getParam(params, "serialHeader", "#");
-//     this.arrayValueJoin = edges.util.getParam(params, "arrayValueJoin", ", ");
-//     this.omitFieldIfEmpty = edges.util.getParam(
-//       params,
-//       "omitFieldIfEmpty",
-//       true
-//     );
-
-//     // internal state for row selection
-//     this.selectedRows = [];
-//     this.namespace = "edges-bs3-results-fields-by-table";
-//   }
-
-//   draw() {
-//     let frag = this.noResultsText;
-//     if (this.component.results === false) {
-//       frag = "Loading results... Please wait";
-//     }
-
-//     const results = this.component.results;
-//     if (results && results.length > 0) {
-//       const headers = this.tableDisplay
-//         .map((field) => `<th>${edges.util.escapeHtml(field.header)}</th>`)
-//         .join("");
-//       const headerRow = this.showIndex
-//         ? `<tr><th>${this.serialHeader}</th>${
-//             this.enableRowSelection ? "<th>Select</th>" : ""
-//           }${headers}</tr>`
-//         : `<tr>${
-//             this.enableRowSelection ? "<th>Select</th>" : ""
-//           }${headers}</tr>`;
-
-//       let rows = results
-//         .map((result, index) => this._renderResult(result, index))
-//         .join("");
-
-//       frag = `
-//             <table class="table table-bordered">
-//                 <thead>
-//                     ${headerRow}
-//                 </thead>
-//                 <tbody>
-//                     ${rows}
-//                 </tbody>
-//             </table>
-//         `;
-//     }
-
-//     const containerClasses = edges.util.styleClasses(
-//       this.namespace,
-//       "container",
-//       this.component.id
-//     );
-//     const container = `<div class="${containerClasses}">${frag}</div>`;
-//     this.component.context.html(container);
-
-//     // Draw side-nav for selected rows
-//     this._drawSideNav();
-//     this.bindEvents();
-//   }
-
-//   _renderResult(res, index) {
-//     const continuousIndex = index + 1;
-//     const rowCheckbox = this.enableRowSelection
-//       ? `<td><input type="checkbox" class="row-select" data-index="${index}" /></td>`
-//       : "";
-
-//     const row = this.tableDisplay
-//       .map((field) => {
-//         let val = this._getValue(field.field, res, "");
-//         if (val) {
-//           val = edges.util.escapeHtml(val);
-//         }
-//         if (field.valueFunction) {
-//           val = field.valueFunction(val, res, field.field, this);
-//         }
-//         return `<td>${field.pre || ""}${val}${field.post || ""}</td>`;
-//       })
-//       .join("");
-
-//     return this.showIndex
-//       ? `<tr><td>${continuousIndex}</td>${rowCheckbox}${row}</tr>`
-//       : `<tr>${rowCheckbox}${row}</tr>`;
-//   }
-
-//   _getValue(path, rec, def) {
-//     const bits = path.split(".");
-//     let val = rec;
-//     for (let i = 0; i < bits.length; i++) {
-//       const field = bits[i];
-//       if (field in val) {
-//         val = val[field];
-//       } else {
-//         return def;
-//       }
-//     }
-//     if (Array.isArray(val)) {
-//       val = val.join(this.arrayValueJoin);
-//     }
-//     return val;
-//   }
-
-//   _drawSideNav() {
-//     let sideNav = document.getElementById("side-nav");
-//     if (!sideNav) {
-//       sideNav = document.createElement("div");
-//       sideNav.id = "side-nav";
-//       sideNav.style.position = "fixed";
-//       sideNav.style.top = "0";
-//       sideNav.style.left = "0";
-//       sideNav.style.width = "250px";
-//       sideNav.style.height = "100%";
-//       sideNav.style.backgroundColor = "#f9f9f9";
-//       sideNav.style.borderRight = "1px solid #ccc";
-//       sideNav.style.overflowY = "auto";
-//       sideNav.style.padding = "10px";
-//       sideNav.style.display = "none"; // Initially hidden
-//       document.body.appendChild(sideNav);
-//     }
-
-//     sideNav.innerHTML = `<h4>Selected Rows</h4><ul>${this.selectedRows
-//       .map((row) => `<li>${row}</li>`)
-//       .join("")}</ul>`;
-//     sideNav.style.display = this.selectedRows.length > 0 ? "block" : "none";
-
-//     const container = document.querySelector(
-//       ".edges-bs3-results-fields-by-table-container"
-//     );
-//     if (container) {
-//       container.style.marginLeft = this.selectedRows.length > 0 ? "260px" : "0";
-//     }
-//   }
-
-//   bindEvents() {
-//     if (this.enableRowSelection) {
-//       const checkboxes = document.querySelectorAll(".row-select");
-//       checkboxes.forEach((checkbox) => {
-//         checkbox.addEventListener("change", (e) => {
-//           const rowIndex = parseInt(e.target.getAttribute("data-index"), 10);
-//           const fieldValue = this._getValue(
-//             this.selectionField,
-//             this.component.results[rowIndex],
-//             ""
-//           );
-
-//           if (e.target.checked) {
-//             if (this.selectedRows.length < this.selectionLimit) {
-//               this.selectedRows.push(fieldValue);
-//             } else {
-//               e.target.checked = false;
-//               alert(`Selection limit of ${this.selectionLimit} reached!`);
-//             }
-//           } else {
-//             this.selectedRows = this.selectedRows.filter(
-//               (val) => val !== fieldValue
-//             );
-//           }
-//           this._drawSideNav();
-//         });
-//       });
-//     }
-//   }
-// };
 
 emlo.Facet = class extends edges.components.RefiningANDTermSelector {
   constructor(params) {
@@ -3664,7 +3744,6 @@ emlo.Sort = class extends edges.Component {
 
   setSortBy(field) {
     var nq = this.edge.cloneQuery();
-    console.log("q", nq);
     // If no field is provided, default to "score"
     if (!field || field === "") {
       field = "score";

@@ -495,6 +495,14 @@ function advanceSearch(params) {
       });
     }
 
+    if (params.get("uuids")) {
+      const uuids = params.get("uuids").split(",").join(" OR ");
+      openingQuery.must.push({
+        field: "uuid_related",
+        value: `(${uuids})`,
+      });
+    }
+
     // Handle date range query
     const sinYear = params.get("dat_sin_year");
     const sinMonth = params.get("dat_sin_month");

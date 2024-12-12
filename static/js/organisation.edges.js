@@ -83,6 +83,9 @@ try {
       renderer: new emlo.ResultTableRenderer({
         noResultsText: "No results to display",
         serialHeader: "",
+        showIndex: false,
+        showCheckbox: true,
+        displayField: "foaf_name",
         tableDisplay: [
           {
             header: "Name",

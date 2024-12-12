@@ -403,9 +403,14 @@ $(document).ready(function () {
   // Get the current URL's search parameters
   const queryParams = new URLSearchParams(window.location.search);
 
+  console.log("query Params");
   // Check if there are any query parameters
   if (queryParams.toString()) {
-    $("#modify_search").show();
+    if (queryParams.get("uuids")) {
+      $("#return_browse").show();
+    } else {
+      $("#modify_search").show();
+    }
   }
 });
 

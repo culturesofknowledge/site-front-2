@@ -22,12 +22,12 @@
         }
 
         // Controlling the search letters centrally for browse page
-        function searchLetters() {
+        function searchLetters(browsePage) {
             const baseURL = `${window.location.origin}/forms/advance`;
             const urlParams = new URLSearchParams(window.location.search);
             const uuids = urlParams.get("uuids");
             if (uuids) {
-                window.location.href = `${baseURL}?uuids=${uuids}`;
+                window.location.href = `${baseURL}?uuids=${uuids}&browsing=${browsePage}`;
             }
         }
     </script>

@@ -91,6 +91,10 @@ emlo.ResultTemplate = class extends edges.Template {
     let frag = `<div class="row row-with-side">
       <div class="side-nav"> 
         <h2 class="main">Search</h2>
+
+        <div id="return_browse" style="display:none;">
+              <button onclick="returnToBrowse()">Return to Browse</button>
+          </div>
        
           <div id="modify_search" style="display:none;">
               <button onclick="modifyCurrentSearch()">Modify search</button>

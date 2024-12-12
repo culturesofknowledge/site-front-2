@@ -29,5 +29,15 @@ function modifyCurrentSearch() {
         alert("Unable to redirect you to modify your search")
     }
 }
+
+function returnToBrowse(){
+    const baseURL = `${window.location.origin}/browse`;
+    const urlParams = new URLSearchParams(window.location.search);
+    const uuids = urlParams.get("uuids");
+    const browsePage = urlParams.get("browsing");
+    if (uuids) {
+        window.location.href = `${baseURL}/${browsePage}?uuids=${uuids}`;
+    }
+}
 </script>
 {% endblock extra_js_bottom %} 

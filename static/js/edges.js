@@ -731,7 +731,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
           }
         }
 
-        return `<td>${field.pre || ""}${val}${field.post || ""}</td>`;
+        return `<td>${val}</td>`;
       })
       .join("");
 

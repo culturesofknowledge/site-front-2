@@ -482,8 +482,6 @@ emlo.ResultTable = class extends edges.Component {
         return;
       }
 
-      console.log("this.hitCount", this.hitCount, this);
-
       // Check if the fetching process is active
       if (this.results === false) {
         currentDoc.innerHTML = "Loading results...";
@@ -3422,38 +3420,6 @@ emlo.Sort = class extends edges.Component {
     this.sortBy = false;
     this.sortDir = "desc"; // Default to descending order
   }
-
-  // synchronise() {
-  //   this.sortDir = "desc"; // Default to descending
-  //   this.sortBy = false;
-
-  //   // Creating map for fetching value
-  //   const sortLookUpMap = new Map(
-  //     this.sortOptions.map((sort) => [sort.value, sort])
-  //   );
-
-  //   if (this.edge.currentQuery) {
-  //     const sorts = this.edge.currentQuery.getSortBy();
-  //     // Checking if start value is present in URL
-  //     const url = new URL(window.location.href);
-  //     const val = url.searchParams.get("sort");
-  //     let selectedOption = null;
-
-  //     if (val) {
-  //       selectedOption = sortLookUpMap.get(val);
-  //     }
-
-  //     if (sorts.length > 0 && selectedOption == null) {
-  //       this.sortBy = sorts[0].field;
-  //       this.sortDir = sorts[0].order;
-  //     } else {
-  //       this.sortBy = selectedOption.field;
-  //       this.sortDir = selectedOption.order;
-  //       console.log("here", selectedOption, this.sortDir);
-  //       this.setSortBy(selectedOption.field);
-  //     }
-  //   }
-  // }
 
   synchronise() {
     this.sortDir = "desc"; // Default to descending

@@ -476,15 +476,16 @@ emlo.ResultTable = class extends edges.Component {
   }
 
   _updateHeader() {
+    let currentDoc = document.getElementById(this.headerSelector);
     try {
-      let currentDoc = document.getElementById(this.headerSelector);
-
       if (!currentDoc) {
         return;
       }
 
+      console.log("this.hitCount", this.hitCount, this);
+
       // Check if the fetching process is active
-      if (!this.hitCount) {
+      if (this.results === false) {
         currentDoc.innerHTML = "Loading results...";
         return;
       }
@@ -498,10 +499,11 @@ emlo.ResultTable = class extends edges.Component {
         }
       } else {
         // Fallback message when results are not fetched
-        currentDoc.innerHTML = "No results found.";
+        currentDoc.innerHTML = "";
       }
     } catch (err) {
       console.error(err);
+      currentDoc.innerHTML = "";
     }
   }
 

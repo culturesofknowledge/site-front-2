@@ -10324,3 +10324,26 @@ ul.pagination li {
   color: #bbb; /* Disabled button text color */
   cursor: not-allowed; /* Not-allowed cursor on disabled buttons */
 }
+
+#news-output .item .title {
+  margin: 0 0 20px;
+  color: black;
+  text-align: center;
+  vertical-align: middle;
+  padding: 5px 3px;
+  background-color: #efc319;
+  min-height: 100px;
+  line-height: 1.5;
+}
+#news-output .item .image {
+  max-height: 215px;
+  overflow: hidden;
+  display: block;
+  background-color: #cecece;
+  text-align: center;
+  transition: max-height 1s;
+}
+#news-output .item .image:hover {
+  max-height: 1000px;
+  transition: max-height 1s;
+}

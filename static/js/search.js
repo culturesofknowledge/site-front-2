@@ -224,6 +224,7 @@ function advanceSearch(params) {
       },
     ];
 
+    const customValue = ["aut", "rec", "pla_ori_name", "pla_des_name"];
     // Loop through paramConfigs to generate query strings
     paramConfigs.forEach((config) => {
       const paramValue = params.get(config.param);
@@ -302,7 +303,7 @@ function advanceSearch(params) {
         }
       }
 
-      if (paramValue) {
+      if (paramValue && !customValue.includes(config.param)) {
         openingQuery.queryStrings.push({
           queryString: paramValue,
           fields: config.queryStringFields,

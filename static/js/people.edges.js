@@ -98,25 +98,25 @@ try {
             valueFunction: null,
           },
           {
-            header: " Letters Written ",
+            header: "Letters Written ",
             field: "ox_totalWorksByAgent",
             pre: "",
             post: "",
-            valueFunction: null,
+            valueFunction: _redirectToSearch,
           },
           {
             header: "Letters Received ",
             field: "ox_totalWorksAddressedToAgent",
             pre: "",
             post: "",
-            valueFunction: null,
+            valueFunction: _redirectToSearch,
           },
           {
             header: " Letters Mentioning",
             field: "ox_totalWorksMentioningAgent",
             pre: "",
             post: "",
-            valueFunction: null,
+            valueFunction: _redirectToSearch,
           },
           {
             header: "Further details",
@@ -144,4 +144,35 @@ try {
   emlo.init();
 } catch (error) {
   console.error(error.message);
+}
+
+function _redirectToSearch(val, res, fieldName) {
+  if (typeof res !== "object" || res === null) {
+    console.log("Invalid input: res is not an object");
+    return "<div>Invalid input</div>";
+  }
+
+  // console.log("finalURL", finalUrl);
+  if (val > 0) {
+    const baseURL = `/forms/advance`;
+    let query = "";
+    const user = res["foaf_name"];
+
+    switch (fieldName) {
+      case "ox_totalWorksByAgent":
+        query = `aut=${user}`;
+        break;
+      case "ox_totalWorksAddressedToAgent":
+        query = `rec=${user}`;
+        break;
+      case "ox_totalWorksMentioningAgent":
+        query = `ment=${user}`;
+        break;
+    }
+    const finalUrl = query ? `${baseURL}?${query}` : `${baseURL}`;
+
+    return `<a href="${finalUrl}"> ${val} </a>`;
+  } else {
+    return `-`;
+  }
 }

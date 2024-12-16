@@ -101,21 +101,21 @@ try {
             field: "ox_totalWorksSentFromPlace",
             pre: "",
             post: "",
-            valueFunction: null,
+            valueFunction: _redirectToSearch,
           },
           {
             header: " Letters Sent To  ",
             field: "ox_totalWorksSentToPlace",
             pre: "",
             post: "",
-            valueFunction: null,
+            valueFunction: _redirectToSearch,
           },
           {
             header: " Letters Mentioning",
             field: "ox_totalWorksMentioningPlace",
             pre: "",
             post: "",
-            valueFunction: null,
+            valueFunction: _redirectToSearch,
           },
           {
             header: "Further details",
@@ -140,4 +140,35 @@ try {
   emlo.init();
 } catch (error) {
   console.error(error.message);
+}
+
+function _redirectToSearch(val, res, fieldName) {
+  if (typeof res !== "object" || res === null) {
+    console.log("Invalid input: res is not an object");
+    return "<div>Invalid input</div>";
+  }
+
+  // console.log("finalURL", finalUrl);
+  if (val > 0) {
+    const baseURL = `/forms/advance`;
+    let query = "";
+    const location = res["browse"];
+
+    switch (fieldName) {
+      case "ox_totalWorksSentFromPlace":
+        query = `pla_ori_name=${location}`;
+        break;
+      case "ox_totalWorksSentToPlace":
+        query = `pla_des_name=${location}`;
+        break;
+      case "ox_totalWorksMentioningPlace":
+        query = `pla_ment_name=${location}`;
+        break;
+    }
+    const finalUrl = query ? `${baseURL}?${query}` : `${baseURL}`;
+
+    return `<a href="${finalUrl}"> ${val} </a>`;
+  } else {
+    return `-`;
+  }
 }

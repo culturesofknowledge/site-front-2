@@ -30,13 +30,11 @@
 
     {# START Catalogue statistics #}
     <div id="home-stats">
-        {# {% include './components/home/stats.jinja2' %} #}
     </div>
     {# End Catalogue statistics #}
 
     {# START Featured catalogues #}
-    <div id="catalogues">
-        {% include './components/home/catalouge.jinja2' %}
+    <div id="catalogues-content">
     </div>
     {# End Featured catalogues #}
 
@@ -68,5 +66,49 @@ function changeEventOnTo(val){
         dat_from_year.value = val
     } 
 }
+
+async function loadCatalougeData(){
+    try {
+        const response = await fetch('/catalogues');
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+
+        // Build the HTML content dynamically
+        const contentDiv = document.getElementById('catalogues-content');
+
+        
+       let cataloguesHTML = `
+            <div id="news-output" class="panel">
+                <div class="row">
+                    <h2 style="margin-left: 15px;">Featured Catalogues</h2>
+        `;
+
+        // Loop through the data and add content for each item
+        data.forEach((item , index) => {
+            cataloguesHTML += `
+                <div class="item large-4 medium-4 small-12 columns">
+                    <a class="link" href="${item.link}">
+                        <div class="image">
+                            <img src="${item.acf.catalogue_main_image[0].catalogue_images}" alt="Catalog blog image${index+1}" />
+                        </div>
+                        <h3 class="title">${item.title}</h3>
+                    </a>
+                </div>
+            `;
+        });
+
+        cataloguesHTML += `</div></div>`;
+
+        // Insert the final HTML into the contentDiv
+        contentDiv.innerHTML = cataloguesHTML;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
+
+window.onload = loadCatalougeData();
 </script>
 {% endblock extra_js_bottom %}

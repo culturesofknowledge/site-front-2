@@ -44,26 +44,27 @@
 
 
 {% block extra_js_bottom %}
+
 {% include "_edges_common_js.jinja2" %}
 <script type="module" src="../static/js/home.edges.js"></script>
 
 <script>
 function changeEventOnFrom(val){
-    dat_to_year = document.getElementById("dat_to_year")
+    const dat_to_year = document.getElementById("dat_to_year")
     
     if(val == "all years") {
         dat_to_year.value = "all years"
-    } else if(val > dat_to_year.value) {
+    } else if(parseInt(val) > parseInt(dat_to_year.value) || dat_to_year.value == "all years") {
         dat_to_year.value = val
     }
 }
 
 function changeEventOnTo(val){
-    dat_from_year = document.getElementById("dat_from_year")
+    const dat_from_year = document.getElementById("dat_from_year")
     
     if(val == "all years") {
         dat_from_year.value = "all years"
-    } else if(val < dat_from_year.value) {
+    } else if(parseInt(val) > parseInt(dat_from_year.value) || dat_from_year.value == "all years") {
         dat_from_year.value = val
     } 
 }

@@ -16,24 +16,7 @@
                   br/&gt;&lt;br/&gt;Search is not case sensitive."
         />
       </div>
-      <div class="large-1 small-2 columns">
-        <label>&nbsp;<!-- for alingment--></label>
-        <span
-          data-tooltip=""
-          aria-haspopup="true"
-          class="has-tip tip-top"
-          data-selector="tooltip-lz7zrq1x0"
-          aria-describedby="tooltip-lz7zrq1x0"
-          title=""
-        >
-          <img
-            style="min-width: 25px; text-align: left"
-            class="help"
-            src="/static/img/icon-help.png"
-            alt="Help"
-          />
-        </span>
-      </div>
+      {% include './components/common/help_icon.jinja2' %}
       {# Search people - Ends #}
 
       {# Search year - Starts #}
@@ -52,6 +35,7 @@
           {% endfor %}
         </select>
       </div>
+      
       <div class="small-5 columns">
         <label>Search to year</label>
         <select
@@ -68,24 +52,7 @@
         </select>
       </div>
 
-      <div class="large-1 small-2 columns">
-        <label>&nbsp;<!-- for alignment--></label>
-        <span
-          data-tooltip=""
-          aria-haspopup="true"
-          class="has-tip tip-top"
-          data-selector="tooltip-lz7zrq1x1"
-          aria-describedby="tooltip-lz7zrq1x1"
-          title=""
-        >
-          <img
-            style="min-width: 25px; text-align: left"
-            class="help"
-            src="/static/img/icon-help.png"
-            alt="Help"
-          />
-        </span>
-      </div>
+      {% include './components/common/help_icon.jinja2' %}
       {# Search year - Ends #}
 
       {# Search places - Starts #}
@@ -106,25 +73,8 @@
           title="Search the places that letters were sent from or to, e.g. 'Queen's College', 'Paris', or 'Spain'. &lt;br/&gt;&lt;br/&gt;Search is not case sensitive."
         />
       </div>
-      <div class="large-1 small-2 columns">
-        <label>&nbsp;<!-- for alingment--></label>
-
-        <span
-          data-tooltip=""
-          aria-haspopup="true"
-          class="has-tip tip-top"
-          data-selector="tooltip-lz7zrq1x2"
-          aria-describedby="tooltip-lz7zrq1x2"
-          title=""
-        >
-          <img
-            style="min-width: 25px; text-align: left"
-            class="help"
-            src="/static/img/icon-help.png"
-            alt="Help"
-          />
-        </span>
-      </div>
+      
+      {% include './components/common/help_icon.jinja2' %}
       {# Search places - Ends #}
 
       {# Search content - Starts #}
@@ -145,25 +95,9 @@
           title="Search across abstracts, keywords, incipits, excipits, transcriptions, and enclosures, e.g. 'Spider' or 'Mathematics'. &lt;br/&gt;&lt;br/&gt;Search is not case sensitive. "
         />
       </div>
-      <div class="large-1 small-2 columns">
-        <label>&nbsp;<!-- for alingment--></label>
-
-        <span
-          data-tooltip=""
-          aria-haspopup="true"
-          class="has-tip tip-top"
-          data-selector="tooltip-lz7zrq1x3"
-          aria-describedby="tooltip-lz7zrq1x3"
-          title=""
-        >
-          <img
-            style="min-width: 25px; text-align: left"
-            class="help"
-            src="/static/img/icon-help.png"
-            alt="Help"
-          />
-        </span>
-      </div>
+      
+      {% include './components/common/help_icon.jinja2' %}
+      {# Search content - Ends #}
 
       <div class="large-3 columns">
         <input
@@ -181,7 +115,6 @@
           value="normal"
         />
       </div>
-      {# Search content - Ends #}
     </form>
 
     <div class="large-9 hide-for-small columns" style="margin-top: 10px">

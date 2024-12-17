@@ -79,7 +79,7 @@ try {
             field: "ox_totalDocsInRepository",
             pre: "",
             post: "",
-            valueFunction: null,
+            valueFunction: _redirectToSearch,
           },
           {
             header: "Further details",
@@ -113,4 +113,29 @@ try {
   emlo.init();
 } catch (error) {
   console.error(error.message);
+}
+
+function _redirectToSearch(val, res, fieldName) {
+  if (typeof res !== "object" || res === null) {
+    console.log("Invalid input: res is not an object");
+    return "<div>Invalid input</div>";
+  }
+
+  // console.log("finalURL", finalUrl);
+  if (val > 0) {
+    const baseURL = `/forms/advance`;
+    let query = "";
+    const user = res["browse"];
+
+    switch (fieldName) {
+      case "ox_totalDocsInRepository":
+        query = `repository=${user}`;
+        break;
+    }
+    const finalUrl = query ? `${baseURL}?${query}` : `${baseURL}`;
+
+    return `<a href="${finalUrl}"> ${val} </a>`;
+  } else {
+    return `-`;
+  }
 }

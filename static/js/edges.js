@@ -2047,7 +2047,15 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
             <span class="stat-item">
               ${
                 isClickable
-                  ? `<a href='#' id="stats" data-key='${field.key}'>${escapedValue}  ${field.title} </a>`
+                  ? `<a href='${
+                      field.redirectUrl
+                        ? `${field.redirectUrl}${
+                            this.component.results[0][field.redirectQueryName]
+                          }`
+                        : ""
+                    }' id="stats" data-key='${field.key}'>${escapedValue}  ${
+                      field.title
+                    } </a>`
                   : `${escapedValue} ${field.title}`
               }
             </span>

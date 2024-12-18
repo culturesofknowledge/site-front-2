@@ -88,11 +88,20 @@ async function loadCatalougeData(){
 
         // Loop through the data and add content for each item
         data.forEach((item , index) => {
+            console.log("item" , item.acf.catalogue_main_image[0])
+            let img = ""
+
+            if(item.acf && item.acf.catalogue_main_image && item.acf.catalogue_main_image.length > 0) {
+                img = item.acf.catalogue_main_image[0].catalogue_images
+            } else {
+                img = "/static/img/news/KMS3059_crop_2.jpg"
+            }   
+
             cataloguesHTML += `
                 <div class="item large-4 medium-4 small-12 columns">
                     <a class="link" href="${item.link}">
                         <div class="image">
-                            <img src="${item.acf.catalogue_main_image[0].catalogue_images}" alt="Catalog blog image${index+1}" />
+                            <img src="${img}" alt="Catalog blog image${index+1}" />
                         </div>
                         <h3 class="title">${item.title}</h3>
                     </a>

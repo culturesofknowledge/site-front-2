@@ -114,7 +114,7 @@ emlo.ResultTemplate = class extends edges.Template {
       <div class="row row-with-side">
 
         <div class="large-12 columns">
-            <div id="about" class="large-12 columns">
+            <div id="result-header-section" class="large-12 columns">
                 <br/>
                 <h2 class="main">
                     <span id="result-header" class="font-18">
@@ -616,6 +616,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
     if (this.component.results === false) {
       frag = "Loading results... Please wait";
     }
+    const resultHeader = document.getElementById("result-header-section");
 
     const results = this.component.results;
     if (results && results.length > 0) {
@@ -650,7 +651,15 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
             </table>
         `;
 
+      if (resultHeader) {
+        resultHeader.style.display = "inline";
+      }
+
       this._renderSideNav();
+    } else {
+      if (resultHeader) {
+        resultHeader.style.display = "none";
+      }
     }
 
     const containerClasses = edges.util.styleClasses(
@@ -3277,6 +3286,8 @@ emlo.PaginationRenderer = class extends edges.Renderer {
     this.scroll = edges.util.getParam(params, "scroll", true);
     this.scrollSelector = edges.util.getParam(params, "scrollSelector", "body");
     this.namespace = "edges-bs3-pager";
+
+    this.total = false;
   }
 
   draw() {
@@ -3454,6 +3465,10 @@ emlo.Sort = class extends edges.Component {
       selectedOption = this.sortOptions[0];
     }
 
+    if (this.edge.result) {
+      this.total = this.edge.result.total();
+    }
+
     // Set the sort values
     this.sortBy = selectedOption.field;
     this.sortDir = selectedOption.order || "desc"; // Default to "desc" if order is not provided
@@ -3495,7 +3510,7 @@ emlo.SortRenderer = class extends edges.Renderer {
     // Get the component and its state
     const comp = this.component;
 
-    if (comp.sortOptions && comp.sortOptions.length > 0) {
+    if (comp.sortOptions && comp.sortOptions.length > 0 && comp.total > 0) {
       // Build the sorting dropdown
       const dropdownClass = edges.util.allClasses(
         this.namespace,

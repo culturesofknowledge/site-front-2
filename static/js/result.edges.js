@@ -330,7 +330,15 @@ try {
         size: 20,
         infiniteScrollPageSize: 50,
         renderer: new emlo.ResultTableRenderer({
-          noResultsText: "No results to display",
+          noResultsText: `
+          <div class="row small-12 large-9">
+            <br>
+
+            <p>
+                No results found. We suggest that you...
+                <button onclick="modifyCurrentSearch()">Modify search</button>
+            </p>
+          </div>`,
           serialHeader: "",
           tableDisplay: [
             {

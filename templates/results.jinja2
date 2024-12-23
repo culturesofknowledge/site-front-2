@@ -35,8 +35,10 @@ function returnToBrowse(){
     const urlParams = new URLSearchParams(window.location.search);
     const uuids = urlParams.get("uuids");
     const browsePage = urlParams.get("browsing");
+    const currentLetter = urlParams.get("letter");
+
     if (uuids) {
-        window.location.href = `${baseURL}/${browsePage}?uuids=${uuids}`;
+        window.location.href = `${baseURL}/${browsePage}?uuids=${uuids}&letter=${currentLetter != null ? currentLetter : 'a'}`;
     }
 }
 </script>

@@ -1522,7 +1522,9 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
             <a href="#" class="${filterRemoveClass} selected-facets" data-key="${edges.util.escapeHtml(
         filt.term
       )}" data-field="${edges.util.escapeHtml(filt.field)}" >
-                   ${edges.util.escapeHtml(filt.display)}
+                   ${edges.util.escapeHtml(
+                     this._getDisplayValue(filt.field, filt.display)
+                   )}
                   <img class="facet" src="../../static/img/minus-facet.png" style="height:15px;" />
                 </a>
           </td>
@@ -1561,6 +1563,64 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
 
     this.component.removeFilter(field, term);
     this.draw(); // Redraw the component to reflect the changes
+    console.log("I am triggered");
+  }
+
+  // PATCH: currently we do not have anything in edges that can help us with this.
+  _getDisplayValue(field, value) {
+    if (field === "uuid_related") {
+      // Return a placeholder value immediately
+      const placeholder = "Loading...";
+
+      // Fetch names asynchronously
+      this._fetchNames(value).then((names) => {
+        if (names) {
+          // Find all matching elements dynamically and update their content
+          document
+            .querySelectorAll(
+              `[data-field="${edges.util.escapeHtml(
+                field
+              )}"][data-key="${edges.util.escapeHtml(value)}"]`
+            )
+            .forEach((el) => {
+              el.innerHTML = `
+                ${edges.util.escapeHtml(names)}
+                <img class="facet" src="../../static/img/minus-facet.png" style="height:15px;" />
+              `;
+            });
+        }
+      });
+
+      return placeholder;
+    } else {
+      return value;
+    }
+  }
+
+  async _fetchNames(value) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const browsing = urlParams.get("browsing");
+    let fl = "browse";
+
+    const collectionName =
+      browsing && browsing != "organisations" ? `${browsing}` : `people`;
+
+    if (!collectionName) {
+      console.error("Collection name not found in the URL.");
+      return "";
+    }
+
+    const response = await fetch(
+      `/solr/${collectionName}/select?q=uuid:${value}&fl=${fl}&wt=json`
+    );
+    const data = await response.json();
+
+    // Extract and process `browse` values
+    const browseNames = data.response.docs.map((doc) => doc[fl]);
+
+    const browseNamesString = browseNames.join(", ");
+
+    return browseNamesString;
   }
 
   _getSelectedFieldLabel(field) {
@@ -1577,6 +1637,8 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
         return "Catalogue";
       case "ox_started-ox_year":
         return "Year";
+      case "uuid_related":
+        return "Any from list";
       default:
         return field;
     }
@@ -3610,10 +3672,17 @@ function _addUrlParam(field, term) {
 }
 
 function _removeUrlParam(field) {
+  let delete_field = "";
+
+  if (field == "uuid_related") {
+    delete_field = "uuids";
+  } else {
+    delete_field = field;
+  }
   const url = new URL(window.location.href);
 
-  if (url.searchParams.has(field)) {
-    url.searchParams.delete(field); // Remove the parameter
+  if (url.searchParams.has(delete_field)) {
+    url.searchParams.delete(delete_field); // Remove the parameter
     window.history.replaceState(null, "", url); // Update the browser URL without reloading
   }
 }

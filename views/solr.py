@@ -131,11 +131,13 @@ def fetchNextResults():
 
         # Handle UUID-related queries based on search_type
         if uuids:
-            uuid_queries = [f'"{uuid}"' for uuid in uuids]
-            if search_type == "all":
-                query = f"uuid_related:({' OR '.join(uuid_queries)})"
-            else:
-                query = f"uuid:({' OR '.join(uuid_queries)})"
+            # Split the single string into a list of UUIDs
+            uuid_list = uuids[0].split(',')
+
+            # Format UUIDs correctly for Solr query
+            uuid_queries = [f'"{uuid.strip()}"' for uuid in uuid_list]  # Strip any extra whitespace
+            query = f"uuid_related:({' OR '.join(uuid_queries)})"
+
 
         # Build Solr query parameters
         solr_params = {
@@ -147,6 +149,8 @@ def fetchNextResults():
             "rows": 1  # Only fetch a single document at a time for pagination
         }
 
+        print(f"{solr_params}")
+
         # Fetch first entry
         first_entry = requests.get(solr_query_url, params=solr_params)
         if first_entry.status_code != 200:
@@ -155,6 +159,7 @@ def fetchNextResults():
         # Fetch last entry (numFound is used to calculate the last entry)
         last_start = max(0, numFound - 1)  # Ensure we don't exceed available records
         last_entry = requests.get(solr_query_url, params={**solr_params, "start": last_start})
+        print(f"last {last_entry} {last_start}")
         if last_entry.status_code != 200:
             return jsonify({'error': 'Error fetching last entry', 'details': last_entry.text}), 500
 
@@ -173,10 +178,10 @@ def fetchNextResults():
 
         # Prepare the response data
         response_data = {
-            "first_entry": first_entry.json().get('response').get('docs' , [])[0],  # Access JSON from the Response object
-            "last_entry": last_entry.json().get('response').get('docs' , [])[0],  # Access JSON from the Response object
+            "first_entry": first_entry.json().get('response').get('docs' , [])[0] if first_entry else None,  # Access JSON from the Response object
+            "last_entry": last_entry.json().get('response').get('docs' , [])[0] if last_entry else None,  # Access JSON from the Response object
             "prev_entry": prev_entry.json().get('response').get('docs' , [])[0] if prev_entry else None,  # Access JSON from the Response object if exists
-            "current_entry": current_entry.json().get('response').get('docs' , [])[0],  # Access JSON from the Response object
+            "current_entry": current_entry.json().get('response').get('docs' , [])[0] if current_entry else None,  # Access JSON from the Response object
             "next_entry": next_entry.json().get('response').get('docs' , [])[0] if next_entry else None # Access JSON from the Response object
         }
 

@@ -157,7 +157,6 @@ def fetchNextResults():
         # Fetch last entry (numFound is used to calculate the last entry)
         last_start = max(0, numFound - 1)  # Ensure we don't exceed available records
         last_entry = requests.get(solr_query_url, params={**solr_params, "start": last_start})
-        print(f"last {last_entry} {last_start}")
         if last_entry.status_code != 200:
             return jsonify({'error': 'Error fetching last entry', 'details': last_entry.text}), 500
 
@@ -170,8 +169,8 @@ def fetchNextResults():
         if current_entry.status_code != 200:
             return jsonify({'error': 'Error fetching current entry', 'details': current_entry.text}), 500
 
-        next_entry = requests.get(solr_query_url, params={**solr_params, "start": start + 1})
-        if next_entry.status_code != 200:
+        next_entry = None if start >= last_start else requests.get(solr_query_url, params={**solr_params, "start": start + 1})
+        if next_entry and next_entry.status_code != 200:
             return jsonify({'error': 'Error fetching next entry', 'details': next_entry.text}), 500
 
         # Prepare the response data
@@ -188,6 +187,7 @@ def fetchNextResults():
     except requests.RequestException as e:
         return jsonify({'error': 'Error fetching data from Solr', 'details': str(e)}), 500
     except Exception as e:
+        print(e)
         return jsonify({'error': 'Internal Server Error', 'details': str(e)}), 500
 
     

@@ -346,10 +346,8 @@ try {
               field: "uuid",
               pre: "",
               post: "",
-              type: "link",
-              linkHrefPrefix: "/profile/work",
               linkText: "Letter",
-              valueFunction: null,
+              valueFunction: _redirectToProfile,
             },
             {
               header: "Date",
@@ -495,4 +493,34 @@ function _getAllMatchingFieldsHTML(val, res, fieldName) {
 
   // Join results with \n\n and wrap in a div
   return `<div>${results.join("\n\n")}</div>`;
+}
+
+function _redirectToProfile(val, res, fieldName, edge, currentIndex) {
+  const total = edge.total(); // Total number of items
+  const start = currentIndex; // Current start index
+  const baseURL = `/profile/work/${val}`;
+
+  // Retrieve existing query parameters from the current URL
+  const urlParams = new URLSearchParams(window.location.search);
+
+  // Initialize a query string for new or updated parameters
+  let queryParams = new URLSearchParams(urlParams);
+
+  // Always set 'start' and 'numFound' if they are relevant
+  queryParams.set("start", start);
+  queryParams.set("numFound", total);
+  queryParams.set("type", "advance");
+
+  // Ensure all other parameters from the current URL are maintained
+  ["sort", "letter", "browsing", "uuids"].forEach((param) => {
+    if (urlParams.has(param)) {
+      queryParams.set(param, urlParams.get(param)); // Keep the existing query value
+    }
+  });
+
+  // Final URL construction: Base URL + query parameters
+  const finalUrl = `${baseURL}?${queryParams.toString()}`;
+
+  // Return the anchor tag with the correct URL
+  return `<a href='${finalUrl}'> Letter </a>`;
 }

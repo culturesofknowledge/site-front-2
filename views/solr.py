@@ -149,8 +149,6 @@ def fetchNextResults():
             "rows": 1  # Only fetch a single document at a time for pagination
         }
 
-        print(f"{solr_params}")
-
         # Fetch first entry
         first_entry = requests.get(solr_query_url, params=solr_params)
         if first_entry.status_code != 200:

@@ -11,15 +11,8 @@ solr_bp = Blueprint("solr", __name__)
 @solr_bp.route('/solr/<path:subpath>', methods=['GET'])  # Include methods you need
 def solr_proxy(subpath):
     try:
-        SOLR_URL = os.getenv('SOLR_URL', '')
+        SOLR_URL = getSolrURL()
 
-        if not SOLR_URL:
-            raise ValueError("SOLR_URL environment variable is not set. Please configure it before starting the app.")
-
-        # Construct the full URL for the external API request
-        # Append the captured subpath
-        if not SOLR_URL.endswith("/"):
-            SOLR_URL = SOLR_URL + "/"
         subpath = subpath.lstrip('/')
         full_url = SOLR_URL + subpath
 
@@ -49,15 +42,7 @@ def solr_proxy(subpath):
 def fetchStats():
     try:
 
-        SOLR_URL = os.getenv('SOLR_URL', '')
-
-        if not SOLR_URL:
-            raise ValueError("SOLR_URL environment variable is not set. Please configure it before starting the app.")
-
-        # Construct the full URL for the external API request
-        # Append the captured subpath
-        if not SOLR_URL.endswith("/"):
-            SOLR_URL = SOLR_URL + "/"
+        SOLR_URL = getSolrURL()
 
         # Get data from the request
         data = request.json
@@ -95,3 +80,19 @@ def fetchStats():
         return jsonify({'error': 'Error fetching data from Solr', 'details': str(e)}), 500
     except Exception as e:
         return jsonify({'error': 'Internal Server Error', 'details': str(e)}), 500
+    
+
+# Function to handle the solr url for each API call. 
+# Todo: we can store solr URL in global variable instead of making call to multiple times to env file.
+def getSolrURL():
+    solr_url = os.getenv('SOLR_URL', '')
+
+    if not solr_url:
+        raise ValueError("SOLR_URL environment variable is not set. Please configure it before starting the app.")
+
+    # Construct the full URL for the external API request
+    # Append the captured subpath
+    if not solr_url.endswith("/"):
+        solr_url = solr_url + "/"
+    
+    return solr_url

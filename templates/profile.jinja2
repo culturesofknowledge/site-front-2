@@ -3,21 +3,26 @@
 {% block title %}Profile{% endblock %}
 
 {% block content %}
-    <div id="navigation-buttons" {% if not request.args.get('start') or not request.args.get('numFound') %}style="display: none;"{% endif %}>
-        {% if request.args.get('bbrowsing') %}
+    
+    <div class="row row-with-side">
+    <div class="large-4"></div>
+    <div id="navigation-buttons" class="large-12 columns" style="margin-top: 15px; margin-bottom:-15px;">
+        {% if request.args.get('browsing') %}
             <button id="back-to-browse">Back to Browse</button>
         {% endif %}
         
         {% if request.args.get('type') %}
             <button id="back-to-results">Back to Results</button>
         {% endif %}
-
-        <button id="first-entry" title="First Entry" {% if start == 0 %}disabled{% endif %}><<</button>
-        <button id="prev-entry" title="Previous Entry" {% if start == 0 %}disabled{% endif %}><</button>
-        <button id="next-entry" title="Next Entry" {% if start == numFound %}disabled{% endif %}>></button>
-        <button id="last-entry" title="Last Entry" {% if start == numFound %}disabled{% endif %}>>></button>
+        
+        {% if request.args.get('start') and request.args.get('numFound') %}
+            <button id="first-entry" title="First Entry"><<</button>
+            <button id="prev-entry" title="Previous Entry"><</button>
+            <button id="next-entry" title="Next Entry">></button>
+            <button id="last-entry" title="Last Entry">>></button>
+        {% endif %}
     </div>
-
+    </div>
 
     <div id="profile-display"></div>
 {% endblock %}
@@ -41,16 +46,15 @@
             const uuids = urlParams.get('uuids');
 
             // Only make the API call if uuid, type, and start are present
-            if (uuid && type && !isNaN(start)) {
-                let apiUrl = '/api/get-entry-data?';
+            if (!isNaN(start)) {
+                let apiUrl = '/results?';
 
                 // Add parameters only if they exist
                 if (uuid) apiUrl += `uuid=${uuid}&`;
                 if (type) apiUrl += `type=${type}&`;
                 if (!isNaN(start)) apiUrl += `start=${start}&`;
+                if (!isNaN(numFound)) apiUrl += `numFound=${numFound}&`;
                 if (sort) apiUrl += `sort=${sort}&`;
-                if (letter) apiUrl += `letter=${letter}&`;
-                if (browsing) apiUrl += `browsing=${browsing}&`;
                 if (uuids) apiUrl += `uuids=${uuids}&`;
 
                 // Remove trailing '&' if exists
@@ -70,8 +74,16 @@
                             document.getElementById('next-entry').disabled = true;
                         }
 
+                        if(start == 0) {
+                            document.getElementById('first-entry').disabled = true;
+                        }
+
+                        if(start >= numFound) {
+                            document.getElementById('last-entry').disabled = true;
+                        }
+
                         // Hide navigation buttons if start and numFound are missing
-                        if (!start || !numFound) {
+                        if (start < 0 || numFound < start) {
                             document.getElementById('navigation-buttons').style.display = 'none';
                         }
 

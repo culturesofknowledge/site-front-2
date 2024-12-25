@@ -39,6 +39,8 @@ function returnToBrowse(){
 
     if (uuids) {
         window.location.href = `${baseURL}/${browsePage}?uuids=${uuids}&letter=${currentLetter != null ? currentLetter : 'a'}`;
+    } else {
+        window.location.href = `${baseURL}/${browsePage}?letter=${currentLetter != null ? currentLetter : 'a'}`;
     }
 }
 </script>

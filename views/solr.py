@@ -80,6 +80,113 @@ def fetchStats():
         return jsonify({'error': 'Error fetching data from Solr', 'details': str(e)}), 500
     except Exception as e:
         return jsonify({'error': 'Internal Server Error', 'details': str(e)}), 500
+
+# This functions fetches the three results based on the search type, this results are used for navigation purpose on 
+# profile page. This will have of three results, in the manner, prev, current and next. Any modification made for this function
+# needs to ne handled inside profile.jinja2. 
+@solr_bp.route('/results')
+def fetchNextResults():
+    try:
+        SOLR_URL = getSolrURL()
+
+        # Sort options mapping
+        SORT_OPTIONS = {
+            "date-a": {"field": "started_date_sort", "order": "asc"},
+            "date-d": {"field": "started_date_sort", "order": "desc"},
+            "author-a": {"field": "author_sort", "order": "asc"},
+            "author-d": {"field": "author_sort", "order": "desc"},
+            "recipient-a": {"field": "recipient_sort", "order": "asc"},
+            "recipient-d": {"field": "recipient_sort", "order": "desc"},
+            "origin-a": {"field": "origin_sort", "order": "asc"},
+            "origin-d": {"field": "origin_sort", "order": "desc"},
+            "destination-a": {"field": "destination_sort", "order": "asc"},
+            "destination-d": {"field": "destination_sort", "order": "desc"}
+        }
+
+        # Retrieve query parameters
+        search_type = request.args.get('search_type', '')
+        start = int(request.args.get('start', '0'))  # Default to "0" if not provided
+        sort = request.args.get('sort', '')  # Optional sort query
+        uuids = request.args.getlist('uuids')  # List of UUIDs
+        numFound = int(request.args.get('numFound', '0'))
+
+        if numFound == 0:
+            return jsonify({'error': 'Error fetching data from Solr', 'details': "numFound is missing or invalid"}), 400
+
+        # Set the Solr collection based on search_type
+        solr_collection = "all" if search_type == "quick" else "works"
+
+        # Build the Solr query base URL
+        solr_query_url = f"{SOLR_URL}{solr_collection}/select"
+
+        # Default query and sort options
+        query = "*:*"
+        sort_query = "started_date_sort asc"
+
+        # Add sort parameter if provided
+        if sort and sort in SORT_OPTIONS:
+            sort_field = SORT_OPTIONS[sort]["field"]
+            sort_order = SORT_OPTIONS[sort]["order"]
+            sort_query = f"{sort_field} {sort_order}"
+
+        # Handle UUID-related queries based on search_type
+        if uuids:
+            uuid_queries = [f'"{uuid}"' for uuid in uuids]
+            if search_type == "all":
+                query = f"uuid_related:({' OR '.join(uuid_queries)})"
+            else:
+                query = f"uuid:({' OR '.join(uuid_queries)})"
+
+        # Build Solr query parameters
+        solr_params = {
+            "q": query,
+            "sort": sort_query,
+            "start": start,
+            "wt" : "json",
+            "fl" : "uuid, object_type",
+            "rows": 1  # Only fetch a single document at a time for pagination
+        }
+
+        # Fetch first entry
+        first_entry = requests.get(solr_query_url, params=solr_params)
+        if first_entry.status_code != 200:
+            return jsonify({'error': 'Error fetching first entry', 'details': first_entry.text}), 500
+
+        # Fetch last entry (numFound is used to calculate the last entry)
+        last_start = max(0, numFound - 1)  # Ensure we don't exceed available records
+        last_entry = requests.get(solr_query_url, params={**solr_params, "start": last_start})
+        if last_entry.status_code != 200:
+            return jsonify({'error': 'Error fetching last entry', 'details': last_entry.text}), 500
+
+        # Fetch previous, current, and next entries
+        prev_entry = None if start <= 0 else requests.get(solr_query_url, params={**solr_params, "start": start - 1})
+        if prev_entry and prev_entry.status_code != 200:
+            return jsonify({'error': 'Error fetching previous entry', 'details': prev_entry.text}), 500
+
+        current_entry = requests.get(solr_query_url, params={**solr_params, "start": start})
+        if current_entry.status_code != 200:
+            return jsonify({'error': 'Error fetching current entry', 'details': current_entry.text}), 500
+
+        next_entry = requests.get(solr_query_url, params={**solr_params, "start": start + 1})
+        if next_entry.status_code != 200:
+            return jsonify({'error': 'Error fetching next entry', 'details': next_entry.text}), 500
+
+        # Prepare the response data
+        response_data = {
+            "first_entry": first_entry.json().get('response').get('docs' , [])[0],  # Access JSON from the Response object
+            "last_entry": last_entry.json().get('response').get('docs' , [])[0],  # Access JSON from the Response object
+            "prev_entry": prev_entry.json().get('response').get('docs' , [])[0] if prev_entry else None,  # Access JSON from the Response object if exists
+            "current_entry": current_entry.json().get('response').get('docs' , [])[0],  # Access JSON from the Response object
+            "next_entry": next_entry.json().get('response').get('docs' , [])[0] if next_entry else None # Access JSON from the Response object
+        }
+
+        return jsonify(response_data), 200
+
+    except requests.RequestException as e:
+        return jsonify({'error': 'Error fetching data from Solr', 'details': str(e)}), 500
+    except Exception as e:
+        return jsonify({'error': 'Internal Server Error', 'details': str(e)}), 500
+
     
 
 # Function to handle the solr url for each API call. 

@@ -611,6 +611,10 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
     this._restoreSelectionFromURL();
   }
 
+  total() {
+    return this.component.hitCount;
+  }
+
   draw() {
     let frag = this.noResultsText;
     if (this.component.results === false) {
@@ -705,7 +709,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
           val = edges.util.escapeHtml(val);
         }
         if (field.valueFunction) {
-          val = field.valueFunction(val, res, field.field, this);
+          val = field.valueFunction(val, res, field.field, this, index);
         }
         if (!val && this.omitFieldIfEmpty) {
           return "<td></td>";

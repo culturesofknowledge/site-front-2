@@ -2,43 +2,118 @@
 
 {% block title %}Profile{% endblock %}
 
-
 {% block content %}
+    <div id="navigation-buttons" {% if not request.args.get('start') or not request.args.get('numFound') %}style="display: none;"{% endif %}>
+        {% if request.args.get('bbrowsing') %}
+            <button id="back-to-browse">Back to Browse</button>
+        {% endif %}
+        
+        {% if request.args.get('type') %}
+            <button id="back-to-results">Back to Results</button>
+        {% endif %}
+
+        <button id="first-entry" title="First Entry" {% if start == 0 %}disabled{% endif %}><<</button>
+        <button id="prev-entry" title="Previous Entry" {% if start == 0 %}disabled{% endif %}><</button>
+        <button id="next-entry" title="Next Entry" {% if start == numFound %}disabled{% endif %}>></button>
+        <button id="last-entry" title="Last Entry" {% if start == numFound %}disabled{% endif %}>>></button>
+    </div>
+
+
     <div id="profile-display"></div>
 {% endblock %}
 
-
 {% block extra_js_bottom %}
+    {% include "_edges_common_js.jinja2" %}
+    <script type="module" src="{{ url_for('static', filename='js/profile.edges.js') }}"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
 
-{% include "_edges_common_js.jinja2" %}
-<script type="module" src="{{ url_for('static', filename='js/profile.edges.js') }}"></script>
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const uuid = urlParams.get('uuid');
+            const type = urlParams.get('type');
+            const start = parseInt(urlParams.get('start') || '0');
+            const numFound = parseInt(urlParams.get('numFound') || '0');
+            const sort = urlParams.get('sort');
+            const letter = urlParams.get('letter');
+            const browsing = urlParams.get('browsing');
+            const uuids = urlParams.get('uuids');
 
-<script>
-        // Initialize the map after rendering the HTML
-        document.addEventListener('DOMContentLoaded', function(event) {
-          
+            // Only make the API call if uuid, type, and start are present
+            if (uuid && type && !isNaN(start)) {
+                let apiUrl = '/api/get-entry-data?';
+
+                // Add parameters only if they exist
+                if (uuid) apiUrl += `uuid=${uuid}&`;
+                if (type) apiUrl += `type=${type}&`;
+                if (!isNaN(start)) apiUrl += `start=${start}&`;
+                if (sort) apiUrl += `sort=${sort}&`;
+                if (letter) apiUrl += `letter=${letter}&`;
+                if (browsing) apiUrl += `browsing=${browsing}&`;
+                if (uuids) apiUrl += `uuids=${uuids}&`;
+
+                // Remove trailing '&' if exists
+                apiUrl = apiUrl.endsWith('&') ? apiUrl.slice(0, -1) : apiUrl;
+
+                // API call logic here
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        const { first_entry, prev_entry, next_entry, last_entry } = data;
+
+                        // Enable/Disable navigation buttons based on API response
+                        if (!prev_entry) {
+                            document.getElementById('prev-entry').disabled = true;
+                        }
+                        if (!next_entry) {
+                            document.getElementById('next-entry').disabled = true;
+                        }
+
+                        // Hide navigation buttons if start and numFound are missing
+                        if (!start || !numFound) {
+                            document.getElementById('navigation-buttons').style.display = 'none';
+                        }
+
+                        // Set navigation button actions
+                        document.getElementById('first-entry').onclick = () => window.location.href = `/profile/${first_entry.uuid}?type=${type}&start=0&sort=${sort}&letter=${letter}&browsing=${browsing}&uuids=${uuids}`;
+                        document.getElementById('prev-entry').onclick = () => window.location.href = `/profile/${prev_entry.uuid}?type=${type}&start=${start - 1}&sort=${sort}&letter=${letter}&browsing=${browsing}&uuids=${uuids}`;
+                        document.getElementById('next-entry').onclick = () => window.location.href = `/profile/${next_entry.uuid}?type=${type}&start=${start + 1}&sort=${sort}&letter=${letter}&browsing=${browsing}&uuids=${uuids}`;
+                        document.getElementById('last-entry').onclick = () => window.location.href = `/profile/${last_entry.uuid}?type=${type}&start=${numFound}&sort=${sort}&letter=${letter}&browsing=${browsing}&uuids=${uuids}`;
+
+                        // Back to browse
+                        if (browsing) {
+                            document.getElementById('back-to-browse').onclick = () => window.location.href = `/browse/${browsing}?letter=${letter}&uuids=${uuids}`;
+                        }
+
+                        // Back to results
+                        if (type) {
+                            document.getElementById('back-to-results').onclick = () => window.location.href = `/forms/advance?sort=${sort}&start=${start}&letter=${letter}&browsing=${browsing}&uuids=${uuids}`;
+                        }
+                    });
+            }
+
+            // Initialize the map after rendering the HTML
             const checkMapElement = setInterval(function() {
                 const mapElement = document.getElementById('location-map');
-             
+
                 if (mapElement) {
                     clearInterval(checkMapElement);
                     
-                    const lat = mapElement.getAttribute("data-lat")
-                    const long = mapElement.getAttribute("data-long")
+                    const lat = mapElement.getAttribute("data-lat");
+                    const long = mapElement.getAttribute("data-long");
                     
                     const map = L.map('location-map').setView([lat, long], 8); // Adjust zoom level as needed
                    
                     // Add OpenStreetMap tile layer
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     }).addTo(map);
 
                     // Add a marker at the given lat, long
                     L.marker([lat, long]).addTo(map)
-                    .bindPopup("Location: " + lat + ", " + long)
-                    .openPopup();
+                        .bindPopup("Location: " + lat + ", " + long)
+                        .openPopup();
                 }
             }, 100);
         })

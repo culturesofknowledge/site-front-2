@@ -3662,6 +3662,329 @@ emlo.SortRenderer = class extends edges.Renderer {
   };
 };
 
+// // Checkbox Component
+// emlo.Checkbox = class extends edges.Component {
+//   constructor(params) {
+//     super(params);
+
+//     this.urlParam = edges.util.getParam(params, "urlParam", "filters");
+//     this.filterGroups = edges.util.getParam(params, "filterGroups", {});
+//     this.selectedFilters = {}; // To store selected filters by group
+//   }
+
+//   synchronise() {
+//     this.selectedFilters = {}; // Reset selected filters
+
+//     // Parse the URL for the 'filter' parameter
+//     const url = new URL(window.location.href);
+//     const filterValues = url.searchParams.get(this.urlParam);
+
+//     if (filterValues) {
+//       const filters = filterValues.split(",");
+//       // Assign filters to their respective groups
+//       for (const filter of filters) {
+//         for (const field of Object.keys(this.filterGroups)) {
+//           if (this.filterGroups[field].paramvalues.includes(filter)) {
+//             if (!this.selectedFilters[field]) {
+//               this.selectedFilters[field] = [];
+//             }
+//             this.selectedFilters[field].push(
+//               this.filterGroups[field].valueMap[filter]
+//             );
+//           }
+//         }
+//       }
+//     }
+
+//     console.log("selectedfilter", this.selectedFilters);
+
+//     // Update the query based on selected filters
+//     this.applyFilters();
+//   }
+
+//   applyFilters() {
+//     const nq = this.edge.cloneQuery();
+//     console.log("NQ :", nq);
+//     // // Clear existing filters in the query
+//     // nq.clearFilters();
+
+//     // Apply new filters from selectedFilters using 'must' queries
+//     for (const [field, filters] of Object.entries(this.selectedFilters)) {
+//       if (filters.length > 0) {
+//         for (const value of filters) {
+//           nq.addMust({ field: field, value: value });
+//         }
+//       }
+//     }
+
+//     // Push the updated query
+//     this.edge.pushQuery(nq);
+//   }
+// };
+
+// // Filter Renderer
+// emlo.CheckboxRenderer = class extends edges.Renderer {
+//   constructor(params) {
+//     super(params);
+//     this.namespace = "edges-filter-renderer";
+//     this.label = edges.util.getParam(params, "label", "Filters");
+//   }
+
+//   draw() {
+//     const comp = this.component;
+
+//     // Create checkboxes for each group and filter
+//     let html = `<div class="${this.namespace}">
+//                       <h4>${this.label}</h4>`;
+
+//     for (const field of Object.keys(comp.filterGroups)) {
+//       html += `<div class="filter-group">
+//                       <strong>${field}</strong><br/>`;
+
+//       const filters = comp.filterGroups[field].paramvalues;
+//       const selectedFilters = comp.selectedFilters[field] || [];
+
+//       for (const filter of filters) {
+//         const isChecked = selectedFilters.includes(filter);
+//         html += `<label>
+//                           <input type="checkbox" value="${filter}" data-field="${field}" ${
+//           isChecked ? "checked" : ""
+//         }>
+//                           ${comp.filterGroups[field].valueMap[fi]}
+//                       </label><br/>`;
+//       }
+
+//       html += `</div>`;
+//     }
+
+//     html += `</div>`;
+
+//     // Render the HTML
+//     comp.context.html(html);
+
+//     // Attach event listeners
+//     const checkboxes = comp.context.find(`input[type='checkbox']`);
+//     checkboxes
+//       .off("change")
+//       .on("change", (event) => this.handleCheckboxChange(event));
+//   }
+
+//   handleCheckboxChange(event) {
+//     const comp = this.component;
+//     const checkbox = event.target;
+//     const field = checkbox.dataset.field;
+//     const value = checkbox.value;
+
+//     if (!comp.selectedFilters[field]) {
+//       comp.selectedFilters[field] = [];
+//     }
+
+//     if (checkbox.checked) {
+//       // Add filter to the group
+//       comp.selectedFilters[field].push(value);
+//     } else {
+//       // Remove filter from the group
+//       comp.selectedFilters[field] = comp.selectedFilters[field].filter(
+//         (filter) => filter !== value
+//       );
+//     }
+
+//     // Update the URL
+//     this.updateUrl();
+
+//     // Apply the filters
+//     comp.applyFilters();
+//   }
+
+//   updateUrl() {
+//     const comp = this.component;
+//     const allFilters = [];
+
+//     // Collect all selected filters
+//     for (const [field, filters] of Object.entries(comp.selectedFilters)) {
+//       allFilters.push(...filters);
+//     }
+
+//     const url = new URL(window.location.href);
+//     if (allFilters.length > 0) {
+//       url.searchParams.set("filter", allFilters.join(","));
+//     } else {
+//       url.searchParams.delete("filter");
+//     }
+
+//     // Update the browser URL without reloading
+//     window.history.replaceState({}, "", url);
+//   }
+// };
+
+// Checkbox Component
+// Checkbox Component
+emlo.Checkbox = class extends edges.Component {
+  constructor(params) {
+    super(params);
+
+    // Define groups for filters with valueMap
+    this.filterGroups = edges.util.getParam(params, "filterGroups", {});
+    this.selectedFilters = {}; // To store selected filters by group
+    this.urlParam = edges.util.getParam(params, "urlParam", "filters");
+  }
+
+  synchronise() {
+    this.selectedFilters = {}; // Reset selected filters
+
+    // Parse the URL for the parameter
+    const url = new URL(window.location.href);
+    const filterValues = url.searchParams.get(this.urlParam);
+
+    if (filterValues) {
+      const filters = filterValues.split(",");
+
+      // Assign filters to their respective groups
+      for (const filter of filters) {
+        for (const field of Object.keys(this.filterGroups)) {
+          const group = this.filterGroups[field];
+          if (group.paramvalues.includes(filter)) {
+            if (!this.selectedFilters[field]) {
+              this.selectedFilters[field] = [];
+            }
+            this.selectedFilters[field].push(filter);
+          }
+        }
+      }
+    }
+
+    // Update the query based on selected filters
+    this.applyFilters();
+  }
+
+  applyFilters() {
+    const nq = this.edge.cloneQuery();
+
+    // Apply new filters from selectedFilters using must
+    for (const [field, filters] of Object.entries(this.selectedFilters)) {
+      if (filters.length > 0) {
+        const group = this.filterGroups[field];
+        const valueMap = group.valueMap;
+        const values = filters
+          .map((paramValue) => valueMap[paramValue])
+          .join(" OR ");
+
+        // Create or update the term in nq.must
+        const existingTermIndex = nq.must.findIndex(
+          (item) => item.term && item.term[field]
+        );
+        if (existingTermIndex !== -1) {
+          nq.must[existingTermIndex] = { term: { [field]: `(${values})` } };
+        } else {
+          nq.must.push({ term: { [field]: `(${values})` } });
+        }
+      } else {
+        // Remove the term if no filters are selected
+        nq.must = nq.must.filter((item) => !(item.term && item.term[field]));
+      }
+    }
+
+    // Push the updated query
+    this.edge.pushQuery(nq);
+    this.edge.cycle();
+  }
+};
+
+// Checkbox Renderer
+emlo.CheckboxRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+    this.namespace = "edges-checkbox-renderer";
+    this.label = edges.util.getParam(params, "label", "Filters");
+  }
+
+  draw() {
+    const comp = this.component;
+
+    // Create checkboxes for each group and filter
+    let html = `<div class="${this.namespace}">
+                      <h4>${this.label}</h4>`;
+
+    for (const field of Object.keys(comp.filterGroups)) {
+      html += `<div class="filter-group">
+                      <strong>${field}</strong><br/>`;
+
+      const group = comp.filterGroups[field];
+      const selectedFilters = comp.selectedFilters[field] || [];
+
+      for (const paramValue of group.paramvalues) {
+        const isChecked = selectedFilters.includes(paramValue);
+        html += `<label>
+                          <input type="checkbox" value="${paramValue}" data-field="${field}" ${
+          isChecked ? "checked" : ""
+        }>
+                          ${group.valueMap[paramValue]}
+                      </label><br/>`;
+      }
+
+      html += `</div>`;
+    }
+
+    html += `</div>`;
+
+    // Render the HTML
+    comp.context.html(html);
+
+    // Attach event listeners
+    const checkboxes = comp.context.find(`input[type='checkbox']`);
+    checkboxes
+      .off("change")
+      .on("change", (event) => this.handleCheckboxChange(event));
+  }
+
+  handleCheckboxChange(event) {
+    const comp = this.component;
+    const checkbox = event.target;
+    const field = checkbox.dataset.field;
+    const value = checkbox.value;
+
+    if (!comp.selectedFilters[field]) {
+      comp.selectedFilters[field] = [];
+    }
+
+    if (checkbox.checked) {
+      // Add filter to the group
+      comp.selectedFilters[field].push(value);
+    } else {
+      // Remove filter from the group
+      comp.selectedFilters[field] = comp.selectedFilters[field].filter(
+        (filter) => filter !== value
+      );
+    }
+
+    // Update the URL
+    this.updateUrl();
+
+    // Apply the filters
+    comp.applyFilters();
+  }
+
+  updateUrl() {
+    const comp = this.component;
+    const allFilters = [];
+
+    // Collect all selected filters
+    for (const [field, filters] of Object.entries(comp.selectedFilters)) {
+      allFilters.push(...filters);
+    }
+
+    const url = new URL(window.location.href);
+    if (allFilters.length > 0) {
+      url.searchParams.set(comp.urlParam, allFilters.join(","));
+    } else {
+      url.searchParams.delete(comp.urlParam);
+    }
+
+    // Update the browser URL without reloading
+    window.history.replaceState({}, "", url);
+  }
+};
+
 function _addUrlParam(field, term) {
   const url = new URL(window.location.href);
   const currentValue = url.searchParams.get(field);

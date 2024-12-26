@@ -3914,30 +3914,30 @@ emlo.CheckboxRenderer = class extends edges.Renderer {
     super(params);
     this.namespace = "edges-checkbox-renderer";
     this.label = edges.util.getParam(params, "label", "Filters");
+    this.seprator = edges.util.getParam(params, "seprator", true);
   }
 
   draw() {
     const comp = this.component;
 
     // Create checkboxes for each group and filter
-    let html = `<div class="${this.namespace}">
-                      <h4>${this.label}</h4>`;
+    let html = `<div class="${this.namespace}" style="display:flex;justify-content: center;">`;
 
     for (const field of Object.keys(comp.filterGroups)) {
-      html += `<div class="filter-group">
-                      <strong>${field}</strong><br/>`;
+      html += `<div class="filter-group" style="display:flex">
+      <br/>`;
 
       const group = comp.filterGroups[field];
       const selectedFilters = comp.selectedFilters[field] || [];
 
       for (const paramValue of group.paramvalues) {
         const isChecked = selectedFilters.includes(paramValue);
-        html += `<label>
+        html += `<label style="margin:0px 10px; text-transform: capitalize;">
                           <input type="checkbox" value="${paramValue}" data-field="${field}" ${
           isChecked ? "checked" : ""
         }>
                           ${group.valueMap[paramValue]}
-                      </label><br/>`;
+                      </label>`;
       }
 
       html += `</div>`;

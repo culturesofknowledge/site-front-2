@@ -3034,7 +3034,7 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
     this.namespace = "edges-custom-bargraph-display";
     this.currentView = "separate"; // Default view
     this.maxPoints = 20; // Max number of data points
-    this.graphHeight = 64;
+    this.graphHeight = 150;
     this.graphWidth = 600;
     this.barColor = "#007bff"; // Default bar color
     this.hoverColor = "#EFC319"; // Hover bar color
@@ -3061,7 +3061,7 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       `;
 
     this.component.context.html(container);
-
+    this.bindGraphEvents();
     if (!this.component.loading) {
       this._renderGraphs();
     }
@@ -3069,15 +3069,39 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
 
   _renderControls() {
     const graphDataKeys = Object.keys(this.component.graphData);
-    if (graphDataKeys.length <= 1) return "";
+
+    const fullscreenClass = edges.util.allClasses(
+      this.namespace,
+      "fullscreen",
+      this
+    );
+
+    const splitBarClass = edges.util.allClasses(
+      this.namespace,
+      "splitBar",
+      this
+    );
+    const stackBarClass = edges.util.allClasses(
+      this.namespace,
+      "stackBar",
+      this
+    );
+    const separateClass = edges.util.allClasses(
+      this.namespace,
+      "separate",
+      this
+    );
+
+    if (graphDataKeys.length <= 1)
+      return `<button  class="${fullscreenClass} tiny">Full Screen</button>`;
 
     return `
       <div class="graph-controls">
-        <button onclick="window.edges_custom_bargraph_display.toggleView('separate')">Separate Charts</button>
-        <button onclick="window.edges_custom_bargraph_display.toggleView('stacked')">Stacked Bar</button>
-        <button onclick="window.edges_custom_bargraph_display.toggleView('split')">Split Bar</button>
+        <button class="${separateClass} tiny">Separate Charts</button>
+        <button class="${stackBarClass} tiny">Stacked Bar</button>
+        <button class="${splitBarClass} tiny">Split Bar</button>
+        <button  class="${fullscreenClass} tiny">Full Screen</button>
       </div>
-      <button onclick="window.edges_custom_bargraph_display.toggleFullscreen('${this.namespace}-container')">Full Screen</button>
     `;
   }
 
@@ -3210,24 +3234,249 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
   }
 
   _drawCombinedGraph(datasets, labels, maxYValue, container) {
-    // Create a combined bar chart if needed
+    // Clear existing content
+    container.innerHTML = "";
+
+    // Set up SVG for the D3 chart
+    const svg = d3
+      .select(container)
+      .append("svg")
+      .attr("width", this.graphWidth + this.margin.left + this.margin.right)
+      .attr("height", this.graphHeight + this.margin.top + this.margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
+
+    // Define scales
+    const x = d3
+      .scaleBand()
+      .domain(labels)
+      .range([0, this.graphWidth])
+      .padding(0.2);
+
+    const y = d3
+      .scaleLinear()
+      .domain([0, maxYValue])
+      .nice()
+      .range([this.graphHeight, 0]);
+
+    const colorScale = d3
+      .scaleOrdinal()
+      .domain(datasets.map((d) => d.label))
+      .range(datasets.map((d) => d.config.barColor || this.barColor));
+
+    // Add X-axis
+    svg
+      .append("g")
+      .attr("transform", `translate(0,${this.graphHeight})`)
+      .call(d3.axisBottom(x));
+
+    // Add Y-axis
+    svg.append("g").call(d3.axisLeft(y));
+
+    if (this.currentView === "stacked") {
+      // Clear existing content
+      container.innerHTML = "";
+
+      // Set up SVG for the D3 chart
+      const svg = d3
+        .select(container)
+        .append("svg")
+        .attr("width", this.graphWidth + this.margin.left + this.margin.right)
+        .attr("height", this.graphHeight + this.margin.top + this.margin.bottom)
+        .append("g")
+        .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
+
+      // Define scales
+      const x = d3
+        .scaleBand()
+        .domain(labels)
+        .range([0, this.graphWidth])
+        .padding(0.1);
+
+      const y = d3
+        .scaleLinear()
+        .domain([0, maxYValue])
+        .nice()
+        .range([this.graphHeight, 0]);
+
+      const colorScale = d3
+        .scaleOrdinal()
+        .domain(datasets.map((d) => d.label))
+        .range(datasets.map((d) => d.config.barColor || this.barColor));
+
+      // Add X-axis
+      svg
+        .append("g")
+        .attr("transform", `translate(0,${this.graphHeight})`)
+        .call(d3.axisBottom(x));
+
+      // Add Y-axis
+      svg.append("g").call(d3.axisLeft(y));
+
+      // Prepare stacked data
+      const stackedData = labels.map((label) => {
+        let cumulative = 0;
+        return datasets.map((dataset) => {
+          const value = dataset.data[label] || 0;
+          const startY = cumulative;
+          cumulative += value;
+          return {
+            label: dataset.label,
+            startY,
+            endY: cumulative,
+            value,
+            barColor: dataset.config.barColor || this.barColor,
+          };
+        });
+      });
+
+      // Draw stacked bars
+      stackedData.forEach((stack, labelIndex) => {
+        stack.forEach((segment, datasetIndex) => {
+          svg
+            .append("rect")
+            .attr("x", x(labels[labelIndex]))
+            .attr("y", y(segment.endY)) // Y position of the top of the segment
+            .attr("height", y(segment.startY) - y(segment.endY)) // Height of the segment
+            .attr("width", x.bandwidth())
+            .attr("fill", segment.barColor)
+            .on("mouseover", (event) => {
+              d3.select(event.target).attr("fill", this.hoverColor);
+              this._showTooltip(event, `${segment.label}: ${segment.value}`);
+            })
+            .on("mouseout", (event) => {
+              d3.select(event.target).attr("fill", segment.barColor);
+              this._hideTooltip();
+            });
+        });
+      });
+    } else if (this.currentView === "split") {
+      // Split (grouped) bar chart
+      const subX = d3
+        .scaleBand()
+        .domain(datasets.map((d) => d.label))
+        .range([0, x.bandwidth()])
+        .padding(0.05);
+
+      datasets.forEach((dataset, datasetIndex) => {
+        svg
+          .selectAll(`.bar-group-${datasetIndex}`)
+          .data(labels)
+          .enter()
+          .append("rect")
+          .attr("class", `bar-group-${datasetIndex}`)
+          .attr("x", (d) => x(d) + subX(dataset.label))
+          .attr("y", (d) => y(dataset.data[d] || 0))
+          .attr("width", subX.bandwidth())
+          .attr("height", (d) => this.graphHeight - y(dataset.data[d] || 0))
+          .attr("fill", dataset.config.barColor || this.barColor)
+          .on("mouseover", (event, d) => {
+            d3.select(event.target).attr("fill", this.hoverColor);
+            this._showTooltip(
+              event,
+              `${dataset.label}: ${dataset.data[d] || 0}`
+            );
+          })
+          .on("mouseout", (event) => {
+            d3.select(event.target).attr(
+              "fill",
+              dataset.config.barColor || this.barColor
+            );
+            this._hideTooltip();
+          });
+      });
+    }
   }
 
-  toggleView(view) {
-    this.currentView = view;
+  bindGraphEvents() {
+    const fullscreenSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "fullscreen",
+      this
+    );
+
+    var splitBarSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "splitBar",
+      this
+    );
+    var separateSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "separate",
+      this
+    );
+    var stackedBarSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "stackBar",
+      this
+    );
+    edges.on(fullscreenSelector, "click", this, "toggleFullscreen");
+    edges.on(stackedBarSelector, "click", this, "stackedView");
+    edges.on(separateSelector, "click", this, "separateView");
+    edges.on(splitBarSelector, "click", this, "splitView");
+  }
+
+  separateView() {
+    this.currentView = "separate";
+    this.draw();
+  }
+
+  stackedView() {
+    this.currentView = "stacked";
+    this.draw();
+  }
+
+  splitView() {
+    this.currentView = "split";
     this.draw();
   }
 
   toggleFullscreen(containerId) {
-    const container = document.getElementById(containerId);
-    if (!document.fullscreenElement) {
-      container
-        .requestFullscreen()
-        .catch((err) =>
-          console.warn(`Error enabling fullscreen: ${err.message}`)
-        );
+    const container = document.getElementById(`${this.namespace}-container`);
+    const isExpanded = container.classList.contains("fullscreen-mode");
+
+    if (isExpanded) {
+      // Shrink back to original size
+      container.style.width = "";
+      container.style.height = "";
+      container.style.position = "";
+      container.style.zIndex = "";
+      container.style.backgroundColor = "";
+      container.style.overflow = ""; // Reset overflow
+      container.classList.remove("fullscreen-mode");
+
+      // Remove close button
+      const closeButton = container.querySelector(".close-button");
+      if (closeButton) {
+        closeButton.remove();
+      }
     } else {
-      document.exitFullscreen();
+      // Expand to full screen
+      container.style.width = "100%";
+      container.style.height = "100%"; // Full height to ensure all content is visible
+      container.style.position = "fixed";
+      container.style.top = "0";
+      container.style.left = "0";
+      container.style.zIndex = "1000";
+      container.style.backgroundColor = "#fff"; // Optional: Set a background color
+      container.style.overflow = "auto"; // Ensure scrollable if content overflows
+      container.classList.add("fullscreen-mode");
+
+      // Add a close button
+      const closeButton = document.createElement("button");
+      closeButton.innerHTML = "Close";
+      closeButton.className = "close-button";
+      closeButton.style.position = "absolute";
+      closeButton.style.top = "10px";
+      closeButton.style.right = "10px";
+      closeButton.style.zIndex = "1100";
+      closeButton.style.backgroundColor = "#ff0000";
+      closeButton.style.color = "#fff";
+      closeButton.style.border = "none";
+      closeButton.style.padding = "10px";
+      closeButton.style.cursor = "pointer";
+      closeButton.onclick = () => this.toggleFullscreen(containerId);
+      container.appendChild(closeButton);
     }
   }
 

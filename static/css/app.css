@@ -10347,3 +10347,13 @@ ul.pagination li {
   max-height: 1000px;
   transition: max-height 1s;
 }
+
+button.tiny {
+  padding-top: 0.625rem;
+  padding-right: 1.25rem;
+  padding-bottom: 0.6875rem;
+  padding-left: 1.25rem;
+  font-size: 0.6875rem;
+  height: 40px;
+  margin: 0px 15px;
+}

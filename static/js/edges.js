@@ -3827,6 +3827,7 @@ emlo.Checkbox = class extends edges.Component {
     this.filterGroups = edges.util.getParam(params, "filterGroups", {});
     this.selectedFilters = {}; // To store selected filters by group
     this.urlParam = edges.util.getParam(params, "urlParam", "filters");
+    this.previousSelectedRange = [];
   }
 
   synchronise() {
@@ -3859,28 +3860,45 @@ emlo.Checkbox = class extends edges.Component {
 
   applyFilters() {
     const nq = this.edge.cloneQuery();
+    const textFields = ["foaf_gender"];
+    const rangeFields = [
+      "ox_totalWorksAddressedToAgent",
+      "ox_totalWorksByAgent",
+      "ox_totalWorksMentioningAgent",
+    ];
 
     // Apply new filters from selectedFilters using must
     for (const [field, filters] of Object.entries(this.selectedFilters)) {
-      if (filters.length > 0) {
-        const group = this.filterGroups[field];
-        const valueMap = group.valueMap;
-        const values = filters
-          .map((paramValue) => valueMap[paramValue])
-          .join(" OR ");
+      if (textFields.includes(field)) {
+        if (filters.length > 0) {
+          const group = this.filterGroups[field];
+          const valueMap = group.valueMap;
+          const values = filters
+            .map((paramValue) => valueMap[paramValue])
+            .join(" OR ");
 
-        // Create or update the term in nq.must
-        const existingTermIndex = nq.must.findIndex(
-          (item) => item.term && item.term[field]
-        );
-        if (existingTermIndex !== -1) {
-          nq.must[existingTermIndex] = { term: { [field]: `(${values})` } };
+          // Create or update the term in nq.must
+          const existingTermIndex = nq.must.findIndex(
+            (item) => item.term && item.term[field]
+          );
+          if (existingTermIndex !== -1) {
+            nq.must[existingTermIndex] = { term: { [field]: `(${values})` } };
+          } else {
+            nq.must.push({ term: { [field]: `(${values})` } });
+          }
         } else {
-          nq.must.push({ term: { [field]: `(${values})` } });
+          // Remove the term if no filters are selected
+          nq.must = nq.must.filter((item) => !(item.term && item.term[field]));
         }
-      } else {
-        // Remove the term if no filters are selected
-        nq.must = nq.must.filter((item) => !(item.term && item.term[field]));
+      } else if (rangeFields.includes(field)) {
+        if (!nq.query.range) {
+          nq.query.range = {};
+        }
+
+        nq.query.range[field] = {
+          gte: 1,
+          lte: "*",
+        };
       }
     }
 
@@ -3952,6 +3970,7 @@ emlo.CheckboxRenderer = class extends edges.Renderer {
       comp.selectedFilters[field].push(value);
     } else {
       // Remove filter from the group
+
       comp.selectedFilters[field] = comp.selectedFilters[field].filter(
         (filter) => filter !== value
       );

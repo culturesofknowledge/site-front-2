@@ -22,6 +22,24 @@ try {
         un: "unknown",
       },
     },
+    ox_totalWorksByAgent: {
+      paramvalues: ["wr"],
+      valueMap: {
+        wr: "Letters Written",
+      },
+    },
+    ox_totalWorksAddressedToAgent: {
+      paramvalues: ["re"],
+      valueMap: {
+        re: "Letters Recevied",
+      },
+    },
+    ox_totalWorksMentioningAgent: {
+      paramvalues: ["me"],
+      valueMap: {
+        me: "Letters Mentioning",
+      },
+    },
   };
 
   emlo.openingQuery = {
@@ -66,33 +84,23 @@ try {
 
     // Add selected filters to the must query
     for (const [field, values] of Object.entries(selectedFilters)) {
-      if (values.length > 0) {
+      if (values.length > 0 && field == "foaf_gender") {
         const group = filterGroups[field];
         const mappedValues = values.map((value) => group.valueMap[value]);
         const joinedValues = mappedValues.join(" OR ");
         emlo.openingQuery.must.push({ term: { [field]: `(${joinedValues})` } });
+      } else {
+        if (!emlo.openingQuery.query.range) {
+          emlo.openingQuery.query.range = {};
+        }
+
+        emlo.openingQuery.query.range[field] = {
+          gte: 1,
+          lte: "*",
+        };
       }
     }
   }
-
-  if (!emlo.openingQuery.query.range) {
-    emlo.openingQuery.query.range = {};
-  }
-
-  emlo.openingQuery.query.range["ox_totalWorksByAgent"] = {
-    gte: 1,
-    lte: "*",
-  };
-
-  emlo.openingQuery.query.range["ox_totalWorksAddressedToAgent"] = {
-    gte: 1,
-    lte: "*",
-  };
-
-  emlo.openingQuery.query.range["ox_totalWorksMentioningAgent"] = {
-    gte: 1,
-    lte: "*",
-  };
 
   // Handle fields to return - TODO: Handle this part in edges
   // emlo.openingQuery.queryStrings.push({

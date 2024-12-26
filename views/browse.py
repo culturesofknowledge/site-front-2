@@ -24,14 +24,30 @@ def people():
 
 @browse_bp.route('/locations')
 def locations():
+    # Check if 'filter' is in the query string; if not, append it automatically
+    filter_param = request.args.get('filters', None)
+
+    # If filter is not present, add it with a default value (you can customize this value)
+    if not filter_param:
+        # Redirect with the filter query appended, this ensures the 'filter' param is always present
+        return redirect(url_for('browse.locations', **{**request.args, 'filters': 'fe,ma,un,re,wr,me'}))
+    
     letter = request.args.get('letter', '').lower()
-    return render_template('/pages/browse/locations.jinja2', title="Browse:Locations" , letter=letter)
+    return render_template('/pages/browse/locations.jinja2', title="Browse:Locations" , letter=letter, filters=filter_param)
 
 
 @browse_bp.route('/organisations')
 def organisations():
+     # Check if 'filter' is in the query string; if not, append it automatically
+    filter_param = request.args.get('filters', None)
+
+    # If filter is not present, add it with a default value (you can customize this value)
+    if not filter_param:
+        # Redirect with the filter query appended, this ensures the 'filter' param is always present
+        return redirect(url_for('browse.organisations', **{**request.args, 'filters': 'fe,ma,un,re,wr,me'}))
+    
     letter = request.args.get('letter', '').lower()
-    return render_template('/pages/browse/organisations.jinja2', title="Browse:Organisations", letter=letter)
+    return render_template('/pages/browse/organisations.jinja2', title="Browse:Organisations", letter=letter, filters=filter_param)
 
 
 @browse_bp.route('/institutions')

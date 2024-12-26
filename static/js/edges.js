@@ -3865,6 +3865,9 @@ emlo.Checkbox = class extends edges.Component {
       "ox_totalWorksAddressedToAgent",
       "ox_totalWorksByAgent",
       "ox_totalWorksMentioningAgent",
+      "ox_totalWorksSentFromPlace",
+      "ox_totalWorksSentToPlace",
+      "ox_totalWorksMentioningPlace",
     ];
 
     // Apply new filters from selectedFilters using must

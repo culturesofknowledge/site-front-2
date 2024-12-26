@@ -14,6 +14,27 @@ try {
     }
   }
 
+  const filterGroups = {
+    ox_totalWorksByAgent: {
+      paramvalues: ["wr"],
+      valueMap: {
+        wr: "Letters Written",
+      },
+    },
+    ox_totalWorksAddressedToAgent: {
+      paramvalues: ["re"],
+      valueMap: {
+        re: "Letters Recevied",
+      },
+    },
+    ox_totalWorksMentioningAgent: {
+      paramvalues: ["me"],
+      valueMap: {
+        me: "Letters Mentioning",
+      },
+    },
+  };
+
   emlo.openingQuery = {
     must: [],
     query: {
@@ -31,25 +52,39 @@ try {
   emlo.openingQuery.must.push({
     term: { browse: `${current_search_letter}*` },
   }); // browse starts with 'd'
+  // Process filters from URL parameters
+  const params = new URLSearchParams(queryString);
+  const filters = params.get("filters");
 
-  if (!emlo.openingQuery.query.range) {
-    emlo.openingQuery.query.range = {};
+  if (filters) {
+    const selectedFilters = {}; // Track selected filters by group
+    const filterValues = filters.split(",");
+
+    // Map the filter values to their respective groups
+    for (const filter of filterValues) {
+      for (const field of Object.keys(filterGroups)) {
+        const group = filterGroups[field];
+        if (group.paramvalues.includes(filter)) {
+          if (!selectedFilters[field]) {
+            selectedFilters[field] = [];
+          }
+          selectedFilters[field].push(filter);
+        }
+      }
+    }
+
+    // Add selected filters to the must query
+    for (const [field, values] of Object.entries(selectedFilters)) {
+      if (!emlo.openingQuery.query.range) {
+        emlo.openingQuery.query.range = {};
+      }
+
+      emlo.openingQuery.query.range[field] = {
+        gte: 1,
+        lte: "*",
+      };
+    }
   }
-
-  emlo.openingQuery.query.range["ox_totalWorksByAgent"] = {
-    gte: 1,
-    lte: "*",
-  };
-
-  emlo.openingQuery.query.range["ox_totalWorksAddressedToAgent"] = {
-    gte: 1,
-    lte: "*",
-  };
-
-  emlo.openingQuery.query.range["ox_totalWorksMentioningAgent"] = {
-    gte: 1,
-    lte: "*",
-  };
 
   // Handle fields to return - TODO: Handle this part in edges
   // emlo.openingQuery.queryStrings.push({
@@ -73,6 +108,15 @@ try {
   emlo.collection = "/solr/people/select";
 
   emlo.components = [
+    new emlo.Checkbox({
+      id: "checkbox",
+      category: "results",
+      filterGroups: filterGroups,
+      renderer: new emlo.CheckboxRenderer({
+        label: "",
+      }),
+    }),
+
     new emlo.ResultTable({
       id: "results",
       category: "results",

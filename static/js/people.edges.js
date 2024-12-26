@@ -1,9 +1,8 @@
 import emlo from "./edges.js";
 
 try {
-  // Fetching URL params
   const queryString = window.location.search;
-  let current_search_letter = "a"; // Setting this as default a
+  let current_search_letter = "a"; // Setting this as default 'a'
 
   if (queryString) {
     const params = new URLSearchParams(queryString);
@@ -13,6 +12,17 @@ try {
       current_search_letter = letter;
     }
   }
+
+  const filterGroups = {
+    foaf_gender: {
+      paramvalues: ["fe", "ma", "un"],
+      valueMap: {
+        fe: "female",
+        ma: "male",
+        un: "unknown",
+      },
+    },
+  };
 
   emlo.openingQuery = {
     must: [],
@@ -27,10 +37,43 @@ try {
     sort: [{ field: "browse", order: "asc" }],
   };
 
+  // Add default must query
   emlo.openingQuery.must.push({ term: { ox_isOrganisation: false } }); // ox_isOrganisation is false
   emlo.openingQuery.must.push({
     term: { browse: `${current_search_letter}*` },
-  }); // browse starts with 'd'
+  });
+
+  // Process filters from URL parameters
+  const params = new URLSearchParams(queryString);
+  const filters = params.get("filters");
+
+  if (filters) {
+    const selectedFilters = {}; // Track selected filters by group
+    const filterValues = filters.split(",");
+
+    // Map the filter values to their respective groups
+    for (const filter of filterValues) {
+      for (const field of Object.keys(filterGroups)) {
+        const group = filterGroups[field];
+        if (group.paramvalues.includes(filter)) {
+          if (!selectedFilters[field]) {
+            selectedFilters[field] = [];
+          }
+          selectedFilters[field].push(filter);
+        }
+      }
+    }
+
+    // Add selected filters to the must query
+    for (const [field, values] of Object.entries(selectedFilters)) {
+      if (values.length > 0) {
+        const group = filterGroups[field];
+        const mappedValues = values.map((value) => group.valueMap[value]);
+        const joinedValues = mappedValues.join(" OR ");
+        emlo.openingQuery.must.push({ term: { [field]: `(${joinedValues})` } });
+      }
+    }
+  }
 
   if (!emlo.openingQuery.query.range) {
     emlo.openingQuery.query.range = {};
@@ -73,6 +116,14 @@ try {
   emlo.collection = "/solr/people/select";
 
   emlo.components = [
+    new emlo.Checkbox({
+      id: "checkbox",
+      category: "results",
+      filterGroups: filterGroups,
+      renderer: new emlo.CheckboxRenderer({
+        label: "",
+      }),
+    }),
     new emlo.ResultTable({
       id: "results",
       category: "results",
@@ -152,7 +203,6 @@ function _redirectToSearch(val, res, fieldName) {
     return "<div>Invalid input</div>";
   }
 
-  // console.log("finalURL", finalUrl);
   if (val > 0) {
     const baseURL = `/forms/advance`;
     let query = "";

@@ -1563,7 +1563,6 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
 
     this.component.removeFilter(field, term);
     this.draw(); // Redraw the component to reflect the changes
-    console.log("I am triggered");
   }
 
   // PATCH: currently we do not have anything in edges that can help us with this.
@@ -3911,7 +3910,6 @@ emlo.SortRenderer = class extends edges.Renderer {
   };
 };
 
-// Checkbox Component
 emlo.Checkbox = class extends edges.Component {
   constructor(params) {
     super(params);
@@ -3953,6 +3951,14 @@ emlo.Checkbox = class extends edges.Component {
 
   applyFilters() {
     const nq = this.edge.cloneQuery();
+
+    // cleaning range if present, if not creating new
+    if (!nq.query.range) {
+      nq.query.range = {};
+    } else {
+      Object.keys(nq.query.range).forEach((key) => delete nq.query.range[key]);
+    }
+
     const textFields = ["foaf_gender"];
     const rangeFields = [
       "ox_totalWorksAddressedToAgent",
@@ -3987,10 +3993,6 @@ emlo.Checkbox = class extends edges.Component {
           nq.must = nq.must.filter((item) => !(item.term && item.term[field]));
         }
       } else if (rangeFields.includes(field)) {
-        if (!nq.query.range) {
-          nq.query.range = {};
-        }
-
         nq.query.range[field] = {
           gte: 1,
           lte: "*",
@@ -4004,7 +4006,6 @@ emlo.Checkbox = class extends edges.Component {
   }
 };
 
-// Checkbox Renderer
 emlo.CheckboxRenderer = class extends edges.Renderer {
   constructor(params) {
     super(params);
@@ -4076,7 +4077,7 @@ emlo.CheckboxRenderer = class extends edges.Renderer {
     this.updateUrl();
 
     // Apply the filters
-    comp.applyFilters();
+    comp.synchronise();
   }
 
   updateUrl() {

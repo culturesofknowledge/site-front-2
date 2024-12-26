@@ -14,6 +14,27 @@ try {
     }
   }
 
+  const filterGroups = {
+    ox_totalWorksSentFromPlace: {
+      paramvalues: ["wr"],
+      valueMap: {
+        wr: "Letters Sent From",
+      },
+    },
+    ox_totalWorksSentToPlace: {
+      paramvalues: ["re"],
+      valueMap: {
+        re: "Letters sent to",
+      },
+    },
+    ox_totalWorksMentioningPlace: {
+      paramvalues: ["me"],
+      valueMap: {
+        me: "Letters Mentioning",
+      },
+    },
+  };
+
   emlo.openingQuery = {
     must: [],
     query: {
@@ -27,28 +48,43 @@ try {
     sort: [{ field: "browse", order: "asc" }],
   };
 
+  // Process filters from URL parameters
+  const params = new URLSearchParams(queryString);
+  const filters = params.get("filters");
+
+  if (filters) {
+    const selectedFilters = {}; // Track selected filters by group
+    const filterValues = filters.split(",");
+
+    // Map the filter values to their respective groups
+    for (const filter of filterValues) {
+      for (const field of Object.keys(filterGroups)) {
+        const group = filterGroups[field];
+        if (group.paramvalues.includes(filter)) {
+          if (!selectedFilters[field]) {
+            selectedFilters[field] = [];
+          }
+          selectedFilters[field].push(filter);
+        }
+      }
+    }
+
+    // Add selected filters to the must query
+    for (const [field, values] of Object.entries(selectedFilters)) {
+      if (!emlo.openingQuery.query.range) {
+        emlo.openingQuery.query.range = {};
+      }
+
+      emlo.openingQuery.query.range[field] = {
+        gte: 1,
+        lte: "*",
+      };
+    }
+  }
+
   emlo.openingQuery.must.push({
     term: { browse: `${current_search_letter}*` },
   }); // browse starts with 'd'
-
-  if (!emlo.openingQuery.query.range) {
-    emlo.openingQuery.query.range = {};
-  }
-
-  emlo.openingQuery.query.range["ox_totalWorksSentFromPlace"] = {
-    gte: 1,
-    lte: "*",
-  };
-
-  emlo.openingQuery.query.range["ox_totalWorksSentToPlace"] = {
-    gte: 1,
-    lte: "*",
-  };
-
-  emlo.openingQuery.query.range["ox_totalWorksMentioningPlace"] = {
-    gte: 1,
-    lte: "*",
-  };
 
   // Handle fields to return
   //   emlo.openingQuery.queryStrings.push({
@@ -72,6 +108,15 @@ try {
   emlo.collection = "/solr/locations/select";
 
   emlo.components = [
+    new emlo.Checkbox({
+      id: "checkbox",
+      category: "results",
+      filterGroups: filterGroups,
+      renderer: new emlo.CheckboxRenderer({
+        label: "",
+      }),
+    }),
+
     new emlo.ResultTable({
       id: "results",
       category: "results",

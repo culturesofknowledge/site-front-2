@@ -3055,7 +3055,7 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
         <div id="${
           this.namespace
         }-container" class="custom-bar-graph-container">
-          <div id="${this.namespace}-chart"></div>
+          <div id="${this.namespace}-chart" style="display:grid"></div>
         </div>
       `;
 
@@ -3430,6 +3430,55 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
     this.draw();
   }
 
+  // toggleFullscreen(containerId) {
+  //   const container = document.getElementById(`${this.namespace}-container`);
+  //   const isExpanded = container.classList.contains("fullscreen-mode");
+
+  //   if (isExpanded) {
+  //     // Shrink back to original size
+  //     container.style.width = "";
+  //     container.style.height = "";
+  //     container.style.position = "";
+  //     container.style.zIndex = "";
+  //     container.style.backgroundColor = "";
+  //     container.style.overflow = ""; // Reset overflow
+  //     container.classList.remove("fullscreen-mode");
+
+  //     // Remove close button
+  //     const closeButton = container.querySelector(".close-button");
+  //     if (closeButton) {
+  //       closeButton.remove();
+  //     }
+  //   } else {
+  //     // Expand to full screen
+  //     container.style.width = "100%";
+  //     container.style.height = "100%"; // Full height to ensure all content is visible
+  //     container.style.position = "fixed";
+  //     container.style.top = "0";
+  //     container.style.left = "0";
+  //     container.style.zIndex = "1000";
+  //     container.style.backgroundColor = "#fff"; // Optional: Set a background color
+  //     container.style.overflow = "auto"; // Ensure scrollable if content overflows
+  //     container.classList.add("fullscreen-mode");
+
+  //     // Add a close button
+  //     const closeButton = document.createElement("button");
+  //     closeButton.innerHTML = "Close";
+  //     closeButton.className = "close-button";
+  //     closeButton.style.position = "absolute";
+  //     closeButton.style.top = "10px";
+  //     closeButton.style.right = "10px";
+  //     closeButton.style.zIndex = "1100";
+  //     closeButton.style.backgroundColor = "#ff0000";
+  //     closeButton.style.color = "#fff";
+  //     closeButton.style.border = "none";
+  //     closeButton.style.padding = "10px";
+  //     closeButton.style.cursor = "pointer";
+  //     closeButton.onclick = () => this.toggleFullscreen(containerId);
+  //     container.appendChild(closeButton);
+  //   }
+  // }
+
   toggleFullscreen(containerId) {
     const container = document.getElementById(`${this.namespace}-container`);
     const isExpanded = container.classList.contains("fullscreen-mode");
@@ -3442,6 +3491,9 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       container.style.zIndex = "";
       container.style.backgroundColor = "";
       container.style.overflow = ""; // Reset overflow
+      container.style.display = ""; // Reset display
+      container.style.alignItems = ""; // Reset alignment
+      container.style.justifyContent = ""; // Reset alignment
       container.classList.remove("fullscreen-mode");
 
       // Remove close button
@@ -3453,12 +3505,16 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       // Expand to full screen
       container.style.width = "100%";
       container.style.height = "100%"; // Full height to ensure all content is visible
+      container.style.maxHeight = "100%";
       container.style.position = "fixed";
       container.style.top = "0";
       container.style.left = "0";
       container.style.zIndex = "1000";
       container.style.backgroundColor = "#fff"; // Optional: Set a background color
       container.style.overflow = "auto"; // Ensure scrollable if content overflows
+      container.style.display = "grid"; // Set grid layout
+      container.style.alignItems = "center"; // Center content vertically
+      container.style.justifyContent = "center"; // Center content horizontally
       container.classList.add("fullscreen-mode");
 
       // Add a close button
@@ -3466,7 +3522,7 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       closeButton.innerHTML = "Close";
       closeButton.className = "close-button";
       closeButton.style.position = "absolute";
-      closeButton.style.top = "10px";
+      closeButton.style.top = "0"; // Position at the very top
       closeButton.style.right = "10px";
       closeButton.style.zIndex = "1100";
       closeButton.style.backgroundColor = "#ff0000";

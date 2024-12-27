@@ -337,7 +337,7 @@ function _getLocationComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-title",
         contentTitle: "Location",
-        sectionTitleImage: "/static/img/person-icon.png",
+        sectionTitleImage: "/static/img/places-icon.png",
       }),
     }),
 
@@ -528,7 +528,7 @@ function _getInstitutionComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-title",
         contentTitle: "Institution",
-        sectionTitleImage: "/static/img/person-icon.png",
+        sectionTitleImage: "/static/img/repository-icon.png",
       }),
     }),
 

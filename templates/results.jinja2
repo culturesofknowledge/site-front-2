@@ -36,11 +36,12 @@ function returnToBrowse(){
     const uuids = urlParams.get("uuids");
     const browsePage = urlParams.get("browsing");
     const currentLetter = urlParams.get("letter");
+    const filters = urlParams.get("filters");
 
     if (uuids) {
-        window.location.href = `${baseURL}/${browsePage}?uuids=${uuids}&letter=${currentLetter != null ? currentLetter : 'a'}`;
+        window.location.href = `${baseURL}/${browsePage}?uuids=${uuids}&filters=${filters}&letter=${currentLetter != null ? currentLetter : 'a'}`;
     } else {
-        window.location.href = `${baseURL}/${browsePage}?letter=${currentLetter != null ? currentLetter : 'a'}`;
+        window.location.href = `${baseURL}/${browsePage}?letter=${currentLetter != null ? currentLetter : 'a'}&filters=${filters}`;
     }
 }
 </script>

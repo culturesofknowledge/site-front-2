@@ -44,6 +44,7 @@
             const letter = urlParams.get('letter');
             const browsing = urlParams.get('browsing');
             const uuids = urlParams.get('uuids');
+            const filters = urlParams.get('filters');
 
             // Only make the API call if uuid, type, and start are present
             if (!isNaN(start)) {
@@ -95,7 +96,7 @@
 
                         // Back to browse
                         if (browsing) {
-                            document.getElementById('back-to-browse').onclick = () => window.location.href = `/browse/${browsing}?letter=${letter}&uuids=${uuids}`;
+                            document.getElementById('back-to-browse').onclick = () => window.location.href = `/browse/${browsing}?letter=${letter}&uuids=${uuids}&filters=${filters}`;
                         }
 
                         // Back to results

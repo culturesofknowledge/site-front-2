@@ -15,6 +15,9 @@
           type="text"
           class="text"
           value="{{ locations if locations else 'all places' }}" 
+          data-default="all places"
+          onfocus="textClear(this);"
+          onblur="textFill(this);"
         />
       </div>
       <div class="small-1 columns">
@@ -49,6 +52,9 @@
           type="text"
           class="text"
           value="all origins"
+          data-default="all origins"
+          onfocus="textClear(this);"
+          onblur="textFill(this);"
         />
       </div>
       <div class="small-1 columns">
@@ -115,6 +121,9 @@
           type="text"
           class="text"
           value="all destinations"
+          data-default="all destinations"
+          onfocus="textClear(this);"
+          onblur="textFill(this);"
         />
       </div>
       <div class="small-1 columns">
@@ -181,6 +190,9 @@
           type="text"
           class="text"
           value="all places mentioned"
+          data-default="all places mentioned"
+          onfocus="textClear(this);"
+          onblur="textFill(this);"
         />
       </div>
       <div class="small-1 columns">

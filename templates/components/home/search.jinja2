@@ -10,8 +10,10 @@
           name="people"
           type="text"
           class="text"
-          placeholder="all people"
-          value=""
+          value="all people"
+          data-default="all people"
+          onfocus="textClear(this);"
+          onblur="textFill(this);"
           title="Search letters for authors, senders, recipients, and people mentioned, e.g. 'Samuel Hartlib', 'John Aubrey', or 'The Royal Society'. &lt;
                   br/&gt;&lt;br/&gt;Search is not case sensitive."
         />
@@ -64,12 +66,10 @@
           name="locations"
           type="text"
           class="text"
-          placeholder="all places"
-          value=""
-          onfocus="
-  javascript:textClear(this);"
-          onblur="
-  javascript:textFill(this);"
+          value="all places"
+          data-default="all places"
+          onfocus="textClear(this);"
+          onblur="textFill(this);"
           title="Search the places that letters were sent from or to, e.g. 'Queen's College', 'Paris', or 'Spain'. &lt;br/&gt;&lt;br/&gt;Search is not case sensitive."
         />
       </div>
@@ -86,12 +86,10 @@
           name="let_con"
           type="text"
           class="text"
-          placeholder="all content"
-          value=""
-          onfocus="
-  javascript:textClear(this);"
-          onblur="
-  javascript:textFill(this);"
+          value="all content"
+          data-default="all content"
+          onfocus="textClear(this);"
+          onblur="textFill(this);"
           title="Search across abstracts, keywords, incipits, excipits, transcriptions, and enclosures, e.g. 'Spider' or 'Mathematics'. &lt;br/&gt;&lt;br/&gt;Search is not case sensitive. "
         />
       </div>

@@ -54,19 +54,6 @@
 {% include "_edges_common_js.jinja2" %}
 <script type="module" src="../static/js/repository_dropdown.edges.js"></script>
 <script>
-
-function textFill(element , defaultText){
-    if(element.value == "") {
-        element.value = element.dataset.default
-    }
-}
-
-function textClear(element , defaultText){
-    if(element.value == element.dataset.default) {
-        element.value = ""
-    }
-}
-
 function advanceSearch(event){
   
     try {

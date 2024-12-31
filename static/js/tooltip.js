@@ -32,7 +32,7 @@ $(document).ready(function () {
     };
 
     // Bind events to both input and help icon
-    const targets = $this.find("input, #help-icon");
+    const targets = $this.find("input, select, #help-icon");
 
     targets.on("mouseenter", function (event) {
       const isHelpIcon = $(this).is("#help-icon");

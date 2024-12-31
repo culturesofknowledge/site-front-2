@@ -4,7 +4,7 @@
     <div
         data-delay="2.0" 
         data-tip="Search letters for authors, senders, recipients, and people mentioned, e.g. 'Samuel Hartlib', 'John Aubrey', or 'The Royal Society'. 
-        <br/>Search is not case sensitive." 
+        <br/><br/>Search is not case sensitive." 
         class="row data-tip-container"
     >
         
@@ -26,7 +26,12 @@
     </div>
 
     <div>
-        <div class="large-4 small-12 columns" style="padding-left: 0px;">
+        <div
+            data-delay="2.0"
+            data-tip="Confine your search to male or female authors, senders, recipients, and people mentioned." 
+            class="large-4 small-12 columns" 
+            style="padding-left: 0px;">
+            
             <div class="large-9 columns" style="padding: 0px;">
                 <label for="people_gend">Gender</label> 
                 
@@ -48,8 +53,12 @@
             </div>
         </div>
 
-        <div class="columns small-12 large-8 end">
-            <div class="large-6 columns">
+        <div 
+             data-delay="2.0"
+            data-tip="Confine your search to instances where the author, sender, recipient was an organization or corporate entity, e.g. The Royal Society." 
+            class="columns small-12 large-8 end">
+            
+            <div class="large-8 columns">
                 <label>&nbsp;<!-- for alignment--></label>
                 <input
                 type="checkbox"
@@ -71,7 +80,8 @@
     <div
         class="row"
         data-delay="2.0"
-        data-tip="Search for people by title, role, or occupation, e.g. 'Bookseller' or 'Politician'. Search is not case sensitive."
+        data-tip="Search for people by title, role, or occupation, e.g. 'Bookseller' or 'Politician'. 
+        <br/><br/>Search is not case sensitive."
     >
         <div class="large-11 columns">
             <label for="people_roles">Titles, roles, or occupations</label>

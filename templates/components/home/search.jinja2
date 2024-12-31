@@ -3,22 +3,47 @@
     <form id="search" action="/forms/" method="post">
 
       {# Search people - Starts #}
-      <div class="large-11 small-10 columns">
-        <label for="people">Search people</label>
-        <input
-          id="people"
-          name="people"
-          type="text"
-          class="text"
-          value="all people"
-          data-default="all people"
-          onfocus="textClear(this);"
-          onblur="textFill(this);"
-          title="Search letters for authors, senders, recipients, and people mentioned, e.g. 'Samuel Hartlib', 'John Aubrey', or 'The Royal Society'. &lt;
-                  br/&gt;&lt;br/&gt;Search is not case sensitive."
-        />
+      {# <div data-tip="Search letters for authors, senders, recipients, and people mentioned, e.g. 'Samuel Hartlib', 'John Aubrey', or 'The Royal Society'.
+      <br/> <br />Search is not case sensitive.">>
+        <div class="large-11 small-10 columns" >
+          <label for="people">Search people</label>
+          <input
+            id="people"
+            name="people"
+            type="text"
+            class="text"
+            value="all people"
+            data-default="all people"
+            onfocus="textClear(this);"
+            onblur="textFill(this);"
+            title=""
+          />
+        </div>
+        {% include './components/common/help_icon.jinja2' %}
+      </div> #}
+
+      <div 
+        data-delay="2.0"
+        data-tip="Search letters for authors, senders, recipients, and people mentioned, e.g. 'Samuel Hartlib', 'John Aubrey', or 'The Royal Society'.
+            <br/><br/>Search is not case sensitive.">
+        <div class="large-11 small-10 columns">
+          <label for="people">Search people</label>
+          <input
+            id="people"
+            name="people"
+            type="text"
+            class="text"
+            value="all people"
+            data-default="all people"
+            onfocus="textClear(this);"
+            onblur="textFill(this);"
+            title=""
+          />
+        </div>
+        {% include './components/common/help_icon.jinja2' %}
       </div>
-      {% include './components/common/help_icon.jinja2' %}
+
+
       {# Search people - Ends #}
 
       {# Search year - Starts #}

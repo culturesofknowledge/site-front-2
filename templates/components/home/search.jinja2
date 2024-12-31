@@ -1,31 +1,11 @@
 <div class="panel" style="">
   <div class="row">
     <form id="search" action="/forms/" method="post">
-
-      {# Search people - Starts #}
-      {# <div data-tip="Search letters for authors, senders, recipients, and people mentioned, e.g. 'Samuel Hartlib', 'John Aubrey', or 'The Royal Society'.
-      <br/> <br />Search is not case sensitive.">>
-        <div class="large-11 small-10 columns" >
-          <label for="people">Search people</label>
-          <input
-            id="people"
-            name="people"
-            type="text"
-            class="text"
-            value="all people"
-            data-default="all people"
-            onfocus="textClear(this);"
-            onblur="textFill(this);"
-            title=""
-          />
-        </div>
-        {% include './components/common/help_icon.jinja2' %}
-      </div> #}
-
       <div 
         data-delay="2.0"
         data-tip="Search letters for authors, senders, recipients, and people mentioned, e.g. 'Samuel Hartlib', 'John Aubrey', or 'The Royal Society'.
             <br/><br/>Search is not case sensitive.">
+
         <div class="large-11 small-10 columns">
           <label for="people">Search people</label>
           <input
@@ -42,84 +22,94 @@
         </div>
         {% include './components/common/help_icon.jinja2' %}
       </div>
-
-
       {# Search people - Ends #}
 
       {# Search year - Starts #}
-      <div class="large-6 small-5 columns">
-        <label>Search from year</label>
-        <select
-          id="dat_from_year"
-          name="dat_from_year"
-          title="Search from this year."
-          class="year_from"
-          onchange="changeEventOnFrom(this.options[this.selectedIndex].value)"
-        >
-          <option class="default" selected="selected">all years</option>
-          {% for year in range(1500, 1841) %}
-          <option value="{{ year }}">{{ year }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      
-      <div class="small-5 columns">
-        <label>Search to year</label>
-        <select
-          id="dat_to_year"
-          name="dat_to_year"
-          title="Search up to this year."
-          class="year_to"
-          onchange="changeEventOnTo(this.options[this.selectedIndex].value)"
-        >
-          <option class="default" selected="selected">all years</option>
-          {% for year in range(1500, 1841) %}
-          <option value="{{ year }}">{{ year }}</option>
-          {% endfor %}
-        </select>
-      </div>
+      <div>
+        <div class="large-6 small-5 columns">
+          <label>Search from year</label>
+          <select
+            id="dat_from_year"
+            name="dat_from_year"
+            title="Search from this year."
+            class="year_from"
+            onchange="changeEventOnFrom(this.options[this.selectedIndex].value)"
+          >
+            <option class="default" selected="selected">all years</option>
+            {% for year in range(1500, 1841) %}
+            <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        
+        <div class="small-5 columns">
+          <label>Search to year</label>
+          <select
+            id="dat_to_year"
+            name="dat_to_year"
+            title="Search up to this year."
+            class="year_to"
+            onchange="changeEventOnTo(this.options[this.selectedIndex].value)"
+          >
+            <option class="default" selected="selected">all years</option>
+            {% for year in range(1500, 1841) %}
+            <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+          </select>
+        </div>
 
-      {% include './components/common/help_icon.jinja2' %}
+        <div data-tip="Search by individual year across year ranges. <br/> <br/> To select a single year, use the first-down only.">
+          {% include './components/common/help_icon.jinja2' %}
+        </div>
+      </div>
       {# Search year - Ends #}
 
       {# Search places - Starts #}
-      <div class="large-11 small-10 columns">
-        <label for="locations">Search places</label>
+      <div 
+        data-delay="2.0"
+        data-tip="Search the places that letters were sent from or to, e.g. 'Queen's College', 'Paris', or 'Spain'. 
+          <br/><br/>Search is not case sensitive.">
+         <div class="large-11 small-10 columns">
+          <label for="locations">Search places</label>
+          <input
+            id="locations"
+            name="locations"
+            type="text"
+            class="text"
+            value="all places"
+            data-default="all places"
+            onfocus="textClear(this);"
+            onblur="textFill(this);"
+            title=""
+          />
+        </div>
 
-        <input
-          id="locations"
-          name="locations"
-          type="text"
-          class="text"
-          value="all places"
-          data-default="all places"
-          onfocus="textClear(this);"
-          onblur="textFill(this);"
-          title="Search the places that letters were sent from or to, e.g. 'Queen's College', 'Paris', or 'Spain'. &lt;br/&gt;&lt;br/&gt;Search is not case sensitive."
-        />
+        {% include './components/common/help_icon.jinja2' %}
       </div>
-      
-      {% include './components/common/help_icon.jinja2' %}
       {# Search places - Ends #}
 
       {# Search content - Starts #}
-      <div class="large-11 small-10 columns">
-        <label>Search content</label>
+      <div
+        data-delay="2.0"
+        title="Search across abstracts, keywords, incipits, excipits, transcriptions, and enclosures, e.g. 'Spider' or 'Mathematics'.<br/><br/>Search is not case sensitive."
+      >
+        <div class="large-11 small-10 columns">
+          <label>Search content</label>
 
-        <input
-          id="let_con"
-          name="let_con"
-          type="text"
-          class="text"
-          value="all content"
-          data-default="all content"
-          onfocus="textClear(this);"
-          onblur="textFill(this);"
-          title="Search across abstracts, keywords, incipits, excipits, transcriptions, and enclosures, e.g. 'Spider' or 'Mathematics'. &lt;br/&gt;&lt;br/&gt;Search is not case sensitive. "
-        />
+          <input
+            id="let_con"
+            name="let_con"
+            type="text"
+            class="text"
+            value="all content"
+            data-default="all content"
+            onfocus="textClear(this);"
+            onblur="textFill(this);"
+          />
+        </div>
+        
+        {% include './components/common/help_icon.jinja2' %}
       </div>
-      
-      {% include './components/common/help_icon.jinja2' %}
       {# Search content - Ends #}
 
       <div class="large-3 columns">

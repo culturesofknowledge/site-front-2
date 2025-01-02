@@ -11,33 +11,26 @@
   <fieldset>
     <legend>Repositories</legend>
 
-    <label for="repository">Repository</label>
-    <div class="row">
+    <div 
+      data-delay="2.0"
+      data-tip="Confine your search to a particular library or archive."
+      class="row">
       <div class="small-11 columns">
+        <label for="repository">Repository</label>
         <div id="repository-dropdown" style="padding: 0px 30px;"></div>
       </div>
-      <div class="small-1 columns">
-        <span
-          data-tooltip=""
-          aria-haspopup="true"
-          class="has-tip tip-top"
-          data-selector="tooltip-lz9klwc51c"
-          aria-describedby="tooltip-lz9klwc51c"
-          title=""
-        >
-          <img
-            style="min-width: 25px; text-align: left"
-            class="help"
-            src="/static/img/icon-help.png"
-            alt="Help"
-          />
-        </span>
+      <div>
+        {% include 'components/common/help_icon.jinja2' %}
       </div>
     </div>
 
-    <label for="let_shel">Shelfmark / ID</label>
-    <div class="row">
+    <div
+      data-delay="2.0"
+      data-tip="Search for letters by their shelfmark or another repository identifier, e.g. 'Tanner', 'Rawl', or 'MS Smith'. 
+      <br/><br/>Search is not case sensitive." 
+      class="row">
       <div class="small-11 columns">
+        <label for="let_shel">Shelfmark / ID</label>
         <input
           id="let_shel"
           name="let_shel"
@@ -49,22 +42,8 @@
           onblur="textFill(this);"
         />
       </div>
-      <div class="small-1 columns">
-        <span
-          data-tooltip=""
-          aria-haspopup="true"
-          class="has-tip tip-top"
-          data-selector="tooltip-lz9klwc51d"
-          aria-describedby="tooltip-lz9klwc51d"
-          title=""
-        >
-          <img
-            style="min-width: 25px; text-align: left"
-            class="help"
-            src="/static/img/icon-help.png"
-            alt="Help"
-          />
-        </span>
+      <div>
+        {% include 'components/common/help_icon.jinja2' %}
       </div>
     </div>
   </fieldset>
@@ -72,9 +51,13 @@
   <fieldset>
     <legend>Printed Editions</legend>
 
-    <label for="let_pe_tex">Printed Editions</label>
-    <div class="row">
+    <div
+      data-delay="2.0"
+      data-tip="Search across the titles of books and pamphlets in which printed versions of letters appear. 
+      <br/><br/>Search is not case sensitive."
+      class="row">
       <div class="small-11 columns">
+        <label for="let_pe_tex">Printed Editions</label>
         <input
           id="let_pe_tex"
           name="let_pe_tex"
@@ -86,58 +69,29 @@
           onblur="textFill(this);"
         />
       </div>
-      <div class="small-1 columns">
-        <span
-          data-tooltip=""
-          aria-haspopup="true"
-          class="has-tip tip-top"
-          data-selector="tooltip-lz9klwc51e"
-          aria-describedby="tooltip-lz9klwc51e"
-          title=""
-        >
-          <img
-            style="min-width: 25px; text-align: left"
-            class="help"
-            src="/static/img/icon-help.png"
-            alt="Help"
-          />
-        </span>
+      <div>
+        {% include 'components/common/help_icon.jinja2' %}
       </div>
     </div>
 
-    <div class="row">
-      <div class="small-6 columns end">
-        <div class="row">
-          <div class="small-10 columns">
-            <input
-              type="checkbox"
-              id="let_pe"
-              name="let_pe"
-              value="false"
-              onchange="changeCheckboxValue(this)"
-              class="checkbox"
-            />
+    <div
+      data-delay="2.0"
+      data-tip="Confine your search to letters that exist in printed versions." 
+      class="row" style="padding-left: 0px;"> 
+      <div class="small-5 columns">
+        <input
+          type="checkbox"
+          id="let_pe"
+          name="let_pe"
+          value="false"
+          onchange="changeCheckboxValue(this)"
+          class="checkbox"
+        />
 
-            <label for="let_pe">Only with printed editions</label>
-          </div>
-          <div class="small-2 columns">
-            <span
-              data-tooltip=""
-              aria-haspopup="true"
-              class="has-tip tip-top"
-              data-selector="tooltip-lz9klwc51f"
-              aria-describedby="tooltip-lz9klwc51f"
-              title=""
-            >
-              <img
-                style="min-width: 25px; text-align: left"
-                class="help"
-                src="/static/img/icon-help.png"
-                alt="Help"
-              />
-            </span>
-          </div>
-        </div>
+        <label for="let_pe">Only with printed editions</label>
+      </div>
+      <div class="small-7 columns">
+        {% include 'components/common/help_icon_nolabel.jinja2' %}
       </div>
     </div>
   </fieldset>

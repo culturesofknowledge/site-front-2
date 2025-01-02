@@ -1,0 +1,47 @@
+ <fieldset>
+    <legend>Endorsements</legend>
+
+    <div
+      data-delay="2.0"
+      data-tip="Search across information on endorsements and annotations in a contemporary hand, e.g. 'Different Hand', 'Top Right', or 'Left Margin'. 
+      <br/><br/>Search is not case sensitive."  
+      class="row">
+      <div class="small-11 columns">
+        <label for="let_end_tex">Search endorsement</label>
+        <input
+          id="let_end_tex"
+          name="let_end_tex"
+          type="text"
+          class="text"
+          value="all endorsements"
+          data-default="all endorsements"
+          onfocus="textClear(this);"
+          onblur="textFill(this);"
+        />
+      </div>
+      <div>
+        {% include 'components/common/help_icon.jinja2' %}
+      </div>
+    </div>
+
+    <div
+      data-delay="2.0"
+      data-tip="Confine your search to letters for which we have information about endorsements and annotations in a contemporary hand" 
+    class="row">
+      <div class="small-10 columns">
+        <input
+          type="checkbox"
+          id="let_end"
+          name="let_end"
+          value="false"
+          onchange="changeCheckboxValue(this)"
+          class="checkbox"
+        />
+
+        <label for="let_end">Only with endorsements</label>
+      </div>
+      <div>
+        {% include 'components/common/help_icon.jinja2' %}
+      </div>
+    </div>
+  </fieldset>

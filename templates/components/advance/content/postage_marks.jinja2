@@ -1,0 +1,47 @@
+<fieldset>
+    <legend>Postage Marks</legend>
+
+    <div
+      data-delay="2.0"
+      data-tip="Search for specific types of postage marks, or for particular representations within postage marks, e.g. 'Bishop Mark'. 
+      <br/><br/>Search is not case sensitive." 
+      class="row">
+      <div class="small-11 columns">
+        <label for="let_pmark_tex">Search postage mark</label>
+        <input
+          id="let_pmark_tex"
+          name="let_pmark_tex"
+          type="text"
+          class="text"
+          value="all postage marks"
+          data-default="all postage marks"
+          onfocus="textClear(this);"
+          onblur="textFill(this);"
+        />
+      </div>
+      <div>
+        {% include 'components/common/help_icon.jinja2' %}
+      </div>
+    </div>
+
+    <div
+      data-delay="2.0"
+      data-tip="Confine your search to letters for which we have information about postage marks." 
+      class="row">
+      <div class="large-5 small-10 columns">
+        <input
+          type="checkbox"
+          id="let_pmark"
+          name="let_pmark"
+          value="false"
+          onchange="changeCheckboxValue(this)"
+          class="checkbox"
+        />
+
+        <label for="let_pmark">Only with postage marks</label>
+      </div>
+      <div>
+        {% include 'components/common/help_icon.jinja2' %}
+      </div>
+    </div>
+  </fieldset>

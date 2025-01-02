@@ -1,0 +1,49 @@
+<fieldset>
+    <legend>Seals</legend>
+
+    <div
+      data-delay="2.0"
+      data-tip="Search for specific types of seal, or for particular representations within seals, e.g. 'Flower', 'Unity of Brethren', or 'Oval'. 
+      <br/><br/>Search is not case sensitive." 
+      class="row">
+      <div class="small-11 columns">
+        <label for="let_seal_tex">Search seals</label>
+        <input
+          id="let_seal_tex"
+          name="let_seal_tex"
+          type="text"
+          class="text"
+          value="all seals"
+          data-default="all seals"
+          onfocus="textClear(this);"
+          onblur="textFill(this);"
+        />
+      </div>
+      <div>
+        {% include 'components/common/help_icon.jinja2' %}
+      </div>
+    </div>
+
+    <div
+      data-delay="2.0"
+      data-tip="Confine your search to letters for which we have information about seals." 
+      class="row">
+      <div class="small-6 columns end" style="padding-left: 0px;">
+        <div class="small-10 columns">
+          <input
+            type="checkbox"
+            id="let_seal"
+            name="let_seal"
+            value="false"
+            onchange="changeCheckboxValue(this)"
+            class="checkbox"
+          />
+
+          <label for="let_seal">Only with seals</label>
+        </div>
+        <div>
+          {% include 'components/common/help_icon_nolabel.jinja2' %}
+        </div>
+      </div>
+    </div>
+  </fieldset>

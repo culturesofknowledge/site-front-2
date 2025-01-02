@@ -1,0 +1,60 @@
+<fieldset>
+    <legend>Enclosures</legend>
+
+    <div class="row">
+      <div class="small-11 columns">
+        <label for="let_with_en_tex">Search enclosures</label>
+        <input
+          id="let_with_en_tex"
+          name="let_with_en_tex"
+          type="text"
+          class="text"
+          value="all enclosures"
+          data-default="all enclosures"
+          onfocus="textClear(this);"
+          onblur="textFill(this);"
+        />
+      </div>
+       <div>
+        {% include 'components/common/help_icon.jinja2' %}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="small-12 large-6 columns" style="padding-left: 0px;">
+          <div class="small-10 columns">
+            <input
+              type="checkbox"
+              id="let_with_en"
+              name="let_with_en"
+              value="false"
+              onchange="changeCheckboxValue(this)"
+              class="checkbox"
+            />
+
+            <label for="let_with_en">Only with enclosures</label>
+          </div>
+          <div>
+            {% include 'components/common/help_icon.jinja2' %}
+          </div>
+      </div>
+
+      <div class="small-12 large-6 columns">
+          <div class="small-10 columns">
+            <input
+              type="checkbox"
+              id="let_en"
+              name="let_en"
+              value="false"
+              onchange="changeCheckboxValue(this)"
+              class="checkbox"
+            />
+
+            <label for="let_en">Only enclosed</label>
+          </div>
+          <div>
+            {% include 'components/common/help_icon.jinja2' %}
+          </div>
+      </div>
+    </div>
+  </fieldset>

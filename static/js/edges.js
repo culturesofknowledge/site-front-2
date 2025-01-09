@@ -4196,6 +4196,7 @@ function _addUrlParam(field, term) {
 function _removeUrlParam(field) {
   let delete_field = "";
   let secondaryField = "";
+
   const fieldMap = {
     "person-author": {
       primary: "aut",
@@ -4222,8 +4223,9 @@ function _removeUrlParam(field) {
     url.searchParams.delete(delete_field); // Remove the parameter
     window.history.replaceState(null, "", url); // Update the browser URL without reloading
 
-    if (secondaryField) {
+    if (secondaryField && url.searchParams.has(secondaryField)) {
       const currentValue = url.searchParams.get(secondaryField);
+
       url.searchParams.delete(secondaryField);
       url.searchParams.set(delete_field, currentValue); // Update or add the parameter
       window.history.replaceState(null, "", url); // Update the browser URL without reloading

@@ -10425,3 +10425,9 @@ button.tiny {
   font-size: 1.25rem;
   font-weight: bold;
 }
+.home-stats {
+  height: 87.2px;
+}
+.stats-image {
+  margin-bottom: 10px;
+}

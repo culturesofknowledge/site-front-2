@@ -10,7 +10,7 @@ try {
       category: "stats",
       solrCore: "people",
       renderer: new emlo.StatsRenderer({
-        title: "people",
+        title: "People",
         titleImage: "/static/img/icon-stats-people.png",
         redirectURL: "/browse/people",
       }),

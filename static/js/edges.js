@@ -250,14 +250,15 @@ emlo.HomeStatsTemplate = class extends edges.Template {
     let stats = "";
 
     let statsComponents = edge.category("stats");
+
     for (let i = 0; i < statsComponents.length; i++) {
-      stats += `<div id="${statsComponents[i].id}"></div>`;
+      stats += `<li class="stats-text text-center" id="${statsComponents[i].id}"></li>`;
     }
 
     let frag = `
     <div class="row">
       <div class="large-12 columns">
-          <ul class="stats-row small-block-grid-2 medium-block-grid-5 large-block-grid-10">
+          <ul class="stats-row small-block-grid-2 medium-block-grid-5 large-block-grid-10 home-stats">
               ${stats}
           </ul>
       </div>
@@ -2888,7 +2889,7 @@ emlo.StatsRenderer = class extends edges.Renderer {
     const imageTag = this.titleImage
       ? `<img src="${edges.util.escapeHtml(
           this.titleImage
-        )}" alt="${edges.util.escapeHtml(this.title)}" class="title-image">`
+        )}" alt="${edges.util.escapeHtml(this.title)}" class="stats-image">`
       : "";
 
     const redirectLink = this.redirectURL
@@ -2900,8 +2901,6 @@ emlo.StatsRenderer = class extends edges.Renderer {
       </p>`;
 
     container = `
-    <br />
-    <li class="stats-text text-center">
         ${imageTag}
         <br />
         
@@ -2912,8 +2911,6 @@ emlo.StatsRenderer = class extends edges.Renderer {
         <br />
         
         ${redirectLink}
-      </li>
-      <br />
       `;
 
     this.component.context.html(container);

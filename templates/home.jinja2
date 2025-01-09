@@ -60,10 +60,10 @@ function changeEventOnFrom(val){
 
 function changeEventOnTo(val){
     const dat_from_year = document.getElementById("dat_from_year")
-    
+    console.log("val" , val , "fropm" , dat_from_year.value)
     if(val == "all years") {
         dat_from_year.value = "all years"
-    } else if(parseInt(val) > parseInt(dat_from_year.value) || dat_from_year.value == "all years") {
+    } else if(parseInt(val) < parseInt(dat_from_year.value) || dat_from_year.value == "all years") {
         dat_from_year.value = val
     } 
 }

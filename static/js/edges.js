@@ -4158,10 +4158,21 @@ emlo.CheckboxRenderer = class extends edges.Renderer {
 };
 
 function _addUrlParam(field, term) {
+  let url_param_field = field;
+
+  const fieldMap = {
+    author_sort: "aut",
+    recipient_sort: "rec",
+  };
+
+  if (fieldMap.hasOwnProperty(field)) {
+    url_param_field = fieldMap[field];
+  }
+
   const url = new URL(window.location.href);
-  const currentValue = url.searchParams.get(field);
+  const currentValue = url.searchParams.get(url_param_field);
   if (currentValue !== term) {
-    url.searchParams.set(field, term); // Update or add the parameter
+    url.searchParams.set(url_param_field, term); // Update or add the parameter
     window.history.replaceState(null, "", url); // Update the browser URL without reloading
   }
 }

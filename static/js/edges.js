@@ -957,8 +957,8 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
 
     // Object containing the field mappings (example)
     const fieldMapping = {
-      aut: "author_sort",
-      rec: "recipient_sort",
+      aut: "person-author",
+      rec: "person-recipient",
       let_con: "Contents",
       locations: "Locations",
       // Add more mappings as needed
@@ -998,9 +998,17 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
         "uuids",
         "letter",
         "rec",
-        "aut",
       ];
-      if (!keys.includes(key) && !notToBeAdded.includes(key)) {
+
+      if (fieldMapping.hasOwnProperty(key) && !keys.includes(key)) {
+        keys.push(key);
+
+        this.filters.push({
+          display: value,
+          term: value,
+          field: fieldMapping[key],
+        });
+      } else if (!keys.includes(key) && !notToBeAdded.includes(key)) {
         keys.push(key);
 
         this.filters.push({
@@ -1014,7 +1022,6 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
 
   removeFilter(field, term) {
     let nq = this.edge.cloneQuery();
-
     // Remove the filter from the "must" clause
     nq.removeMust(
       new es.TermFilter({
@@ -4164,6 +4171,7 @@ emlo.CheckboxRenderer = class extends edges.Renderer {
 
 function _addUrlParam(field, term) {
   let url_param_field = field;
+  const url = new URL(window.location.href);
 
   const fieldMap = {
     author_sort: "aut",
@@ -4171,10 +4179,13 @@ function _addUrlParam(field, term) {
   };
 
   if (fieldMap.hasOwnProperty(field)) {
-    url_param_field = fieldMap[field];
+    if (url.searchParams.has(fieldMap[field])) {
+      url_param_field = field;
+    } else {
+      url_param_field = fieldMap[field];
+    }
   }
 
-  const url = new URL(window.location.href);
   const currentValue = url.searchParams.get(url_param_field);
   if (currentValue !== term) {
     url.searchParams.set(url_param_field, term); // Update or add the parameter
@@ -4184,9 +4195,24 @@ function _addUrlParam(field, term) {
 
 function _removeUrlParam(field) {
   let delete_field = "";
+  let secondaryField = "";
+  const fieldMap = {
+    "person-author": {
+      primary: "aut",
+      secondary: "author_sort",
+    },
+    "person-recipient": {
+      primary: "rec",
+      secondary: "recipient_sort",
+    },
+  };
 
   if (field == "uuid_related") {
     delete_field = "uuids";
+  }
+  if (fieldMap.hasOwnProperty(field)) {
+    delete_field = fieldMap[field].primary;
+    secondaryField = fieldMap[field].secondary;
   } else {
     delete_field = field;
   }
@@ -4195,6 +4221,13 @@ function _removeUrlParam(field) {
   if (url.searchParams.has(delete_field)) {
     url.searchParams.delete(delete_field); // Remove the parameter
     window.history.replaceState(null, "", url); // Update the browser URL without reloading
+
+    if (secondaryField) {
+      const currentValue = url.searchParams.get(secondaryField);
+      url.searchParams.delete(secondaryField);
+      url.searchParams.set(delete_field, currentValue); // Update or add the parameter
+      window.history.replaceState(null, "", url); // Update the browser URL without reloading
+    }
   }
 }
 

@@ -112,7 +112,10 @@ input[type="checkbox"]:checked {
             <a href="#institutions_section">Repositories and Editions</a>
 
             <br/> <br/>
-            <button onclick="advanceSearch()" name="submit-advanced" type="submit" class="button submit search-related">Search</button>
+            <div class="search-plus-action">
+                <button onclick="advanceSearch()" name="submit-advanced" type="submit" class="button submit search-related">Search</button>
+                <button onclick="resetAll()" class="small-button">Reset All</button>
+            </div>
         </div> 
         
         <div class="row row-with-side">
@@ -156,70 +159,71 @@ input[type="checkbox"]:checked {
 <script type="module" src="../static/js/tooltip.js"></script>
 
 <script>
+const inputs = [
+    { id: "people", defaultValue: "all people", paramName: "people" },
+    { id: "people_gend", defaultValue: "all", paramName: "people_gend" },
+    { id: "people_roles", defaultValue: "all roles and titles", paramName: "people_roles" },
+    { id: "agent_org", defaultValue: "false", paramName: "agent_org" },
+    { id: "aut", defaultValue: "all senders", paramName: "aut" },
+    { id: "aut_gend", defaultValue: "all", paramName: "aut_gend" },
+    { id: "aut_roles", defaultValue: "all roles and titles", paramName: "aut_roles" },
+    { id: "aut_org", defaultValue: "false", paramName: "aut_org" },
+    { id: "aut_mark", defaultValue: "false", paramName: "aut_mark" },
+    { id: "rec", defaultValue: "all recipients", paramName: "rec" },
+    { id: "rec_gend", defaultValue: "all", paramName: "rec_gend" },
+    { id: "rec_roles", defaultValue: "all roles and titles", paramName: "rec_roles" },
+    { id: "rec_org", defaultValue: "false", paramName: "rec_org" },
+    { id: "rec_mark", defaultValue: "false", paramName: "rec_mark" },
+    { id: "ment", defaultValue: "all people mentioned", paramName: "ment" },
+    { id: "ment_gend", defaultValue: "all", paramName: "ment_gend" },
+    { id: "ment_roles", defaultValue: "all roles and titles", paramName: "ment_roles" },
+    { id: "ment_org", defaultValue: "false", paramName: "ment_org" },
+    { id: "dat_sin_year", defaultValue: "all years", paramName: "dat_sin_year" },
+    { id: "dat_sin_month", defaultValue: "all months", paramName: "dat_sin_month" },
+    { id: "dat_sin_day", defaultValue: "all dates", paramName: "dat_sin_day" },
+    { id: "dat_from_year", defaultValue: "all years", paramName: "dat_from_year" },
+    { id: "dat_from_month", defaultValue: "all months", paramName: "dat_from_month" },
+    { id: "dat_from_day", defaultValue: "all dates", paramName: "dat_from_day" },
+    { id: "dat_to_year", defaultValue: "all years", paramName: "dat_to_year" },
+    { id: "dat_to_month", defaultValue: "all months", paramName: "dat_to_month" },
+    { id: "dat_to_day", defaultValue: "all dates", paramName: "dat_to_day" },
+    { id: "pla_ment_name", defaultValue: "all places mentioned", paramName: "pla_ment_name" },
+    { id: "pla_ori_name", defaultValue: "all origins", paramName: "pla_ori_name" },
+    { id: "pla_ori_mark", defaultValue: "false", paramName: "pla_ori_mark" },
+    { id: "pla_des_name", defaultValue: "all destinations", paramName: "pla_des_name" },
+    { id: "pla_des_mark", defaultValue: "false", paramName: "pla_des_mark" },
+    { id: "locations", defaultValue: "all places", paramName: "locations" },
+    { id: "let_con", defaultValue: "all content", paramName: "let_con" },
+    { id: "let_type", defaultValue: "all types", paramName: "let_type" },
+    { id: "let_lang", defaultValue: "all languages", paramName: "let_lang" },
+    { id: "let_ima", defaultValue: "false", paramName: "let_ima" },
+    { id: "let_trans", defaultValue: "false", paramName: "let_trans" },
+    { id: "let_abst", defaultValue: "false", paramName: "let_abst" },
+    { id: "let_pmark", defaultValue: "false", paramName: "let_pmark" },
+    { id: "let_pmark_tex", defaultValue: "all postage marks", paramName: "let_pmark_tex" },
+    { id: "let_end", defaultValue: "false", paramName: "let_end" },
+    { id: "let_end_tex", defaultValue: "all endorsements", paramName: "let_pmark_tex" },
+    { id: "let_en", defaultValue: "false", paramName: "let_en" },
+    { id: "let_with_en", defaultValue: "false", paramName: "let_with_en" },
+    { id: "let_with_en_tex", defaultValue: "all enclosures", paramName: "let_with_en_tex" },
+    { id: "let_seal_tex", defaultValue: "all seals", paramName: "let_seal_tex" },
+    { id: "let_seal", defaultValue: "false", paramName: "let_seal" },
+    { id: "let_pap_typ", defaultValue: "false", paramName: "let_pap_typ" },
+    { id: "let_pap_typ_tex", defaultValue: "all paper types", paramName: "let_pap_typ_tex" },
+    { id: "let_pap_siz", defaultValue: "false", paramName: "let_pap_siz" },
+    { id: "let_pap_siz_tex", defaultValue: "all paper sizes", paramName: "let_pap_siz_tex" },
+    { id: "let_page", defaultValue: "false", paramName: "let_page" },
+    { id: "let_page_min", defaultValue: "0", paramName: "let_page_min" },
+    { id: "repository", defaultValue: "all repositories", paramName: "repository" },
+    { id: "let_shel", defaultValue: "all shelfmarks", paramName: "let_shel" },
+    { id: "let_pe", defaultValue: "false", paramName: "let_pe" },
+    { id: "let_pe_tex", defaultValue: "all printed editions", paramName: "let_pe_tex" },
+];
+
 function advanceSearch(event){
   
     try {
-        const inputs = [
-            { id: "people", defaultValue: "all people", paramName: "people" },
-            { id: "people_gend", defaultValue: "all", paramName: "people_gend" },
-            { id: "people_roles", defaultValue: "all roles and titles", paramName: "people_roles" },
-            { id: "agent_org", defaultValue: "false", paramName: "agent_org" },
-            { id: "aut", defaultValue: "all senders", paramName: "aut" },
-            { id: "aut_gend", defaultValue: "all", paramName: "aut_gend" },
-            { id: "aut_roles", defaultValue: "all roles and titles", paramName: "aut_roles" },
-            { id: "aut_org", defaultValue: "false", paramName: "aut_org" },
-            { id: "aut_mark", defaultValue: "false", paramName: "aut_mark" },
-            { id: "rec", defaultValue: "all recipients", paramName: "rec" },
-            { id: "rec_gend", defaultValue: "all", paramName: "rec_gend" },
-            { id: "rec_roles", defaultValue: "all roles and titles", paramName: "rec_roles" },
-            { id: "rec_org", defaultValue: "false", paramName: "rec_org" },
-            { id: "rec_mark", defaultValue: "false", paramName: "rec_mark" },
-            { id: "ment", defaultValue: "all people mentioned", paramName: "ment" },
-            { id: "ment_gend", defaultValue: "all", paramName: "ment_gend" },
-            { id: "ment_roles", defaultValue: "all roles and titles", paramName: "ment_roles" },
-            { id: "ment_org", defaultValue: "false", paramName: "ment_org" },
-            { id: "dat_sin_year", defaultValue: "all years", paramName: "dat_sin_year" },
-            { id: "dat_sin_month", defaultValue: "all months", paramName: "dat_sin_month" },
-            { id: "dat_sin_day", defaultValue: "all dates", paramName: "dat_sin_day" },
-            { id: "dat_from_year", defaultValue: "all years", paramName: "dat_from_year" },
-            { id: "dat_from_month", defaultValue: "all months", paramName: "dat_from_month" },
-            { id: "dat_from_day", defaultValue: "all dates", paramName: "dat_from_day" },
-            { id: "dat_to_year", defaultValue: "all years", paramName: "dat_to_year" },
-            { id: "dat_to_month", defaultValue: "all months", paramName: "dat_to_month" },
-            { id: "dat_to_day", defaultValue: "all dates", paramName: "dat_to_day" },
-            { id: "pla_ment_name", defaultValue: "all places mentioned", paramName: "pla_ment_name" },
-            { id: "pla_ori_name", defaultValue: "all origins", paramName: "pla_ori_name" },
-            { id: "pla_ori_mark", defaultValue: "false", paramName: "pla_ori_mark" },
-            { id: "pla_des_name", defaultValue: "all destinations", paramName: "pla_des_name" },
-            { id: "pla_des_mark", defaultValue: "false", paramName: "pla_des_mark" },
-            { id: "locations", defaultValue: "all places", paramName: "locations" },
-            { id: "let_con", defaultValue: "all content", paramName: "let_con" },
-            { id: "let_type", defaultValue: "all types", paramName: "let_type" },
-            { id: "let_lang", defaultValue: "all languages", paramName: "let_lang" },
-            { id: "let_ima", defaultValue: "false", paramName: "let_ima" },
-            { id: "let_trans", defaultValue: "false", paramName: "let_trans" },
-            { id: "let_abst", defaultValue: "false", paramName: "let_abst" },
-            { id: "let_pmark", defaultValue: "false", paramName: "let_pmark" },
-            { id: "let_pmark_tex", defaultValue: "all postage marks", paramName: "let_pmark_tex" },
-            { id: "let_end", defaultValue: "false", paramName: "let_end" },
-            { id: "let_end_tex", defaultValue: "all endorsements", paramName: "let_pmark_tex" },
-            { id: "let_en", defaultValue: "false", paramName: "let_en" },
-            { id: "let_with_en", defaultValue: "false", paramName: "let_with_en" },
-            { id: "let_with_en_tex", defaultValue: "all enclosures", paramName: "let_with_en_tex" },
-            { id: "let_seal_tex", defaultValue: "all seals", paramName: "let_seal_tex" },
-            { id: "let_seal", defaultValue: "false", paramName: "let_seal" },
-            { id: "let_pap_typ", defaultValue: "false", paramName: "let_pap_typ" },
-            { id: "let_pap_typ_tex", defaultValue: "all paper types", paramName: "let_pap_typ_tex" },
-            { id: "let_pap_siz", defaultValue: "false", paramName: "let_pap_siz" },
-            { id: "let_pap_siz_tex", defaultValue: "all paper sizes", paramName: "let_pap_siz_tex" },
-            { id: "let_page", defaultValue: "false", paramName: "let_page" },
-            { id: "let_page_min", defaultValue: "0", paramName: "let_page_min" },
-            { id: "repository", defaultValue: "all repositories", paramName: "repository" },
-            { id: "let_shel", defaultValue: "all shelfmarks", paramName: "let_shel" },
-            { id: "let_pe", defaultValue: "false", paramName: "let_pe" },
-            { id: "let_pe_tex", defaultValue: "all printed editions", paramName: "let_pe_tex" },
-        ];
-
+        
         const baseURL = `${window.location.origin}/forms/advance`;
         let sendQuery = false;
         let queryString = "";
@@ -305,6 +309,36 @@ function updateDays(yearElementID, monthElementID, dayElementID){
     } catch (err) {
         console.error(err)
     }
+}
+
+function resetAll() {
+
+    const conf = confirm("Are you sure you want to reset all values? By doing this, you will reset all the values and the URL query. This action can't be undone.")
+
+    if(!conf) {
+        return
+    }
+
+    // Resetting the queries 
+    const urlWithoutQuery = window.location.origin + window.location.pathname;
+    // Update the browser's history state without reloading the page
+    window.history.replaceState(null, '', urlWithoutQuery);
+
+    // Resetting all the values
+    inputs.forEach((item) => {
+        const doc = document.getElementById(item.id)
+
+        if(doc) {
+
+            if(doc.type == "checkbox") {
+                if(item.defaultValue == "false") {
+                    doc.checked = false
+                }
+            }
+
+            doc.value = item.defaultValue
+        }
+    })
 }
 </script>
 {% endblock extra_js_bottom %}

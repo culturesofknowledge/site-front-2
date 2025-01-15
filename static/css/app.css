@@ -10448,3 +10448,15 @@ button.tiny {
 .filter-select {
   max-width: 100px;
 }
+.search-plus-action {
+  display: flex;
+  flex-direction: column;
+}
+
+.small-button {
+  padding: 8px 16px;
+  font-size: 14px;
+  color: white;
+  border: none;
+  cursor: pointer;
+}

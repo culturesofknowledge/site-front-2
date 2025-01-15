@@ -10441,6 +10441,7 @@ button.tiny {
 .flex {
   display: flex;
 }
+
 .dynamic-field {
   justify-content: space-around;
   align-items: center;
@@ -10459,4 +10460,8 @@ button.tiny {
   color: white;
   border: none;
   cursor: pointer;
+}
+
+.space-between {
+  justify-content: space-between;
 }

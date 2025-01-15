@@ -1,20 +1,31 @@
-<div class="section clearfix">
-  <hr class="yellow-divider" />
-  
-  <h3><img src="/static/img/icon-quill.png" alt="Content Icon" />Content</h3>
+<hr class="yellow-divider" />
 
-  {% include 'components/advance/content/content.jinja2' %}
+<div class="section clearfix"> 
+  <div class="flex space-between">
+    <div>
+      <h3><img src="/static/img/icon-quill.png" alt="Content Icon" />Content</h3>
+    </div>
 
-  {% include 'components/advance/content/postage_marks.jinja2' %}
+    <div>
+      <button class="small-button" onclick="toggleContentSection()" id="content-section-expand"> Expand </button>  
+    </div>
+  </div>
 
-  {% include 'components/advance/content/endorsements.jinja2' %}
+  <div id="content-section-container" style="display:none;">
+    {% include 'components/advance/content/content.jinja2' %}
 
-  {% include 'components/advance/content/enclosures.jinja2' %}
+    {% include 'components/advance/content/postage_marks.jinja2' %}
 
-  {% include 'components/advance/content/seal.jinja2' %}
+    {% include 'components/advance/content/endorsements.jinja2' %}
 
-  {% include 'components/advance/content/paper.jinja2' %}
+    {% include 'components/advance/content/enclosures.jinja2' %}
+
+    {% include 'components/advance/content/seal.jinja2' %}
+
+    {% include 'components/advance/content/paper.jinja2' %}
 
 
-  <button onclick="advanceSearch()" name="submit-advanced" type="submit" class="button submit search-related">Search</button>
+    <button onclick="advanceSearch()" name="submit-advanced" type="submit" class="button submit search-related">Search</button>
+  </div>
+
 </div>

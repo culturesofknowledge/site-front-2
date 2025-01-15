@@ -136,9 +136,10 @@ input[type="checkbox"]:checked {
                         {% include './components/advance/places.jinja2' %}
                     </div>
 
-                    <div id="letters_section" class="large-12 columns" style="padding-left:25px">
+                    <div id="letters_section" class="large-12 columns" style="padding-left:25px; transition: height 0.3s ease; overflow: hidden;">
                         {% include './components/advance/letters.jinja2' %}
                     </div>
+
 
                     <div id="institutions_section" class="large-12 columns" style="padding-left:25px">
                         {% include './components/advance/institutions.jinja2' %}
@@ -340,5 +341,21 @@ function resetAll() {
         }
     })
 }
+
+function toggleContentSection() {
+    let section = document.getElementById("content-section-container");
+    let buttonLabel = document.getElementById("content-section-expand")
+    console.log("display" , section.style)
+    var currentHeight = section.style.height;
+
+    if(section.style.display == "none") {
+        section.style.display = "unset"
+        buttonLabel.innerHTML = "Collapse"
+    } else {
+        section.style.display = "none"
+        buttonLabel.innerHTML = "Expand"
+    }
+}
+
 </script>
 {% endblock extra_js_bottom %}

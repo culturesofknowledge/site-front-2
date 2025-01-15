@@ -8,7 +8,7 @@
 
         <div class="large-11 small-10 columns">
           <label for="people">Search people</label>
-          <input
+          {# <input
             id="people"
             name="people"
             type="text"
@@ -18,11 +18,23 @@
             onfocus="textClear(this);"
             onblur="textFill(this);"
             title=""
-          />
+          /> #}
+
+          <div id="form-container">
+            <!-- Dynamic fields will be added here -->
+          </div>
         </div>
-        {% include './components/common/help_icon.jinja2' %}
+        <div id="help-icon-template"  > 
+          {% include './components/common/help_icon.jinja2' %}
+        </div>
       </div>
       {# Search people - Ends #}
+
+      <div>
+        <div class="large-11 small-10 columns" style="justify-content: end;display: flex;">
+          <a id="add-field"> Add more people </a>
+        </div>
+      </div>
 
       {# Search year - Starts #}
       <div>
@@ -156,3 +168,170 @@
 
   </div>
 </div>
+
+{% block extra_js_bottom %}
+{# <script>
+  // DOM elements
+  const formContainer = document.getElementById("form-container");
+  const addFieldButton = document.getElementById("add-field");
+  let fieldCount = 0;
+
+  // Options for the dropdown
+  const selectOptions = [
+    { display: "People", value: "people" },
+    { display: "Sender", value: "aut" },
+    { display: "Receiver", value: "rec" },
+    { display: "Mentioned", value: "ment" }
+  ];
+
+  // Create a select element with options
+  const createSelectElement = (name) => {
+    const select = document.createElement("select");
+    select.setAttribute("name", name);
+    select.classList.add("filter-select");
+
+    // Add options to the select
+    selectOptions.forEach((option) => {
+      const optionElement = document.createElement("option");
+      optionElement.value = option.value;
+      optionElement.textContent = option.display;
+      select.appendChild(optionElement);
+    });
+
+    return select;
+  };
+
+  // Create an input element
+  const createInputElement = (name) => {
+    const input = document.createElement("input");
+    input.setAttribute("id", name);
+    input.setAttribute("type", "text");
+    input.setAttribute("value", "all people");
+    input.setAttribute("data-default" , "all people")
+    input.setAttribute("onfocus" , "textClear(this);")
+    input.setAttribute("onfocus" , "textFill(this)")
+    input.classList.add("text");
+    return input;
+  };
+
+  // Create a new field
+  const createField = () => {
+    // Create the container div for the field
+    const fieldDiv = document.createElement("div");
+    fieldDiv.classList.add("flex", "dynamic-field");
+
+    // Create select and input elements
+    const select = createSelectElement(`filter_type_${fieldCount}`);
+    const input = createInputElement(`filter_value_${fieldCount}`);
+
+    // Append select and input to the field container
+    fieldDiv.appendChild(select);
+    fieldDiv.appendChild(input);
+
+    // Append the field container to the form
+    formContainer.appendChild(fieldDiv);
+
+    // Increment the field count
+    fieldCount++;
+  };
+
+  // Add the initial field
+  createField();
+
+  // Event listener for adding new fields
+  addFieldButton.addEventListener("click", createField);
+</script> #}
+
+<script>
+  // DOM elements
+  const formContainer = document.getElementById("form-container");
+  const addFieldButton = document.getElementById("add-field");
+  let fieldCount = 0;
+
+  // Options for the dropdown with placeholders
+  const selectOptions = [
+    { display: "People", value: "people", placeholder: "all people" },
+    { display: "Sender", value: "aut", placeholder: "all sender" },
+    { display: "Receiver", value: "rec", placeholder: "all receiver" },
+    { display: "Mentioned", value: "ment", placeholder: "all people mentioned" }
+  ];
+
+  // Create a select element with options
+  const createSelectElement = (name, inputElement) => {
+    const select = document.createElement("select");
+    select.setAttribute("name", name);
+    select.classList.add("filter-select");
+
+    // Add options to the select
+    selectOptions.forEach((option) => {
+      const optionElement = document.createElement("option");
+      optionElement.value = option.value;
+      optionElement.textContent = option.display;
+      select.appendChild(optionElement);
+    });
+
+    // Set initial placeholder for the input based on the first option
+    if (inputElement) {
+      inputElement.value = selectOptions[0].placeholder;
+      inputElement.dataset.default = selectOptions[0].placeholder;
+    }
+
+    // Add onchange event to update the input's placeholder
+    select.addEventListener("change", () => {
+      const selectedOption = selectOptions.find(
+        (option) => option.value === select.value
+      );
+      if (selectedOption) {
+        inputElement.value = selectedOption.placeholder;
+        inputElement.dataset.default = selectedOption.placeholder;
+      }
+    });
+
+    return select;
+  };
+
+  // Create an input element
+  const createInputElement = (name) => {
+    const input = document.createElement("input");
+    input.setAttribute("id", name);
+    input.setAttribute("name", name);
+    input.setAttribute("type", "text");
+    input.setAttribute("value", "");
+    input.setAttribute("data-default", "");
+    input.addEventListener("focus", () => textClear(input));
+    input.addEventListener("blur", () => textFill(input));
+    input.classList.add("text");
+    return input;
+  };
+
+  // Create a new field
+  const createField = () => {
+    // Create the container div for the field
+    const fieldDiv = document.createElement("div");
+    fieldDiv.classList.add("flex", "dynamic-field");
+
+    // Create input element
+    const input = createInputElement(`filter_value_${fieldCount}`);
+
+    // Create select element and pass the input element to set its placeholder
+    const select = createSelectElement(`filter_type_${fieldCount}`, input);
+
+    // Append select and input to the field container
+    fieldDiv.appendChild(select);
+    fieldDiv.appendChild(input);
+
+    // Append the field container to the form
+    formContainer.appendChild(fieldDiv);
+
+    // Increment the field count
+    fieldCount++;
+  };
+
+  // Add the initial field
+  createField();
+
+  // Event listener for adding new fields
+  addFieldButton.addEventListener("click", createField);
+</script>
+
+{% endblock extra_js_bottom %}

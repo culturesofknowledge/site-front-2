@@ -10431,3 +10431,20 @@ button.tiny {
 .stats-image {
   margin-bottom: 10px;
 }
+.search-home-people {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.flex {
+  display: flex;
+}
+.dynamic-field {
+  justify-content: space-around;
+  align-items: center;
+}
+.filter-select {
+  max-width: 100px;
+}

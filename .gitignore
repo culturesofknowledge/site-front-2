@@ -34,12 +34,14 @@ data/**/*.csv
 data/**/*.csv.bak
 
 # docker
-docker-emlo/solr-data
-docker-emlo/redis
-!docker-emlo/solr-data/.keep
-docker-emlo/csv_import_files
-!docker-emlo/csv_import_files-data/.keep
-docker-emlo/solr-conf/solr/home/**/core.properties
+docker/solr-data
+!docker/solr-data/.keep
+docker/solr9-data
+!docker/solr9-data/.keep
+docker/csv_import_files
+!docker/csv_import_files-data/.keep
+docker/solr/**/core.properties
+docker/solr9/**/core.properties
 
 # ENV folder
 site-front-2

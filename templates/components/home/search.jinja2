@@ -36,7 +36,7 @@
             onchange="changeEventOnFrom(this.options[this.selectedIndex].value)"
           >
             <option class="default" selected="selected">all years</option>
-            {% for year in range(1500, 1841) %}
+            {% for year in range(1450, 1860) %}
             <option value="{{ year }}">{{ year }}</option>
             {% endfor %}
           </select>
@@ -52,13 +52,14 @@
             onchange="changeEventOnTo(this.options[this.selectedIndex].value)"
           >
             <option class="default" selected="selected">all years</option>
-            {% for year in range(1500, 1841) %}
+            {% for year in range(1450, 1860) %}
             <option value="{{ year }}">{{ year }}</option>
             {% endfor %}
           </select>
         </div>
 
-        <div data-tip="Search by individual year across year ranges. <br/> <br/> To select a single year, use the first-down only.">
+        <div data-tip="Search by individual year across year ranges. 
+        <br/> <br/> To select a single year, use the first drop-down only.">
           {% include './components/common/help_icon.jinja2' %}
         </div>
       </div>

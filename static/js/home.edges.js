@@ -33,7 +33,7 @@ try {
       solrCore: "all",
       facetField: "ox_isOrganisation",
       renderer: new emlo.StatsRenderer({
-        title: "Organisations",
+        title: "‘Organizations",
         titleImage: "/static/img/icon-stats-organisations.png",
         redirectURL: "/browse/organisations",
       }),

@@ -53,10 +53,6 @@ $(document).ready(function () {
       showTooltip(event, !isHelpIcon); // No delay for #help-icon
     });
 
-    targets.on("mousemove", (event) => {
-      showTooltip(event, false); // Update position without delay
-    });
-
     targets.on("mouseleave", hideTooltip);
   });
 });

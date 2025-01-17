@@ -1,0 +1,91 @@
+{% extends "base.jinja2" %}
+
+{% block title %}Comment{% endblock %}
+
+
+{% block content %}
+    <div class="row">
+        <div class="large-2 columns"><!-- dummy column -->&nbsp;</div>
+
+        <div class="large-10 columns" style="padding-left:25px">
+            <br>
+            <div id="comment_heading">
+			    <h3>
+                    Please complete the form below if you wish to comment on any 
+                    aspect of this record. We will be sent the unique ID/URL of the record 
+                    alongside your remarks and will get back to you as soon as we can.
+                </h3>
+            </div>
+            <br>
+            
+            <div id="form-section">
+                <form>
+
+				    <div>
+                        <label style="width:150px;">To:</label> &nbsp; 
+                        <strong>Early Modern Letters Online</strong>
+                    </div>
+                    
+                    <br />
+
+                    <div>
+                        <label style="width:150px;">Subject:</label> &nbsp; 
+                        <span>Comment on EMLO record</span>
+                    </div>
+		
+                    <br />
+
+                    <label for="name" style="width:150px;">Your name:</label>
+                    <input type="text" name="name" id="name">
+
+                    <label for="email" style="width:150px;">Your e-mail address:</label>
+                    <input type="text" name="email" id="email">
+
+				    <label for="comment" class="floatleft" style="width:150px;">Your comment:</label>
+                    <textarea name="comment" id="comment" rows="10" cols="50" class="floatleft;" style="margin-left:3px; padding:10px; font-family: 'coustard', 'times new roman', 'times', serif;"></textarea>
+
+
+				    <input type="hidden" id="id" name="id" value="">
+                    <input type="hidden" name="type" value="">
+
+                    <!-- Google Captcha -->
+				    <label for="g-recaptcha-response">Captcha:</label>
+				   
+
+				    <br>
+
+                    <input type="submit" onsubmit="submitForm" class="button submit" value="Send">
+			    </form>
+            </div>
+        </div>  
+    </div>
+{% endblock %}
+
+
+{% block extra_js_bottom %}
+<script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+        // Function to get query parameter by name
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Replace 'yourQueryParam' with the actual query parameter name
+        const queryValue = getQueryParam('id');
+        
+        // Replace 'yourFieldId' with the actual ID of the field
+        if (queryValue) {
+            const field = document.getElementById('id');
+            if (field) {
+            field.value = queryValue;
+            }
+        }
+    });
+
+    function submitForm() {
+        alert("Form functionality is pending")
+    }
+</script>
+{% endblock extra_js_bottom %}

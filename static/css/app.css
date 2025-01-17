@@ -9890,6 +9890,15 @@ select {
   border: #efc319 2px solid;
 }
 
+#main-content {
+  min-height: 750px;
+}
+
+.stats-row {
+  display: flex;
+  justify-content: space-between;
+  list-style: none;
+}
 .stats-text {
   font-size: 0.75em;
   line-height: 0.85rem;
@@ -9963,6 +9972,12 @@ h5,
 .browseby li.active {
   background-color: #e4e4e4;
   padding: 5px;
+}
+.profile-icon {
+  float: left;
+  height: 25px;
+  width: 25px;
+  margin-right: 15px;
 }
 
 .profilepart {
@@ -10114,7 +10129,7 @@ ul.pagination li {
   flex-direction: column;
 }
 
-.side-nav {
+/* .side-nav {
   top: 263px;
   border-top: 1px solid #efc319;
   border-bottom: 1px solid #efc319;
@@ -10126,6 +10141,87 @@ ul.pagination li {
   line-height: 2.6;
   display: flex;
   flex-direction: column;
+} */
+
+/* General Row Layout */
+.row-with-side {
+  display: flex; /* Use flexbox for alignment */
+  flex-wrap: nowrap; /* No wrapping by default */
+  gap: 10px; /* Space between side-nav and content */
+}
+
+/* Side Navigation */
+.side-nav {
+  margin-top: 200px;
+  flex: 0 0 222px; /* Fixed width for larger screens */
+  position: relative; /* Prevent overlap */
+  border-top: 1px solid #efc319;
+  border-bottom: 1px solid #efc319;
+  padding-top: 15px;
+  font-size: 1rem;
+  line-height: 2.6;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+}
+
+.graph-tooltip {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  padding: 5px;
+  border-radius: 4px;
+  pointer-events: none; /* Ensures the tooltip won't interfere with other elements */
+  opacity: 1; /* Ensure it’s visible */
+  z-index: 9999; /* Make sure it's above other elements */
+}
+
+/* Content Section */
+.content {
+  flex: 1; /* Take the remaining space */
+  margin-left: 25px;
+}
+
+/* Responsive Layout for Smaller Screens */
+@media (max-width: 1024px) {
+  .row {
+    flex-direction: column; /* Stack side-nav and content vertically */
+  }
+
+  .side-nav {
+    order: 2; /* Move side-nav below content */
+    width: 100%; /* Take full width */
+    max-width: none;
+    top: 0px;
+    margin-bottom: 20px; /* Add spacing below side-nav */
+  }
+
+  .content {
+    order: 1; /* Ensure content comes first */
+    margin-left: 0; /* Reset margin */
+  }
+}
+
+@media (max-width: 768px) {
+  .side-nav {
+    padding: 10px; /* Reduce padding */
+    font-size: 0.9rem; /* Adjust font size for smaller screens */
+  }
+
+  .content {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .side-nav {
+    padding: 8px;
+    font-size: 0.8rem;
+  }
+
+  .content {
+    padding: 5px;
+  }
 }
 
 .yellow-divider {
@@ -10165,4 +10261,173 @@ ul.pagination li {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.content {
+  margin-left: 40px;
+  margin-bottom: 20px;
+}
+
+/* Pagination container */
+.edges-bs3-pager-container {
+  display: flex;
+  justify-content: flex-start; /* Aligns buttons to the left */
+  white-space: nowrap; /* Prevent wrapping of buttons */
+  padding: 5px 0; /* Optional padding for some space */
+  width: 100%; /* Full width of the parent container */
+  height: 24px; /* Height of the container */
+  margin-bottom: 20px; /* Adds margin to the bottom of the container */
+}
+
+/* General button styles applied to the div that wraps the button */
+.edges-bs3-pager-container .button-wrapper {
+  display: flex; /* Flexbox for centering content */
+  justify-content: center; /* Horizontally center button text */
+  align-items: center; /* Vertically center button text */
+  width: 60px; /* Set button width to 50px */
+  height: 24px; /* Set button height to 24px */
+  font-size: 14px; /* Font size */
+  text-align: center; /* Center align text */
+  border: 1px solid #ddd; /* Border color */
+  background-color: #ddd; /* Default background color */
+  color: black; /* Text color */
+  margin: 0 2px; /* Space between buttons */
+  border-radius: 4px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s, color 0.3s; /* Smooth transition for background and text color */
+  white-space: nowrap; /* Prevent text from breaking inside the button */
+}
+
+/* Active button styles applied to the div that wraps the button */
+.edges-bs3-pager-container .button-wrapper.active {
+  background-color: #008cba; /* Active button background color */
+  color: white; /* Active button text color */
+}
+
+/* Hover effect for buttons */
+.edges-bs3-pager-container .button-wrapper:hover {
+  background-color: #ccc; /* Background color when hovering */
+}
+
+/* Styles for '...' (ellipsis) buttons */
+.edges-bs3-pager-container .button-wrapper.ellipsis {
+  background-color: transparent; /* Transparent background for ellipsis */
+  color: #888; /* Gray color for ellipsis */
+  font-size: 16px; /* Slightly larger font for ellipsis */
+  font-weight: bold; /* Bold font for ellipsis */
+  border: none; /* Remove border for ellipsis */
+}
+
+/* Disabled buttons (e.g., when you can't go back from the first page) */
+.edges-bs3-pager-container .button-wrapper:disabled {
+  background-color: #f2f2f2; /* Disabled button background */
+  color: #bbb; /* Disabled button text color */
+  cursor: not-allowed; /* Not-allowed cursor on disabled buttons */
+}
+
+#news-output .item .title {
+  margin: 0 0 20px;
+  color: black;
+  text-align: center;
+  vertical-align: middle;
+  padding: 5px 3px;
+  background-color: #efc319;
+  min-height: 100px;
+  line-height: 1.5;
+}
+#news-output .item .image {
+  max-height: 215px;
+  overflow: hidden;
+  display: block;
+  background-color: #cecece;
+  text-align: center;
+  transition: max-height 1s;
+}
+#news-output .item .image:hover {
+  max-height: 1000px;
+  transition: max-height 1s;
+}
+
+button.tiny {
+  padding-top: 0.625rem;
+  padding-right: 1.25rem;
+  padding-bottom: 0.6875rem;
+  padding-left: 1.25rem;
+  font-size: 0.6875rem;
+  height: 40px;
+  margin: 0px 15px;
+}
+
+/* CSS for tooltip */
+[data-tip] {
+  position: relative;
+  cursor: pointer;
+}
+
+[data-tip]:before,
+[data-tip]:after {
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+  position: absolute;
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+  transform: translateY(-5px);
+}
+
+/* Centered Arrow */
+.tooltip {
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+  position: absolute;
+  background: #1a1a1a;
+  color: #fff;
+  padding: 8px 10px;
+  max-width: 300px; /* Fixed width */
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 4px;
+  text-align: left;
+  font-family: arial !important; /* Optional: Gives a preformatted style */
+  font-size: 14px;
+  line-height: 1.4em;
+  white-space: pre-wrap; /* Preserves formatting like spaces and line breaks */
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 9;
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+}
+
+.tooltip::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  transform: translateX(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid #1a1a1a;
+}
+
+.tooltip.show {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.search-related {
+  float: right;
+}
+.search-related {
+  background-color: #efc319;
+  color: #172854;
+  padding: 0.75rem 1.5rem 0.75rem;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+.home-stats {
+  height: 87.2px;
+}
+.stats-image {
+  margin-bottom: 10px;
 }

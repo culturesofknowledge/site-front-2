@@ -69,7 +69,7 @@ try {
             post: "",
             type: "link",
             linkHref: "uuid",
-            linkHrefPrefix: "/profile/work/",
+            linkHrefPrefix: "/profile/work",
             valueFunction: null,
           },
           {

@@ -1,17 +1,22 @@
-FROM python:3.12
+FROM python:3.12-alpine
+
+ENV APP_DIR=/data
+WORKDIR ${APP_DIR}
+
+RUN apk update && apk upgrade
+
+RUN apk add bash build-base vim git
 
 RUN python -m pip install --upgrade pip
 
-COPY requirements.txt requirements.txt
-RUN python -m pip install -r requirements.txt
+COPY setup.py $APP_DIR/setup.py
+COPY run.py $APP_DIR/run.py
+COPY config.py $APP_DIR/config.py
+COPY views $APP_DIR/views
+COPY templates $APP_DIR/templates
+COPY static $APP_DIR/static
+COPY requirements.txt $APP_DIR/requirements.txt
+RUN cd $APP_DIR && python -m pip install -r requirements.txt
 
-COPY run.py run.py
-
-# Needed for run.py imports
-COPY views views
-COPY solr solr
-COPY config.py config.py
-
-# The templates and icons are stored here
-COPY templates templates
-COPY static static
+COPY docker-entrypoint.sh /bin/
+RUN chmod +x /bin/docker-entrypoint.sh

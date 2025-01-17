@@ -76,9 +76,25 @@ emlo.ResultTemplate = class extends edges.Template {
       refine_search += `<div id="${refineSearchComponents[i].id}"></div>`;
     }
 
-    let frag = `<div class="row">
+    let top = "";
+    let topComponents = edge.category("top");
+    for (let i = 0; i < topComponents.length; i++) {
+      top += `<div id="${topComponents[i].id}"></div>`;
+    }
+
+    let bottom = "";
+    let bottomComponents = edge.category("bottom");
+    for (let i = 0; i < bottomComponents.length; i++) {
+      bottom += `<div id="${bottomComponents[i].id}"></div>`;
+    }
+
+    let frag = `<div class="row row-with-side">
       <div class="side-nav"> 
         <h2 class="main">Search</h2>
+
+        <div id="return_browse" style="display:none;">
+              <button onclick="returnToBrowse()">Return to Browse</button>
+          </div>
        
           <div id="modify_search" style="display:none;">
               <button onclick="modifyCurrentSearch()">Modify search</button>
@@ -95,11 +111,10 @@ emlo.ResultTemplate = class extends edges.Template {
         </div>
       </div>
 
-      <div class="row">
-        <div class="large-2 columns"><!-- dummy column -->&nbsp;</div>
+      <div class="row row-with-side">
 
-        <div class="large-10 columns" style="margin-left:25px">
-            <div id="about">
+        <div class="large-12 columns">
+            <div id="result-header-section" class="large-12 columns">
                 <br/>
                 <h2 class="main">
                     <span id="result-header" class="font-18">
@@ -116,6 +131,94 @@ emlo.ResultTemplate = class extends edges.Template {
                 </h2>
             </div>
    
+             <div id="" class="large-12 columns">
+              <div>
+                ${top}
+              </div>
+
+              <div>
+                ${results}
+              </div>
+
+              <div>
+                ${bottom}
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>`;
+
+    this.edge.context.html(frag);
+  }
+};
+
+emlo.ProfileTemplate = class extends edges.Template {
+  constructor(params) {
+    // TODO: Needs to be added for results page
+    // this.showControlSection = edges.util.getParam(
+    //   params,
+    //   "showControlSection",
+    //   false
+    // );
+    super(params);
+  }
+
+  draw(edge) {
+    this.edge = edge;
+    let results = "";
+
+    let resultComponents = edge.category("results");
+    for (let i = 0; i < resultComponents.length; i++) {
+      results += `<div id="${resultComponents[i].id}"></div>`;
+    }
+
+    let sidebar = "";
+    let sidebarComponents = edge.category("sidebar");
+    for (let i = 0; i < sidebarComponents.length; i++) {
+      sidebar += `<div id="${sidebarComponents[i].id}"></div>`;
+    }
+
+    let sidebarTitle = "";
+    let sidebarTitleComponents = edge.category("sidebarTitle");
+    for (let i = 0; i < sidebarTitleComponents.length; i++) {
+      sidebarTitle += `<div id="${sidebarTitleComponents[i].id}"></div>`;
+    }
+
+    let frag = `<div class="row row-with-side">
+      <div class="side-nav"> 
+        <div id="sidebar-title">
+          ${sidebarTitle}
+        </div>
+        
+        <div id="sidebar-actions">
+            <div>
+              <img src="../../static/img/icon-short-url.png" alt="short-url" />
+              Short URL:
+              <span id="shor-url-link">
+              </span>
+            </div>
+
+            <div id="send-comment">
+              <img src="../../static/img/icon-send-comment.png" alt="short-url" />
+              <a> Send Comment </a>
+            </div>
+        </div>
+        
+        <div id="more-options">
+            ${sidebar}
+        </div>
+      </div>
+
+      <div class="row row-with-side">
+        <div class="large-12 columns" style="margin-left:25px">
+            <div id="profile">
+                <br/>
+                <h2 class="main">
+                    <span id="profile-header" class="font-18">
+                    </span>
+                </h2>
+            </div>
+   
              <div id="" class="large-12 columns" style="margin-left:25px">
               ${results}
             </div>
@@ -125,7 +228,46 @@ emlo.ResultTemplate = class extends edges.Template {
 
     this.edge.context.html(frag);
   }
+
+  _sendComment() {
+    alert("sending");
+  }
 };
+
+emlo.HomeStatsTemplate = class extends edges.Template {
+  constructor(params) {
+    // TODO: Needs to be added for results page
+    // this.showControlSection = edges.util.getParam(
+    //   params,
+    //   "showControlSection",
+    //   false
+    // );
+    super(params);
+  }
+
+  draw(edge) {
+    this.edge = edge;
+    let stats = "";
+
+    let statsComponents = edge.category("stats");
+
+    for (let i = 0; i < statsComponents.length; i++) {
+      stats += `<li class="stats-text text-center" id="${statsComponents[i].id}"></li>`;
+    }
+
+    let frag = `
+    <div class="row">
+      <div class="large-12 columns">
+          <ul class="stats-row small-block-grid-2 medium-block-grid-5 large-block-grid-10 home-stats">
+              ${stats}
+          </ul>
+      </div>
+    </div>
+    `;
+    this.edge.context.html(frag);
+  }
+};
+
 emlo.DropDown = class extends edges.Component {
   constructor(params) {
     super(params);
@@ -284,6 +426,13 @@ emlo.ResultTable = class extends edges.Component {
       10
     );
 
+    this.updateHeader = edges.util.getParam(params, "updateHeader", false);
+    this.headerSelector = edges.util.getParam(
+      params,
+      "headerSelector",
+      "header"
+    );
+
     //////////////////////////////////////
     // variables for tracking internal state
 
@@ -321,6 +470,40 @@ emlo.ResultTable = class extends edges.Component {
 
     // record the hit count for later use
     this.hitCount = source.total();
+
+    if (this.updateHeader) {
+      this._updateHeader();
+    }
+  }
+
+  _updateHeader() {
+    let currentDoc = document.getElementById(this.headerSelector);
+    try {
+      if (!currentDoc) {
+        return;
+      }
+
+      // Check if the fetching process is active
+      if (this.results === false) {
+        currentDoc.innerHTML = "Loading results...";
+        return;
+      }
+
+      // Check if results are fetched correctly
+      if (this.hitCount && this.hitCount >= 0) {
+        if (this.hitCount > 50) {
+          currentDoc.innerHTML = `${this.hitCount} results (50 results per page)`;
+        } else {
+          currentDoc.innerHTML = `${this.hitCount} results`;
+        }
+      } else {
+        // Fallback message when results are not fetched
+        currentDoc.innerHTML = "";
+      }
+    } catch (err) {
+      console.error(err);
+      currentDoc.innerHTML = "";
+    }
   }
 
   _appendResults(params) {
@@ -395,7 +578,6 @@ emlo.ResultTable = class extends edges.Component {
     params.callback();
   }
 };
-
 emlo.ResultTableRenderer = class extends edges.Renderer {
   constructor(params) {
     super(params);
@@ -407,31 +589,39 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       "No results to display"
     );
 
-    // ordered list of fields with headers, pre and post wrappers, and a value function
     this.tableDisplay = edges.util.getParam(params, "tableDisplay", []);
-
-    // flag to control whether the index column is displayed
     this.showIndex = edges.util.getParam(params, "showIndex", true);
     this.serialHeader = edges.util.getParam(params, "serialHeader", "#");
-    // if a multi-value field is found that needs to be displayed, which character to use to join
     this.arrayValueJoin = edges.util.getParam(params, "arrayValueJoin", ", ");
-
-    // if a field does not have a value, don't display anything from its part of the render
     this.omitFieldIfEmpty = edges.util.getParam(
       params,
       "omitFieldIfEmpty",
       true
     );
 
-    // variables for internal state
+    // New parameters for selection functionality
+    this.defaultSelected = edges.util.getParam(params, "defaultSelected", []);
+    this.showCheckbox = edges.util.getParam(params, "showCheckbox", false);
+    this.checkboxLimit = edges.util.getParam(params, "checkboxLimit", 10);
+    this.displayField = edges.util.getParam(params, "displayField", "");
+
+    this.selectedRows = new Set(); // Track selected rows by UUID
     this.namespace = "edges-bs3-results-fields-by-table";
+
+    // Restore selection from URL on page load
+    this._restoreSelectionFromURL();
+  }
+
+  total() {
+    return this.component.hitCount;
   }
 
   draw() {
     let frag = this.noResultsText;
     if (this.component.results === false) {
-      frag = "";
+      frag = "Loading results... Please wait";
     }
+    const resultHeader = document.getElementById("result-header-section");
 
     const results = this.component.results;
     if (results && results.length > 0) {
@@ -446,8 +636,11 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
         .map((field) => `<th>${edges.util.escapeHtml(field.header)}</th>`)
         .join("");
       const headerRow = this.showIndex
-        ? `<tr><th>${this.serialHeader}</th>${headers}</tr>`
-        : `<tr>${headers}</tr>`;
+        ? `<tr>${this.showCheckbox ? "<th></th>" : ""}<th>${
+            this.serialHeader
+          }</th>${headers}</tr>`
+        : `<tr>${this.showCheckbox ? "<th></th>" : ""}${headers}</tr>`;
+
       let rows = results
         .map((result, index) => this._renderResult(result, index))
         .join("");
@@ -462,6 +655,16 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
                 </tbody>
             </table>
         `;
+
+      if (resultHeader) {
+        resultHeader.style.display = "inline";
+      }
+
+      this._renderSideNav();
+    } else {
+      if (resultHeader) {
+        resultHeader.style.display = "none";
+      }
     }
 
     const containerClasses = edges.util.styleClasses(
@@ -471,50 +674,12 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
     );
     const container = `<div class="${containerClasses}">${frag}</div>`;
     this.component.context.html(container);
+
+    // Attach event handlers for row selection
+    if (this.showCheckbox) {
+      this._attachRowSelectionHandlers();
+    }
   }
-
-  // _renderResult(res, index) {
-  //   const rowClasses = edges.util.styleClasses(
-  //     this.namespace,
-  //     "row",
-  //     this.component.id
-  //   );
-  //   const row = this.tableDisplay
-  //     .map((field) => {
-  //       let val = "";
-  //       if (field.field) {
-  //         val = this._getValue(field.field, res, val);
-  //       }
-  //       if (val) {
-  //         val = edges.util.escapeHtml(val);
-  //       }
-  //       if (field.valueFunction) {
-  //         val = field.valueFunction(val, res, this);
-  //       }
-  //       if (!val && this.omitFieldIfEmpty) {
-  //         return "<td></td>";
-  //       }
-
-  //       if (field.type) {
-  //         if (field.type == "date") {
-  //           return `<td>${this._formatDate(val)}</td>`;
-  //         } else if (field.type == "link") {
-  //           if (field.linkText) {
-  //             return `<td><a href=${val}>${field.linkText}</a></td>`;
-  //           } else {
-  //             return `<td><a href=${val}>Link</a></td>`;
-  //           }
-  //         }
-  //       }
-
-  //       return `<td>${field.pre || ""}${val}${field.post || ""}</td>`;
-  //     })
-  //     .join("");
-
-  //   return this.showIndex
-  //     ? `<tr class="${rowClasses}"><td>${index + 1}</td>${row}</tr>`
-  //     : `<tr class="${rowClasses}">${row}</tr>`;
-  // }
 
   _renderResult(res, index) {
     const rowClasses = edges.util.styleClasses(
@@ -523,11 +688,8 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       this.component.id
     );
 
-    // Default page size if not defined
     const pageSize = this.component.infiniteScrollPageSize || 50;
-
-    // Safely retrieve the pagination component
-    let pageNumber = 1; // Default to the first page
+    let pageNumber = 1;
 
     const paginationComponent = this.component.edge.components.find(
       (comp) => comp.id === "top-pager"
@@ -536,7 +698,6 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       pageNumber = paginationComponent.page;
     }
 
-    // Calculate the continuous serial number using the pageNumber and pageSize
     const continuousIndex = (pageNumber - 1) * pageSize + index + 1;
 
     const row = this.tableDisplay
@@ -549,69 +710,151 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
           val = edges.util.escapeHtml(val);
         }
         if (field.valueFunction) {
-          val = field.valueFunction(val, res, this);
+          val = field.valueFunction(val, res, field.field, this, index);
         }
         if (!val && this.omitFieldIfEmpty) {
           return "<td></td>";
         }
 
         if (field.type) {
-          const type = field.type;
-          if (field.type == "date") {
+          if (field.type === "date") {
             return `<td>${this._formatDate(val)}</td>`;
           }
 
-          if (field.type == "link") {
-            // Setting href for the link tag in the table
-            let href = "#";
-            if (field.linkHref) {
-              href = this._getValue(field.linkHref, res, val);
-            } else {
-              href = val;
-            }
-
-            // Setting the display name for the link
-            let linkText = "Link";
-
-            if (field.linkText) {
-              linkText = field.linkText;
-            } else if (val) {
-              linkText = val;
-            }
-
-            // Setting link prefix
-            let prefix = "";
-
-            if (field.linkHrefPrefix) {
-              prefix = field.linkHrefPrefix;
-            }
-
-            return `<td><a href="${prefix}${href}">${linkText}</a></td>`;
+          if (field.type === "pre") {
+            return `<td><pre>${val}</pre></td>`;
           }
 
-          if (field.type == "multiple") {
-            if (field.multipleFields && field.multipleFields.length > 0) {
-              const self = this;
-              const multipleFieldDisplay = field.multipleFields
-                .map((item) => {
-                  const value = this._getValue(item.field, res, "");
-                  return value ? `<div>${item.label}: ${value}</div>` : "";
-                })
-                .join(""); // Join without separators for a stacked display
+          if (field.type === "link") {
+            let href = field.linkHref
+              ? this._getValue(field.linkHref, res, val)
+              : val;
+            let linkText = field.linkText || val;
+            let prefix = field.linkHrefPrefix || "";
+            return `<td><a href="${prefix}/${href}">${linkText}</a></td>`;
+          }
 
-              return `<td>${multipleFieldDisplay}</td>`;
-            }
+          if (field.type === "multiple" && field.multipleFields) {
+            const multipleFieldDisplay = field.multipleFields
+              .map((item) => {
+                const value = this._getValue(item.field, res, "");
+                return value ? `<div>${item.label}: ${value}</div>` : "";
+              })
+              .join("");
+            return `<td>${multipleFieldDisplay}</td>`;
           }
         }
 
-        return `<td>${field.pre || ""}${val}${field.post || ""}</td>`;
+        return `<td>${val}</td>`;
       })
       .join("");
 
-    // Add continuous serial number as the first cell in the row if showIndex is enabled
+    const isChecked = this.defaultSelected.includes(res.uuid) ? "checked" : "";
+    if (isChecked) {
+      this.selectedRows.add(res.uuid);
+    }
+
+    const checkboxCell = this.showCheckbox
+      ? `<td><input type="checkbox" class="select-row" data-uuid="${
+          res.uuid
+        }" data-display="${res[this.displayField]}" ${isChecked}></td>`
+      : "";
+
     return this.showIndex
-      ? `<tr class="${rowClasses}"><td>${continuousIndex}</td>${row}</tr>`
-      : `<tr class="${rowClasses}">${row}</tr>`;
+      ? `<tr class="${rowClasses}">${checkboxCell}<td>${continuousIndex}</td>${row}</tr>`
+      : `<tr class="${rowClasses}">${checkboxCell}${row}</tr>`;
+  }
+
+  _renderSideNav() {
+    const selectedItems = Array.from(this.selectedRows)
+      .slice(0, this.checkboxLimit)
+      .map((uuid) => {
+        const displayName = this._getDisplayName(uuid) || uuid;
+        return `<div><input type="checkbox" class="side-nav-item" data-uuid="${uuid}" checked> ${displayName}</div>`;
+      })
+      .join("");
+
+    const selectedList = document.getElementById("selected-items-list");
+    const sideNavDoc = document.getElementById("side-nav");
+    if (selectedList) {
+      selectedList.innerHTML = selectedItems;
+    }
+
+    if (sideNavDoc) {
+      if (this.selectedRows.size > 0) {
+        sideNavDoc.style.display = "inline";
+      } else {
+        sideNavDoc.style.display = "none";
+      }
+
+      // Update the URL
+      this._updateURL();
+
+      // Attach event handlers for side nav items
+      this._attachSideNavHandlers();
+    }
+  }
+
+  _attachRowSelectionHandlers() {
+    const context = this.component.context;
+    const renderer = this;
+
+    context.find(".select-row").on("change", function () {
+      const uuid = $(this).data("uuid");
+      const displayName = $(this).data("display");
+
+      // Check the current selection count
+      if ($(this).is(":checked")) {
+        if (renderer.selectedRows.size >= renderer.checkboxLimit) {
+          // Prevent additional selections if limit is reached
+          $(this).prop("checked", false);
+
+          // Display a message to the user
+          alert(`You can only select up to ${renderer.checkboxLimit} items.`);
+          return;
+        }
+
+        // Add the UUID to the selected set
+        renderer.selectedRows.add(uuid);
+      } else {
+        // Remove the UUID from the selected set if unchecked
+        renderer.selectedRows.delete(uuid);
+      }
+
+      // Update the side navigation and URL
+      renderer._renderSideNav();
+    });
+  }
+
+  _attachSideNavHandlers() {
+    const renderer = this;
+
+    // Attach event handlers to the side navigation items
+    const sideNavItems = document.querySelectorAll(".side-nav-item");
+
+    sideNavItems.forEach((item) => {
+      item.addEventListener("change", function () {
+        const uuid = this.getAttribute("data-uuid");
+
+        if (!this.checked) {
+          // Remove the UUID from the selected set
+          renderer.selectedRows.delete(uuid);
+
+          // Uncheck the corresponding checkbox in the table
+          const tableCheckbox = renderer.component.context.find(
+            `.select-row[data-uuid='${uuid}']`
+          );
+          if (tableCheckbox.length) {
+            tableCheckbox.prop("checked", false);
+          }
+
+          // Update the URL to reflect the change
+          renderer._updateURL();
+
+          renderer._renderSideNav();
+        }
+      });
+    });
   }
 
   _getValue(path, rec, def) {
@@ -636,16 +879,38 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
     return val;
   }
 
-  _formatDate(timestamp) {
-    // Create a new Date object using the timestamp
-    const date = new Date(timestamp);
+  _getDisplayName(uuid) {
+    const results = this.component.results || [];
+    const result = results.find((res) => res.uuid === uuid);
+    return result ? result[this.displayField] : null;
+  }
 
-    // Check if the date is invalid
-    if (isNaN(date.getTime())) {
-      return ""; // Return empty string if date is invalid
+  _updateURL() {
+    const uuids = Array.from(this.selectedRows).join(",");
+    const url = new URL(window.location);
+    if (uuids) {
+      url.searchParams.set("uuids", uuids);
+    } else {
+      url.searchParams.delete("uuids");
     }
 
-    // Define an array of month names
+    window.history.replaceState({}, "", url);
+  }
+
+  _restoreSelectionFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const uuids = urlParams.get("uuids");
+    if (uuids) {
+      this.defaultSelected = uuids.split(",");
+    }
+  }
+
+  _formatDate(timestamp) {
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) {
+      return "";
+    }
+
     const months = [
       "January",
       "February",
@@ -661,12 +926,10 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       "December",
     ];
 
-    // Extract day, month, and year
     const day = date.getDate().toString().padStart(2, "0");
     const month = months[date.getMonth()];
     const year = date.getFullYear();
 
-    // Format date as dd month yyyy
     return `${day} ${month} ${year}`;
   }
 };
@@ -690,28 +953,76 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
       }
     }
     this.filters = [];
+    let keys = []; // to keep the url in sync
 
-    // extract all the filter values that pertain to this selector
+    // Object containing the field mappings (example)
+    const fieldMapping = {
+      aut: "person-author",
+      rec: "person-recipient",
+      let_con: "Contents",
+      locations: "Locations",
+      // Add more mappings as needed
+    };
+
+    // Extract all the filter values that pertain to this selector
     let filters = this.edge.currentQuery.listMust(
       new es.TermFilter({ field: this.field })
     );
 
+    // Iterate through the existing filters
     for (let i = 0; i < filters.length; i++) {
       let val = filters[i].value;
       let translate_val = this._translate(val);
       let displayValue = val !== translate_val ? translate_val : val;
 
-      this.filters.push({
-        display: displayValue,
-        term: val,
-        field: filters[i].field,
-      });
+      if (!keys.includes(filters[i].field)) {
+        keys.push(filters[i].field);
+
+        this.filters.push({
+          display: displayValue,
+          term: val,
+          field: filters[i].field,
+        });
+      }
+    }
+
+    // Check if there are query parameters in the URL
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Loop through all URL query parameters
+    for (const [key, value] of urlParams.entries()) {
+      const notToBeAdded = [
+        "start",
+        "sort",
+        "browsing",
+        "uuids",
+        "letter",
+        "rec",
+      ];
+
+      if (fieldMapping.hasOwnProperty(key) && !keys.includes(key)) {
+        keys.push(key);
+
+        this.filters.push({
+          display: value,
+          term: value,
+          field: fieldMapping[key],
+        });
+      } else if (!keys.includes(key) && !notToBeAdded.includes(key)) {
+        keys.push(key);
+
+        this.filters.push({
+          display: value,
+          term: value,
+          field: key,
+        });
+      }
     }
   }
 
   removeFilter(field, term) {
     let nq = this.edge.cloneQuery();
-
+    // Remove the filter from the "must" clause
     nq.removeMust(
       new es.TermFilter({
         field: field,
@@ -719,7 +1030,17 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
       })
     );
 
-    // reset the search page to the start and then trigger the next query
+    // Remove matching query strings
+    nq.removeQueryStrings(
+      new es.TermFilter({
+        field: field,
+        value: term,
+      })
+    );
+
+    _removeUrlParam(field);
+
+    // Reset the search page to the start and trigger the next query
     nq.from = 0;
     this.edge.pushQuery(nq);
     this.edge.cycle();
@@ -759,6 +1080,12 @@ emlo.FacetRenderer = class extends edges.Renderer {
     let ts = this.component;
 
     if (!ts.active && this.hideInactive) {
+      ts.context.html("");
+      return;
+    }
+
+    // If there are no values for the facet, hide the entire facet
+    if (!ts.values || ts.values.length === 0) {
       ts.context.html("");
       return;
     }
@@ -843,13 +1170,20 @@ emlo.FacetRenderer = class extends edges.Renderer {
       `;
     }
 
-    const filterTerms = ts.filters.map((filter) => filter.term.toString());
+    const filterTerms = ts.filters.map((filter) =>
+      filter.term ? filter.term.toString() : ""
+    );
+
+    const filterFields = ts.filters.map((filter) =>
+      filter.field ? filter.field.toString() : ""
+    );
 
     if (ts.values && ts.values.length > 0) {
       results = "";
 
       ts.values.forEach((val, idx) => {
-        if (!filterTerms.includes(val.term.toString())) {
+        // Skip facets where count is zero
+        if (!filterTerms.includes(val.term.toString()) && val.count > 0) {
           let count = val.count;
           if (this.countFormat) {
             count = this.countFormat(count);
@@ -869,9 +1203,15 @@ emlo.FacetRenderer = class extends edges.Renderer {
                 ${count}
               </td>
             </tr>
-            `;
+          `;
         }
       });
+    }
+
+    // If no results were found, hide the facet altogether
+    if (results === "Loading..." || results === "" || ts.values.length === 0) {
+      ts.context.html(""); // Remove the entire facet from the DOM
+      return; // Stop execution as no content is needed
     }
 
     // Add "Show more" button if there are more than 10 entries
@@ -937,7 +1277,11 @@ emlo.FacetRenderer = class extends edges.Renderer {
 
     let isHideCount = false;
 
-    if (filterTerms.length >= this.hideCount && this.hideCount > 0) {
+    const filterFieldsCount = filterFields.reduce((acc, item) => {
+      return item === this.component.field ? acc + 1 : acc;
+    }, 0);
+
+    if (filterFieldsCount >= this.hideCount && this.hideCount > 0) {
       isHideCount = true;
     }
 
@@ -1075,6 +1419,7 @@ emlo.FacetRenderer = class extends edges.Renderer {
 
   termSelected(element) {
     var term = this.component.jq(element).attr("data-key");
+    _addUrlParam(this.component.field, term);
     this.component.selectTerm(term);
   }
 
@@ -1148,7 +1493,9 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
 
     // Clear the context if no filters are active
     if (ts.filters.length === 0) {
-      ts.context.html("<tr><td>None</td></tr>");
+      ts.context.html(
+        "<table class='facet'><tbody><tr><td>None</td></tr></tbody></table>"
+      );
       return;
     }
 
@@ -1185,13 +1532,15 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
       filterFrag += `
         <tr class="${resultClass}">
           <td>
-          ${typeof filt.term}
+          ${this._getSelectedFieldLabel(filt.field)}
           </td>
-          <td>
+          <td style="min-width: 100px;">
             <a href="#" class="${filterRemoveClass} selected-facets" data-key="${edges.util.escapeHtml(
         filt.term
       )}" data-field="${edges.util.escapeHtml(filt.field)}" >
-                   ${edges.util.escapeHtml(filt.display)}
+                   ${edges.util.escapeHtml(
+                     this._getDisplayValue(filt.field, filt.display)
+                   )}
                   <img class="facet" src="../../static/img/minus-facet.png" style="height:15px;" />
                 </a>
           </td>
@@ -1231,6 +1580,2657 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
     this.component.removeFilter(field, term);
     this.draw(); // Redraw the component to reflect the changes
   }
+
+  // PATCH: currently we do not have anything in edges that can help us with this.
+  _getDisplayValue(field, value) {
+    if (field === "uuid_related") {
+      // Return a placeholder value immediately
+      const placeholder = "Loading...";
+
+      // Fetch names asynchronously
+      this._fetchNames(value).then((names) => {
+        if (names) {
+          // Find all matching elements dynamically and update their content
+          document
+            .querySelectorAll(
+              `[data-field="${edges.util.escapeHtml(
+                field
+              )}"][data-key="${edges.util.escapeHtml(value)}"]`
+            )
+            .forEach((el) => {
+              el.innerHTML = `
+                ${edges.util.escapeHtml(names)}
+                <img class="facet" src="../../static/img/minus-facet.png" style="height:15px;" />
+              `;
+            });
+        }
+      });
+
+      return placeholder;
+    } else {
+      return value;
+    }
+  }
+
+  async _fetchNames(value) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const browsing = urlParams.get("browsing");
+    let fl = "browse";
+
+    const collectionName =
+      browsing && browsing != "organisations" ? `${browsing}` : `people`;
+
+    if (!collectionName) {
+      console.error("Collection name not found in the URL.");
+      return "";
+    }
+
+    const response = await fetch(
+      `/solr/${collectionName}/select?q=uuid:${value}&fl=${fl}&wt=json`
+    );
+    const data = await response.json();
+
+    // Extract and process `browse` values
+    const browseNames = data.response.docs.map((doc) => doc[fl]);
+
+    const browseNamesString = browseNames.join(", ");
+
+    return browseNamesString;
+  }
+
+  _getSelectedFieldLabel(field) {
+    switch (field) {
+      case "author_sort":
+        return "Author";
+      case "recipient_sort":
+        return "Recipient";
+      case "origin_sort":
+        return "Origin of letter";
+      case "destination_sort":
+        return "Destination of letter";
+      case "cito_Catalog":
+        return "Catalogue";
+      case "ox_started-ox_year":
+        return "Year";
+      case "uuid_related":
+        return "Any from list";
+      default:
+        return field;
+    }
+  }
 };
+
+emlo.MultiFields = class extends edges.Component {
+  constructor(params) {
+    super(params);
+    this.results = [];
+    this.hitCount = 0;
+    this.primaryField = edges.util.getParam(params, "primaryField", "");
+    this.fetchSecondaryData = edges.util.getParam(
+      params,
+      "fetchSecondaryData",
+      false
+    ); // Enable/disable secondary data fetch
+
+    this.loading = true; // Track loading state
+    this.errorMessage = ""; // Track error message
+  }
+
+  async synchronise() {
+    this.results = [];
+    this.hitCount = 0;
+    this.loading = true; // Start loading
+    this.errorMessage = ""; // Reset any previous error messages
+
+    const source = this.edge.result;
+
+    if (!source) {
+      this.loading = false; // Stop loading if no source
+      return;
+    }
+
+    const results = source.results();
+
+    try {
+      await this._appendResults({ results: results });
+      this.hitCount = source.total();
+    } catch (error) {
+      this.errorMessage = "Error fetching data.";
+    } finally {
+      this.loading = false; // Stop loading
+    }
+
+    this.renderer.draw();
+
+    this.hitCount = source.total();
+  }
+
+  async _appendResults(params) {
+    const results = params.results;
+
+    if (this.fetchSecondaryData) {
+      for (const result of results) {
+        const fieldData = result[this.primaryField];
+        if (fieldData && Array.isArray(fieldData)) {
+          // Fetching secondary data for each fieldData URL
+          const secondaryResults = await Promise.all(
+            fieldData.map((url) => {
+              const collection = url.split("/")[3];
+              let collectionName = "";
+
+              if (collection == "person") {
+                collectionName = "people";
+              } else {
+                collectionName = collection;
+              }
+
+              const id = url.split("/")[4];
+
+              return this._fetchAndExtractSecondaryData(collectionName, id); // Await the result
+            })
+          );
+
+          result[this.primaryField] = secondaryResults; // Replace with fetched data
+        }
+      }
+    }
+
+    this.results = this.results.concat(results);
+  }
+
+  async _fetchAndExtractSecondaryData(collectionName, ID) {
+    try {
+      let url = "";
+
+      if (collectionName == "people") {
+        url = `/solr/${collectionName}/select?q=uuid:${ID}&wt=json`;
+      } else {
+        url = `/solr/${collectionName}s/select?q=uuid:${ID}&wt=json`;
+      }
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        console.error(
+          `Error fetching data from ${url}: ${response.statusText}`
+        );
+        return null;
+      }
+      const data = await response.json();
+
+      // Extract and return the relevant field from secondary data
+      return data.response.docs[0] || null;
+    } catch (error) {
+      console.error(`Error fetching data from ${url}: ${error}`);
+      return null;
+    }
+  }
+};
+
+emlo.MultiFieldsRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+
+    // Rendering configuration
+    this.type = edges.util.getParam(params, "type", ""); // Render type: list, table, bar, label
+    this.field = edges.util.getParam(params, "field", ""); // Field value to display
+    this.sectionTitle = edges.util.getParam(params, "sectionTitle", ""); // Title for the section
+    this.sectionTitleStyle = edges.util.getParam(
+      params,
+      "sectionTitleStyle",
+      "h3"
+    ); // Title style: h1, h2, etc.
+    this.sectionTitleImage = edges.util.getParam(
+      params,
+      "sectionTitleImage",
+      null
+    ); // Optional image for title
+    this.noResultsText = edges.util.getParam(
+      params,
+      "noResultsText",
+      "No results to display"
+    );
+    this.contentTitle = edges.util.getParam(params, "contentTitle", "");
+    this.contentTitleImage = edges.util.getParam(
+      params,
+      "contentTitleImage",
+      null
+    );
+    this.fields = edges.util.getParam(params, "fields", []);
+    this.primaryField = edges.util.getParam(params, "primaryField", "");
+    this.lat_field = edges.util.getParam(params, "lat_field", "");
+    this.long_field = edges.util.getParam(params, "long_field", "");
+    this.divider = edges.util.getParam(params, "divider", false); // Whether to include a divider
+    this.message = edges.util.getParam(params, "message", "");
+    this.namespace = "edges-custom-display";
+  }
+
+  draw() {
+    let frag = "";
+
+    if (this.component.loading) {
+      frag = "<div class='loading-message'>Loading...</div>"; // Show loading message
+    } else if (this.component.errorMessage) {
+      frag = `<div class='error-message'>${this.component.errorMessage}</div>`; // Show error message
+    } else if (this.component.results && this.component.results.length > 0) {
+      switch (this.type) {
+        case "heading":
+          frag = this._pageHeading();
+          break;
+        case "side-title":
+          frag = this._sideTitle();
+          break;
+        case "links":
+          frag = this._renderLinks();
+          break;
+        case "nested":
+          frag = this._renderNestedTable();
+          break;
+        case "nested-label":
+          frag = this._renderNestedLabel();
+          break;
+        case "nested-list":
+          frag = this._renderNestedList();
+          break;
+        case "table":
+          frag = this._renderTable();
+          break;
+        case "bar":
+          frag = this._renderBarGraph();
+          break;
+        case "label":
+          frag = this._renderLabelValue();
+          break;
+        case "content":
+          frag = this._renderContent();
+          break;
+        case "dates":
+          frag = this._renderDates();
+          break;
+        case "stats":
+          frag = this._renderStats();
+          break;
+        case "text":
+          frag = this._renderText();
+          break;
+        case "plain-text":
+          frag = this._renderPlainText();
+          break;
+        case "location":
+          frag = this._renderLocation();
+          break;
+        case "side-nested-links":
+          frag = this._sidebarNestedLinks();
+          break;
+        case "images":
+          frag = this._renderImages();
+          break;
+        case "img":
+          frag = this._renderImage();
+          break;
+        case "dummy-message":
+          frag = this._renderDummyText();
+          break;
+        default:
+          frag = "<div></div>";
+      }
+    }
+
+    const sectionTitleFrag = this._renderSectionTitle();
+    const dividerFrag = this.divider ? ' <hr class="yellow-divider" />' : "";
+
+    const containerClasses = edges.util.styleClasses(
+      this.namespace,
+      "container",
+      this.component.id
+    );
+
+    let container = "";
+
+    if (frag) {
+      container = `<div class="${containerClasses}">
+        ${dividerFrag}  
+        ${sectionTitleFrag}
+        ${frag}
+      </div>`;
+    }
+
+    this.component.context.html(container);
+  }
+
+  _renderSectionTitle() {
+    if (this.component.results && this.component.results.length > 0) {
+      const imageTag = this.sectionTitleImage
+        ? `<img style="float:left;height:25px;width:25px;margin-right:15px;" src="${edges.util.escapeHtml(
+            this.sectionTitleImage
+          )}" alt="${edges.util.escapeHtml(
+            this.sectionTitle
+          )}" class="title-image">`
+        : "";
+
+      return `<${this.sectionTitleStyle} class="section-title">
+      ${imageTag} ${edges.util.escapeHtml(this.sectionTitle)}
+    </${this.sectionTitleStyle}>`;
+    } else {
+      return "";
+    }
+  }
+
+  _pageHeading() {
+    return `
+      <h2 class="main">
+        <span id="result-header" class="font-18">
+          ${edges.util.escapeHtml(this.component.results[0][this.field] || "")}
+        </span>
+      </h2>`;
+  }
+
+  _sideTitle() {
+    const imageTag = this.contentTitleImage
+      ? `<img src="${edges.util.escapeHtml(
+          this.contentTitleImage
+        )}" alt="${edges.util.escapeHtml(
+          this.contentTitle
+        )}" class="profile-icon">`
+      : "";
+
+    return `
+    <h4 class="main">
+      ${imageTag}
+      ${edges.util.escapeHtml(this.contentTitle)}
+    </h4>
+    <hr class="yellow-divider" />`;
+  }
+
+  _renderBarGraph() {
+    // Render a basic bar graph
+    return `<div class="bar-graph-container">
+      ${this.component.results
+        .map((result) => {
+          const value = result[this.field];
+          return `<div class="bar">
+          <span>${edges.util.escapeHtml(value || 0)}</span>
+        </div>`;
+        })
+        .join("")}
+    </div>`;
+  }
+
+  _renderLabelValue() {
+    // Render label-value pairs
+    return this.fields
+      ? this.fields
+          .map((field) => {
+            let value = "";
+
+            let additionalInfo = "";
+
+            if (field.additonalInfo && field.additonalInfo.length > 0) {
+              // Handle additionalInfo array
+              additionalInfo = field.additonalInfo
+                .map((info) => {
+                  let displayValue = "";
+                  if (info.mainKey in this.component.results[0]) {
+                    const mainValue = this.component.results[0][info.mainKey];
+                    if (typeof mainValue === "boolean") {
+                      displayValue = mainValue ? info.text : "";
+                    } else if (mainValue) {
+                      displayValue = `Marked as:   ${mainValue}`;
+                    }
+                  }
+
+                  if (
+                    !displayValue &&
+                    info.secondaryKey in this.component.results[0]
+                  ) {
+                    const secondaryValue =
+                      this.component.results[0][info.secondaryKey];
+                    if (typeof secondaryValue === "boolean") {
+                      displayValue = secondaryValue ? info.text : "";
+                    } else if (secondaryValue) {
+                      displayValue = `Marked as:   ${secondaryValue}`;
+                    }
+                  }
+
+                  return edges.util.escapeHtml(displayValue || "");
+                })
+                .join("<br/>");
+            }
+
+            if (field.type == "date") {
+              const rawDate = new Date(this.component.results[0][field.key]);
+              const formattedDate = rawDate.toLocaleDateString("en-US", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              });
+
+              value = formattedDate;
+            } else {
+              value = this.component.results[0][field.key];
+            }
+
+            return additionalInfo || value
+              ? `<div class="content">
+                 ${
+                   value
+                     ? `<span>${edges.util.escapeHtml(
+                         field.title
+                       )} </span><span>${edges.util.escapeHtml(value)}</span>`
+                     : ""
+                 }
+                 ${additionalInfo ? `<span>${additionalInfo}</span>` : ""}
+               </div>`
+              : "";
+          })
+          .join("")
+      : "";
+  }
+
+  _renderContent() {
+    // Render custom content
+
+    if (this.field) {
+      return this.component.results[0][this.field]
+        ? ` 
+    <div class="custom-content">
+      ${edges.util.escapeHtml(this.component.results[0][this.field])}
+    </div>
+    `
+        : "";
+    }
+
+    if (this.fields.length > 0) {
+      return `<div class="content">
+      ${this.fields
+        .map(
+          (field) =>
+            `
+               <strong> ${field.title} </strong>
+               <dd> ${edges.util.escapeHtml(
+                 this.component.results[0][field.key] || ""
+               )} </dd>
+              <br/>
+            `
+        )
+        .join("")}</div>
+      `;
+    }
+  }
+
+  // _renderLocation() {
+  //   // Render a location
+  //   return `<div class="location">
+  //     <span>${edges.util.escapeHtml(
+  //       this.component.results[0][this.field] || ""
+  //     )}</span>
+  //   </div>`;
+  // }
+
+  _renderLocation() {
+    // Extract the latitude and longitude from your component's results
+    const lat = this.component.results[0][this.lat_field];
+    const lon = this.component.results[0][this.long_field];
+
+    // Generate a unique ID for the map container (to avoid clashes if multiple maps are rendered)
+    const mapContainerId = `map-${Math.random().toString(36).substr(2, 9)}`;
+
+    // Render the location and include a map container
+    return `<div class="location">
+        <span>  
+            <div>
+              <dl> 
+                <strong> Latitude </strong>
+              </dl>
+              <dd>
+                ${lat}
+              </dd>
+            </div>
+            <div>
+              <dl> 
+                <strong> Longitude </strong>
+              </dl>
+              <dd>
+                ${lon}
+              </dd>
+            </div>
+        </span>
+        <div id="location-map" data-lat="${lat}" data-long="${lon}" style="height: 300px; width: 100%; margin-top: 10px;"></div>
+    </div>
+    `;
+  }
+
+  _renderDates() {
+    return `<div class="content">
+      ${this.fields
+        .map(
+          (field) =>
+            `
+               <strong> ${field.title} </strong>
+               <dd> ${edges.util.escapeHtml(
+                 this.component.results[0][field.key] || ""
+               )} </dd>
+            `
+        )
+        .join("")}</div>
+      `;
+  }
+
+  _renderStats() {
+    // Collect stats and graph fields separately
+    const statsHtml = this.fields
+      .filter((field) => field.name !== "graph") // Exclude graph fields
+      .map((field) => {
+        const value = this.component.results[0][field.key] || 0;
+        const escapedValue = edges.util.escapeHtml(value);
+        const isClickable = value > 0;
+
+        return `
+            <span class="stat-item">
+              ${
+                isClickable
+                  ? `<a href='${
+                      field.redirectUrl
+                        ? `${field.redirectUrl}${
+                            this.component.results[0][field.redirectQueryName]
+                          }`
+                        : ""
+                    }' id="stats" data-key='${field.key}'>${escapedValue}  ${
+                      field.title
+                    } </a>`
+                  : `${escapedValue} ${field.title}`
+              }
+            </span>
+          `;
+      })
+      .join(" ♦ ");
+
+    // Handle graph fields separately
+    const graphHtml = this.fields
+      .filter((field) => field.name === "graph")
+      .map((field) => {
+        this._renderBarGraph(field.key); // Call the graph rendering function
+        return ""; // Exclude graphs from stats string
+      })
+      .join("");
+
+    return `
+        <div class="content">
+          ${statsHtml}
+        </div>
+        ${graphHtml ? `<div class="graph-section">${graphHtml}</div>` : ""}
+      `;
+  }
+
+  // _renderNestedTable() {
+  //   const parentField = this.primaryField;
+  //   const field = this.field;
+  //   const subFields = this.fields;
+
+  //   // Validate required fields
+  //   if (!parentField || (!field && !(subFields && subFields.length > 0))) {
+  //     return "";
+  //   }
+
+  //   // Iterate through results and build rows
+  //   const rows = this.component.results
+  //     .map((result) => {
+  //       const parentObjects = result[parentField]; // Get all objects in the primary field array
+  //       if (!parentObjects || parentObjects.length === 0) return ""; // Skip if no data in primary field
+
+  //       // Iterate over each object in the parent field array
+  //       return parentObjects
+  //         .map((parentObject) => {
+  //           if (!parentObject) return ""; // Skip if the object is invalid
+
+  //           // Generate row content
+  //           const cells = [];
+  //           if (field) {
+  //             // Handle single field
+  //             const value = parentObject[field];
+  //             cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
+  //           }
+
+  //           if (subFields) {
+  //             // Handle multiple fields
+  //             subFields.forEach((subField) => {
+  //               const value = parentObject[subField.key]; // Access value directly using the key
+
+  //               if (subField.clickable) {
+  //                 // Create clickable cell
+  //                 cells.push(`
+  //                   <td>
+  //                     <a href="/profile/${subField.collectionName}/${
+  //                   parentObject["uuid"]
+  //                 }" class="clickable-row">${edges.util.escapeHtml(
+  //                   value || ""
+  //                 )}</a>
+  //                   </td>
+  //                 `);
+  //               } else {
+  //                 // Create non-clickable cell
+  //                 cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
+  //               }
+  //             });
+  //           }
+
+  //           // Return the row
+  //           return `<tr>${cells.join("")}</tr>`;
+  //         })
+  //         .join(""); // Combine all rows for the parent objects
+  //     })
+  //     .filter((row) => row) // Remove empty rows
+  //     .join(""); // Combine all rows into a single HTML string
+
+  //   // Wrap rows into table structure
+  //   const table = `
+  //     <table class="nested-table">
+  //       <tbody>
+  //         ${rows}
+  //       </tbody>
+  //     </table>
+  //   `;
+
+  //   return rows ? table : ""; // Return table or no results
+  // }
+
+  _renderNestedTable() {
+    const parentField = this.primaryField;
+    const field = this.field;
+    const subFields = this.fields;
+
+    // Validate required fields
+    if (!parentField || (!field && !(subFields && subFields.length > 0))) {
+      return "";
+    }
+
+    // Flatten all parentObjects for row count
+    const allParentObjects = this.component.results.flatMap(
+      (result) => result[parentField] || []
+    );
+
+    // Check if total parentObject count exceeds 30
+    if (allParentObjects.length > 30) {
+      // Summarized format for large datasets
+      let aut = "";
+      const decadeSummary = allParentObjects.reduce((acc, parentObject) => {
+        if (!parentObject) return acc;
+
+        const year = parentObject["ox_started-ox_year"];
+        aut = parentObject["author_sort"];
+
+        if (year) {
+          const decade = Math.floor(year / 10) * 10; // Calculate decade
+          if (!acc[decade]) acc[decade] = {};
+          acc[decade][year] = (acc[decade][year] || 0) + 1;
+        } else {
+          console.log("Unkown year");
+        }
+
+        return acc;
+      }, {});
+
+      // Generate summarized table rows
+      const rows = Object.entries(decadeSummary)
+        .map(([decade, years]) => {
+          const yearCounts = Object.entries(years)
+            .map(
+              ([year, count]) =>
+                `<a href="/forms/advance?aut=${aut}&dat_sin_year=${year}"> ${year}: ${count} </a>`
+            )
+            .join(" ♦ ");
+          return `
+          <tr>
+            <td>${decade}</td>
+            <td> ${yearCounts} </td>
+          </tr>`;
+        })
+        .join("");
+
+      return `
+        <table class="nested-table">
+          <thead>
+            <tr>
+              <th>
+                Decade
+              </th>
+              <th>
+                Letters per year
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      `;
+    }
+
+    // Current format for datasets with parentObject count <= 30
+    const rows = this.component.results
+      .map((result) => {
+        const parentObjects = result[parentField];
+        if (!parentObjects || parentObjects.length === 0) return "";
+
+        return parentObjects
+          .map((parentObject) => {
+            if (!parentObject) return "";
+
+            const cells = [];
+            if (field) {
+              const value = parentObject[field];
+              cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
+            }
+
+            if (subFields) {
+              subFields.forEach((subField) => {
+                const value = parentObject[subField.key];
+                if (subField.clickable) {
+                  cells.push(`
+                    <td>
+                      <a href="/profile/${subField.collectionName}/${
+                    parentObject["uuid"]
+                  }" class="clickable-row">${edges.util.escapeHtml(
+                    value || ""
+                  )}</a>
+                    </td>
+                  `);
+                } else {
+                  cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
+                }
+              });
+            }
+
+            return `<tr>${cells.join("")}</tr>`;
+          })
+          .join("");
+      })
+      .filter((row) => row)
+      .join("");
+
+    const table = `
+      <table class="nested-table">
+        <tbody>
+          ${rows}
+        </tbody>
+      </table>
+    `;
+
+    return rows ? table : "";
+  }
+
+  _renderNestedList() {
+    const parentField = this.primaryField;
+    const field = this.field;
+    const subFields = this.fields;
+
+    // Validate required fields
+    if (!parentField || (!field && !(subFields && subFields.length > 0))) {
+      return "";
+    }
+
+    // Iterate through results and build rows
+    const rows = this.component.results
+      .map((result) => {
+        const parentObjects = result[parentField]; // Get all objects in the primary field array
+        if (!parentObjects || parentObjects.length === 0) return ""; // Skip if no data in primary field
+
+        // Iterate over each object in the parent field array
+        return parentObjects
+          .map((parentObject) => {
+            if (!parentObject) return ""; // Skip if the object is invalid
+
+            // Generate row content
+            const cells = [];
+            if (field) {
+              // Handle single field
+              const value = parentObject[field];
+              cells.push(`<li>${edges.util.escapeHtml(value || "")}</li>`);
+            }
+
+            if (subFields) {
+              // Handle multiple fields
+              subFields.forEach((subField) => {
+                const value = parentObject[subField.key]; // Access value directly using the key
+
+                if (subField.clickable) {
+                  // Create clickable cell
+                  cells.push(`
+                    <li>
+                      <a href="/profile/${subField.collectionName}/${
+                    parentObject["uuid"]
+                  }" class="clickable-row">${edges.util.escapeHtml(
+                    value || ""
+                  )}</a>
+                    </li>
+                  `);
+                } else {
+                  // Create non-clickable cell
+                  cells.push(`<li>${edges.util.escapeHtml(value || "")}</li>`);
+                }
+              });
+            }
+
+            // Return the row
+            return `<tr>${cells.join("")}</tr>`;
+          })
+          .join(""); // Combine all rows for the parent objects
+      })
+      .filter((row) => row) // Remove empty rows
+      .join(""); // Combine all rows into a single HTML string
+
+    // Wrap rows into table structure
+    const list = `
+      <ul>
+        ${rows}
+      </ul>
+    `;
+
+    return rows ? list : ""; // Return table or no results
+  }
+
+  _renderNestedLabel() {
+    const parentField = this.primaryField;
+    const field = this.field;
+    const subFields = this.fields;
+
+    // Validate required fields
+    if (!parentField || (!field && !(subFields && subFields.length > 0))) {
+      return "";
+    }
+
+    // Iterate through results and build rows
+    const rows = this.component.results
+      .map((result) => {
+        const parentObjects = result[parentField]; // Get all objects in the primary field array
+
+        if (!parentObjects || parentObjects.length === 0) return ""; // Skip if no data in primary field
+
+        // Iterate over each object in the parent field array
+        return parentObjects
+          .map((parentObject) => {
+            if (!parentObject) return ""; // Skip if the object is invalid
+
+            // Generate row content
+            const cells = [];
+            if (field) {
+              // Handle single field
+              const value = parentObject[field];
+              cells.push(`<div>${edges.util.escapeHtml(value || "")}</div>`);
+            }
+
+            if (subFields) {
+              // Handle multiple fields
+              subFields.forEach((subField) => {
+                const value = parentObject[subField.key]; // Access value directly using the key
+
+                let additionalInfo = "";
+
+                if (
+                  subField.additonalInfo &&
+                  subField.additonalInfo.length > 0
+                ) {
+                  // Handle additionalInfo array
+                  additionalInfo = subField.additonalInfo
+                    .map((info) => {
+                      let displayValue = "";
+                      if (info.mainKey in result) {
+                        const mainValue = result[info.mainKey];
+                        if (typeof mainValue === "boolean") {
+                          displayValue = mainValue ? info.text : "";
+                        } else if (mainValue) {
+                          displayValue = `Marked as:   ${mainValue}`;
+                        }
+                      }
+
+                      if (!displayValue && info.secondaryKey in result) {
+                        const secondaryValue = result[info.secondaryKey];
+                        if (typeof secondaryValue === "boolean") {
+                          displayValue = secondaryValue ? info.text : "";
+                        } else if (secondaryValue) {
+                          displayValue = `Marked as:   ${secondaryValue}`;
+                        }
+                      }
+
+                      return edges.util.escapeHtml(displayValue || "");
+                    })
+                    .join("<br/>");
+                }
+
+                if (subField.clickable) {
+                  // Create clickable cell
+                  cells.push(`
+                    <div>
+                      <a href="/profile/${subField.collectionName}/${
+                    parentObject["uuid"]
+                  }" class="clickable-row">${edges.util.escapeHtml(
+                    value || ""
+                  )}</a>
+                      <br/>
+                    ${additionalInfo}
+                    </div>
+                  `);
+                } else {
+                  // Create non-clickable cell
+                  cells.push(
+                    `<div>${edges.util.escapeHtml(value || "")}</div>  <br/>
+                    ${additionalInfo}`
+                  );
+                }
+              });
+            }
+
+            // Return the row
+            return `<div>${cells.join("")}</div>`;
+          })
+          .join(""); // Combine all rows for the parent objects
+      })
+      .filter((row) => row) // Remove empty rows
+      .join(""); // Combine all rows into a single HTML string
+
+    const labelsList = `
+      <div class="content">
+        ${rows}
+      </div>
+    `;
+    return rows ? labelsList : ""; // Return table or no results
+  }
+
+  _renderTable() {
+    // Render a table with rows based on fields
+    const headers = this.fields
+      .map((field) => `<th>${edges.util.escapeHtml(field.title)}</th>`)
+      .join("");
+    const rows = this.component.results
+      .map((result) => {
+        const cells = this.fields
+          .map(
+            (field) =>
+              `<td>${edges.util.escapeHtml(result[field.key] || "")}</td>`
+          )
+          .join("");
+        return `<tr>${cells}</tr>`;
+      })
+      .join("");
+
+    return `<table class="table">
+      <thead><tr>${headers}</tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  }
+
+  _sidebarNestedLinks() {
+    const parentField = this.primaryField;
+    const field = this.field;
+    const subFields = this.fields;
+
+    // Validate required fields
+    if (!parentField || (!field && !(subFields && subFields.length > 0))) {
+      return "";
+    }
+
+    // Iterate through results and build rows
+    const rows = this.component.results
+      .map((result) => {
+        const parentObjects = result[parentField]; // Get all objects in the primary field array
+        if (!parentObjects || parentObjects.length === 0) return ""; // Skip if no data in primary field
+
+        // Iterate over each object in the parent field array
+        return parentObjects
+          .map((parentObject) => {
+            if (!parentObject) return ""; // Skip if the object is invalid
+
+            // Generate row content
+            const cells = [];
+            if (field) {
+              // Handle single field
+              const value = parentObject[field];
+              cells.push(`<div>${edges.util.escapeHtml(value || "")}</div>`);
+            }
+
+            if (subFields) {
+              // Handle multiple fields
+              subFields.forEach((subField) => {
+                const value = parentObject[subField.key]; // Access value directly using the key
+                const otherInfo = parentObject[subField.otherInfo];
+
+                const otherInfoDiv = otherInfo
+                  ? `<span>- ${edges.util.escapeHtml(otherInfo)} </span>`
+                  : "";
+                if (subField.linkKey) {
+                  if (subField.linkKey == "uuid") {
+                    const collectionName = parentObject["object_type"];
+
+                    cells.push(`
+                      <div>
+                        <a  href="/profile/${collectionName}/${
+                      parentObject["uuid"]
+                    }" class="clickable-row">${edges.util.escapeHtml(
+                      value || ""
+                    )}</a>
+                      ${otherInfoDiv}
+                      </div>
+                    `);
+                  } else {
+                    cells.push(`
+                      <div>
+                        <a target="_blank" href="${edges.util.escapeHtml(
+                          parentObject[subField.linkKey]
+                        )}" class="clickable-row">${edges.util.escapeHtml(
+                      value || ""
+                    )}</a>
+                      ${otherInfoDiv}
+                      </div>
+                    `);
+                  }
+                } else {
+                  // Create non-clickable cell
+                  cells.push(
+                    `<div>${edges.util.escapeHtml(
+                      value || ""
+                    )}</div> ${otherInfoDiv}`
+                  );
+                }
+              });
+            }
+            // Return the row
+            return `<div>${cells.join("")}</div>`;
+          })
+          .join(""); // Combine all rows for the parent objects
+      })
+      .filter((row) => row) // Remove empty rows
+      .join(""); // Combine all rows into a single HTML string
+
+    const labelsList = `
+      <div class="content">
+        ${rows}
+      </div>
+    `;
+    return rows ? labelsList : ""; // Return table or no results
+  }
+
+  _renderText() {
+    const value = this.component.results[0][this.field];
+
+    if (this.field == "cito_Catalog") {
+      return value
+        ? `
+        <em>
+          Collection details: 
+          <a href="http://emlo-portal.bodleian.ox.ac.uk/collections/?catalogue=${value}"> The Correspondence ${value} </a>
+        <em>
+      `
+        : "";
+    }
+
+    return value
+      ? `
+          <pre class="content" style="white-space: preserve-breaks;font-size:14px;">
+            ${edges.util.escapeHtml(value)}
+          </pre>
+      `
+      : "";
+  }
+
+  _renderPlainText() {
+    return this.component.results[0][this.field]
+      ? `
+          <p style="margin-left:40px">
+            ${edges.util.escapeHtml(
+              this.component.results[0][this.field] || ""
+            )}
+          </p>
+      `
+      : "";
+  }
+
+  _renderImages() {
+    const parentField = this.primaryField;
+    const field = this.field;
+
+    // Validate required fields
+    if (!parentField || (!field && !(subFields && subFields.length > 0))) {
+      return "";
+    }
+
+    // Iterate through results and build rows
+    const rows = this.component.results
+      .map((result) => {
+        const parentObjects = result[parentField]; // Get all objects in the primary field array
+        if (!parentObjects || parentObjects.length === 0) return ""; // Skip if no data in primary field
+
+        // Iterate over each object in the parent field array
+        return parentObjects
+          .map((parentObject) => {
+            if (!parentObject) return ""; // Skip if the object is invalid
+
+            // Generate row content
+            const cells = [];
+            if (field) {
+              // Handle single field
+              const value = parentObject[field];
+              if (value) {
+                const imageId = `img-${Math.random()
+                  .toString(36)
+                  .substr(2, 9)}`; // Unique ID for the image
+                cells.push(`
+                  <div class="image-wrapper">
+                    <span id="${imageId}-loading" class="loading-message">Loading...</span>
+                    <a href="/profile/image/${parentObject["uuid"]}">
+                      <img id="${imageId}" src="${edges.util.escapeHtml(
+                  value
+                )}" 
+                        onload="document.getElementById('${imageId}-loading').style.display='none';" 
+                        onerror="document.getElementById('${imageId}-loading').innerText='Failed to load';" />
+                    </a>
+                  </div>
+                `);
+              }
+            }
+
+            // Return the row
+            if (cells.length > 0) {
+              return `<div>${cells.join("")}</div>`;
+            } else {
+              return "";
+            }
+          })
+          .join(""); // Combine all rows for the parent objects
+      })
+      .filter((row) => row) // Remove empty rows
+      .join(""); // Combine all rows into a single HTML string
+
+    const images = `
+      <div class="content">
+        ${rows}
+      </div>
+    `;
+    return rows ? images : ""; // Return table or no results
+  }
+
+  _renderImage() {
+    const imageTag = this.component.results[0][this.field]
+      ? `<img src="${edges.util.escapeHtml(
+          this.component.results[0][this.field]
+        )}" alt="">
+        `
+      : "";
+
+    return imageTag ? `${imageTag}` : "";
+  }
+
+  _renderLinks() {
+    const fieldValue = this.component.results[0][this.field];
+
+    if (!fieldValue) return ""; // If no value, return empty string
+
+    // Check if the value is a string
+    if (typeof fieldValue === "string") {
+      return `
+        <div>
+          <a href="/profile/${this.component.results[0]["object_type"]}/${this.component.results[0]["uuid"]}">
+            ${this.contentTitle}
+          </a>
+        </div>`;
+    }
+
+    // If the value is an array, iterate and render links
+    if (Array.isArray(fieldValue)) {
+      return fieldValue
+        .map((value) => {
+          const parts = value.split("/");
+          if (parts.length < 4) return ""; // Ensure there are enough parts to avoid errors
+
+          return `
+            <p style="margin-left: 40px">
+              <a href="/profile/${parts[3]}/${parts[4]}">
+                ${this.contentTitle}
+              </a>
+            </p>`;
+        })
+        .join(""); // Combine all generated links into a single string
+    }
+
+    // Default return for unsupported types
+    return "";
+  }
+
+  _renderDummyText() {
+    return `${this.message}`;
+  }
+};
+emlo.Stats = class extends edges.Component {
+  constructor(params) {
+    super(params);
+    this.hitCount = 0;
+    this.solrCore = edges.util.getParam(params, "solrCore", "");
+    this.facetFields = edges.util.getParam(params, "facetFields", []);
+    this.facetField = edges.util.getParam(params, "facetField", "");
+  }
+
+  async synchronise() {
+    this.hitCount = 0;
+
+    // Fetch data from Solr and update the hit count
+    const hitCount = await this._fetchHitCount(this.solrCore);
+    if (hitCount !== null) {
+      this.hitCount = hitCount;
+    }
+
+    this.renderer.draw();
+  }
+
+  async _fetchHitCount(collectionName) {
+    // Base Solr query
+    let url = `/solr/${collectionName}/select?q=*:*&rows=0&wt=json`;
+
+    // Add facet fields to the query if they exist, in case multiple facet field support is needed
+    // if (this.facetFields.length > 0) {
+    //   const facetQuery = this.facetFields
+    //     .map((field) => ``)
+    //     .join("&");
+    //   url += `&facet=true&${facetQuery}`;
+    // }
+
+    if (this.facetField) {
+      url += `&facet=true&facet.field=${encodeURIComponent(this.facetField)}`;
+    }
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        console.error(
+          `Error fetching data from ${url}: ${response.statusText}`
+        );
+        return null;
+      }
+
+      const data = await response.json();
+
+      // Log facet counts if available
+      if (data.facet_counts && data.facet_counts.facet_fields) {
+        if (
+          this.facetField &&
+          data.facet_counts.facet_fields[this.facetField]
+        ) {
+          if (this.facetField == "cito_Catalog") {
+            return data.facet_counts.facet_fields["cito_Catalog"].length / 2;
+          } else if (this.facetField == "ox_isOrganisation") {
+            for (
+              let i = 0;
+              i < data.facet_counts.facet_fields["ox_isOrganisation"].length;
+              i += 2
+            ) {
+              if (
+                data.facet_counts.facet_fields["ox_isOrganisation"][i] ===
+                "true"
+              ) {
+                return data.facet_counts.facet_fields["ox_isOrganisation"][
+                  i + 1
+                ];
+              }
+            }
+          }
+        }
+      }
+
+      return data.response.numFound || 0; // Return hit count
+    } catch (error) {
+      console.error(`Error fetching data from ${url}: ${error}`);
+      return null;
+    }
+  }
+};
+
+emlo.StatsRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+    this.title = edges.util.getParam(params, "title", ""); // Title for the section
+    this.titleImage = edges.util.getParam(params, "titleImage", null); // Optional image for title
+    this.redirectURL = edges.util.getParam(params, "redirectURL", ""); // This URL will be provided in jinja format
+    this.namespace = "edges-stats-display";
+  }
+
+  draw() {
+    let container = "";
+
+    const imageTag = this.titleImage
+      ? `<img src="${edges.util.escapeHtml(
+          this.titleImage
+        )}" alt="${edges.util.escapeHtml(this.title)}" class="stats-image">`
+      : "";
+
+    const redirectLink = this.redirectURL
+      ? `<a href="${edges.util.escapeHtml(this.redirectURL)}"> 
+      ${edges.util.escapeHtml(this.title)}
+      </a>`
+      : `<p style="font-size: inherit;"> 
+      ${edges.util.escapeHtml(this.title)}
+      </p>`;
+
+    container = `
+        ${imageTag}
+        <br />
+        
+        <span>
+          ${edges.util.escapeHtml(this.component.hitCount)}
+        </span>
+        
+        <br />
+        
+        ${redirectLink}
+      `;
+
+    this.component.context.html(container);
+  }
+};
+
+emlo.BarGraph = class extends edges.Component {
+  constructor(params) {
+    super(params);
+    this.solrCore = "";
+    this.fieldKeys = edges.util.getParam(params, "fieldKeys", []);
+    this.xAxisField = edges.util.getParam(params, "xAxisField", "");
+    this.results = [];
+    this.graphData = {};
+    this.cache = {};
+    this.loading = false; // To track loading state
+  }
+
+  async synchronise() {
+    this.graphData = {};
+    this.loading = true;
+    this.renderer.draw();
+
+    const source = this.edge.result;
+
+    if (!source) {
+      this.loading = false;
+      return;
+    }
+
+    this.results = source.results();
+
+    if (this.results.length === 0) {
+      console.warn("No results found.");
+      this.loading = false;
+      this.renderer.draw();
+      return;
+    }
+
+    const solrCoreMap = new Map();
+    const uuidToFieldKeyMap = new Map();
+
+    // Collect UUIDs grouped by solrCore and track fieldKeys
+    for (const fieldKey of this.fieldKeys) {
+      const value = this.results[0]?.[fieldKey];
+
+      if (!value) {
+        console.warn(`No value found for fieldKey: ${fieldKey}`);
+        continue;
+      }
+
+      const valuesArray = Array.isArray(value) ? value : [value];
+
+      for (const val of valuesArray) {
+        const [solrCore, uuid] = val.split("/").slice(-2);
+
+        uuidToFieldKeyMap.set(uuid, fieldKey);
+
+        if (!solrCoreMap.has(solrCore)) {
+          solrCoreMap.set(solrCore, new Set());
+        }
+        solrCoreMap.get(solrCore).add(uuid);
+      }
+    }
+
+    // Iterate over solrCoreMap and fetch data
+    for (const [solrCore, uuids] of solrCoreMap.entries()) {
+      if (uuids.size === 0) continue; // Skip empty UUID sets
+      const uuidArray = Array.from(uuids);
+      const fieldData = await this._fetchGraphData(solrCore, uuidArray);
+
+      for (const doc of fieldData.response.docs) {
+        const fieldKey = uuidToFieldKeyMap.get(doc.uuid);
+        if (fieldKey) {
+          if (!this.graphData[fieldKey]) {
+            this.graphData[fieldKey] = [];
+          }
+          this.graphData[fieldKey].push(doc);
+        }
+      }
+    }
+
+    this.loading = false;
+    this.renderer.draw();
+  }
+
+  async _fetchGraphData(solrCore, uuidArray) {
+    if (uuidArray.length === 0) {
+      console.warn("No UUIDs provided for Solr core:", solrCore);
+      return {};
+    }
+
+    const payload = {
+      solrCore: solrCore,
+      uuids: uuidArray,
+      filter: "", // Adjust if a filter is required
+    };
+
+    try {
+      const response = await fetch("/stats", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        console.error(
+          `Error fetching data for ${solrCore}: ${response.statusText}`
+        );
+        return {};
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error(`Error in fetchSolrData API call: ${error}`);
+      return {};
+    }
+  }
+};
+emlo.BarGraphRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+    this.namespace = "edges-custom-bargraph-display";
+    this.currentView = "separate"; // Default view
+    this.maxPoints = 20; // Max number of data points
+    this.graphHeight = 150;
+    this.graphWidth = 600;
+    this.barColor = "#007bff"; // Default bar color
+    this.hoverColor = "#EFC319"; // Hover bar color
+    this.marginAbove = 10; // Margin above the max value
+    this.margin = { top: 50, right: 20, bottom: 40, left: 40 }; // Margins for the chart
+    this.graphConfig = edges.util.getParam(params, "graphConfig", {});
+  }
+
+  // You can set this graphConfig object externally
+  setGraphConfig(config) {
+    this.graphConfig = config;
+  }
+
+  draw() {
+    const container = this.component.loading
+      ? `<div class="loading-indicator">Loading, please wait...</div>`
+      : `
+      ${this._renderControls()}
+        <div id="${
+          this.namespace
+        }-container" class="custom-bar-graph-container">
+          <div id="${this.namespace}-chart" style="display:grid"></div>
+        </div>
+      `;
+
+    this.component.context.html(container);
+    this.bindGraphEvents();
+    if (!this.component.loading) {
+      this._renderGraphs();
+    }
+  }
+
+  _renderControls() {
+    const graphDataKeys = Object.keys(this.component.graphData);
+
+    const fullscreenClass = edges.util.allClasses(
+      this.namespace,
+      "fullscreen",
+      this
+    );
+
+    const splitBarClass = edges.util.allClasses(
+      this.namespace,
+      "splitBar",
+      this
+    );
+    const stackBarClass = edges.util.allClasses(
+      this.namespace,
+      "stackBar",
+      this
+    );
+    const separateClass = edges.util.allClasses(
+      this.namespace,
+      "separate",
+      this
+    );
+
+    if (graphDataKeys.length <= 1)
+      return `<button  class="${fullscreenClass} tiny">Full Screen</button>`;
+
+    return `
+      <div class="graph-controls">
+        <button class="${separateClass} tiny">Separate Charts</button>
+        <button class="${stackBarClass} tiny">Stacked Bar</button>
+        <button class="${splitBarClass} tiny">Split Bar</button>
+        <button  class="${fullscreenClass} tiny">Full Screen</button>
+      </div>
+    `;
+  }
+
+  _renderGraphs() {
+    const graphContainer = document.getElementById(`${this.namespace}-chart`);
+    graphContainer.innerHTML = ""; // Clear existing graphs
+
+    const datasets = [];
+    const labels = []; // Unified x-axis labels
+    let maxYValue = 0; // Unified y-axis max value
+
+    for (const [fieldKey, fieldData] of Object.entries(
+      this.component.graphData
+    )) {
+      const reducedData = this._reduceData(fieldData);
+      const valueCounts = this._countOccurrences(
+        reducedData,
+        this.component.xAxisField
+      );
+
+      // Get the configuration for this fieldKey, or use defaults if not found
+      const config = this.graphConfig[fieldKey] || {
+        barColor: this.barColor,
+        graphTitle: fieldKey,
+      }; // Default to fieldKey as title and default bar color
+
+      // Update x-axis labels to ensure they are uniform and sorted
+      for (const label in valueCounts) {
+        if (!labels.includes(label)) {
+          let i = 0;
+          while (i < labels.length && labels[i] < label) {
+            i++;
+          }
+          labels.splice(i, 0, label); // Insert at position i
+        }
+      }
+
+      const localMax = Math.max(...Object.values(valueCounts));
+      maxYValue = Math.max(maxYValue, localMax);
+
+      datasets.push({
+        label: fieldKey,
+        data: valueCounts,
+        config: config, // Include the config for this dataset
+      });
+
+      if (this.currentView === "separate") {
+        this._drawGraph(
+          valueCounts,
+          labels,
+          maxYValue,
+          fieldKey,
+          graphContainer,
+          config
+        );
+      }
+    }
+
+    if (this.currentView !== "separate") {
+      this._drawCombinedGraph(datasets, labels, maxYValue, graphContainer);
+    }
+  }
+
+  _drawGraph(valueCounts, labels, maxYValue, fieldKey, container, config) {
+    // Set up SVG for the D3 chart
+    const svg = d3
+      .select(container)
+      .append("svg")
+      .attr("width", this.graphWidth + this.margin.left + this.margin.right)
+      .attr("height", this.graphHeight + this.margin.top + this.margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
+
+    // Define scales
+    const x = d3
+      .scaleBand()
+      .domain(labels)
+      .range([0, this.graphWidth])
+      .padding(0.1);
+
+    const y = d3
+      .scaleLinear()
+      .domain([0, maxYValue])
+      .nice()
+      .range([this.graphHeight, 0]);
+
+    // Add X-axis
+    svg
+      .append("g")
+      .attr("transform", `translate(0,${this.graphHeight})`)
+      .call(d3.axisBottom(x));
+
+    // Add Y-axis (with no decimal values)
+    svg.append("g").call(d3.axisLeft(y).ticks(Math.ceil(maxYValue / 10))); // Adjust number of ticks based on the max value
+
+    // Draw bars
+    svg
+      .selectAll(".bar")
+      .data(labels)
+      .enter()
+      .append("rect")
+      .attr("class", "bar")
+      .attr("x", (d) => x(d))
+      .attr("y", (d) => y(valueCounts[d] || 0))
+      .attr("width", x.bandwidth())
+      .attr("height", (d) => this.graphHeight - y(valueCounts[d] || 0))
+      .attr("fill", config.barColor) // Use the custom bar color (or default)
+      .on("mouseover", (event, d) => {
+        // Hover effect
+        d3.select(event.target).attr("fill", this.hoverColor);
+        this._showTooltip(
+          event,
+          `${d}: ${valueCounts[d]} ${config.graphTitle}`
+        );
+      })
+      .on("mouseout", (event) => {
+        // Reset hover effect
+        d3.select(event.target).attr("fill", config.barColor);
+        this._hideTooltip();
+      });
+
+    // Title
+    svg
+      .append("text")
+      .attr("class", "chart-title")
+      .attr("x", -10)
+      .attr("y", -20)
+      .attr("text-anchor", "left")
+      .text(config.graphTitle); // Use the custom graph title (or default to fieldKey)
+  }
+
+  _drawCombinedGraph(datasets, labels, maxYValue, container) {
+    // Clear existing content
+    container.innerHTML = "";
+
+    // Set up SVG for the D3 chart
+    const svg = d3
+      .select(container)
+      .append("svg")
+      .attr("width", this.graphWidth + this.margin.left + this.margin.right)
+      .attr("height", this.graphHeight + this.margin.top + this.margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
+
+    // Define scales
+    const x = d3
+      .scaleBand()
+      .domain(labels)
+      .range([0, this.graphWidth])
+      .padding(0.2);
+
+    const y = d3
+      .scaleLinear()
+      .domain([0, maxYValue])
+      .nice()
+      .range([this.graphHeight, 0]);
+
+    const colorScale = d3
+      .scaleOrdinal()
+      .domain(datasets.map((d) => d.label))
+      .range(datasets.map((d) => d.config.barColor || this.barColor));
+
+    // Add X-axis
+    svg
+      .append("g")
+      .attr("transform", `translate(0,${this.graphHeight})`)
+      .call(d3.axisBottom(x));
+
+    // Add Y-axis
+    svg.append("g").call(d3.axisLeft(y));
+
+    if (this.currentView === "stacked") {
+      // Clear existing content
+      container.innerHTML = "";
+
+      // Set up SVG for the D3 chart
+      const svg = d3
+        .select(container)
+        .append("svg")
+        .attr("width", this.graphWidth + this.margin.left + this.margin.right)
+        .attr("height", this.graphHeight + this.margin.top + this.margin.bottom)
+        .append("g")
+        .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
+
+      // Define scales
+      const x = d3
+        .scaleBand()
+        .domain(labels)
+        .range([0, this.graphWidth])
+        .padding(0.1);
+
+      const y = d3
+        .scaleLinear()
+        .domain([0, maxYValue])
+        .nice()
+        .range([this.graphHeight, 0]);
+
+      const colorScale = d3
+        .scaleOrdinal()
+        .domain(datasets.map((d) => d.label))
+        .range(datasets.map((d) => d.config.barColor || this.barColor));
+
+      // Add X-axis
+      svg
+        .append("g")
+        .attr("transform", `translate(0,${this.graphHeight})`)
+        .call(d3.axisBottom(x));
+
+      // Add Y-axis
+      svg.append("g").call(d3.axisLeft(y));
+
+      // Prepare stacked data
+      const stackedData = labels.map((label) => {
+        let cumulative = 0;
+        return datasets.map((dataset) => {
+          const value = dataset.data[label] || 0;
+          const startY = cumulative;
+          cumulative += value;
+          return {
+            label: dataset.label,
+            startY,
+            endY: cumulative,
+            value,
+            barColor: dataset.config.barColor || this.barColor,
+          };
+        });
+      });
+
+      // Draw stacked bars
+      stackedData.forEach((stack, labelIndex) => {
+        stack.forEach((segment, datasetIndex) => {
+          svg
+            .append("rect")
+            .attr("x", x(labels[labelIndex]))
+            .attr("y", y(segment.endY)) // Y position of the top of the segment
+            .attr("height", y(segment.startY) - y(segment.endY)) // Height of the segment
+            .attr("width", x.bandwidth())
+            .attr("fill", segment.barColor)
+            .on("mouseover", (event) => {
+              d3.select(event.target).attr("fill", this.hoverColor);
+              this._showTooltip(event, `${segment.label}: ${segment.value}`);
+            })
+            .on("mouseout", (event) => {
+              d3.select(event.target).attr("fill", segment.barColor);
+              this._hideTooltip();
+            });
+        });
+      });
+    } else if (this.currentView === "split") {
+      // Split (grouped) bar chart
+      const subX = d3
+        .scaleBand()
+        .domain(datasets.map((d) => d.label))
+        .range([0, x.bandwidth()])
+        .padding(0.05);
+
+      datasets.forEach((dataset, datasetIndex) => {
+        svg
+          .selectAll(`.bar-group-${datasetIndex}`)
+          .data(labels)
+          .enter()
+          .append("rect")
+          .attr("class", `bar-group-${datasetIndex}`)
+          .attr("x", (d) => x(d) + subX(dataset.label))
+          .attr("y", (d) => y(dataset.data[d] || 0))
+          .attr("width", subX.bandwidth())
+          .attr("height", (d) => this.graphHeight - y(dataset.data[d] || 0))
+          .attr("fill", dataset.config.barColor || this.barColor)
+          .on("mouseover", (event, d) => {
+            d3.select(event.target).attr("fill", this.hoverColor);
+            this._showTooltip(
+              event,
+              `${dataset.label}: ${dataset.data[d] || 0}`
+            );
+          })
+          .on("mouseout", (event) => {
+            d3.select(event.target).attr(
+              "fill",
+              dataset.config.barColor || this.barColor
+            );
+            this._hideTooltip();
+          });
+      });
+    }
+  }
+
+  bindGraphEvents() {
+    const fullscreenSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "fullscreen",
+      this
+    );
+
+    var splitBarSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "splitBar",
+      this
+    );
+    var separateSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "separate",
+      this
+    );
+    var stackedBarSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "stackBar",
+      this
+    );
+    edges.on(fullscreenSelector, "click", this, "toggleFullscreen");
+    edges.on(stackedBarSelector, "click", this, "stackedView");
+    edges.on(separateSelector, "click", this, "separateView");
+    edges.on(splitBarSelector, "click", this, "splitView");
+  }
+
+  separateView() {
+    this.currentView = "separate";
+    this.draw();
+  }
+
+  stackedView() {
+    this.currentView = "stacked";
+    this.draw();
+  }
+
+  splitView() {
+    this.currentView = "split";
+    this.draw();
+  }
+
+  // toggleFullscreen(containerId) {
+  //   const container = document.getElementById(`${this.namespace}-container`);
+  //   const isExpanded = container.classList.contains("fullscreen-mode");
+
+  //   if (isExpanded) {
+  //     // Shrink back to original size
+  //     container.style.width = "";
+  //     container.style.height = "";
+  //     container.style.position = "";
+  //     container.style.zIndex = "";
+  //     container.style.backgroundColor = "";
+  //     container.style.overflow = ""; // Reset overflow
+  //     container.classList.remove("fullscreen-mode");
+
+  //     // Remove close button
+  //     const closeButton = container.querySelector(".close-button");
+  //     if (closeButton) {
+  //       closeButton.remove();
+  //     }
+  //   } else {
+  //     // Expand to full screen
+  //     container.style.width = "100%";
+  //     container.style.height = "100%"; // Full height to ensure all content is visible
+  //     container.style.position = "fixed";
+  //     container.style.top = "0";
+  //     container.style.left = "0";
+  //     container.style.zIndex = "1000";
+  //     container.style.backgroundColor = "#fff"; // Optional: Set a background color
+  //     container.style.overflow = "auto"; // Ensure scrollable if content overflows
+  //     container.classList.add("fullscreen-mode");
+
+  //     // Add a close button
+  //     const closeButton = document.createElement("button");
+  //     closeButton.innerHTML = "Close";
+  //     closeButton.className = "close-button";
+  //     closeButton.style.position = "absolute";
+  //     closeButton.style.top = "10px";
+  //     closeButton.style.right = "10px";
+  //     closeButton.style.zIndex = "1100";
+  //     closeButton.style.backgroundColor = "#ff0000";
+  //     closeButton.style.color = "#fff";
+  //     closeButton.style.border = "none";
+  //     closeButton.style.padding = "10px";
+  //     closeButton.style.cursor = "pointer";
+  //     closeButton.onclick = () => this.toggleFullscreen(containerId);
+  //     container.appendChild(closeButton);
+  //   }
+  // }
+
+  toggleFullscreen(containerId) {
+    const container = document.getElementById(`${this.namespace}-container`);
+    const isExpanded = container.classList.contains("fullscreen-mode");
+
+    if (isExpanded) {
+      // Shrink back to original size
+      container.style.width = "";
+      container.style.height = "";
+      container.style.position = "";
+      container.style.zIndex = "";
+      container.style.backgroundColor = "";
+      container.style.overflow = ""; // Reset overflow
+      container.style.display = ""; // Reset display
+      container.style.alignItems = ""; // Reset alignment
+      container.style.justifyContent = ""; // Reset alignment
+      container.classList.remove("fullscreen-mode");
+
+      // Remove close button
+      const closeButton = container.querySelector(".close-button");
+      if (closeButton) {
+        closeButton.remove();
+      }
+    } else {
+      // Expand to full screen
+      container.style.width = "100%";
+      container.style.height = "100%"; // Full height to ensure all content is visible
+      container.style.maxHeight = "100%";
+      container.style.position = "fixed";
+      container.style.top = "0";
+      container.style.left = "0";
+      container.style.zIndex = "1000";
+      container.style.backgroundColor = "#fff"; // Optional: Set a background color
+      container.style.overflow = "auto"; // Ensure scrollable if content overflows
+      container.style.display = "grid"; // Set grid layout
+      container.style.alignItems = "center"; // Center content vertically
+      container.style.justifyContent = "center"; // Center content horizontally
+      container.classList.add("fullscreen-mode");
+
+      // Add a close button
+      const closeButton = document.createElement("button");
+      closeButton.innerHTML = "Close";
+      closeButton.className = "close-button";
+      closeButton.style.position = "absolute";
+      closeButton.style.top = "0"; // Position at the very top
+      closeButton.style.right = "10px";
+      closeButton.style.zIndex = "1100";
+      closeButton.style.backgroundColor = "#ff0000";
+      closeButton.style.color = "#fff";
+      closeButton.style.border = "none";
+      closeButton.style.padding = "10px";
+      closeButton.style.cursor = "pointer";
+      closeButton.onclick = () => this.toggleFullscreen(containerId);
+      container.appendChild(closeButton);
+    }
+  }
+
+  _reduceData(data) {
+    if (data.length <= this.maxPoints) return data;
+    const step = Math.ceil(data.length / this.maxPoints);
+    return data.filter((_, index) => index % step === 0);
+  }
+
+  _countOccurrences(data, field) {
+    return data.reduce((acc, item) => {
+      const value = item[field];
+      acc[value] = (acc[value] || 0) + 1;
+      return acc;
+    }, {});
+  }
+
+  _showTooltip(event, text) {
+    const tooltip = d3
+      .select("body")
+      .append("div")
+      .attr("class", "graph-tooltip")
+      .text(text)
+      .style("left", `${event.pageX + 10}px`)
+      .style("top", `${event.pageY - 10}px`);
+  }
+
+  _hideTooltip() {
+    d3.select(".graph-tooltip").remove();
+  }
+};
+
+emlo.Pagination = class extends edges.Component {
+  constructor(params) {
+    super(params);
+
+    this.from = false;
+    this.to = false;
+    this.total = false;
+    this.page = false;
+    this.pageSize = false;
+    this.totalPages = false;
+  }
+
+  synchronise() {
+    this.from = false;
+    this.to = false;
+    this.total = false;
+    this.page = false;
+    this.pageSize = false;
+    this.totalPages = false;
+
+    if (this.edge.currentQuery) {
+      // Checking if start value is present in URL
+      const url = new URL(window.location.href);
+      const val = url.searchParams.get("start");
+      const start = parseInt(val);
+      const from = parseInt(this.edge.currentQuery.getFrom());
+
+      if (start != from) {
+        this.from = parseInt(this.edge.currentQuery.getFrom()) + 1;
+      } else {
+        this.from = start + 1;
+      }
+
+      this.pageSize = parseInt(this.edge.currentQuery.getSize());
+    }
+
+    if (this.edge.result) {
+      this.total = this.edge.result.total();
+    }
+
+    if (this.from !== false && this.total !== false) {
+      this.to = this.from + this.pageSize - 1;
+      this.page = Math.ceil((this.from - 1) / this.pageSize) + 1;
+      this.totalPages = Math.ceil(this.total / this.pageSize);
+    }
+
+    if (typeof this.from === "number") {
+      _addUrlParam("start", this.from - 1);
+    }
+  }
+
+  setFrom(from) {
+    const nq = this.edge.cloneQuery();
+    nq.from = from - 1; // 0-indexed for internal
+    if (nq.from < 0) nq.from = 0;
+    this.edge.pushQuery(nq);
+    this.edge.cycle();
+  }
+
+  setSize(size) {
+    const nq = this.edge.cloneQuery();
+    nq.size = size;
+    this.edge.pushQuery(nq);
+    this.edge.cycle();
+  }
+
+  decrementPage() {
+    const from = Math.max(this.from - 10 * this.pageSize, 1);
+    this.setFrom(from);
+  }
+
+  incrementPage() {
+    const from = Math.min(
+      this.from + 10 * this.pageSize,
+      (this.totalPages - 1) * this.pageSize + 1
+    );
+    this.setFrom(from);
+  }
+
+  goToPage(params) {
+    const page = params.page;
+    const nf = (page - 1) * this.pageSize + 1;
+    this.setFrom(nf);
+  }
+
+  goToFirst() {
+    this.setFrom(1);
+  }
+
+  goToLast() {
+    this.setFrom((this.totalPages - 1) * this.pageSize + 1);
+  }
+};
+
+emlo.PaginationRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+    this.scroll = edges.util.getParam(params, "scroll", true);
+    this.scrollSelector = edges.util.getParam(params, "scrollSelector", "body");
+    this.namespace = "edges-bs3-pager";
+
+    this.total = false;
+  }
+
+  draw() {
+    // Sync the pagination data from the component
+    this.component.synchronise();
+
+    // Render the navigation UI with page information
+    var nav = this._renderNavigation();
+    var pageInfo = `<p>Page ${this.component.page} of ${this.component.totalPages}. (The arrows will jump blocks of 10 pages.)  </p>`;
+    var container =
+      this.component.totalPages > 1
+        ? `
+          <div>${pageInfo}</div>
+          <div class="${this.namespace}-container">
+              ${nav}
+          </div>
+      `
+        : "";
+    this.component.context.html(container);
+    this.bindEvents();
+  }
+
+  _renderNavigation() {
+    var firstClass = edges.util.allClasses(this.namespace, "first", this);
+    var prevBlockClass = edges.util.allClasses(
+      this.namespace,
+      "prev-block",
+      this
+    );
+    var pageNumClass = edges.util.allClasses(this.namespace, "page-num", this);
+    var nextBlockClass = edges.util.allClasses(
+      this.namespace,
+      "next-block",
+      this
+    );
+    var lastClass = edges.util.allClasses(this.namespace, "last", this);
+    var ellipsisClass = edges.util.allClasses(this.namespace, "ellipsis", this);
+
+    // Generate first, prev, next, last buttons
+    var firstBtn = `<div class="button-wrapper ${firstClass}">First</div>`;
+    var prevBlockBtn = `<div class="button-wrapper ${prevBlockClass}"><<<</div>`;
+    var nextBlockBtn = `<div class="button-wrapper ${nextBlockClass}">>>></div>`;
+    var lastBtn = `<div class="button-wrapper ${lastClass}">Last</div>`;
+
+    // Ellipsis buttons for indicating more pages to the back or forward
+    var prevEllipsis =
+      this.component.page > 3
+        ? `<div class="button-wrapper ${ellipsisClass}">...</div>`
+        : "";
+    var nextEllipsis =
+      this.component.page < this.component.totalPages - 2
+        ? `<div class="button-wrapper ${ellipsisClass}">...</div>`
+        : "";
+
+    // Dynamically create page number buttons based on the current page and total pages
+    var pageBtns = "";
+    const pageCount = this.component.totalPages;
+    const currentPage = this.component.page;
+
+    // Ensure we always have at least 5 pages to display
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(pageCount, currentPage + 2);
+
+    // Generate page number buttons with appropriate range
+    if (startPage > 1) {
+      pageBtns += prevEllipsis; // Show ellipsis if there are pages before the current range
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      let activeClass = i === currentPage ? "active" : "";
+      pageBtns += `<div class="button-wrapper ${pageNumClass} ${activeClass}" data-page="${i}">${i}</div>`;
+    }
+
+    if (endPage < pageCount) {
+      pageBtns += nextEllipsis; // Show ellipsis if there are pages after the current range
+    }
+
+    return `${firstBtn} ${prevBlockBtn} ${pageBtns} ${nextBlockBtn} ${lastBtn}`;
+  }
+
+  bindEvents() {
+    var firstSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "first",
+      this
+    );
+    var lastSelector = edges.util.jsClassSelector(this.namespace, "last", this);
+    var prevBlockSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "prev-block",
+      this
+    );
+    var nextBlockSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "next-block",
+      this
+    );
+    var pageSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "page-num",
+      this
+    );
+
+    edges.on(firstSelector, "click", this, "goToFirst");
+    edges.on(lastSelector, "click", this, "goToLast");
+    edges.on(prevBlockSelector, "click", this, "decrementPage");
+    edges.on(nextBlockSelector, "click", this, "incrementPage");
+    edges.on(pageSelector, "click", this, "goToPage");
+  }
+
+  goToFirst() {
+    this.component.goToFirst();
+  }
+
+  goToLast() {
+    this.component.goToLast();
+  }
+
+  incrementPage() {
+    this.component.incrementPage();
+  }
+
+  decrementPage() {
+    this.component.decrementPage();
+  }
+
+  goToPage(element) {
+    var page = parseInt($(element).attr("data-page"));
+    this.component.goToPage({ page });
+  }
+};
+
+emlo.Sort = class extends edges.Component {
+  constructor(params) {
+    super(params);
+
+    // Sorting options array: {display, value, field, order}
+    this.sortOptions = edges.util.getParam(params, "sortOptions", false);
+
+    // Current sorting field and order
+    this.sortBy = false;
+    this.sortDir = "desc"; // Default to descending order
+  }
+
+  synchronise() {
+    this.sortDir = "desc"; // Default to descending
+    this.sortBy = false;
+
+    // Create a lookup map for sortOptions
+    const sortLookUpMap = new Map(
+      this.sortOptions.map((sort) => [sort.value, sort])
+    );
+
+    let selectedOption = null; // Initialize selectedOption
+    const url = new URL(window.location.href); // Get the current URL
+    const urlSortValue = url.searchParams.get("sort"); // Get 'sort' param from URL
+
+    // Check if a sort value exists in the URL
+    if (urlSortValue && sortLookUpMap.has(urlSortValue)) {
+      selectedOption = sortLookUpMap.get(urlSortValue);
+    } else if (this.edge.currentQuery) {
+      // Get sorts from the query
+      const sorts = this.edge.currentQuery.getSortBy();
+      if (sorts.length > 0) {
+        // Use the first sort value from the query
+        selectedOption = {
+          field: sorts[0].field,
+          order: sorts[0].order,
+        };
+      }
+    }
+
+    // Fallback to the first sortOption if no sort is found
+    if (!selectedOption) {
+      selectedOption = this.sortOptions[0];
+    }
+
+    if (this.edge.result) {
+      this.total = this.edge.result.total();
+    }
+
+    // Set the sort values
+    this.sortBy = selectedOption.field;
+    this.sortDir = selectedOption.order || "desc"; // Default to "desc" if order is not provided
+
+    // Apply the selected sort
+    this.setSortBy(this.sortBy);
+  }
+
+  setSortBy(field) {
+    var nq = this.edge.cloneQuery();
+    // If no field is provided, default to "score"
+    if (!field || field === "") {
+      field = "score";
+    }
+
+    // Set the sort by field and order (based on current sortDir)
+    nq.setSortBy(
+      new es.Sort({
+        field: field,
+        order: this.sortDir, // Use the stored sortDir (asc/desc)
+      })
+    );
+
+    // Reset the search page to the start and trigger the next query
+    // nq.from = 0;
+    this.edge.pushQuery(nq);
+    this.edge.cycle();
+  }
+};
+
+emlo.SortRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+    this.label = edges.util.getParam(params, "label", "Sort");
+    this.namespace = "edges-sort-renderer";
+  }
+
+  draw() {
+    // Get the component and its state
+    const comp = this.component;
+
+    if (comp.sortOptions && comp.sortOptions.length > 0 && comp.total > 0) {
+      // Build the sorting dropdown
+      const dropdownClass = edges.util.allClasses(
+        this.namespace,
+        "dropdown",
+        this
+      );
+
+      const dropdown = `
+      <label> ${this.label} </label>
+      <select class="${dropdownClass} form-control">
+          ${comp.sortOptions
+            .map(
+              (opt, index) =>
+                `<option value="${opt.value}" data-field="${
+                  opt.field
+                }" data-order="${opt.order}">
+                    ${edges.util.escapeHtml(opt.display)}
+                </option>`
+            )
+            .join("")}
+      </select>`;
+
+      // Render the dropdown into the component context
+      comp.context.html(dropdown);
+
+      // Set the selectedIndex to reflect the current sortBy and sortDir
+      this.setUISortField(comp);
+
+      // Attach the event listener for the dropdown change
+      const dropdownSelector = edges.util.jsClassSelector(
+        this.namespace,
+        "dropdown",
+        this
+      );
+      edges.on(dropdownSelector, "change", this, "changeSortBy");
+    }
+  }
+
+  // This function sets the selected index based on the current sortBy field and order
+  setUISortField(comp) {
+    // Ensure the component has sort options and the current field/order
+    if (!comp.sortOptions || comp.sortOptions.length === 0 || !comp.sortBy) {
+      return;
+    }
+
+    // Find the index of the selected sort option based on field and order
+    const selectedIndex = comp.sortOptions.findIndex(
+      (option) => option.field === comp.sortBy && option.order === comp.sortDir
+    );
+
+    // Get the dropdown element and set the selected index
+    const dropdownSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "dropdown",
+      this
+    );
+    const dropdown = comp.jq(dropdownSelector);
+    if (dropdown) {
+      dropdown[0].selectedIndex = selectedIndex;
+    }
+  }
+
+  // This function is called when the user changes the sort option
+  changeSortBy = function (element) {
+    const selectedIndex = element.selectedIndex;
+    const selectedOption = this.component.sortOptions[selectedIndex];
+
+    // Update the component's sortBy and sortDir based on the selected option
+    this.component.sortBy = selectedOption.field;
+    this.component.sortDir = selectedOption.order;
+
+    _addUrlParam("sort", selectedOption.value);
+    // Trigger the sort logic (update the query or API call)
+    this.component.synchronise(selectedOption.field);
+  };
+};
+
+emlo.Checkbox = class extends edges.Component {
+  constructor(params) {
+    super(params);
+
+    // Define groups for filters with valueMap
+    this.filterGroups = edges.util.getParam(params, "filterGroups", {});
+    this.selectedFilters = {}; // To store selected filters by group
+    this.urlParam = edges.util.getParam(params, "urlParam", "filters");
+    this.previousSelectedRange = [];
+  }
+
+  synchronise() {
+    this.selectedFilters = {}; // Reset selected filters
+
+    // Parse the URL for the parameter
+    const url = new URL(window.location.href);
+    const filterValues = url.searchParams.get(this.urlParam);
+
+    if (filterValues) {
+      const filters = filterValues.split(",");
+
+      // Assign filters to their respective groups
+      for (const filter of filters) {
+        for (const field of Object.keys(this.filterGroups)) {
+          const group = this.filterGroups[field];
+          if (group.paramvalues.includes(filter)) {
+            if (!this.selectedFilters[field]) {
+              this.selectedFilters[field] = [];
+            }
+            this.selectedFilters[field].push(filter);
+          }
+        }
+      }
+    }
+
+    // Update the query based on selected filters
+    this.applyFilters();
+  }
+
+  applyFilters() {
+    const nq = this.edge.cloneQuery();
+
+    // cleaning range if present, if not creating new
+    if (!nq.query.range) {
+      nq.query.range = {};
+    } else {
+      Object.keys(nq.query.range).forEach((key) => delete nq.query.range[key]);
+    }
+
+    const textFields = ["foaf_gender"];
+    const rangeFields = [
+      "ox_totalWorksAddressedToAgent",
+      "ox_totalWorksByAgent",
+      "ox_totalWorksMentioningAgent",
+      "ox_totalWorksSentFromPlace",
+      "ox_totalWorksSentToPlace",
+      "ox_totalWorksMentioningPlace",
+    ];
+
+    // Apply new filters from selectedFilters using must
+    for (const [field, filters] of Object.entries(this.selectedFilters)) {
+      if (textFields.includes(field)) {
+        if (filters.length > 0) {
+          const group = this.filterGroups[field];
+          const valueMap = group.valueMap;
+          const values = filters
+            .map((paramValue) => valueMap[paramValue])
+            .join(" OR ");
+
+          // Create or update the term in nq.must
+          const existingTermIndex = nq.must.findIndex(
+            (item) => item.term && item.term[field]
+          );
+          if (existingTermIndex !== -1) {
+            nq.must[existingTermIndex] = { term: { [field]: `(${values})` } };
+          } else {
+            nq.must.push({ term: { [field]: `(${values})` } });
+          }
+        } else {
+          // Remove the term if no filters are selected
+          nq.must = nq.must.filter((item) => !(item.term && item.term[field]));
+        }
+      } else if (rangeFields.includes(field)) {
+        nq.query.range[field] = {
+          gte: 1,
+          lte: "*",
+        };
+      }
+    }
+
+    // Push the updated query
+    this.edge.pushQuery(nq);
+    this.edge.cycle();
+  }
+};
+
+emlo.CheckboxRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+    this.namespace = "edges-checkbox-renderer";
+    this.label = edges.util.getParam(params, "label", "Filters");
+    this.seprator = edges.util.getParam(params, "seprator", true);
+  }
+
+  draw() {
+    const comp = this.component;
+
+    // Create checkboxes for each group and filter
+    let html = `<div class="${this.namespace}" style="display:flex;justify-content: center;">`;
+
+    for (const field of Object.keys(comp.filterGroups)) {
+      html += `<div class="filter-group" style="display:flex">
+      <br/>`;
+
+      const group = comp.filterGroups[field];
+      const selectedFilters = comp.selectedFilters[field] || [];
+
+      for (const paramValue of group.paramvalues) {
+        const isChecked = selectedFilters.includes(paramValue);
+        html += `<label style="margin:0px 10px; text-transform: capitalize;">
+                          <input type="checkbox" value="${paramValue}" data-field="${field}" ${
+          isChecked ? "checked" : ""
+        }>
+                          ${group.valueMap[paramValue]}
+                      </label>`;
+      }
+
+      html += `</div>`;
+    }
+
+    html += `</div>`;
+
+    // Render the HTML
+    comp.context.html(html);
+
+    // Attach event listeners
+    const checkboxes = comp.context.find(`input[type='checkbox']`);
+    checkboxes
+      .off("change")
+      .on("change", (event) => this.handleCheckboxChange(event));
+  }
+
+  handleCheckboxChange(event) {
+    const comp = this.component;
+    const checkbox = event.target;
+    const field = checkbox.dataset.field;
+    const value = checkbox.value;
+
+    if (!comp.selectedFilters[field]) {
+      comp.selectedFilters[field] = [];
+    }
+
+    if (checkbox.checked) {
+      // Add filter to the group
+      comp.selectedFilters[field].push(value);
+    } else {
+      // Remove filter from the group
+
+      comp.selectedFilters[field] = comp.selectedFilters[field].filter(
+        (filter) => filter !== value
+      );
+    }
+
+    // Update the URL
+    this.updateUrl();
+
+    // Apply the filters
+    comp.synchronise();
+  }
+
+  updateUrl() {
+    const comp = this.component;
+    const allFilters = [];
+
+    // Collect all selected filters
+    for (const [field, filters] of Object.entries(comp.selectedFilters)) {
+      allFilters.push(...filters);
+    }
+
+    const url = new URL(window.location.href);
+    if (allFilters.length > 0) {
+      url.searchParams.set(comp.urlParam, allFilters.join(","));
+    } else {
+      url.searchParams.delete(comp.urlParam);
+    }
+
+    // Update the browser URL without reloading
+    window.history.replaceState({}, "", url);
+  }
+};
+
+function _addUrlParam(field, term) {
+  let url_param_field = field;
+  const url = new URL(window.location.href);
+
+  const fieldMap = {
+    author_sort: "aut",
+    recipient_sort: "rec",
+  };
+
+  if (fieldMap.hasOwnProperty(field)) {
+    if (url.searchParams.has(fieldMap[field])) {
+      url_param_field = field;
+    } else {
+      url_param_field = fieldMap[field];
+    }
+  }
+
+  const currentValue = url.searchParams.get(url_param_field);
+  if (currentValue !== term) {
+    url.searchParams.set(url_param_field, term); // Update or add the parameter
+    window.history.replaceState(null, "", url); // Update the browser URL without reloading
+  }
+}
+
+function _removeUrlParam(field) {
+  let delete_field = "";
+  let secondaryField = "";
+
+  const fieldMap = {
+    "person-author": {
+      primary: "aut",
+      secondary: "author_sort",
+    },
+    "person-recipient": {
+      primary: "rec",
+      secondary: "recipient_sort",
+    },
+  };
+
+  if (field == "uuid_related") {
+    delete_field = "uuids";
+  }
+  if (fieldMap.hasOwnProperty(field)) {
+    delete_field = fieldMap[field].primary;
+    secondaryField = fieldMap[field].secondary;
+  } else {
+    delete_field = field;
+  }
+  const url = new URL(window.location.href);
+
+  if (url.searchParams.has(delete_field)) {
+    url.searchParams.delete(delete_field); // Remove the parameter
+    window.history.replaceState(null, "", url); // Update the browser URL without reloading
+
+    if (secondaryField && url.searchParams.has(secondaryField)) {
+      const currentValue = url.searchParams.get(secondaryField);
+
+      url.searchParams.delete(secondaryField);
+      url.searchParams.set(delete_field, currentValue); // Update or add the parameter
+      window.history.replaceState(null, "", url); // Update the browser URL without reloading
+    }
+  }
+}
 
 export default emlo;

@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, request
 
 forms_bp = Blueprint('forms', __name__ , url_prefix='/forms')
 
+
 @forms_bp.route('/', methods=['POST'])
 def forms():
     people = request.form.get('people')
@@ -25,6 +26,7 @@ def forms():
 
     # Redirect to the new URL with query parameters
     return redirect(url_for('forms.results', **query_params))
+
 
 @forms_bp.route('/advance')
 def results():

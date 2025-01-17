@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css?family=Arvo" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <title>Early Modern Letter Online : {{ title }}</title>
     {% block extra_stylesheets %}{% endblock %}
     <script>
@@ -18,6 +19,32 @@
             } catch(err) {
                 console.error(err)
             } 
+        }
+
+        // Controlling the search letters centrally for browse page
+        function searchLetters(browsePage) {
+            const baseURL = `${window.location.origin}/forms/advance`;
+            const urlParams = new URLSearchParams(window.location.search);
+            const uuids = urlParams.get("uuids");
+            const currentLetter = urlParams.get("letter");
+            const filters = urlParams.get("filters");
+            if (uuids) {
+                window.location.href = `${baseURL}?uuids=${uuids}&browsing=${browsePage}&filters=${filters}&letter=${currentLetter != null ? currentLetter : 'a'}`;
+            }
+        }
+        
+        // Controlling the text fill for all the forms within the EMLO app
+        function textFill(element , defaultText){
+            if(element.value == "") {
+                element.value = element.dataset.default
+            }
+        }
+
+        // Controlling the text clear for all the forms within the EMLO app
+        function textClear(element , defaultText){
+            if(element.value == element.dataset.default) {
+                element.value = ""
+            }
         }
     </script>
 </head>
@@ -74,7 +101,9 @@
     <!-- END header / menu -->
 
     <!-- START content -->
-    {% block content %}{% endblock %}
+    <div id="main-content">
+        {% block content %}{% endblock %}
+    </div>
     <!-- END content -->
 
     <!-- START footer -->

@@ -4,50 +4,6 @@
 
 {% block content %}
    <div id="emlo-results"></div>
-    {# <div class="side-nav">
-        <h2 class="main">Search</h2>
-        
-        {% if request.args %}
-            <div id="modify_search">
-                <button onclick="modifyCurrentSearch()">Modify search</button>
-            </div>
-        {% endif %}
-
-        <div id="current_search">
-            <h3 class="main">Your current search</h3>
-        </div>
-        
-        <div id="refine_search">
-            <h3 class="main">Refine your results</h3>
-            <div id="emlo-refine-search"></div>
-        </div>
-    </div>
-    <div class="row">
-       <div class="large-2 columns"><!-- dummy column -->&nbsp;</div>
-
-       <div class="large-10 columns" style="margin-left:25px">
-            <div id="about">
-                <br/>
-                <h2 class="main">
-                    <span id="result-header" class="font-18">
-                    </span>
-
-                    <br><br>
-                    
-                    <div data-alert="" class="alert-box secondary radius">
-                        EMLO is an active, collaborative project in continual development, and as such may contain errors/duplicates. 
-                        We rely on feedback from the scholarly community: if you spot an error, please 
-                        <a href="/about#contact">get in touch</a>.
-                    </div>
-
-                </h2>
-            </div>
-   
-             <div id="" class="large-12 columns" style="margin-left:25px">
-                <div id="emlo-results"></div>
-            </div>
-       </div>
-    </div> #}
 {% endblock %}
 
 
@@ -55,7 +11,6 @@
 
 {% include "_edges_common_js.jinja2" %}
 <script type="module" src="../static/js/result.edges.js"></script>
-{# <script type="module" src="../static/js/result_refine.edges.js"></script> #}
 
 <script>
 function modifyCurrentSearch() {
@@ -72,6 +27,21 @@ function modifyCurrentSearch() {
     } catch(err) {
         console.error(`got an error ${err} while redirecting the user to search+ page`)
         alert("Unable to redirect you to modify your search")
+    }
+}
+
+function returnToBrowse(){
+    const baseURL = `${window.location.origin}/browse`;
+    const urlParams = new URLSearchParams(window.location.search);
+    const uuids = urlParams.get("uuids");
+    const browsePage = urlParams.get("browsing");
+    const currentLetter = urlParams.get("letter");
+    const filters = urlParams.get("filters");
+
+    if (uuids) {
+        window.location.href = `${baseURL}/${browsePage}?uuids=${uuids}&filters=${filters}&letter=${currentLetter != null ? currentLetter : 'a'}`;
+    } else {
+        window.location.href = `${baseURL}/${browsePage}?letter=${currentLetter != null ? currentLetter : 'a'}&filters=${filters}`;
     }
 }
 </script>

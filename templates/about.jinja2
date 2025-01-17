@@ -3,8 +3,8 @@
 {% block title %}About{% endblock %}
 
 {% block content %}
-    <div>
-        <div class="fixed-nav">
+    <div class="row row-with-side">
+        <div class="side-nav">
             <a href="#context">Context</a>
             <a href="#citation">Citation Guidelines</a>
             <a href="#copyright">Copyright and Scholarly Responsibility</a>
@@ -15,11 +15,8 @@
             <a href="#contact">Contact</a>
         </div> 
 
-        <div class="row">
-
-            <div class="large-2 columns"><!-- dummy column -->&nbsp;</div>
-
-            <div class="large-10 columns" style="padding-left:25px">
+        <div class="row row-with-side">
+            <div class="large-12 columns" style="padding-left:25px">
 
                 <div id="about">
                     <br/>
@@ -61,8 +58,12 @@
                     {% include './components/about/cookies.jinja2' %}
                 </div>
 
-                <div id="contact" class="large-10" style="padding-left:25px">
+                <div id="contact" class="large-10 columns" style="padding-left:25px">
                     {% include './components/about/contact.jinja2' %}
+                </div>
+
+                <div class="large-10">
+                    &nbsp;
                 </div>
             </div>  
         </div>

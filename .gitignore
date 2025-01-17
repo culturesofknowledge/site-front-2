@@ -14,7 +14,10 @@ __pycache__/
 # generated from Gradle or Maven project
 .idea/libraries/
 
-
+# re-indexer
+indexing/src/solr_reindexing
+indexing/src/solr_csv_export
+solr_reindexing/*
 
 # nodejs
 node_modules/
@@ -31,7 +34,12 @@ data/**/*.csv
 data/**/*.csv.bak
 
 # docker
-docker/emfr/data-solr
+docker-emlo/solr-data
+docker-emlo/redis
+!docker-emlo/solr-data/.keep
+docker-emlo/csv_import_files
+!docker-emlo/csv_import_files-data/.keep
+docker-emlo/solr-conf/solr/home/**/core.properties
 
 # ENV folder
 site-front-2

@@ -1,37 +1,48 @@
 # SITE FRONT 2
 
-## Setup
+## Setup the repository
 
-1. **Clone the repository:**
+1. Clone the repository:
 
-2. **Checkout to edges-integration**
+2. Initialise the edges submodule:
 
    ```sh
-   git checkout edges-integration
+   git submodule update --init
+   ```
+3. Set up the environment variables:
+   Create a `.env` file in the root directory. Copy the .env.template file and set the values for solr and redis 
+
+
+## Run using docker 
+
+1. Build the `web`, `solr`, and `redis` containers using docker
+
+   ```
+   docker-compose build
    ```
 
-3. **Create and Activate virtual env:**
+2. Run the application
+
+   ```
+   docker-compose up -d
+   ```
+
+## Run natively
+
+1. Create and activate virtual env:
 
    ```sh
    python3 -m venv site-front-env
    source site-front-env/bin/activate
    ```
 
-4. **Install the dependencies:**
+2. Install the dependencies:
 
    ```sh
    pip install -r requirements.txt
    ```
 
-5. **Set up the environment variables:**
-   Create a `.env` file in the root directory and add the following:
-
-   ```env
-   PORT=5000 [you can choose some other port number too]
-   SOLR_URL= [you need to point this to your solr url]
-   ```
-
-6. **Run the application:**
+3. Run the application:
    ```sh
    python run.py
    ```
@@ -39,8 +50,9 @@
 ## Usage
 
 - The application will be accessible at `http://localhost:5000`.
+- Note: You need to have data in your Solr container. Look for instructions on indexing data in solr below.
 
-### How to run this project - [Temp arrangement]
+### Indexing data in Solr
 
 This project is missing it's own solr ingration hence we will he using the older project which can be accessible [here](https://github.com/culturesofknowledge/site-front).
 You need to follow the following steps

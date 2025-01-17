@@ -5,7 +5,9 @@
 
   <fieldset class="alignment">
     <label>Single Date</label>
+
     <div class="row">
+      <label>&nbsp;<!-- for alingment--></label>
       <div class="columns small-12 large-3">
         <select id="dat_sin_year" name="dat_sin_year" class="select2-hidden-accessible" tabindex="-1" aria-hidden="true"
           onchange="updateDays('dat_sin_year' , 'dat_sin_month' , 'dat_sin_day')"
@@ -34,22 +36,8 @@
         </select>
       </div>
 
-      <div class="columns small-12 large-2">
-        <span
-          data-tooltip=""
-          aria-haspopup="true"
-          class="has-tip tip-top"
-          data-selector="tooltip-lz9klwc5i"
-          aria-describedby="tooltip-lz9klwc5i"
-          title=""
-        >
-          <img
-            style="min-width: 25px; text-align: left"
-            class="help"
-            src="/static/img/icon-help.png"
-            alt="Help"
-          />
-        </span>
+      <div data-tip="Search within a single year, month, day or a combination of all three.">
+        {% include 'components/common/help_icon.jinja2' %}
       </div>
     </div>
   </fieldset>
@@ -86,22 +74,8 @@
           <option class="default" selected="selected">all dates</option>
         </select>
       </div>
-      <div class="columns small-12 large-2">
-        <span
-          data-tooltip=""
-          aria-haspopup="true"
-          class="has-tip tip-top"
-          data-selector="tooltip-lz9klwc5j"
-          aria-describedby="tooltip-lz9klwc5j"
-          title=""
-        >
-          <img
-            style="min-width: 25px; text-align: left"
-            class="help"
-            src="/static/img/icon-help.png"
-            alt="Help"
-          />
-        </span>
+      <div data-tip="Search from this year, month, day or combination of all three. ">
+         {% include 'components/common/help_icon.jinja2' %}
       </div>
     </div>
 
@@ -135,22 +109,8 @@
           <option class="default" selected="selected">all dates</option>
         </select>
       </div>
-      <div class="columns small-12 large-2">
-        <span
-          data-tooltip=""
-          aria-haspopup="true"
-          class="has-tip tip-top"
-          data-selector="tooltip-lz9klwc5k"
-          aria-describedby="tooltip-lz9klwc5k"
-          title=""
-        >
-          <img
-            style="min-width: 25px; text-align: left"
-            class="help"
-            src="/static/img/icon-help.png"
-            alt="Help"
-          />
-        </span>
+      <div data-tip="Search till this year, month, day or combination of all three. ">
+        {% include 'components/common/help_icon.jinja2' %}
       </div>
     </div>
   </fieldset>

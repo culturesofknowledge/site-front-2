@@ -26,6 +26,20 @@ function quickSearch(params) {
   if (params != null) {
     const searchQuery = params.get("everything");
 
+    if (params.get("cito_Catalog")) {
+      openingQuery.must.push({
+        field: "cito_Catalog",
+        value: `"${params.get("cito_Catalog")}"`,
+      });
+    }
+
+    if (params.get("object_type")) {
+      openingQuery.must.push({
+        field: "object_type",
+        value: `"${params.get("object_type")}"`,
+      });
+    }
+
     if (searchQuery != "") {
       openingQuery.must.push({
         term: {
@@ -210,6 +224,7 @@ function advanceSearch(params) {
       },
     ];
 
+    const customValue = ["aut", "rec", "pla_ori_name", "pla_des_name"];
     // Loop through paramConfigs to generate query strings
     paramConfigs.forEach((config) => {
       const paramValue = params.get(config.param);
@@ -288,7 +303,7 @@ function advanceSearch(params) {
         }
       }
 
-      if (paramValue) {
+      if (paramValue && !customValue.includes(config.param)) {
         openingQuery.queryStrings.push({
           queryString: paramValue,
           fields: config.queryStringFields,
@@ -436,6 +451,56 @@ function advanceSearch(params) {
       openingQuery.queryStrings.push({
         queryString: "*",
         fields: [{ field: "manifestation-printed_edition", operator: "OR" }],
+      });
+    }
+
+    if (params.get("author_sort")) {
+      openingQuery.must.push({
+        field: "author_sort",
+        value: `"${params.get("author_sort")}"`,
+      });
+    }
+
+    if (params.get("recipient_sort")) {
+      openingQuery.must.push({
+        field: "recipient_sort",
+        value: `"${params.get("recipient_sort")}"`,
+      });
+    }
+
+    if (params.get("origin_sort")) {
+      openingQuery.must.push({
+        field: "origin_sort",
+        value: `"${params.get("origin_sort")}"`,
+      });
+    }
+
+    if (params.get("destination_sort")) {
+      openingQuery.must.push({
+        field: "destination_sort",
+        value: `"${params.get("destination_sort")}"`,
+      });
+    }
+
+    if (params.get("cito_Catalog")) {
+      openingQuery.must.push({
+        field: "cito_Catalog",
+        value: `"${params.get("cito_Catalog")}"`,
+      });
+    }
+
+    if (params.get("ox_started-ox_year")) {
+      openingQuery.must.push({
+        field: "ox_started-ox_year",
+        value: `"${params.get("ox_started-ox_year")}"`,
+      });
+    }
+
+    if (params.get("uuids")) {
+      const uuids = params.get("uuids").split(",").join(" OR ");
+      openingQuery.must.push({
+        field: "uuid_related",
+        value: `(${uuids})`,
       });
     }
 

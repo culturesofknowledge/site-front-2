@@ -6,33 +6,26 @@
   <fieldset>
     <legend>All places</legend>
 
-    <label for="locations">Name</label>
-    <div class="row">
+    <div
+      data-delay="2.0"
+      data-tip="Search the places that letters were sent from or to, e.g. 'Queen's College', 'Paris', or 'Spain'. 
+      <br/><br/>Search is not case sensitive." 
+      class="row">
       <div class="small-11 columns">
+        <label for="locations">Name</label>
         <input
           id="locations"
           name="locations"
           type="text"
           class="text"
           value="{{ locations if locations else 'all places' }}" 
+          data-default="all places"
+          onfocus="textClear(this);"
+          onblur="textFill(this);"
         />
       </div>
-      <div class="small-1 columns">
-        <span
-          data-tooltip=""
-          aria-haspopup="true"
-          class="has-tip tip-top"
-          data-selector="tooltip-lz9klwc5l"
-          aria-describedby="tooltip-lz9klwc5l"
-          title=""
-        >
-          <img
-            style="min-width: 25px; text-align: left"
-            class="help"
-            src="/static/img/icon-help.png"
-            alt="Help"
-          />
-        </span>
+      <div>
+        {% include 'components/common/help_icon.jinja2' %}
       </div>
     </div>
   </fieldset>
@@ -40,37 +33,30 @@
   <fieldset>
     <legend>Origin</legend>
 
-    <label for="pla_ori_name">Name</label>
-    <div class="row">
+    <div
+      data-delay="2.0"
+      data-tip="Search the places that letters were sent from, e.g. 'Queen's College', 'Paris', or 'Spain'. 
+      <br/><br/>Search is not case sensitive." 
+      class="row">
       <div class="small-11 columns">
+        <label for="pla_ori_name">Name</label>
         <input
           id="pla_ori_name"
           name="pla_ori_name"
           type="text"
           class="text"
           value="all origins"
+          data-default="all origins"
+          onfocus="textClear(this);"
+          onblur="textFill(this);"
         />
       </div>
-      <div class="small-1 columns">
-        <span
-          data-tooltip=""
-          aria-haspopup="true"
-          class="has-tip tip-top"
-          data-selector="tooltip-lz9klwc5m"
-          aria-describedby="tooltip-lz9klwc5m"
-          title=""
-        >
-          <img
-            style="min-width: 25px; text-align: left"
-            class="help"
-            src="/static/img/icon-help.png"
-            alt="Help"
-          />
-        </span>
+       <div>
+        {% include 'components/common/help_icon.jinja2' %}
       </div>
     </div>
 
-    <div class="row">
+    <div data-delay="2.0" data-tip="Search place names exactly as they were expressed in the original letters." class="row">
       <div class="small-4 columns">
         <input
           type="checkbox"
@@ -83,22 +69,8 @@
 
         <label for="pla_ori_mark">As marked</label>
       </div>
-      <div class="small-1 columns end">
-        <span
-          data-tooltip=""
-          aria-haspopup="true"
-          class="has-tip tip-top"
-          data-selector="tooltip-lz9klwc5n"
-          aria-describedby="tooltip-lz9klwc5n"
-          title=""
-        >
-          <img
-            style="min-width: 25px; text-align: left"
-            class="help"
-            src="/static/img/icon-help.png"
-            alt="Help"
-          />
-        </span>
+      <div>
+        {% include 'components/common/help_icon.jinja2' %}
       </div>
     </div>
   </fieldset>
@@ -106,37 +78,31 @@
   <fieldset>
     <legend>Destination</legend>
 
-    <label for="pla_des_name">Name</label>
-    <div class="row">
+    
+    <div
+      data-delay="2.0" 
+      data-tip="Search the places that letters were sent to, e.g. 'Queen's College', 'Paris', or 'Spain'. 
+      <br/><br/>Search is not case sensitive."   
+      class="row">
       <div class="small-11 columns">
+        <label for="pla_des_name">Name</label>
         <input
           id="pla_des_name"
           name="pla_des_name"
           type="text"
           class="text"
           value="all destinations"
+          data-default="all destinations"
+          onfocus="textClear(this);"
+          onblur="textFill(this);"
         />
       </div>
-      <div class="small-1 columns">
-        <span
-          data-tooltip=""
-          aria-haspopup="true"
-          class="has-tip tip-top"
-          data-selector="tooltip-lz9klwc5o"
-          aria-describedby="tooltip-lz9klwc5o"
-          title=""
-        >
-          <img
-            style="min-width: 25px; text-align: left"
-            class="help"
-            src="/static/img/icon-help.png"
-            alt="Help"
-          />
-        </span>
+       <div>
+        {% include 'components/common/help_icon.jinja2' %}
       </div>
     </div>
 
-    <div class="row">
+    <div data-delay="2.0" data-tip="Search place names exactly as they were expressed in the original letters."  class="row">
       <div class="small-4 columns">
         <input
           type="checkbox"
@@ -149,22 +115,8 @@
 
         <label for="pla_des_mark">As marked</label>
       </div>
-      <div class="small-1 columns end">
-        <span
-          data-tooltip=""
-          aria-haspopup="true"
-          class="has-tip tip-top"
-          data-selector="tooltip-lz9klwc5p"
-          aria-describedby="tooltip-lz9klwc5p"
-          title=""
-        >
-          <img
-            style="min-width: 25px; text-align: left"
-            class="help"
-            src="/static/img/icon-help.png"
-            alt="Help"
-          />
-        </span>
+       <div>
+        {% include 'components/common/help_icon.jinja2' %}
       </div>
     </div>
   </fieldset>
@@ -172,33 +124,26 @@
   <fieldset>
     <legend>Places mentioned</legend>
 
-    <label for="pla_ment_name">Name</label>
-    <div class="row">
+    <div
+      data-delay="2.0" 
+      data-tip="Search for places mentioned, e.g. 'Queen's College', 'Paris', or 'Spain'. 
+      <br/><br/>Search is not case sensitive."   
+      class="row">
       <div class="small-11 columns">
+        <label for="pla_ment_name">Name</label>
         <input
           id="pla_ment_name"
           name="pla_ment_name"
           type="text"
           class="text"
           value="all places mentioned"
+          data-default="all places mentioned"
+          onfocus="textClear(this);"
+          onblur="textFill(this);"
         />
       </div>
-      <div class="small-1 columns">
-        <span
-          data-tooltip=""
-          aria-haspopup="true"
-          class="has-tip tip-top"
-          data-selector="tooltip-lz9klwc5q"
-          aria-describedby="tooltip-lz9klwc5q"
-          title=""
-        >
-          <img
-            style="min-width: 25px; text-align: left"
-            class="help"
-            src="/static/img/icon-help.png"
-            alt="Help"
-          />
-        </span>
+     <div>
+        {% include 'components/common/help_icon.jinja2' %}
       </div>
     </div>
   </fieldset>

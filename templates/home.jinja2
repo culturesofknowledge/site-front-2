@@ -17,6 +17,8 @@
                 Mellon Foundation, and now very generously funded by the Packard Humanities Institute,
                 Early Modern Letters Online — EMLO — is a combined finding aid and editorial interface
                 for basic descriptions of early modern correspondence.
+
+                <br/><br/>
             </p>
         </div>
     </div>
@@ -30,13 +32,11 @@
 
     {# START Catalogue statistics #}
     <div id="home-stats">
-        {% include './components/home/stats.jinja2' %}
     </div>
     {# End Catalogue statistics #}
 
     {# START Featured catalogues #}
-    <div id="catalogues">
-        {% include './components/home/catalouge.jinja2' %}
+    <div id="catalogues-content">
     </div>
     {# End Featured catalogues #}
 
@@ -44,25 +44,82 @@
 
 
 {% block extra_js_bottom %}
+
+{% include "_edges_common_js.jinja2" %}
+<script type="module" src="../static/js/home.edges.js"></script>
+<script type="module" src="../static/js/tooltip.js"></script>
+
 <script>
 function changeEventOnFrom(val){
-    dat_to_year = document.getElementById("dat_to_year")
+    const dat_to_year = document.getElementById("dat_to_year")
     
     if(val == "all years") {
         dat_to_year.value = "all years"
-    } else if(val > dat_to_year.value) {
+    } else if(parseInt(val) > parseInt(dat_to_year.value) || dat_to_year.value == "all years") {
         dat_to_year.value = val
     }
 }
 
 function changeEventOnTo(val){
-    dat_from_year = document.getElementById("dat_from_year")
-    
+    const dat_from_year = document.getElementById("dat_from_year")
+    console.log("val" , val , "fropm" , dat_from_year.value)
     if(val == "all years") {
         dat_from_year.value = "all years"
-    } else if(val < dat_from_year.value) {
+    } else if(parseInt(val) < parseInt(dat_from_year.value) || dat_from_year.value == "all years") {
         dat_from_year.value = val
     } 
 }
+
+async function loadCatalougeData(){
+    try {
+        const response = await fetch('/catalogues');
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+
+        // Build the HTML content dynamically
+        const contentDiv = document.getElementById('catalogues-content');
+
+        
+       let cataloguesHTML = `
+            <div id="news-output" class="panel">
+                <div class="row">
+                    <h2 style="margin-left: 15px;">Featured catalogues</h2>
+        `;
+
+        // Loop through the data and add content for each item
+        data.forEach((item , index) => {
+            let img = ""
+
+            if(item.acf && item.acf.catalogue_main_image && item.acf.catalogue_main_image.length > 0) {
+                img = item.acf.catalogue_main_image[0].catalogue_images
+            } else {
+                img = "/static/img/news/KMS3059_crop_2.jpg"
+            }   
+
+            cataloguesHTML += `
+                <div class="item large-4 medium-4 small-12 columns">
+                    <a class="link" href="${item.link}">
+                        <div class="image">
+                            <img src="${img}" alt="Catalog blog image${index+1}" />
+                        </div>
+                        <h3 class="title">${item.title}</h3>
+                    </a>
+                </div>
+            `;
+        });
+
+        cataloguesHTML += `</div></div>`;
+
+        // Insert the final HTML into the contentDiv
+        contentDiv.innerHTML = cataloguesHTML;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
+
+window.onload = loadCatalougeData();
 </script>
 {% endblock extra_js_bottom %}

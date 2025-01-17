@@ -355,17 +355,20 @@
     -->
     <dynamicField name="*_t_sort" type="text_gen_sort" indexed="true" stored="true" multiValued="false"/>
     <dynamicField name="*_txt_sort" type="text_gen_sort" indexed="true" stored="true"/>
-    <fieldType name="text_gen_sort" class="solr.SortableTextField" positionIncrementGap="100" multiValued="true">
+    <fieldType name="text_gen_sort" class="solr.SortableTextField" positionIncrementGap="100" omitNorms="true" multiValued="true">
       <analyzer type="index">
         <tokenizer name="standard"/>
         <filter name="stop" ignoreCase="true" words="stopwords.txt" />
         <filter name="lowercase"/>
+        <filter class="solr.TrimFilterFactory" />
+        <filter class="solr.PatternReplaceFilterFactory" pattern="([^a-z])" replacement="" replace="all"/>
       </analyzer>
       <analyzer type="query">
         <tokenizer name="standard"/>
         <filter name="stop" ignoreCase="true" words="stopwords.txt" />
         <filter name="synonymGraph" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
         <filter name="lowercase"/>
+        <filter class="solr.TrimFilterFactory" />
       </analyzer>
     </fieldType>
 
@@ -644,7 +647,7 @@
 
   <field name="timestamp_indexed"  type="tdate"  indexed="true"  stored="true"  multiValued="false"  default="NOW"  />
   <field name="object_type"  type="string"  indexed="true"  stored="true"  required="true"  default="institution"  />
-  <field name="browse"  type="alphaOnlySort"  indexed="true"  stored="true"  multiValued="false"  />
+  <field name="browse"  type="text_gen_sort"  indexed="true"  stored="true"  multiValued="false"  />
   <field name="default_search_field"  type="text_general"  indexed="true"  stored="false"  multiValued="true"  />
 
 <!-- end CofK: institutions -->

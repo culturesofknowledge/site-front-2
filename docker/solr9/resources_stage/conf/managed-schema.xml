@@ -131,7 +131,7 @@
     <!-- Field to use to determine and enforce document uniqueness.
       Unless this field is marked with required="false", it will be a required field
     -->
-    <uniqueKey>id</uniqueKey>
+    <uniqueKey>dcterms_identifier-uuid_</uniqueKey>
 
     <!-- copyField commands copy one field to another at the time a document
        is added to the index.  It's used either to index the same field differently,
@@ -610,7 +610,6 @@
         <!--          -->
         <!-- optional -->
         <!--          -->
-  <field name="dcterms_source"  type="string"  indexed="true"  stored="true"  />
         <field name="ox_titleOfResource"  type="text"  indexed="true"  stored="true"  required="true"  /> <!-- resource_name -->
         <field name="rdf_type"  type="string"  indexed="false"  stored="true"  />
         <field name="ox_detailsOfResource"  type="text"  indexed="true"  stored="true"  /> <!-- resource_details -->
@@ -636,7 +635,7 @@
   <copyField source="uuid" dest="default_search_field"/>
 
   <field name="timestamp_indexed"  type="tdate"  indexed="true"  stored="true"  multiValued="false"  default="NOW"  />
-  <field name="object_type"  type="string"  indexed="true"  stored="true"  required="true"  default="location"  />
+  <field name="object_type"  type="string"  indexed="true"  stored="true"  required="true"  default="resource"  />
   <field name="default_search_field"  type="text_general"  indexed="true"  stored="false"  multiValued="true"  />
 
 <!-- end CofK: resources_stage -->
@@ -1115,10 +1114,8 @@
 <!--                                          -->
 <!-- <copyField source="SOURCE" dest="DEST"/> -->
 <!--                                          --> 
-	       <!-- <copyField source="dcterms_identifier-uuid_" dest="id"/> -->
+  <copyField source="dcterms_identifier-uuid_" dest="id"/>
 
-  <copyField source="dcterms_source" dest="default_search_field"/>
-   
    <!-- Above, multiple source fields are copied to the [text] field. 
 	  Another way to map multiple source fields to the same 
 	  destination field is to use the dynamic field syntax. 

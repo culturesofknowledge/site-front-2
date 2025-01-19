@@ -169,7 +169,7 @@
     <!-- Field to use to determine and enforce document uniqueness.
       Unless this field is marked with required="false", it will be a required field
     -->
-    <uniqueKey>id</uniqueKey>
+    <uniqueKey>dcterms_identifier-uuid_</uniqueKey>
 
     <!-- copyField commands copy one field to another at the time a document
        is added to the index.  It's used either to index the same field differently,
@@ -665,7 +665,6 @@
   <field name="ox_internalCreated"  type="tdate"  indexed="false"  stored="true"  /> <!-- creation_timestamp -->
   <field name="ox_internalModified"  type="tdate"  indexed="false"  stored="true"  /> <!-- change_timestamp -->
   <field name="ox_internalModifiedByUser"  type="string"  indexed="false"  stored="true"  /> <!-- change_user -->
-  <field name="foaf_thumbnail"  type="string"  indexed="true"  stored="true"  />
 
 
 <!--                   -->
@@ -720,8 +719,6 @@
   <field name="default_search_field"  type="text_general"  indexed="true"  stored="false"  multiValued="true"  />
   <field name="browse"  type="text_gen_sort"  indexed="true"  stored="true"  multiValued="false"  />
   <field name="name-strict"  type="text_ws"  indexed="true"  stored="true"  />
-
-  <field name="frbr_Manifestation-manifestation"  type="string"  indexed="true"  stored="true"  multiValued="true"  />
 
 <!-- end CofK: locations -->
 
@@ -1199,7 +1196,7 @@
 <!--                                          -->
 <!-- <copyField source="SOURCE" dest="DEST"/> -->
 <!--                                          --> 
-	       <!-- <copyField source="dcterms_identifier-uuid_" dest="id"/> -->
+  <copyField source="dcterms_identifier-uuid_" dest="id"/>
 
   <copyField source="foaf_name" dest="default_search_field"/>
   <copyField source="skos_altLabel" dest="default_search_field"/>

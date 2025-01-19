@@ -169,7 +169,7 @@
     <!-- Field to use to determine and enforce document uniqueness.
       Unless this field is marked with required="false", it will be a required field
     -->
-    <uniqueKey>id</uniqueKey>
+    <uniqueKey>dcterms_identifier-uuid_</uniqueKey>
 
     <!-- copyField commands copy one field to another at the time a document
        is added to the index.  It's used either to index the same field differently,
@@ -1102,7 +1102,7 @@
 <!--                                          -->
 <!-- <copyField source="SOURCE" dest="DEST"/> -->
 <!--                                          --> 
-	       <!-- <copyField source="dcterms_identifier-uuid_" dest="id"/> -->
+  <copyField source="dcterms_identifier-uuid_" dest="id"/>
 
   <copyField source="dcterms_source" dest="default_search_field"/>
    

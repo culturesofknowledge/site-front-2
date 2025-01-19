@@ -169,7 +169,7 @@
     <!-- Field to use to determine and enforce document uniqueness.
       Unless this field is marked with required="false", it will be a required field
     -->
-    <uniqueKey>id</uniqueKey>
+    <uniqueKey>dcterms_identifier-uuid_</uniqueKey>
 
     <!-- copyField commands copy one field to another at the time a document
        is added to the index.  It's used either to index the same field differently,
@@ -617,9 +617,6 @@
 <!--          -->
 <!-- optional -->
 <!--          --> 
-  <field name="dcterms_source"  type="string"  indexed="true"  stored="true"  /> <!-- image_filename -->
-  <field name="ox_imageDisplayOrder"  type="string"  indexed="false"  stored="true"  /> <!-- display_order -->
-  <field name="ox_imageCredits"  type="string"  indexed="false"  stored="true"  /> <!-- credits -->
   <field name="rdf_type"  type="string"  indexed="false"  stored="true"  />
   <field name="geonames_officialName"  type="text_general"  indexed="true"  stored="true" multiValued="false" /> <!-- institution_name -->
   <field name="geonames_alternateName"  type="text_general"  indexed="true"  stored="true" multiValued="false" /> <!-- institution_synonyms -->
@@ -632,7 +629,6 @@
   <field name="ox_internalCreated"  type="tdate"  indexed="true"  stored="true"  /> <!-- creation_timestamp -->
   <field name="ox_internalModified"  type="tdate"  indexed="true"  stored="true"  /> <!-- change_timestamp -->
   <field name="ox_internalModifiedByUser"  type="string"  indexed="false"  stored="true"  /> <!-- change_user -->
-  <field name="foaf_thumbnail"  type="string"  indexed="true"  stored="true"  />
 
 <!--                         -->
 <!-- Links from institutions -->
@@ -1126,9 +1122,8 @@
 <!--                                          -->
 <!-- <copyField source="SOURCE" dest="DEST"/> -->
 <!--                                          --> 
-	       <!-- <copyField source="dcterms_identifier-uuid_" dest="id"/> -->
+  <copyField source="dcterms_identifier-uuid_" dest="id"/>
 
-  <copyField source="dcterms_source" dest="default_search_field"/>
   <copyField source="geonames_officialName" dest="default_search_field"/>
   <copyField source="geonames_alternateName" dest="default_search_field"/>
   <copyField source="geonames_locatedIn" dest="default_search_field"/>

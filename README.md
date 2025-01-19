@@ -1,5 +1,16 @@
 # SITE FRONT 2
 
+This project is a rewrite of [EMLO front](https://github.com/culturesofknowledge/site-front) using Solr, flask and edges. 
+
+* The data structure of the input csv files used to index data in solr, the UI design and the webiste functionality are to remain the same.
+* The indexer code has been copied from [EMLO front](https://github.com/culturesofknowledge/site-front) and upgraded to Python 3.
+
+The data in SOLR
+
+* Data is exported from EMLO edit / EMLO Edit new into csv files, for indexing in SOLR. 
+* The indexer container indexes the data in Solr, to be used by edges throught flask.
+* The export and import is scheduled to run once a week (or overnight) and is triggered from EMLO edit / EMLO edit new. 
+
 ## Setup the repository
 
 1. Clone the repository:
@@ -15,7 +26,7 @@
 
 ## Run using docker 
 
-1. Build the `web`, `solr`, and `redis` containers using docker
+1. Build the `web`, `solr`, `redis` and `indexer` containers using docker
 
    ```
    docker-compose build
@@ -26,6 +37,8 @@
    ```
    docker-compose up -d
    ```
+
+Note: For the indexer container to run successfully and to index data in SOLR, see the [indexer readme](https://github.com/culturesofknowledge/site-front-2/blob/dev/indexer/README.md).
 
 ## Run natively
 
@@ -54,11 +67,7 @@
 
 ### Indexing data in Solr
 
-This project is missing it's own solr ingration hence we will he using the older project which can be accessible [here](https://github.com/culturesofknowledge/site-front).
-You need to follow the following steps
-
-1. Run the site-front project, this will allow us to access solr data from the current EMLO front.
-2. Run the current project.
+The indexer container can be used to index data in Solr. See the [indexer readme](https://github.com/culturesofknowledge/site-front-2/blob/dev/indexer/README.md).
 
 ## File Structure
 

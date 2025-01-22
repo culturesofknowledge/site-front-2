@@ -321,9 +321,7 @@ function advanceSearch(params) {
     if (params.get("let_trans") == "true") {
       openingQuery.queryStrings.push({
         queryString: "*",
-        fields: [
-          { field: "manifestation-urlOfTranscription", operator: "AND" },
-        ],
+        fields: [{ field: "ox_urlOfTranscription", operator: "AND" }],
       });
     }
 

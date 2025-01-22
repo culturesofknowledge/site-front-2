@@ -422,7 +422,7 @@ function advanceSearch(params) {
     ) {
       openingQuery.queryStrings.push({
         queryString: "*",
-        fields: [{ field: "manifestation-paper_type", operator: "OR" }],
+        fields: [{ field: "manifestation-paper_size", operator: "OR" }],
       });
     }
 
@@ -433,10 +433,7 @@ function advanceSearch(params) {
           lte: "*",
         },
       };
-    } else if (
-      params.get("let_pap_siz") &&
-      params.get("let_pap_siz") == "true"
-    ) {
+    } else if (params.get("let_page") && params.get("let_page") == "true") {
       openingQuery.queryStrings.push({
         queryString: "*",
         fields: [{ field: "manifestation-paper_type", operator: "OR" }],

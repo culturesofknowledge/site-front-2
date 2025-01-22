@@ -9,7 +9,7 @@ emlo.components = [
     category: "results",
     renderer: new emlo.DropDownRenderer({
       field: "geonames_officialName",
-      defaultOptionText: "all Repositories",
+      defaultOptionText: "all repositories",
     }),
   }),
 ];

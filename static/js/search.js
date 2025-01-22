@@ -428,7 +428,7 @@ function advanceSearch(params) {
 
     if (params.get("let_page_min") && params.get("let_page_min") != "") {
       openingQuery.query.range = {
-        "manifestation-paper_size": {
+        "manifestation-pages_number": {
           gte: params.get("let_page_min"),
           lte: "*",
         },

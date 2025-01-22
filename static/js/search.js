@@ -401,7 +401,10 @@ function advanceSearch(params) {
         queryString: params.get("let_pap_typ_tex"),
         fields: [{ field: "manifestation-paper_type", operator: "OR" }],
       });
-    } else if (params.get("let_pap_type") && params.get("let_seal") == "true") {
+    } else if (
+      params.get("let_pap_typ") &&
+      params.get("let_pap_typ") == "true"
+    ) {
       openingQuery.queryStrings.push({
         queryString: "*",
         fields: [{ field: "manifestation-paper_type", operator: "OR" }],

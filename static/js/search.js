@@ -436,7 +436,7 @@ function advanceSearch(params) {
     } else if (params.get("let_page") && params.get("let_page") == "true") {
       openingQuery.queryStrings.push({
         queryString: "*",
-        fields: [{ field: "manifestation-paper_type", operator: "OR" }],
+        fields: [{ field: "manifestation-pages_number", operator: "OR" }],
       });
     }
 

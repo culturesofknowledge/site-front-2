@@ -4,7 +4,7 @@
   <h3><img src="/static/img/icon-calendar.png" alt="Dates Icon" />Dates</h3>
 
   <fieldset class="alignment">
-    <label>Single Date</label>
+    <label>Single date</label>
 
     <div class="row">
       <label>&nbsp;<!-- for alingment--></label>
@@ -33,11 +33,14 @@
       <div class="columns small-12 large-3">
         <select id="dat_sin_day" name="dat_sin_day" class="select2-hidden-accessible" tabindex="-1" aria-hidden="true">
           <option class="default" selected="selected">all dates</option>
+          {% for date in range(1, 32) %}
+          <option value="{{ date }}">{{ date }}</option>
+          {% endfor %}
         </select>
       </div>
 
       <div data-tip="Search within a single year, month, day or a combination of all three.">
-        {% include 'components/common/help_icon.jinja2' %}
+        {% include 'components/common/help_icon_nolabel.jinja2' %}
       </div>
     </div>
   </fieldset>
@@ -72,10 +75,13 @@
       <div class="columns small-12 large-3">
         <select id="dat_from_day" name="dat_from_day" class="select2-hidden-accessible" tabindex="-1" aria-hidden="true">
           <option class="default" selected="selected">all dates</option>
+          {% for date in range(1, 32) %}
+          <option value="{{ date }}">{{ date }}</option>
+          {% endfor %}
         </select>
       </div>
       <div data-tip="Search from this year, month, day or combination of all three. ">
-         {% include 'components/common/help_icon.jinja2' %}
+         {% include 'components/common/help_icon_nolabel.jinja2' %}
       </div>
     </div>
 
@@ -107,10 +113,13 @@
       <div class="columns small-12 large-3">
         <select id="dat_to_day" name="dat_to_day" class="select2-hidden-accessible" tabindex="-1" aria-hidden="true">
           <option class="default" selected="selected">all dates</option>
+          {% for date in range(1, 32) %}
+          <option value="{{ date }}">{{ date }}</option>
+          {% endfor %}
         </select>
       </div>
       <div data-tip="Search till this year, month, day or combination of all three. ">
-        {% include 'components/common/help_icon.jinja2' %}
+        {% include 'components/common/help_icon_nolabel.jinja2' %}
       </div>
     </div>
   </fieldset>

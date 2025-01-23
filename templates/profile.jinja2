@@ -1,6 +1,37 @@
 {% extends "base.jinja2" %}
 
 {% block title %}Profile{% endblock %}
+{% block extra_stylesheets %}
+<style>
+    h2{margin:20px 0px}
+    h3,h4{margin-top: 0.5rem;margin-bottom: 0.2rem;}
+	h3.worklegend{font-size:25px !important}
+	.profilepart h4{font-size:22px !important}
+	.profilepart h5 { font-size: 20px !important; }
+	p{margin-bottom:0}
+	span.as-marked {
+		font-family: monospace;
+		font-size: 17px;
+	}
+	.people,.locations {
+		margin-bottom: 17px;
+		margin-left: 10px;
+	}
+	.fieldlabel { color:#172854; min-width: 120px; margin-right: 10px;display:inline-block }
+	.flags{font-size:smaller}
+	.flags:before { content:"("}
+	.flags:after { content:")"}
+	.profilepart .profilepart .content { margin-left: 6px; }
+	.display_details_of_one_object.True {
+		border-left: 1px dashed #777;
+		padding: 5px 0 5px 20px;
+		margin-bottom: 10px;
+	}
+	.comment {
+		margin-top: 10px;
+	}
+</style>
+{% endblock %}
 
 {% block content %}
     

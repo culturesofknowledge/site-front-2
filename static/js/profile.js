@@ -1005,6 +1005,27 @@ function _getWorkComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "repo-versions",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        divider: true,
+        sectionTitle: "Repositories and Versions ",
+        sectionTitleImage: "/static/img/icon-repository.png",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "repo",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "frbr_Manifestation-manifestation",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "repo-version",
+        primaryField: "frbr_Manifestation-manifestation",
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "comments",
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({

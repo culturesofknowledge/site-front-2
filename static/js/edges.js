@@ -1870,6 +1870,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         case "dummy-message":
           frag = this._renderDummyText();
           break;
+        case "repo-version":
+          frag = this._renderRepoVersion();
+          break;
         default:
           frag = "<div></div>";
       }
@@ -1939,6 +1942,104 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       ${edges.util.escapeHtml(this.contentTitle)}
     </h4>
     <hr class="yellow-divider" />`;
+  }
+
+  _renderRepoVersion() {
+    const sectionHeading = "Versions (originals, copies, digital, etc.)";
+    let frag = `<h2>${sectionHeading}</h2>`;
+    this.component.results[0][this.primaryField].forEach((item) => {
+      if (item.dcterms_type == "Letter") {
+        frag += this._getLetterReopContent(item);
+        this._getInstituteData(item["ox_resourceAt-institution"]);
+      } else {
+        frag += `
+          <h3>Version: ${item.dcterms_type}</h3>
+				  <p> ${item.ox_printedEditionDetails}</p>
+        `;
+      }
+    });
+
+    return `
+      <div style="margin-left:25px"> ${frag} </div>
+    `;
+  }
+
+  _getLetterReopContent(content) {
+    return `
+  <div class="display_details_of_one_object False">
+	  <h3>Version: Letter</h3>
+		
+    <p><span class="fieldlabel">Repository:</span></p>
+      <div id="repo-section"></p>
+		  <p>
+        <span class="fieldlabel">Shelfmark:</span> ${content["dcterms_identifier-shelf_"]} 
+      </p>
+      <p>
+        <span class="fieldlabel">Postage mark:</span>${content.mail_postageMark}
+      </p>
+	</div>
+    `;
+  }
+
+  _getInstituteData(institutions) {
+    institutions.forEach(async (url) => {
+      const parts = url.split("/");
+      const institutionId = parts.at(-1); // Last part is the ID
+      const field =
+        "geonames_officialName,geonames_locatedIn,geonames_inCountry";
+
+      try {
+        // Fetch institution details from API
+        const response = await fetch(
+          `/solr/institutions/select?q=uuid:${institutionId}&fl=${field}&wt=json`
+        );
+        if (!response.ok)
+          throw new Error(`Failed to fetch details for ${institutionId}`);
+
+        const data = await response.json();
+        const institutionData = data?.response?.docs?.[0] || {};
+
+        // Conditionally build name, city, and country sections
+        const nameHTML = institutionData.geonames_officialName
+          ? `<a href="/profile/institution/${institutionId}">${institutionData.geonames_officialName}</a><br>`
+          : "";
+        const cityHTML = institutionData.geonames_locatedIn
+          ? `<span style="color:#172854;">City</span>:<br>&nbsp;&nbsp;&nbsp; ${institutionData.geonames_locatedIn}<br>`
+          : "";
+        const countryHTML = institutionData.geonames_inCountry
+          ? `<span style="color:#172854;">Country</span>:<br>&nbsp;&nbsp;&nbsp; ${institutionData.geonames_inCountry}<br>`
+          : "";
+
+        // Only return non-empty sections
+        if (!nameHTML && !cityHTML && !countryHTML) return;
+
+        // Return the constructed HTML for this institution
+        const frag = `
+          <div class="display_details_of_one_object True">
+            ${nameHTML}
+            ${cityHTML}
+            ${countryHTML}
+          </div>
+        `;
+
+        const repo = document.getElementById("repo-section");
+        if (repo) {
+          repo.innerHTML = frag;
+        }
+      } catch (error) {
+        console.error(`Error fetching institution details for ${url}:`, error);
+      }
+    });
+    // return `<div class="display_details_of_one_object True">
+    //     <a href="/profile/institution/id">
+    //       Institute vakue needs to be added.
+    //     </a>
+    //     <br>
+    // 	  <span style="color:#172854;">
+    //       City
+    //     </span>:<br>&nbsp;&nbsp;&nbsp; Basel<br>
+    // 	  <span style="color:#172854;">Country</span>:<br>&nbsp;&nbsp;&nbsp; Switzerland<br>
+    //   </div>`
   }
 
   _renderBarGraph() {

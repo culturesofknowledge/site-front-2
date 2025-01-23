@@ -10263,11 +10263,6 @@ ul.pagination li {
   align-items: center;
 }
 
-.content {
-  margin-left: 40px;
-  margin-bottom: 20px;
-}
-
 /* Pagination container */
 .edges-bs3-pager-container {
   display: flex;

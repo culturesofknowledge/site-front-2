@@ -692,7 +692,43 @@ function _getWorkComponents(emlo) {
                 secondaryKey: "",
                 text: "(Date is approximate)",
               },
+              {
+                mainKey: "ox_started-indef_inferred",
+                secondaryKey: "",
+                text: "(Date is inferred)",
+              },
+              {
+                mainKey: "ox_started-indef_uncertain",
+                secondaryKey: "",
+                text: "(Date is uncertain)",
+              },
             ],
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "gap",
+      category: "results",
+      primaryField: "comments",
+      renderer: new emlo.MultiFieldsRenderer({}),
+    }),
+
+    new emlo.MultiFields({
+      id: "comments-new",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "comments",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested-list",
+        sectionTitle: "Comments about the date:",
+        sectionTitleStyle: "span",
+        primaryField: "comments",
+        fields: [
+          {
+            title: "",
+            key: "bibo_Note",
           },
         ],
       }),

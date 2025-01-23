@@ -1997,14 +1997,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
             }
 
             if (field.type == "date") {
-              const rawDate = new Date(this.component.results[0][field.key]);
-              const formattedDate = rawDate.toLocaleDateString("en-US", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              });
-
-              value = formattedDate;
+              value = this._formatDate(this.component.results[0][field.key]);
             } else {
               value = this.component.results[0][field.key];
             }
@@ -2100,19 +2093,48 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   }
 
   _renderDates() {
+    console.log("Change");
     return `<div class="content">
       ${this.fields
         .map(
           (field) =>
             `
-               <strong> ${field.title} </strong>
-               <dd> ${edges.util.escapeHtml(
-                 this.component.results[0][field.key] || ""
-               )} </dd>
+              <strong> ${field.title} </strong>
+              <dd> 
+                ${_formatDate(this.component.results[0][field.key])}
+              </dd>
             `
         )
         .join("")}</div>
       `;
+  }
+
+  _formatDate(timestamp) {
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) {
+      return "";
+    }
+
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+
+    return `${day} ${month} ${year}`;
   }
 
   _renderStats() {

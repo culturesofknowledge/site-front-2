@@ -321,9 +321,7 @@ function advanceSearch(params) {
     if (params.get("let_trans") == "true") {
       openingQuery.queryStrings.push({
         queryString: "*",
-        fields: [
-          { field: "manifestation-urlOfTranscription", operator: "AND" },
-        ],
+        fields: [{ field: "ox_urlOfTranscription", operator: "AND" }],
       });
     }
 
@@ -403,7 +401,10 @@ function advanceSearch(params) {
         queryString: params.get("let_pap_typ_tex"),
         fields: [{ field: "manifestation-paper_type", operator: "OR" }],
       });
-    } else if (params.get("let_pap_type") && params.get("let_seal") == "true") {
+    } else if (
+      params.get("let_pap_typ") &&
+      params.get("let_pap_typ") == "true"
+    ) {
       openingQuery.queryStrings.push({
         queryString: "*",
         fields: [{ field: "manifestation-paper_type", operator: "OR" }],
@@ -421,24 +422,21 @@ function advanceSearch(params) {
     ) {
       openingQuery.queryStrings.push({
         queryString: "*",
-        fields: [{ field: "manifestation-paper_type", operator: "OR" }],
+        fields: [{ field: "manifestation-paper_size", operator: "OR" }],
       });
     }
 
     if (params.get("let_page_min") && params.get("let_page_min") != "") {
       openingQuery.query.range = {
-        "manifestation-paper_size": {
+        "manifestation-pages_number": {
           gte: params.get("let_page_min"),
           lte: "*",
         },
       };
-    } else if (
-      params.get("let_pap_siz") &&
-      params.get("let_pap_siz") == "true"
-    ) {
+    } else if (params.get("let_page") && params.get("let_page") == "true") {
       openingQuery.queryStrings.push({
         queryString: "*",
-        fields: [{ field: "manifestation-paper_type", operator: "OR" }],
+        fields: [{ field: "manifestation-pages_number", operator: "OR" }],
       });
     }
 

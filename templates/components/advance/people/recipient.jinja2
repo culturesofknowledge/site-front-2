@@ -3,8 +3,7 @@
 
     <div
         data-delay="2.0"
-        data-tip="Search for recipients, e.g. 'Samuel Hartlib', 'John Aubrey', or 'The Royal Society'. 
-        <br/><br/>Search is not case sensitive." 
+        data-tip="Search for recipients, e.g. 'Samuel Hartlib', 'John Aubrey', or 'The Royal Society'. Search is not case sensitive." 
         class="row">
         <div class="small-11 columns">
             <label for="rec">Name</label>
@@ -31,12 +30,12 @@
             class="columns small-12 large-2"
             style="padding-left: 0px;"
         >
-            <div class="large-8 columns" style="padding: 0px;">
+            <div class="large-7 columns" style="padding: 0px;">
                 <label for="rec_gend">Gender</label>
                 <select id="rec_gend" name="rec_gend" title="" class="">
                     <option class="default" selected="selected">all</option>
-                    <option value="female">Female</option>
-                    <option value="male">Male</option>
+                    <option value="female">female</option>
+                    <option value="male">male</option>
                     <option value="unknown">unknown</option>
                 </select>
             </div>
@@ -62,7 +61,7 @@
                     class="checkbox"
                 />
 
-                <label for="rec_org">Only Organizations</label>
+                <label for="rec_org">Only organizations</label>
             </div>
             <div>
                 {% include 'components/common/help_icon.jinja2' %}
@@ -95,7 +94,8 @@
 
     <div
         data-delay="2.0"
-        data-tip="Search for recipients by title, role, or occupation, e.g. 'Bookseller' or 'Politician'. Search is not case sensitive. " 
+        data-tip="Search for recipients by title, role, or occupation, e.g. 'Bookseller' or 'Politician'. 
+        <br/>Note that this information hasn’t yet been captured for all recipient." 
         class="row"
     >
         <div class="large-11 columns">

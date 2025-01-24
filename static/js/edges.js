@@ -272,8 +272,17 @@ emlo.DropDown = class extends edges.Component {
   constructor(params) {
     super(params);
     this.results = false;
-
+    this.size = edges.util.getParam(params, "size", 0);
+    this.sortOptions = edges.util.getParam(params, "sortOptions", []);
     this.hitCount = 0;
+  }
+
+  contrib(query) {
+    query.size = this.size ? this.size : 10;
+
+    if (this.sortOptions.length > 0) {
+      query.sort = this.sortOptions;
+    }
   }
 
   synchronise() {
@@ -290,6 +299,7 @@ emlo.DropDown = class extends edges.Component {
 
     // first filter the results
     var results = source.results();
+
     this._appendResults({ results: results });
 
     // record the hit count for later use

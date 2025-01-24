@@ -252,17 +252,17 @@ emlo.HomeStatsTemplate = class extends edges.Template {
     let statsComponents = edge.category("stats");
 
     for (let i = 0; i < statsComponents.length; i++) {
-      stats += `<li class="stats-text text-center" id="${statsComponents[i].id}"></li>`;
+      stats += `<div id="${statsComponents[i].id}"></div>`;
     }
 
+    console.log;
+
     let frag = `
-    <div class="row">
-      <div class="large-12 columns">
-          <ul class="stats-row small-block-grid-2 medium-block-grid-5 large-block-grid-10 home-stats">
+ 
               ${stats}
-          </ul>
-      </div>
-    </div>
+   
+   
+   
     `;
     this.edge.context.html(frag);
   }
@@ -2951,6 +2951,89 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     return `${this.message}`;
   }
 };
+// emlo.Stats = class extends edges.Component {
+//   constructor(params) {
+//     super(params);
+//     this.hitCount = 0;
+//     this.solrCore = edges.util.getParam(params, "solrCore", "");
+//     this.facetFields = edges.util.getParam(params, "facetFields", []);
+//     this.facetField = edges.util.getParam(params, "facetField", "");
+//   }
+
+//   async synchronise() {
+//     this.hitCount = 0;
+
+//     // Fetch data from Solr and update the hit count
+//     const hitCount = await this._fetchHitCount(this.solrCore);
+//     if (hitCount !== null) {
+//       this.hitCount = hitCount;
+//     }
+
+//     this.renderer.draw();
+//   }
+
+//   async _fetchHitCount(collectionName) {
+//     // Base Solr query
+//     let url = `/solr/${collectionName}/select?q=*:*&rows=0&wt=json`;
+
+//     // Add facet fields to the query if they exist, in case multiple facet field support is needed
+//     // if (this.facetFields.length > 0) {
+//     //   const facetQuery = this.facetFields
+//     //     .map((field) => ``)
+//     //     .join("&");
+//     //   url += `&facet=true&${facetQuery}`;
+//     // }
+
+//     if (this.facetField) {
+//       url += `&facet=true&facet.field=${encodeURIComponent(this.facetField)}`;
+//     }
+
+//     try {
+//       const response = await fetch(url);
+//       if (!response.ok) {
+//         console.error(
+//           `Error fetching data from ${url}: ${response.statusText}`
+//         );
+//         return null;
+//       }
+
+//       const data = await response.json();
+
+//       // Log facet counts if available
+//       if (data.facet_counts && data.facet_counts.facet_fields) {
+//         if (
+//           this.facetField &&
+//           data.facet_counts.facet_fields[this.facetField]
+//         ) {
+//           if (this.facetField == "cito_Catalog") {
+//             return data.facet_counts.facet_fields["cito_Catalog"].length / 2;
+//           } else if (this.facetField == "ox_isOrganisation") {
+//             for (
+//               let i = 0;
+//               i < data.facet_counts.facet_fields["ox_isOrganisation"].length;
+//               i += 2
+//             ) {
+//               if (
+//                 data.facet_counts.facet_fields["ox_isOrganisation"][i] ===
+//                 "true"
+//               ) {
+//                 return data.facet_counts.facet_fields["ox_isOrganisation"][
+//                   i + 1
+//                 ];
+//               }
+//             }
+//           }
+//         }
+//       }
+
+//       return data.response.numFound || 0; // Return hit count
+//     } catch (error) {
+//       console.error(`Error fetching data from ${url}: ${error}`);
+//       return null;
+//     }
+//   }
+// };
+
 emlo.Stats = class extends edges.Component {
   constructor(params) {
     super(params);
@@ -2958,122 +3041,111 @@ emlo.Stats = class extends edges.Component {
     this.solrCore = edges.util.getParam(params, "solrCore", "");
     this.facetFields = edges.util.getParam(params, "facetFields", []);
     this.facetField = edges.util.getParam(params, "facetField", "");
+    this.statsFields = edges.util.getParam(params, "statsFields", []);
+
+    this.statsObject = {};
   }
 
-  async synchronise() {
-    this.hitCount = 0;
-
-    // Fetch data from Solr and update the hit count
-    const hitCount = await this._fetchHitCount(this.solrCore);
-    if (hitCount !== null) {
-      this.hitCount = hitCount;
+  contrib(query) {
+    if (this.facetFields.length > 0) {
+      query.aggs = this.facetFields;
     }
-
-    this.renderer.draw();
   }
 
-  async _fetchHitCount(collectionName) {
-    // Base Solr query
-    let url = `/solr/${collectionName}/select?q=*:*&rows=0&wt=json`;
+  synchronise() {
+    const facets = this.edge.result.buckets("object_type") || [];
+    const orgBucket = this.edge.result.buckets("ox_isOrganisation") || [];
+    const citoCatalogBucket = this.edge.result.buckets("cito_Catalog") || [];
+    const orgCount =
+      orgBucket.find((item) => item.key === "true")?.doc_count || 0;
 
-    // Add facet fields to the query if they exist, in case multiple facet field support is needed
-    // if (this.facetFields.length > 0) {
-    //   const facetQuery = this.facetFields
-    //     .map((field) => ``)
-    //     .join("&");
-    //   url += `&facet=true&${facetQuery}`;
-    // }
+    // Create a map for faster lookups
+    const facetsMap = facets.reduce((acc, item) => {
+      acc[item.key] = item.doc_count || 0; // Ensure we always get a number
+      return acc;
+    }, {});
 
-    if (this.facetField) {
-      url += `&facet=true&facet.field=${encodeURIComponent(this.facetField)}`;
-    }
-
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        console.error(
-          `Error fetching data from ${url}: ${response.statusText}`
-        );
-        return null;
+    this.statsFields.forEach((field) => {
+      if (field === "person") {
+        this.statsObject[field] = (facetsMap[field] || 0) - orgCount;
+      } else if (field === "organizations") {
+        this.statsObject[field] = orgCount;
+      } else if (field == "cito_Catalog") {
+        this.statsObject[field] = citoCatalogBucket.length;
+      } else {
+        this.statsObject[field] = facetsMap[field] || 0;
       }
-
-      const data = await response.json();
-
-      // Log facet counts if available
-      if (data.facet_counts && data.facet_counts.facet_fields) {
-        if (
-          this.facetField &&
-          data.facet_counts.facet_fields[this.facetField]
-        ) {
-          if (this.facetField == "cito_Catalog") {
-            return data.facet_counts.facet_fields["cito_Catalog"].length / 2;
-          } else if (this.facetField == "ox_isOrganisation") {
-            for (
-              let i = 0;
-              i < data.facet_counts.facet_fields["ox_isOrganisation"].length;
-              i += 2
-            ) {
-              if (
-                data.facet_counts.facet_fields["ox_isOrganisation"][i] ===
-                "true"
-              ) {
-                return data.facet_counts.facet_fields["ox_isOrganisation"][
-                  i + 1
-                ];
-              }
-            }
-          }
-        }
-      }
-
-      return data.response.numFound || 0; // Return hit count
-    } catch (error) {
-      console.error(`Error fetching data from ${url}: ${error}`);
-      return null;
-    }
+    });
   }
 };
 
 emlo.StatsRenderer = class extends edges.Renderer {
   constructor(params) {
     super(params);
-    this.title = edges.util.getParam(params, "title", ""); // Title for the section
-    this.titleImage = edges.util.getParam(params, "titleImage", null); // Optional image for title
-    this.redirectURL = edges.util.getParam(params, "redirectURL", ""); // This URL will be provided in jinja format
+    this.statsEntries = edges.util.getParam(params, "statsEntries", []); // TODO: Better naming
     this.namespace = "edges-stats-display";
   }
 
   draw() {
-    let container = "";
+    let container = `
+      <div class="row">
+        <div class="large-12 columns">
+          <ul class="small-block-grid-2 medium-block-grid-5 large-block-grid-10">
+    `;
 
-    const imageTag = this.titleImage
-      ? `<img src="${edges.util.escapeHtml(
-          this.titleImage
-        )}" alt="${edges.util.escapeHtml(this.title)}" class="stats-image">`
-      : "";
+    if (this.statsEntries.length > 0) {
+      this.statsEntries.forEach((item) => {
+        const imageTag = item.titleImage
+          ? `<img src="${edges.util.escapeHtml(
+              item.titleImage
+            )}" alt="${edges.util.escapeHtml(item.title)}" class="stats-image">`
+          : "";
 
-    const redirectLink = this.redirectURL
-      ? `<a href="${edges.util.escapeHtml(this.redirectURL)}"> 
-      ${edges.util.escapeHtml(this.title)}
+        const redirectLink = item.redirectURL
+          ? `<a href="${edges.util.escapeHtml(item.redirectURL)}"> 
+      ${edges.util.escapeHtml(item.title)}
       </a>`
-      : `<p style="font-size: inherit;"> 
-      ${edges.util.escapeHtml(this.title)}
+          : `<p style="font-size: inherit;"> 
+      ${edges.util.escapeHtml(item.title)}
       </p>`;
 
-    container = `
-        ${imageTag}
-        <br />
-        
-        <span>
-          ${edges.util.escapeHtml(this.component.hitCount)}
-        </span>
-        
-        <br />
-        
-        ${redirectLink}
+        // Appending list to container
+        container += `
+        <li class="stats-text text-center">
+          ${imageTag}
+          <br />
+          
+          <span>
+            ${this._getStatCount(
+              item.statKey,
+              item.tweakCount,
+              item.upperLimit
+            )}
+          </span>
+          
+          <br />
+          
+          ${redirectLink}
+        </li>
       `;
+      });
+    }
 
+    container += `
+      </ul>
+		</div> 
+	</div>
+    `;
     this.component.context.html(container);
+  }
+
+  _getStatCount(key, tweak, upperLimit) {
+    if (key && this.component.statsObject.hasOwnProperty(key)) {
+      if (this.component.statsObject[key] > upperLimit)
+        return this.component.statsObject[key] - (upperLimit - tweak);
+    } else {
+      return 0;
+    }
   }
 };
 

@@ -357,9 +357,15 @@ emlo.DropDownRenderer = class extends edges.Renderer {
         `<option value="" disabled selected>${this.defaultOptionText}</option>` +
         options;
 
+      const dropdownClass = edges.util.allClasses(
+        this.namespace,
+        "repo-dropdown",
+        this
+      );
+
       // Create dropdown element
       frag = `
-        <select class="form-control">
+        <select id="repository" class="${dropdownClass} form-control">
           ${options}
         </select>
       `;
@@ -372,7 +378,21 @@ emlo.DropDownRenderer = class extends edges.Renderer {
     );
     const container = `<div class="${containerClasses}">${frag}</div>`;
     this.component.context.html(container);
+
+    // Attach the event listener for the dropdown change
+    const dropdownSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "repo-dropdown",
+      this
+    );
+
+    edges.on(dropdownSelector, "change", this, "changeRepoValue");
   }
+
+  // This function is called when the user changes the sort option
+  changeRepoValue = function (element) {
+    _addUrlParam("repository", element.value);
+  };
 
   _renderOption(result) {
     if (this.field) {

@@ -36,7 +36,7 @@ try {
             upperLimit: 21985,
           },
           {
-            title: "Location",
+            title: "Locations",
             titleImage: "/static/img/icon-stats-locations.png",
             redirectURL: "/browse/locations",
             statKey: "location",

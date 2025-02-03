@@ -430,5 +430,11 @@ $(function() {
         }
     });
 });
+
+$(document).on("keypress" , (e) => {
+    if(e.keyCode == 13 && e.key.toLowerCase() == "enter") {
+        advanceSearch()
+    }
+})
 </script>
 {% endblock extra_js_bottom %}

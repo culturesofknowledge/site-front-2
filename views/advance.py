@@ -3,8 +3,8 @@ from flask import Blueprint, render_template, request
 advance_bp = Blueprint('advance', __name__)
 
 # Constants
-START_YEAR = 1500
-END_YEAR = 1841
+START_YEAR = 1450
+END_YEAR = 1860
 
 MONTHS_MAP = {
     "January": "01",

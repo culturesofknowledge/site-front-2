@@ -211,7 +211,6 @@ function _redirectToSearch(val, res, fieldName) {
         query = `pla_ment_name=${location}`;
         break;
     }
-    console.log("current_search_letter", current_search_letter);
 
     query += query ? `&${currentPageQ}` : `${currentPageQ}`;
 

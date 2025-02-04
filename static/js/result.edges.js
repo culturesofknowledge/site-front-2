@@ -411,7 +411,7 @@ $(document).ready(function () {
 
   // Check if there are any query parameters
   if (queryParams.toString()) {
-    if (queryParams.get("uuids")) {
+    if (queryParams.get("uuids") || queryParams.get("browsing")) {
       $("#return_browse").show();
     } else {
       $("#modify_search").show();

@@ -16,6 +16,7 @@
 
             <div id="" class="large-12 columns">
                 <div class="pagination-centered">
+                    <label style="text-align:start;">Decade</label>
                     <select name="decade" id="decade" onchange="change_decade(this.value)">
                         {% for decade in range(1450, 1860, 10) %}
                             <option value="{{ decade }}" {% if decade == current_decade %}selected="selected"{% endif %}>{{ decade }}s</option>

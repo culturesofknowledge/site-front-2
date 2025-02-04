@@ -960,7 +960,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
     const month = months[date.getMonth()];
     const year = date.getFullYear();
 
-    return `${day} ${month} ${year}`;
+    return year == 9999 ? `${day} ${month}` : `${day} ${month} ${year}`;
   }
 };
 
@@ -2265,7 +2265,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const month = months[date.getMonth()];
     const year = date.getFullYear();
 
-    return `${day} ${month} ${year}`;
+    return year == 9999 ? `${day} ${month}` : `${day} ${month} ${year}`;
   }
 
   _renderStats() {

@@ -1,9 +1,9 @@
 import emlo from "./edges.js";
+let current_search_letter = "a"; // Setting this as default a
 
 try {
   // Fetching URL params
   const queryString = window.location.search;
-  let current_search_letter = "a"; // Setting this as default a
 
   if (queryString) {
     const params = new URLSearchParams(queryString);
@@ -126,12 +126,15 @@ function _redirectToSearch(val, res, fieldName) {
     const baseURL = `/forms/advance`;
     let query = "";
     const user = res["browse"];
+    const currentPageQ = `browsing=organisations&letter=${current_search_letter}`;
 
     switch (fieldName) {
       case "ox_totalDocsInRepository":
         query = `repository=${user}`;
         break;
     }
+
+    query += query ? `&${currentPageQ}` : `${currentPageQ}`;
     const finalUrl = query ? `${baseURL}?${query}` : `${baseURL}`;
 
     return `<a href="${finalUrl}"> ${val} </a>`;

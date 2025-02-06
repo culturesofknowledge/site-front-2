@@ -1969,7 +1969,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     return `
     <h4 class="main">
       ${imageTag}
-      ${edges.util.escapeHtml(this.contentTitle)}
+      <strong>${edges.util.escapeHtml(this.contentTitle)}</strong>
     </h4>
     <hr class="yellow-divider" />`;
   }

@@ -2230,21 +2230,27 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   }
 
   _renderDates() {
-    console.log("Change");
-    return `<div class="content"><dl>
-      ${this.fields
-        .map(
-          (field) =>
-            ` <dt>
-                <strong> ${field.title} </strong>
-              </dt>
-              <dd> 
-                ${this._formatDate(this.component.results[0][field.key])}
-              </dd>
-            `
-        )
-        .join("")}</dl></div>
-      `;
+    let content = "";
+    this.fields.map((field) => {
+      const val = this.component.results[0][field.key];
+
+      if (val) {
+        content += `
+          <dt>
+            <strong> ${field.title} </strong>
+          </dt>
+          <dd> 
+            ${this._formatDate(val)}
+          </dd>
+        `;
+      }
+    });
+
+    if (content) {
+      return `<div class="content"><dl> ${content} </dl></div>`;
+    } else {
+      return "";
+    }
   }
 
   _formatDate(timestamp) {

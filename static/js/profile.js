@@ -68,7 +68,7 @@ function _getPeopleComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-nested-links",
         divider: true,
-        contentTitle: "Related Resources ",
+        contentTitle: "Related resources ",
         primaryField: "rdfs_seeAlso-resource",
         fields: [
           {
@@ -443,7 +443,7 @@ function _getPeopleComponents(emlo) {
         contentTitle: "",
         divider: true,
         fields: [
-          { title: "Alternate Names", key: "skos_altLabel" },
+          { title: "Alternate name", key: "skos_altLabel" },
           { title: "Titles or roles", key: "ox_titlesRolesOccupations" },
         ],
       }),
@@ -475,21 +475,21 @@ function _getPeopleComponents(emlo) {
         fields: [
           {
             name: "text",
-            title: " letters written",
+            title: "Letters written",
             key: "ox_totalWorksByAgent",
             redirectUrl: "/forms/advance?aut=",
             redirectQueryName: "browse",
           },
           {
             name: "text",
-            title: " letters received ",
+            title: "Letters received ",
             key: "ox_totalWorksAddressedToAgent",
             redirectUrl: "/forms/advance?rec=",
             redirectQueryName: "browse",
           },
           {
             name: "text",
-            title: " letters mentioning",
+            title: "Letters mentioning",
             key: "ox_totalWorksMentioningAgent",
             redirectUrl: "/forms/advance?ment=",
             redirectQueryName: "browse",
@@ -850,7 +850,7 @@ function _getInstitutionComponents(emlo) {
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
         type: "text",
-        sectionTitle: "Alternative names",
+        sectionTitle: "Alternative name",
         sectionTitleImage: "/static/img/icon-repository.png",
         field: "geonames_alternateName",
         divider: true,

@@ -9981,13 +9981,13 @@ h5,
 }
 
 .profilepart {
-  border-top: 1px solid #efc319;
+  /* border-top: 1px solid #efc319; */
   padding-bottom: 20px;
 }
 
 .profilepart:last-child {
   padding-bottom: 45px;
-  border-bottom: 1px solid #efc319;
+  /* border-bottom: 1px solid #efc319; */
 }
 
 .profilepart .content {

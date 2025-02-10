@@ -56,7 +56,7 @@ function _getPeopleComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-title",
         contentTitle: "Person",
-        sectionTitleImage: "/static/img/person-icon.png",
+        contentTitleImage: "/static/img/person-icon.png",
       }),
     }),
 
@@ -337,7 +337,7 @@ function _getLocationComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-title",
         contentTitle: "Location",
-        sectionTitleImage: "/static/img/places-icon.png",
+        contentTitleImage: "/static/img/places-icon.png",
       }),
     }),
 
@@ -528,7 +528,7 @@ function _getInstitutionComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-title",
         contentTitle: "Institution",
-        sectionTitleImage: "/static/img/repository-icon.png",
+        contentTitleImage: "/static/img/repository-icon.png",
       }),
     }),
 
@@ -617,7 +617,7 @@ function _getWorkComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-title",
         contentTitle: "Letter",
-        sectionTitleImage: "/static/img/person-icon.png",
+        contentTitleImage: "/static/img/person-icon.png",
       }),
     }),
 
@@ -1088,7 +1088,7 @@ function _getManifestation(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-title",
         contentTitle: "Document",
-        sectionTitleImage: "/static/img/person-icon.png",
+        contentTitleImage: "/static/img/person-icon.png",
       }),
     }),
 

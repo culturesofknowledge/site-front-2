@@ -1933,16 +1933,18 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   _renderSectionTitle() {
     if (this.component.results && this.component.results.length > 0) {
       const imageTag = this.sectionTitleImage
-        ? `<img style="float:left;height:25px;width:25px;margin-right:15px;" src="${edges.util.escapeHtml(
+        ? `<img style="float:left;" src="${edges.util.escapeHtml(
             this.sectionTitleImage
           )}" alt="${edges.util.escapeHtml(
             this.sectionTitle
           )}" class="title-image">`
         : "";
 
-      return `<${this.sectionTitleStyle} class="section-title">
+      return `
+          <div class="column profilepart">
+      <${this.sectionTitleStyle}>
       ${imageTag} ${edges.util.escapeHtml(this.sectionTitle)}
-    </${this.sectionTitleStyle}>`;
+    </${this.sectionTitleStyle}> </div><br/>`;
     } else {
       return "";
     }

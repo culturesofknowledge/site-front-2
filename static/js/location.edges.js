@@ -1,9 +1,10 @@
 import emlo from "./edges.js";
+let current_search_letter = "a";
 
 try {
   // Fetching URL params
   const queryString = window.location.search;
-  let current_search_letter = "a"; // Setting this as default a
+  // Setting this as default a
 
   if (queryString) {
     const params = new URLSearchParams(queryString);
@@ -198,7 +199,7 @@ function _redirectToSearch(val, res, fieldName) {
     const baseURL = `/forms/advance`;
     let query = "";
     const location = res["browse"];
-
+    const currentPageQ = `browsing=locations&letter=${current_search_letter}`;
     switch (fieldName) {
       case "ox_totalWorksSentFromPlace":
         query = `pla_ori_name=${location}`;
@@ -210,6 +211,9 @@ function _redirectToSearch(val, res, fieldName) {
         query = `pla_ment_name=${location}`;
         break;
     }
+
+    query += query ? `&${currentPageQ}` : `${currentPageQ}`;
+
     const finalUrl = query ? `${baseURL}?${query}` : `${baseURL}`;
 
     return `<a href="${finalUrl}"> ${val} </a>`;

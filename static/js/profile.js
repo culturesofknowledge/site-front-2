@@ -94,9 +94,9 @@ function _getPeopleComponents(emlo) {
         fields: [
           {
             title: "",
-            key: "ox_titleOfResource",
-            otherInfo: "ox_detailsOfResource",
-            linkKey: "dcterms_relation",
+            key: "browse",
+            otherInfo: "",
+            linkKey: "uuid",
           },
         ],
       }),
@@ -115,9 +115,9 @@ function _getPeopleComponents(emlo) {
         fields: [
           {
             title: "",
-            key: "ox_titleOfResource",
-            otherInfo: "ox_detailsOfResource",
-            linkKey: "dcterms_relation",
+            key: "browse",
+            otherInfo: "",
+            linkKey: "uuid",
           },
         ],
       }),
@@ -136,9 +136,9 @@ function _getPeopleComponents(emlo) {
         fields: [
           {
             title: "",
-            key: "ox_titleOfResource",
-            otherInfo: "ox_detailsOfResource",
-            linkKey: "dcterms_relation",
+            key: "browse",
+            otherInfo: "",
+            linkKey: "uuid",
           },
         ],
       }),

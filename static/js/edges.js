@@ -1931,7 +1931,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   }
 
   _renderSectionTitle() {
-    if (this.component.results && this.component.results.length > 0) {
+    if (
+      this.component.results &&
+      this.component.results.length > 0 &&
+      this.sectionTitle
+    ) {
       const imageTag = this.sectionTitleImage
         ? `<img style="float:left;" src="${edges.util.escapeHtml(
             this.sectionTitleImage
@@ -2757,39 +2761,41 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                     const collectionName = parentObject["object_type"];
 
                     cells.push(`
-                      <div>
+                      <dd><p>
                         <a  href="/profile/${collectionName}/${
                       parentObject["uuid"]
                     }" class="clickable-row">${edges.util.escapeHtml(
                       value || ""
                     )}</a>
                       ${otherInfoDiv}
-                      </div>
+                      </p></dd>
                     `);
                   } else {
                     cells.push(`
-                      <div>
+                      <dd><p>
                         <a target="_blank" href="${edges.util.escapeHtml(
                           parentObject[subField.linkKey]
                         )}" class="clickable-row">${edges.util.escapeHtml(
                       value || ""
                     )}</a>
                       ${otherInfoDiv}
-                      </div>
+                      </p></dd>
                     `);
                   }
                 } else {
                   // Create non-clickable cell
                   cells.push(
-                    `<div>${edges.util.escapeHtml(
+                    `
+                    <dd><p>
+                    <div>${edges.util.escapeHtml(
                       value || ""
-                    )}</div> ${otherInfoDiv}`
+                    )}</div> ${otherInfoDiv} </p> </dd>`
                   );
                 }
               });
             }
             // Return the row
-            return `<div>${cells.join("")}</div>`;
+            return `<dl>${cells.join("")}</dl>`;
           })
           .join(""); // Combine all rows for the parent objects
       })
@@ -2797,7 +2803,10 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       .join(""); // Combine all rows into a single HTML string
 
     const labelsList = `
-      <div class="content">
+      <div>
+        <dt> 
+          <strong> ${this.contentTitle} </strong> 
+        </dt>
         ${rows}
       </div>
     `;

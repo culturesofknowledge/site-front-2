@@ -68,7 +68,7 @@ function _getPeopleComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-nested-links",
         divider: true,
-        sectionTitle: "Related Resources ",
+        contentTitle: "Related Resources ",
         primaryField: "rdfs_seeAlso-resource",
         fields: [
           {
@@ -88,7 +88,7 @@ function _getPeopleComponents(emlo) {
       primaryField: "rel_childOf-person",
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-nested-links",
-        sectionTitle: "Parent of ",
+        contentTitle: "Parent of ",
         primaryField: "rel_childOf-person",
         fields: [
           {
@@ -108,7 +108,7 @@ function _getPeopleComponents(emlo) {
       primaryField: "rel_relativeOf-person",
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-nested-links",
-        sectionTitle: "Relative of ",
+        contentTitle: "Relative of ",
         primaryField: "rel_relativeOf-person",
         fields: [
           {
@@ -128,7 +128,7 @@ function _getPeopleComponents(emlo) {
       primaryField: "foaf_member-person",
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-nested-links",
-        sectionTitle: "Member of ",
+        contentTitle: "Member of ",
         primaryField: "foaf_member-person",
         fields: [
           {
@@ -349,7 +349,7 @@ function _getLocationComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-nested-links",
         divider: true,
-        sectionTitle: "Related Resources ",
+        contentTitle: "Related Resources ",
         primaryField: "rdfs_seeAlso-resource",
         fields: [
           {
@@ -369,7 +369,7 @@ function _getLocationComponents(emlo) {
       primaryField: "rel_wasBirthplaceOf-person",
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-nested-links",
-        sectionTitle: "People born at place ",
+        contentTitle: "People born at place ",
         primaryField: "rel_wasBirthplaceOf-person",
         fields: [
           {
@@ -549,7 +549,7 @@ function _getInstitutionComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-nested-links",
         divider: true,
-        sectionTitle: "Related Resources ",
+        contentTitle: "Related Resources ",
         primaryField: "rdfs_seeAlso-resource",
         fields: [
           {
@@ -638,7 +638,7 @@ function _getWorkComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-nested-links",
         divider: true,
-        sectionTitle: "Related Resources ",
+        contentTitle: "Related Resources ",
         primaryField: "rdfs_seeAlso-resource",
         fields: [
           {

@@ -2409,8 +2409,13 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     // Current format for datasets with parentObject count <= 30
     const rows = this.component.results
       .map((result) => {
-        const parentObjects = result[parentField];
+        let parentObjects = result[parentField];
         if (!parentObjects || parentObjects.length === 0) return "";
+
+        parentObjects.sort(
+          (a, b) => a["ox_started-ox_year"] - b["ox_started-ox_year"]
+        );
+        let lastfieldKey = 0;
 
         return parentObjects
           .map((parentObject) => {
@@ -2421,7 +2426,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
               const value = parentObject[field];
               cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
             }
-
             if (subFields) {
               subFields.forEach((subField) => {
                 const value = parentObject[subField.key];
@@ -2436,7 +2440,23 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                     </td>
                   `);
                 } else {
-                  cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
+                  if (
+                    subField.key == "ox_started-ox_year" ||
+                    subField.key == "ox_completed-ox_year"
+                  ) {
+                    if (lastfieldKey !== value) {
+                      lastfieldKey = value;
+                      cells.push(
+                        `<td>${edges.util.escapeHtml(value || "")}</td>`
+                      );
+                    } else {
+                      cells.push(`<td></td>`);
+                    }
+                  } else {
+                    cells.push(
+                      `<td>${edges.util.escapeHtml(value || "")}</td>`
+                    );
+                  }
                 }
               });
             }

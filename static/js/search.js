@@ -514,13 +514,22 @@ function advanceSearch(params) {
     const toDay = params.get("dat_to_day");
 
     if (sinYear) {
-      openingQuery.queryStrings.push({
-        queryString: sinYear,
-        fields: [
-          { field: "ox_started-ox_year", operator: "OR" },
-          { field: "ox_completed-ox_year", operator: "OR" },
-        ],
-      });
+      if (sinYear == "Unknown year") {
+        openingQuery.query.range = {
+          started_date_sort: {
+            lte: "9999-12-31T00:00:00Z",
+            gte: "9999-1-1T00:00:00Z",
+          },
+        };
+      } else {
+        openingQuery.queryStrings.push({
+          queryString: sinYear,
+          fields: [
+            { field: "ox_started-ox_year", operator: "OR" },
+            { field: "ox_completed-ox_year", operator: "OR" },
+          ],
+        });
+      }
     }
 
     if (sinMonth) {

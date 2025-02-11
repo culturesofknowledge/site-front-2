@@ -537,6 +537,7 @@ function _getPeopleComponents(emlo) {
         sectionTitle: "Letters Written",
         sectionTitleImage: "/static/img/icon-quill.png",
         primaryField: "frbr_creatorOf-work",
+        field: "aut",
         fields: [
           { title: "", key: "ox_started-ox_year" },
           {
@@ -560,6 +561,7 @@ function _getPeopleComponents(emlo) {
         sectionTitle: "Letters Received",
         sectionTitleImage: "/static/img/icon-quill.png",
         primaryField: "mail_recipientOf-work",
+        field: "rec",
         fields: [
           { title: "", key: "ox_started-ox_year" },
           {
@@ -583,6 +585,7 @@ function _getPeopleComponents(emlo) {
         sectionTitle: "Letters Mentioning",
         sectionTitleImage: "/static/img/icon-quill.png",
         primaryField: "dcterms_isReferencedBy-work",
+        field: "ment",
         fields: [
           { title: "", key: "ox_started-ox_year" },
           {
@@ -742,6 +745,7 @@ function _getLocationComponents(emlo) {
         sectionTitle: "Letters Sent From",
         sectionTitleImage: "/static/img/icon-quill.png",
         primaryField: "mail_originOf-work",
+        field: "pla_ori_name",
         fields: [
           { title: "", key: "ox_started-ox_year" },
           {
@@ -765,6 +769,7 @@ function _getLocationComponents(emlo) {
         sectionTitle: "Letters Sent To",
         sectionTitleImage: "/static/img/icon-quill.png",
         primaryField: "mail_destinationOf-work",
+        field: "pla_des_name",
         fields: [
           { title: "", key: "ox_started-ox_year" },
           {
@@ -788,6 +793,7 @@ function _getLocationComponents(emlo) {
         sectionTitle: "Letters Mentioning",
         sectionTitleImage: "/static/img/icon-quill.png",
         primaryField: "dcterms_isReferencedBy-work",
+        field: "pla_ment_name",
         fields: [
           { title: "", key: "ox_started-ox_year" },
           {

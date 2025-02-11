@@ -2160,13 +2160,25 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     // Render custom content
 
     if (this.field) {
-      return this.component.results[0][this.field]
-        ? ` 
-    <div class="custom-content">
-      ${edges.util.escapeHtml(this.component.results[0][this.field])}
-    </div>
-    `
-        : "";
+      const result = this.component.results[0][this.field];
+
+      if (result) {
+        if (this.field == "ox_locationAlternateName") {
+          const alt_name = result.split("\n").join("; ");
+
+          return `
+            <div class="custom-content">
+              ${edges.util.escapeHtml(alt_name)}
+            </div>`;
+        } else {
+          return `
+            <div class="custom-content">
+              ${edges.util.escapeHtml(result)}
+            </div>`;
+        }
+      } else {
+        return "";
+      }
     }
 
     if (this.fields.length > 0) {

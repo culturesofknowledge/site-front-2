@@ -2213,11 +2213,12 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const lat = this.component.results[0][this.lat_field];
     const lon = this.component.results[0][this.long_field];
 
-    // Generate a unique ID for the map container (to avoid clashes if multiple maps are rendered)
-    const mapContainerId = `map-${Math.random().toString(36).substr(2, 9)}`;
+    if (lat && lon) {
+      // Generate a unique ID for the map container (to avoid clashes if multiple maps are rendered)
+      const mapContainerId = `map-${Math.random().toString(36).substr(2, 9)}`;
 
-    // Render the location and include a map container
-    return `<div class="content">
+      // Render the location and include a map container
+      return `<div class="content">
     <div class="content">
         <dl>  
             <dt> 
@@ -2237,6 +2238,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         <div id="location-map" data-lat="${lat}" data-long="${lon}" style="height: 300px; width: 100%; margin-top: 10px;"></div>
     </div></div>
     `;
+    } else {
+      return "";
+    }
   }
 
   _renderDates() {

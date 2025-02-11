@@ -2205,27 +2205,25 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const mapContainerId = `map-${Math.random().toString(36).substr(2, 9)}`;
 
     // Render the location and include a map container
-    return `<div class="location">
-        <span>  
-            <div>
-              <dl> 
-                <strong> Latitude </strong>
-              </dl>
-              <dd>
-                ${lat}
-              </dd>
-            </div>
-            <div>
-              <dl> 
-                <strong> Longitude </strong>
-              </dl>
-              <dd>
-                ${lon}
-              </dd>
-            </div>
-        </span>
+    return `<div class="content">
+    <div class="content">
+        <dl>  
+            <dt> 
+              <strong> Latitude </strong>
+            </dt>
+            <dd>
+              ${lat}
+            </dd>
+            
+            <dt> 
+              <strong> Longitude </strong>
+            </dt>
+            <dd>
+              ${lon}
+            </dd>
+        </dl>
         <div id="location-map" data-lat="${lat}" data-long="${lon}" style="height: 300px; width: 100%; margin-top: 10px;"></div>
-    </div>
+    </div></div>
     `;
   }
 

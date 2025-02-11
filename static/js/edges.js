@@ -2536,7 +2536,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                   `);
                 } else {
                   // Create non-clickable cell
-                  cells.push(`<li>${edges.util.escapeHtml(value || "")}</li>`);
+                  cells.push(
+                    `<li style="white-space: break-spaces;">${edges.util.escapeHtml(
+                      value || ""
+                    )}</li>`
+                  );
                 }
               });
             }

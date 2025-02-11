@@ -806,6 +806,33 @@ function _getLocationComponents(emlo) {
         divider: true,
       }),
     }),
+
+    new emlo.MultiFields({
+      id: "gap",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        sectionTitle: "Comments",
+        divider: true,
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "comments-new",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "ox_isAnnotatedBy-comment",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested-list",
+        sectionTitleStyle: "span",
+        primaryField: "ox_isAnnotatedBy-comment",
+        fields: [
+          {
+            title: "",
+            key: "bibo_Note",
+          },
+        ],
+      }),
+    }),
   ];
 }
 

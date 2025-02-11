@@ -649,7 +649,7 @@ function _getLocationComponents(emlo) {
     }),
 
     new emlo.MultiFields({
-      id: "related-people",
+      id: "related-people-born",
       category: "sidebar",
       fetchSecondaryData: true,
       primaryField: "rel_wasBirthplaceOf-person",
@@ -657,6 +657,46 @@ function _getLocationComponents(emlo) {
         type: "side-nested-links",
         contentTitle: "People born at place ",
         primaryField: "rel_wasBirthplaceOf-person",
+        fields: [
+          {
+            title: "",
+            key: "browse",
+            otherInfo: "ox_titlesRolesOccupations",
+            linkKey: "uuid",
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "related-people-died",
+      category: "sidebar",
+      fetchSecondaryData: true,
+      primaryField: "rel_wasPlaceOfDeathOf-person",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "side-nested-links",
+        contentTitle: "People who died at place",
+        primaryField: "rel_wasPlaceOfDeathOf-person",
+        fields: [
+          {
+            title: "",
+            key: "browse",
+            otherInfo: "ox_titlesRolesOccupations",
+            linkKey: "uuid",
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "related-people-visited",
+      category: "sidebar",
+      fetchSecondaryData: true,
+      primaryField: "rel_wasVisitedBy-person",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "side-nested-links",
+        contentTitle: "People who visited place ",
+        primaryField: "rel_wasVisitedBy-person",
         fields: [
           {
             title: "",

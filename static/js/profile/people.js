@@ -403,13 +403,41 @@ export function getPeopleComponents(emlo) {
       id: "dates",
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
-        type: "dates",
+        type: "date-people",
         sectionTitle: "Dates",
         sectionTitleImage: "/static/img/icon-calendar.png",
         divider: true,
         fields: [
-          { title: "Date of birth", key: "bio_Birth-ox_year" },
-          { title: "Date of death", key: "bio_Death-ox_year" },
+          {
+            title: "Date of birth",
+            keys: {
+              date: {
+                day: "bio_Birth-ox_day",
+                month: "bio_Birth-ox_month",
+                year: "bio_Birth-ox_year",
+              },
+              flag: {
+                indef_uncertain: "uncertain",
+                indef_inferred: "inferred",
+                indef_approximate: "approximate",
+              },
+            },
+          },
+          {
+            title: "Date of death",
+            keys: {
+              date: {
+                day: "bio_Death-ox_day",
+                month: "bio_Death-ox_month",
+                year: "bio_Death-ox_year",
+              },
+              flag: {
+                indef_uncertain: "uncertain",
+                indef_inferred: "inferred",
+                indef_approximate: "approximate",
+              },
+            },
+          },
         ],
       }),
     }),

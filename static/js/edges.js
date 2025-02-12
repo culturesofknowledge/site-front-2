@@ -1911,6 +1911,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         case "dates":
           frag = this._renderDates();
           break;
+        case "date-people":
+          frag = this._renderDatesForPeople();
+          break;
         case "stats":
           frag = this._renderStats();
           break;
@@ -2300,6 +2303,81 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     } else {
       return "";
     }
+  }
+
+  // Specific for people on profile
+  _renderDatesForPeople() {
+    let content = "";
+    let resultObj = this.component.results[0];
+
+    this.fields.map((field) => {
+      let displayValue = "";
+
+      if (field.keys.date) {
+        let day = field.keys.date.day
+          ? resultObj[field.keys.date.day] || ""
+          : "";
+        let month = field.keys.date.month
+          ? resultObj[field.keys.date.month]
+            ? this._getMonthName(resultObj[field.keys.date.month])
+            : ""
+          : "";
+        let year =
+          field.keys.date.year && resultObj[field.keys.date.year] !== 9999
+            ? resultObj[field.keys.date.year]
+            : "";
+
+        let dateParts = [day, month, year].filter(Boolean).join(" ");
+        if (dateParts) {
+          displayValue = dateParts;
+        }
+      }
+
+      if (field.keys.flag) {
+        let flagValues = Object.keys(field.keys.flag)
+          .map((key) => (key && resultObj[key] ? field.keys.flag[key] : ""))
+          .filter(Boolean)
+          .join(", ");
+        if (flagValues) {
+          displayValue = flagValues;
+        }
+      }
+
+      if (displayValue) {
+        content += `
+      <dt>
+        <strong> ${field.title || ""} </strong>
+      </dt>
+      <dd> 
+        ${displayValue}
+      </dd>
+    `;
+      }
+    });
+
+    if (content) {
+      return `<div class="content"><dl> ${content} </dl></div>`;
+    } else {
+      return "";
+    }
+  }
+
+  _getMonthName(monthKey) {
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    return months[monthKey - 1] || "";
   }
 
   _formatDate(timestamp) {

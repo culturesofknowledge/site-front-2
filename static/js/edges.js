@@ -1613,20 +1613,39 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
 
   // PATCH: currently we do not have anything in edges that can help us with this.
   _getDisplayValue(field, value) {
-    if (field === "uuid_related") {
+    const colMap = {
+      "mail_origin-location": "locations",
+      "mail_destination-location": "locations",
+      "dcterms_references-location": "locations",
+    };
+
+    const validFields = [
+      "uuid_related",
+      "dcterms_references-location",
+      "mail_destination-location",
+      "mail_origin-location",
+    ];
+
+    if (validFields.includes(field)) {
       // Return a placeholder value immediately
       const placeholder = "Loading...";
 
+      if (value && value.startsWith("*") && value.endsWith("*")) {
+        value = value.slice(1, -1);
+      }
+
+      let collectionName = "";
+
+      if (colMap.hasOwnProperty(field)) {
+        collectionName = colMap[field];
+      }
+
       // Fetch names asynchronously
-      this._fetchNames(value).then((names) => {
+      this._fetchNames(value, collectionName).then((names) => {
         if (names) {
           // Find all matching elements dynamically and update their content
           document
-            .querySelectorAll(
-              `[data-field="${edges.util.escapeHtml(
-                field
-              )}"][data-key="${edges.util.escapeHtml(value)}"]`
-            )
+            .querySelectorAll(`[data-field="${edges.util.escapeHtml(field)}"]`)
             .forEach((el) => {
               el.innerHTML = `
                 ${edges.util.escapeHtml(names)}
@@ -1642,13 +1661,19 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
     }
   }
 
-  async _fetchNames(value) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const browsing = urlParams.get("browsing");
+  async _fetchNames(value, colName) {
+    let collectionName = "";
     let fl = "browse";
 
-    const collectionName =
-      browsing && browsing != "organisations" ? `${browsing}` : `people`;
+    if (colName) {
+      collectionName = colName;
+    } else {
+      const urlParams = new URLSearchParams(window.location.search);
+      const browsing = urlParams.get("browsing");
+
+      collectionName =
+        browsing && browsing != "organisations" ? `${browsing}` : `people`;
+    }
 
     if (!collectionName) {
       console.error("Collection name not found in the URL.");
@@ -1682,6 +1707,8 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
         return "Catalogue";
       case "ox_started-ox_year":
         return "Year";
+      case "mail_origin-location":
+        return " Origin of letter";
       case "uuid_related":
         return "Any from list";
       default:
@@ -4427,6 +4454,19 @@ function _removeUrlParam(field) {
   if (field == "uuid_related") {
     delete_field = "uuids";
   }
+
+  if (field == "dcterms_references-location") {
+    delete_field = "dcterms_references-location";
+  }
+
+  if (field == "mail_destination-location") {
+    delete_field = "mail_destination-location";
+  }
+
+  if (field == "mail_origin-location") {
+    delete_field = "mail_origin-location";
+  }
+
   if (fieldMap.hasOwnProperty(field)) {
     delete_field = fieldMap[field].primary;
     secondaryField = fieldMap[field].secondary;

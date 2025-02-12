@@ -1707,8 +1707,12 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
         return "Catalogue";
       case "ox_started-ox_year":
         return "Year";
-      case "mail_origin-location":
+      case "mail_origin-location" || "pla_ori_name":
         return " Origin of letter";
+      case "mail_destination-location" || "pla_des_name":
+        return " Origin of letter";
+      case "dcterms_references-location" || "pla_ment_name":
+        return " Places mentioned";
       case "uuid_related":
         return "Any from list";
       default:

@@ -1302,7 +1302,7 @@ emlo.FacetRenderer = class extends edges.Renderer {
 
     let tog = this.title;
     if (this.togglable) {
-      tog = `<p class="main">${this.title}</p>`;
+      tog = `<h4 class="main">${this.title}</h4>`;
     }
 
     let isHideCount = false;

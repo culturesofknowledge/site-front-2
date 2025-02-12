@@ -515,7 +515,8 @@ export function getPeopleComponents(emlo) {
         sectionTitle: "Letters Written",
         sectionTitleImage: "/static/img/icon-quill.png",
         primaryField: "frbr_creatorOf-work",
-        field: "aut",
+        field: "frbr_creator-person",
+        primaryResultKey: "uuid",
         fields: [
           { title: "", key: "ox_started-ox_year" },
           {
@@ -539,7 +540,8 @@ export function getPeopleComponents(emlo) {
         sectionTitle: "Letters Received",
         sectionTitleImage: "/static/img/icon-quill.png",
         primaryField: "mail_recipientOf-work",
-        field: "rec",
+        field: "mail_recipient-person",
+        primaryResultKey: "uuid",
         fields: [
           { title: "", key: "ox_started-ox_year" },
           {
@@ -563,7 +565,8 @@ export function getPeopleComponents(emlo) {
         sectionTitle: "Letters Mentioning",
         sectionTitleImage: "/static/img/icon-quill.png",
         primaryField: "dcterms_isReferencedBy-work",
-        field: "ment",
+        field: "dcterms_references-person",
+        primaryResultKey: "uuid",
         fields: [
           { title: "", key: "ox_started-ox_year" },
           {

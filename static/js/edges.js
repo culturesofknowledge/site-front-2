@@ -1617,6 +1617,9 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
       "mail_origin-location": "locations",
       "mail_destination-location": "locations",
       "dcterms_references-location": "locations",
+      "frbr_creator-person": "people",
+      "mail_recipient-person": "people",
+      "dcterms_references-person": "people",
     };
 
     const validFields = [
@@ -1624,6 +1627,9 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
       "dcterms_references-location",
       "mail_destination-location",
       "mail_origin-location",
+      "frbr_creator-person",
+      "mail_recipient-person",
+      "dcterms_references-person",
     ];
 
     if (validFields.includes(field)) {
@@ -1696,9 +1702,13 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
   _getSelectedFieldLabel(field) {
     switch (field) {
       case "author_sort":
+      case "frbr_creator-person":
         return "Author";
       case "recipient_sort":
+      case "mail_recipient-person":
         return "Recipient";
+      case "dcterms_references-person":
+        return "Mentions";
       case "origin_sort":
         return "Origin of letter";
       case "destination_sort":
@@ -4540,16 +4550,17 @@ function _removeUrlParam(field) {
     delete_field = "uuids";
   }
 
-  if (field == "dcterms_references-location") {
-    delete_field = "dcterms_references-location";
-  }
+  const validFields = [
+    "dcterms_references-location",
+    "mail_destination-location",
+    "mail_origin-location",
+    "frbr_creator-person",
+    "mail_recipient-person",
+    "dcterms_references-person",
+  ];
 
-  if (field == "mail_destination-location") {
-    delete_field = "mail_destination-location";
-  }
-
-  if (field == "mail_origin-location") {
-    delete_field = "mail_origin-location";
+  if (validFields.includes(field)) {
+    delete_field = field;
   }
 
   if (fieldMap.hasOwnProperty(field)) {

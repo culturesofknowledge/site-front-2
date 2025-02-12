@@ -168,7 +168,8 @@ export function getLocationComponents(emlo) {
         sectionTitle: "Letters Sent From",
         sectionTitleImage: "/static/img/icon-quill.png",
         primaryField: "mail_originOf-work",
-        field: "pla_ori_name",
+        field: "mail_origin-location",
+        primaryResultKey: "uuid",
         fields: [
           { title: "", key: "ox_started-ox_year" },
           {
@@ -192,7 +193,8 @@ export function getLocationComponents(emlo) {
         sectionTitle: "Letters Sent To",
         sectionTitleImage: "/static/img/icon-quill.png",
         primaryField: "mail_destinationOf-work",
-        field: "pla_des_name",
+        field: "mail_destination-location",
+        primaryResultKey: "uuid",
         fields: [
           { title: "", key: "ox_started-ox_year" },
           {
@@ -216,7 +218,8 @@ export function getLocationComponents(emlo) {
         sectionTitle: "Letters Mentioning",
         sectionTitleImage: "/static/img/icon-quill.png",
         primaryField: "dcterms_isReferencedBy-work",
-        field: "pla_ment_name",
+        field: "dcterms_references-location",
+        primaryResultKey: "uuid",
         fields: [
           { title: "", key: "ox_started-ox_year" },
           {

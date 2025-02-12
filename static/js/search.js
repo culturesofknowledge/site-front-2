@@ -487,6 +487,27 @@ function advanceSearch(params) {
       });
     }
 
+    if (params.get("mail_origin-location")) {
+      openingQuery.must.push({
+        field: "mail_origin-location",
+        value: `*${params.get("mail_origin-location")}*`,
+      });
+    }
+
+    if (params.get("mail_destination-location")) {
+      openingQuery.must.push({
+        field: "mail_destination-location",
+        value: `*${params.get("mail_destination-location")}*`,
+      });
+    }
+
+    if (params.get("dcterms_references-location")) {
+      openingQuery.must.push({
+        field: "dcterms_references-location",
+        value: `*${params.get("dcterms_references-location")}*`,
+      });
+    }
+
     if (params.get("ox_started-ox_year")) {
       openingQuery.must.push({
         field: "ox_started-ox_year",

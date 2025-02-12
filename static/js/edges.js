@@ -1861,6 +1861,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     );
     this.fields = edges.util.getParam(params, "fields", []);
     this.primaryField = edges.util.getParam(params, "primaryField", "");
+    this.primaryResultKey = edges.util.getParam(params, "primaryResultKey", "");
     this.lat_field = edges.util.getParam(params, "lat_field", "");
     this.long_field = edges.util.getParam(params, "long_field", "");
     this.divider = edges.util.getParam(params, "divider", false); // Whether to include a divider
@@ -2403,7 +2404,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
           parentObject["ox_started-ox_year"] ||
           parentObject["ox_completed-ox_year"];
 
-        queryVal = parentObject["author_sort"];
+        if (this.primaryResultKey) {
+          queryVal = this.component.results[0][this.primaryResultKey];
+        } else {
+          queryVal = parentObject["author_sort"];
+        }
 
         if (year) {
           const decade = Math.floor(year / 10) * 10; // Calculate decade

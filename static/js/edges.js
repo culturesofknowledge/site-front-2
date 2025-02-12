@@ -2475,10 +2475,10 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
             if (!parentObject) return "";
 
             const cells = [];
-            if (field) {
-              const value = parentObject[field];
-              cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
-            }
+            // if (field) {
+            //   const value = parentObject[field];
+            //   cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
+            // }
             if (subFields) {
               subFields.forEach((subField) => {
                 const value = parentObject[subField.key];
@@ -2505,10 +2505,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                     } else {
                       cells.push(`<td></td>`);
                     }
-                  } else {
-                    cells.push(
-                      `<td>${edges.util.escapeHtml(value || "")}</td>`
-                    );
                   }
                 }
               });

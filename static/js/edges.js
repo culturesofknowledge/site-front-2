@@ -2334,13 +2334,12 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       }
 
       if (field.keys.flag) {
-        let flagValues = Object.keys(field.keys.flag)
-          .map((key) => (key && resultObj[key] ? field.keys.flag[key] : ""))
-          .filter(Boolean)
-          .join(", ");
-        if (flagValues) {
-          displayValue = flagValues;
-        }
+        Object.keys(field.keys.flag).forEach((item) => {
+          // const key = field.keys.flag[item];
+          if (resultObj[item]) {
+            displayValue += ` ${field.keys.flag[item]}`;
+          }
+        });
       }
 
       if (displayValue) {

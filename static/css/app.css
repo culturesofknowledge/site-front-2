@@ -6744,6 +6744,7 @@ meta.foundation-mq-topbar {
 .top-bar .toggle-topbar.menu-icon {
   top: 50%;
   margin-top: -16px;
+  left: 55%;
 }
 
 .top-bar .toggle-topbar.menu-icon a {

@@ -50,6 +50,8 @@
 <script type="module" src="../static/js/tooltip.js"></script>
 
 <script>
+var catalogue_count = 0
+var image_limit = 0
 function changeEventOnFrom(val){
     const dat_to_year = document.getElementById("dat_to_year")
     
@@ -71,6 +73,8 @@ function changeEventOnTo(val){
 }
 
 async function loadCatalougeData(){
+    catalouge_count = "{{ catalouge_count }}"
+    image_limit = "{{ image_limit }}"
     try {
         const response = await fetch('/catalogues');
         if (!response.ok) {

@@ -36,7 +36,7 @@
             onchange="changeEventOnFrom(this.options[this.selectedIndex].value)"
           >
             <option class="default" selected="selected">all years</option>
-            {% for year in range(1450, 1860) %}
+            {% for year in range(1450, 1861) %}
             <option value="{{ year }}">{{ year }}</option>
             {% endfor %}
           </select>
@@ -52,7 +52,7 @@
             onchange="changeEventOnTo(this.options[this.selectedIndex].value)"
           >
             <option class="default" selected="selected">all years</option>
-            {% for year in range(1450, 1860) %}
+            {% for year in range(1450, 1861) %}
             <option value="{{ year }}">{{ year }}</option>
             {% endfor %}
           </select>

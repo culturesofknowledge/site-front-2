@@ -66,6 +66,8 @@ try {
             redirectURL:
               "http://emlo-portal.bodleian.ox.ac.uk/collections/?page_id=480",
             statKey: "cito_Catalog",
+            dontFetch: true,
+            hardCodedCount: catalogue_count,
             tweakCount: 0,
             upperLimit: 0,
           },
@@ -91,7 +93,7 @@ try {
             redirectURL: "",
             statKey: "image",
             tweakCount: 0,
-            upperLimit: 48661,
+            upperLimit: image_limit,
           },
           {
             title: "Comments",

@@ -3230,11 +3230,15 @@ emlo.StatsRenderer = class extends edges.Renderer {
           <br />
           
           <span>
-            ${this._getStatCount(
-              item.statKey,
-              item.tweakCount,
-              item.upperLimit
-            )}
+            ${
+              item.dontFetch
+                ? item.hardCodedCount
+                : this._getStatCount(
+                    item.statKey,
+                    item.tweakCount,
+                    item.upperLimit
+                  )
+            }
           </span>
           
           <br />

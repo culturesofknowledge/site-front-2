@@ -1,5 +1,7 @@
 import emlo from "./edges.js";
 
+console.log("catalouge_count", catalouge_count);
+
 try {
   emlo.selector = "home-stats";
   emlo.collection = "/solr/all/select";
@@ -66,6 +68,8 @@ try {
             redirectURL:
               "http://emlo-portal.bodleian.ox.ac.uk/collections/?page_id=480",
             statKey: "cito_Catalog",
+            dontFetch: true,
+            hardCodedCount: catalouge_count,
             tweakCount: 0,
             upperLimit: 0,
           },
@@ -91,7 +95,7 @@ try {
             redirectURL: "",
             statKey: "image",
             tweakCount: 0,
-            upperLimit: 48661,
+            upperLimit: image_limit,
           },
           {
             title: "Comments",

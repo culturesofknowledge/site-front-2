@@ -7124,6 +7124,34 @@ meta.foundation-mq-topbar {
   display: block;
 }
 
+@media only screen and (max-width: 767px) {
+  .top-bar .toggle-topbar {
+    display: block !important;
+  }
+
+  .top-bar-section {
+    display: none;
+  }
+
+  .top-bar.expanded .top-bar-section {
+    display: block;
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .top-bar-section ul {
+    display: block;
+    width: 100%;
+    text-align: left;
+  }
+
+  .top-bar-section ul li {
+    float: none;
+    display: block;
+    width: 100%;
+  }
+}
+
 @media only screen and (min-width: 40.063em) {
   .top-bar {
     background: #333333;

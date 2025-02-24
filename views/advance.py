@@ -4,7 +4,7 @@ advance_bp = Blueprint('advance', __name__)
 
 # Constants
 START_YEAR = 1450
-END_YEAR = 1860
+END_YEAR = 1861
 
 MONTHS_MAP = {
     "January": "01",

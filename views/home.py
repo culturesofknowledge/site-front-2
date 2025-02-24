@@ -7,25 +7,25 @@ home_bp = Blueprint('home', __name__)
 
 @home_bp.route('/')
 def home():
-    catalouge_data = "static/data/catalouge.json"
+    catalogue_data = "static/data/catalogue.json"
     variables = "static/data/variable.json"
 
     try:
-        with open(catalouge_data, "r", encoding="utf-8") as file:
+        with open(catalogue_data, "r", encoding="utf-8") as file:
             data = json.load(file)
         
         with open(variables, "r", encoding="utf-8") as file:
             var_data = json.load(file)
         
         # Count the length of each array in the JSON
-        catalouge_count = sum(len(value) for value in data.values() if isinstance(value, list))
+        catalogue_count = sum(len(value) for value in data.values() if isinstance(value, list))
         image_limit = var_data.get("image_limit")
 
     except (FileNotFoundError, json.JSONDecodeError) as e:
-        catalouge_count = 0
+        catalogue_count = 0
         image_limit = 0
         print(f"Error loading JSON: {e}")
-    return render_template('home.jinja2', title="Home" , catalouge_count = catalouge_count , image_limit=image_limit)
+    return render_template('home.jinja2', title="Home" , catalogue_count = catalogue_count , image_limit=image_limit)
 
 @home_bp.route('/catalogues')
 def load_catalogues():

@@ -10426,3 +10426,68 @@ button.tiny {
 .stats-image {
   margin-bottom: 10px;
 }
+
+/* Normal (closed) state */
+.combo-box {
+  background-color: #ffffff;
+  border: #efc319 2px solid;
+}
+
+.combo-display {
+  -webkit-appearance: none !important;
+  -webkit-border-radius: 0px;
+  background-color: #ffffff;
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgeD0iMTJweCIgeT0iMHB4IiB3aWR0aD0iMjRweCIgaGVpZ2h0PSIzcHgiIHZpZXdCb3g9IjAgMCA2IDMiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDYgMyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHBvbHlnb24gcG9pbnRzPSI1Ljk5MiwwIDIuOTkyLDMgLTAuMDA4LDAgIi8+PC9zdmc+);
+  background-position: 100% center;
+  background-repeat: no-repeat;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #cccccc;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
+  color: rgba(0, 0, 0, 0.75);
+  line-height: normal;
+  border-radius: 0;
+  height: 2.3125rem;
+}
+
+/* Open state - when dropdown is active */
+.combo-box.open .combo-display {
+  border-color: #007bff; /* Highlight border */
+  background: #f0f8ff; /* Light blue background */
+  box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2); /* Soft shadow */
+}
+
+/* Dropdown styles */
+.combo-dropdown {
+  position: absolute;
+  width: 100%;
+  background: white;
+  border: 1px solid #ccc;
+  display: none;
+  z-index: 10;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.combo-search {
+  width: 100%;
+  padding: 5px;
+  box-sizing: border-box;
+  border-bottom: 1px solid #ccc;
+}
+
+.combo-options {
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.combo-option {
+  padding: 5px;
+  cursor: pointer;
+}
+
+.combo-option:hover {
+  background: #eee;
+}

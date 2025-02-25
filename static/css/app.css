@@ -6744,6 +6744,7 @@ meta.foundation-mq-topbar {
 .top-bar .toggle-topbar.menu-icon {
   top: 50%;
   margin-top: -16px;
+  left: 55%;
 }
 
 .top-bar .toggle-topbar.menu-icon a {
@@ -7121,6 +7122,34 @@ meta.foundation-mq-topbar {
 
 .js-generated {
   display: block;
+}
+
+@media only screen and (max-width: 767px) {
+  .top-bar .toggle-topbar {
+    display: block !important;
+  }
+
+  .top-bar-section {
+    display: none;
+  }
+
+  .top-bar.expanded .top-bar-section {
+    display: block;
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .top-bar-section ul {
+    display: block;
+    width: 100%;
+    text-align: left;
+  }
+
+  .top-bar-section ul li {
+    float: none;
+    display: block;
+    width: 100%;
+  }
 }
 
 @media only screen and (min-width: 40.063em) {
@@ -10396,11 +10425,11 @@ button.tiny {
 .tooltip::before {
   content: "";
   position: absolute;
-  top: -5px;
+  bottom: -5px; /* Position at bottom */
   transform: translateX(-50%);
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
-  border-bottom: 5px solid #1a1a1a;
+  border-top: 5px solid #1a1a1a; /* Arrow now points downward */
 }
 
 .tooltip.show {
@@ -10431,6 +10460,7 @@ button.tiny {
 .combo-box {
   background-color: #ffffff;
   border: #efc319 2px solid;
+  margin-bottom: 10px;
 }
 
 .combo-display {

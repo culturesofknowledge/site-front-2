@@ -10460,6 +10460,7 @@ button.tiny {
 .combo-box {
   background-color: #ffffff;
   border: #efc319 2px solid;
+  margin-bottom: 10px;
 }
 
 .combo-display {

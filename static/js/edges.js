@@ -632,6 +632,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
     // New parameters for selection functionality
     this.defaultSelected = edges.util.getParam(params, "defaultSelected", []);
     this.showCheckbox = edges.util.getParam(params, "showCheckbox", false);
+    this.selectField = edges.util.getParam(params, "selectField", "uuid");
     this.checkboxLimit = edges.util.getParam(params, "checkboxLimit", 10);
     this.displayField = edges.util.getParam(params, "displayField", "");
 
@@ -779,20 +780,32 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       })
       .join("");
 
-    const isChecked = this.defaultSelected.includes(res.uuid) ? "checked" : "";
+    const data = this._getSelectField(res[this.selectField], this.selectField);
+    const isChecked = this.defaultSelected.includes(data) ? "checked" : "";
     if (isChecked) {
-      this.selectedRows.add(res.uuid);
+      this.selectedRows.add(data);
     }
 
     const checkboxCell = this.showCheckbox
-      ? `<td><input type="checkbox" class="select-row" data-uuid="${
-          res.uuid
-        }" data-display="${res[this.displayField]}" ${isChecked}></td>`
+      ? `<td><input type="checkbox" class="select-row" data-uuid="${data}" data-display="${
+          res[this.displayField]
+        }" ${isChecked}></td>`
       : "";
 
     return this.showIndex
       ? `<tr class="${rowClasses}">${checkboxCell}<td>${continuousIndex}</td>${row}</tr>`
       : `<tr class="${rowClasses}">${checkboxCell}${row}</tr>`;
+  }
+
+  _getSelectField(data, selectField) {
+    if (selectField == "uuid") {
+      return data;
+    } else {
+      if (Array.isArray(data) && data.length > 0) {
+        return data.map((url) => url.split("/").pop()).join(", ");
+      }
+      return "";
+    }
   }
 
   _renderSideNav() {

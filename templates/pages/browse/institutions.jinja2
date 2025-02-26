@@ -1,7 +1,19 @@
 {% extends "/base/browse_base.jinja2" %}
 
 {% block browse_content %}
-    <div class="row row-with-side" style="margin-left: 20px;">
+    <div class="row row-with-side">
+    
+        <div id="side-nav" class="side-nav" style="display: none;"> 
+            <h2 class="main">Current Selection</h2>
+
+            <div id="selected-items-list"></div>
+
+            <div>
+                <button onclick="searchLetters('people')">Show letters</button>
+            </div>
+        </div>
+
+        <div class="row row-with-side" style="margin-left: 20px;">
          <div class="large-12 columns">
             <div id="people" class="large-12 columns">
                 <br/>
@@ -32,6 +44,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 {% endblock %}
 

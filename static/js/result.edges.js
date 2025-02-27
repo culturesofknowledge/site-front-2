@@ -229,6 +229,7 @@ try {
         category: "refine_search",
         field: "author_sort",
         display: "Author",
+        size: -1,
         renderer: new emlo.FacetRenderer({
           open: true,
           title: "Author",
@@ -244,6 +245,7 @@ try {
         category: "refine_search",
         field: "recipient_sort",
         display: "Recipient",
+        size: -1,
         renderer: new emlo.FacetRenderer({
           open: true,
           title: "Recipient",
@@ -259,6 +261,7 @@ try {
         category: "refine_search",
         field: "origin_sort",
         display: "Origin of letter",
+        size: -1,
         renderer: new emlo.FacetRenderer({
           open: true,
           title: "Origin of letter",
@@ -274,6 +277,7 @@ try {
         category: "refine_search",
         field: "destination_sort",
         display: "Destination of letter ",
+        size: -1,
         renderer: new emlo.FacetRenderer({
           open: true,
           title: "Destination of letter ",
@@ -289,6 +293,7 @@ try {
         category: "refine_search",
         field: "cito_Catalog",
         display: "Catalogue ",
+        size: -1,
         renderer: new emlo.FacetRenderer({
           open: true,
           title: "Catalogue ",
@@ -304,6 +309,7 @@ try {
         category: "refine_search",
         field: "ox_started-ox_year",
         display: " Year ",
+        size: -1,
         renderer: new emlo.FacetRenderer({
           open: true,
           title: " Year ",

@@ -59,15 +59,25 @@ try {
             tweakCount: 0,
             upperLimit: 0,
           },
-
           {
-            title: "Catalogues",
+            title: "Curated catalogues",
             titleImage: "/static/img/icon-stats-Catalogues.png",
             redirectURL:
-              "http://emlo-portal.bodleian.ox.ac.uk/collections/?page_id=480",
+              "http://emlo-portal.bodleian.ox.ac.uk/collections/?page_id=1966",
             statKey: "cito_Catalog",
             dontFetch: true,
-            hardCodedCount: catalogue_count,
+            hardCodedCount: curated,
+            tweakCount: 0,
+            upperLimit: 0,
+          },
+          {
+            title: "Starter catalogues",
+            titleImage: "/static/img/icon-stats-Catalogues.png",
+            redirectURL:
+              "http://emlo-portal.bodleian.ox.ac.uk/collections/?page_id=5304",
+            statKey: "cito_Catalog",
+            dontFetch: true,
+            hardCodedCount: starter,
             tweakCount: 0,
             upperLimit: 0,
           },

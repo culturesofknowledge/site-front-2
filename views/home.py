@@ -18,14 +18,18 @@ def home():
             var_data = json.load(file)
         
         # Count the length of each array in the JSON
-        catalogue_count = sum(len(value) for value in data.values() if isinstance(value, list))
+        curated = data.get("curated")
+        starter = data.get("starter")
+        # catalogue_count = sum(len(value) for value in data.values() if isinstance(value, list))
         image_limit = var_data.get("image_limit")
-
+        
     except (FileNotFoundError, json.JSONDecodeError) as e:
-        catalogue_count = 0
+        # catalogue_count = 0
+        starter = 0
+        curated = 0
         image_limit = 0
         print(f"Error loading JSON: {e}")
-    return render_template('home.jinja2', title="Home" , catalogue_count = catalogue_count , image_limit=image_limit)
+    return render_template('home.jinja2', title="Home" , curated = len(curated) , starter = len(starter), image_limit=image_limit)
 
 @home_bp.route('/catalogues')
 def load_catalogues():

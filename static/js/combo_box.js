@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const wrapper = document.createElement("div");
       wrapper.classList.add("combo-box");
+      wrapper.style.textAlign = "left";
 
       // Create a fake select button
       const displayBox = document.createElement("div");
@@ -18,7 +19,6 @@ document.addEventListener("DOMContentLoaded", function () {
       const dropdown = document.createElement("div");
       dropdown.classList.add("combo-dropdown");
       dropdown.style.position = "absolute";
-      dropdown.style.top = "100%";
       dropdown.style.width = "100%";
       dropdown.style.background = "#fff";
       dropdown.style.border = "1px solid #ccc";

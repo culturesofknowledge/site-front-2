@@ -10521,3 +10521,49 @@ button.tiny {
 .combo-option:hover {
   background: #eee;
 }
+
+.facet-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.facet-modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 0;
+  border: 1px solid #ccc;
+  width: 50%;
+  max-width: 600px;
+  border-radius: 5px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.facet-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: #f1f1f1;
+  border-bottom: 1px solid #ccc;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.facet-modal-close {
+  cursor: pointer;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.facet-modal-content-wrapper {
+  max-height: 300px; /* Fixed height for scrollable content */
+  overflow-y: auto; /* Enables scrolling */
+  padding: 15px;
+}

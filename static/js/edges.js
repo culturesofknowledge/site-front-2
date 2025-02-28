@@ -3204,7 +3204,7 @@ emlo.StatsRenderer = class extends edges.Renderer {
     let container = `
       <div class="row">
         <div class="large-12 columns">
-          <ul class="small-block-grid-2 medium-block-grid-5 large-block-grid-10">
+          <ul class="small-block-grid-2 medium-block-grid-6 large-block-grid-12">
     `;
 
     if (this.statsEntries.length > 0) {

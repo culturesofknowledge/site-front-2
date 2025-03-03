@@ -210,7 +210,7 @@ emlo.ProfileTemplate = class extends edges.Template {
       </div>
 
       <div class="row row-with-side">
-        <div class="large-12 columns" style="margin-left:25px">
+        <div class="large-12 columns" style="padding-left:0px">
             <div id="profile">
                 <br/>
                 <h2 class="main">
@@ -2674,12 +2674,13 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       ${this.fields
         .map(
           (field) =>
-            `
-               <strong> ${field.title} </strong>
+            ` 
+            <dl>
+               <dt><strong> ${field.title} </strong></dt>
                <dd> ${edges.util.escapeHtml(
                  this.component.results[0][field.key] || ""
                )} </dd>
-              <br/>
+            </dl>
             `
         )
         .join("")}</div>

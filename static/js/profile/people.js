@@ -6,6 +6,8 @@ export function getPeopleComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-title",
         contentTitle: "Person",
+        dynamicTitle: "Organization",
+        dynamicTitleField: "ox_isOrganisation",
         contentTitleImage: "/static/img/person-icon.png",
       }),
     }),

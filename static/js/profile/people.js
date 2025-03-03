@@ -395,7 +395,7 @@ export function getPeopleComponents(emlo) {
         contentTitle: "",
         divider: true,
         fields: [
-          { title: "Alternate name", key: "skos_altLabel" },
+          { title: "Alternative names", key: "skos_altLabel" },
           { title: "Titles or roles", key: "ox_titlesRolesOccupations" },
         ],
       }),

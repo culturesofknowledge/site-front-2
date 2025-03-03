@@ -2281,6 +2281,12 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       "No results to display"
     );
     this.contentTitle = edges.util.getParam(params, "contentTitle", "");
+    this.dynamicTitle = edges.util.getParam(params, "dynamicTitle", "");
+    this.dynamicTitleField = edges.util.getParam(
+      params,
+      "dynamicTitleField",
+      ""
+    );
     this.contentTitleImage = edges.util.getParam(
       params,
       "contentTitleImage",
@@ -2429,18 +2435,35 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   }
 
   _sideTitle() {
+    let title;
+    const result = this.component.results[0];
+    if (this.dynamicTitle != "" && this.dynamicTitleField != "") {
+      let val;
+      if (result.hasOwnProperty(this.dynamicTitleField)) {
+        val = result[this.dynamicTitleField];
+      }
+
+      if (typeof val === "boolean") {
+        title = val ? this.dynamicTitle : "";
+      } else {
+        title = val != "" ? val : this.dynamicTitle;
+      }
+    }
+
+    if (title == "") {
+      title = this.contentTitle;
+    }
+
     const imageTag = this.contentTitleImage
       ? `<img src="${edges.util.escapeHtml(
           this.contentTitleImage
-        )}" alt="${edges.util.escapeHtml(
-          this.contentTitle
-        )}" class="profile-icon">`
+        )}" alt="${edges.util.escapeHtml(title)}" class="profile-icon">`
       : "";
 
     return `
     <h4 class="main">
       ${imageTag}
-      <strong>${edges.util.escapeHtml(this.contentTitle)}</strong>
+      <strong>${edges.util.escapeHtml(title)}</strong>
     </h4>
     <hr class="yellow-divider" />`;
   }

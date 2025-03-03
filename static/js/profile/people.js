@@ -411,7 +411,7 @@ export function getPeopleComponents(emlo) {
         divider: true,
         fields: [
           {
-            title: "Date of birth",
+            title: "Date of formation",
             keys: {
               date: {
                 day: "bio_Birth-ox_day",
@@ -426,7 +426,7 @@ export function getPeopleComponents(emlo) {
             },
           },
           {
-            title: "Date of death",
+            title: "Date of disbandment",
             keys: {
               date: {
                 day: "bio_Death-ox_day",

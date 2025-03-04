@@ -210,7 +210,7 @@ emlo.ProfileTemplate = class extends edges.Template {
       </div>
 
       <div class="row row-with-side">
-        <div class="large-12 columns" style="margin-left:25px">
+        <div class="large-12 columns" style="padding-left:0px">
             <div id="profile">
                 <br/>
                 <h2 class="main">
@@ -960,7 +960,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
     const month = months[date.getMonth()];
     const year = date.getFullYear();
 
-    return `${day} ${month} ${year}`;
+    return year === 9999 ? `${day} ${month}` : `${day} ${month} ${year}`;
   }
 };
 
@@ -1106,6 +1106,438 @@ emlo.FacetRenderer = class extends edges.Renderer {
     this.showAll = false; // Track whether to show all entries
   }
 
+  // Older code
+  // draw() {
+  //   let ts = this.component;
+
+  //   if (!ts.active && this.hideInactive) {
+  //     ts.context.html("");
+  //     return;
+  //   }
+
+  //   // If there are no values for the facet, hide the entire facet
+  //   if (!ts.values || ts.values.length === 0) {
+  //     ts.context.html("");
+  //     return;
+  //   }
+
+  //   const valClass = edges.util.allClasses(
+  //     this.namespace,
+  //     "value",
+  //     this.component.id
+  //   );
+  //   const filterRemoveClass = edges.util.allClasses(
+  //     this.namespace,
+  //     "filter-remove",
+  //     this.component.id
+  //   );
+
+  //   const resultsListClass = edges.util.styleClasses(
+  //     this.namespace,
+  //     "results-list",
+  //     this.component.id
+  //   );
+  //   const resultClass = edges.util.styleClasses(
+  //     this.namespace,
+  //     "result",
+  //     this.component.id
+  //   );
+  //   const controlClass = edges.util.styleClasses(
+  //     this.namespace,
+  //     "controls",
+  //     this.component.id
+  //   );
+  //   const facetClass = edges.util.styleClasses(
+  //     this.namespace,
+  //     "facet",
+  //     this.component.id
+  //   );
+  //   const headerClass = edges.util.styleClasses(
+  //     this.namespace,
+  //     "header",
+  //     this.component.id
+  //   );
+  //   const selectedClass = edges.util.styleClasses(
+  //     this.namespace,
+  //     "selected",
+  //     this.component.id
+  //   );
+
+  //   const controlId = edges.util.htmlID(
+  //     this.namespace,
+  //     "controls",
+  //     this.component.id
+  //   );
+  //   const sizeId = edges.util.htmlID(this.namespace, "size", this.component.id);
+  //   const orderId = edges.util.htmlID(
+  //     this.namespace,
+  //     "order",
+  //     this.component.id
+  //   );
+  //   const toggleId = edges.util.htmlID(
+  //     this.namespace,
+  //     "toggle",
+  //     this.component.id
+  //   );
+  //   const resultsId = edges.util.htmlID(
+  //     this.namespace,
+  //     "results",
+  //     this.component.id
+  //   );
+  //   const showMoreId = edges.util.htmlID(
+  //     this.namespace,
+  //     "show-more",
+  //     this.component.id
+  //   );
+
+  //   let results = "Loading...";
+  //   if (ts.values !== false) {
+  //     results = `
+  //       <tr>
+  //         <td>
+  //           None
+  //         </td>
+  //       </tr>
+  //     `;
+  //   }
+
+  //   const filterTerms = ts.filters.map((filter) =>
+  //     filter.term ? filter.term.toString() : ""
+  //   );
+
+  //   const filterFields = ts.filters.map((filter) =>
+  //     filter.field ? filter.field.toString() : ""
+  //   );
+
+  //   if (ts.values && ts.values.length > 0) {
+  //     results = "";
+
+  //     ts.values.forEach((val, idx) => {
+  //       // Skip facets where count is zero
+  //       if (!filterTerms.includes(val.term.toString()) && val.count > 0) {
+  //         let count = val.count;
+  //         if (this.countFormat) {
+  //           count = this.countFormat(count);
+  //         }
+  //         const isHidden = idx >= this.displayLimit && !this.showAll;
+  //         results += `
+  //           <tr style="${isHidden ? "display:none;" : ""}">
+  //             <td>
+  //               <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
+  //           val.term
+  //         )}">
+  //                 <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
+  //                 ${edges.util.escapeHtml(val.display)}
+  //               </a>
+  //             </td>
+  //             <td>
+  //               ${count}
+  //             </td>
+  //           </tr>
+  //         `;
+  //       }
+  //     });
+  //   }
+
+  //   // If no results were found, hide the facet altogether
+  //   if (results === "Loading..." || results === "" || ts.values.length === 0) {
+  //     ts.context.html(""); // Remove the entire facet from the DOM
+  //     return; // Stop execution as no content is needed
+  //   }
+
+  //   // Add "Show more" button if there are more than 10 entries
+  //   let showMoreFrag = "";
+  //   if (ts.values.length > this.displayLimit) {
+  //     showMoreFrag = `
+  //       <tr>
+  //         <td id="${showMoreId}" class="btn btn-link">
+  //           ${this.showAll ? "Click to hide" : "Click to show more..."}
+  //         </td>
+  //         <td>
+  //         </td>
+  //       </tr>
+  //     `;
+  //   }
+
+  //   let tooltipFrag = "";
+  //   if (this.tooltipText) {
+  //     const tt = this._shortTooltip();
+  //     const tooltipClass = edges.util.styleClasses(
+  //       this.namespace,
+  //       "tooltip",
+  //       this.component.id
+  //     );
+  //     const tooltipId = edges.util.htmlID(
+  //       this.namespace,
+  //       "tooltip",
+  //       this.component.id
+  //     );
+  //     tooltipFrag = `<div id="${tooltipId}" class="${tooltipClass}" style="display:none"><div class="row"><div class="col-md-12">${tt}</div></div></div>`;
+  //   }
+
+  //   let controlFrag = "";
+  //   if (this.controls) {
+  //     controlFrag = `<div class="${controlClass}" style="display:none" id="${controlId}"><div class="row">
+  //                     <div class="col-md-12">
+  //                         <div class="btn-group">
+  //                             <button type="button" class="btn btn-default btn-sm" id="${sizeId}" title="List Size">0</button>
+  //                             <button type="button" class="btn btn-default btn-sm" id="${orderId}" title="List Order"></button>
+  //                         </div>
+  //                     </div>
+  //                 </div></div>`;
+  //   }
+
+  //   let filterFrag = "";
+  //   if (ts.filters.length > 0 && this.showSelected) {
+  //     ts.filters.forEach((filt) => {
+  //       filterFrag += `<div class="${resultClass}"><strong>${edges.util.escapeHtml(
+  //         filt.display
+  //       )}&nbsp;`;
+  //       filterFrag += `<a href="#" class="${filterRemoveClass}" data-key="${edges.util.escapeHtml(
+  //         filt.term
+  //       )}">`;
+  //       filterFrag += '<i class="fas fa-times"></i></a>';
+  //       filterFrag += "</strong></a></div>";
+  //     });
+  //   }
+
+  //   let tog = this.title;
+  //   if (this.togglable) {
+  //     tog = `<h4 class="main">${this.title}</h4>`;
+  //   }
+
+  //   let isHideCount = false;
+
+  //   const filterFieldsCount = filterFields.reduce((acc, item) => {
+  //     return item === this.component.field ? acc + 1 : acc;
+  //   }, 0);
+
+  //   if (filterFieldsCount >= this.hideCount && this.hideCount > 0) {
+  //     isHideCount = true;
+  //   }
+
+  //   let frag = `<div class="${facetClass}" style="${
+  //     isHideCount ? "display:none;" : ""
+  //   }">
+  //                     <div class="${headerClass}"><div class="row">
+  //                         <div class="col-md-12">
+  //                             ${tog}
+  //                         </div>
+  //                     </div></div>
+  //                     ${tooltipFrag}
+  //                     {{CONTROLS}}
+  //                     <div class="row" style="display:none" id="${resultsId}">
+  //                         <div class="col-md-12">
+  //                           <table class="facet">
+  //                             <tbody>
+  //                               {{RESULTS}}
+  //                               {{SHOWMOREFRAG}}
+  //                             </tbody>
+  //                           </table>
+  //                         </div>
+  //                     </div></div>`;
+
+  //   frag = frag
+  //     .replace(/{{RESULTS}}/g, results)
+  //     .replace(/{{CONTROLS}}/g, controlFrag)
+  //     .replace(/{{SELECTED}}/g, filterFrag)
+  //     .replace(/{{SHOWMOREFRAG}}/g, showMoreFrag);
+
+  //   ts.context.html(frag);
+
+  //   this.setUISize();
+  //   this.setUISort();
+  //   this.setUIOpen();
+
+  //   const valueSelector = edges.util.jsClassSelector(
+  //     this.namespace,
+  //     "value",
+  //     this.component.id
+  //   );
+  //   const filterRemoveSelector = edges.util.jsClassSelector(
+  //     this.namespace,
+  //     "filter-remove",
+  //     this
+  //   );
+  //   const toggleSelector = edges.util.idSelector(
+  //     this.namespace,
+  //     "toggle",
+  //     this
+  //   );
+  //   const sizeSelector = edges.util.idSelector(this.namespace, "size", this);
+  //   const orderSelector = edges.util.idSelector(this.namespace, "order", this);
+  //   const showMoreSelector = edges.util.idSelector(
+  //     this.namespace,
+  //     "show-more",
+  //     this
+  //   );
+
+  //   edges.on(valueSelector, "click", this, "termSelected");
+  //   edges.on(toggleSelector, "click", this, "toggleOpen");
+  //   edges.on(filterRemoveSelector, "click", this, "removeFilter");
+  //   edges.on(sizeSelector, "click", this, "changeSize");
+  //   edges.on(orderSelector, "click", this, "changeSort");
+
+  //   if (this.component.jq(showMoreSelector).length > 0) {
+  //     edges.on(showMoreSelector, "click", this, "showMoreEntries");
+  //   }
+  // }
+
+  // draw() {
+  //   let ts = this.component;
+
+  //   if (!ts.active && this.hideInactive) {
+  //     ts.context.html("");
+  //     return;
+  //   }
+
+  //   if (!ts.values || ts.values.length === 0) {
+  //     ts.context.html("");
+  //     return;
+  //   }
+
+  //   const valClass = edges.util.allClasses(
+  //     this.namespace,
+  //     "value",
+  //     this.component.id
+  //   );
+  //   const showMoreId = edges.util.htmlID(
+  //     this.namespace,
+  //     "show-more",
+  //     this.component.id
+  //   );
+  //   const modalId = edges.util.htmlID(
+  //     this.namespace,
+  //     "facet-modal",
+  //     this.component.id
+  //   );
+  //   const modalCloseId = edges.util.htmlID(
+  //     this.namespace,
+  //     "facet-modal-close",
+  //     this.component.id
+  //   );
+  //   const modalContentId = edges.util.htmlID(
+  //     this.namespace,
+  //     "facet-modal-content",
+  //     this.component.id
+  //   );
+
+  //   // Limited list for inline display
+  //   let limitedResults = "";
+  //   ts.values.forEach((val, idx) => {
+  //     if (val.count > 0) {
+  //       let count = this.countFormat ? this.countFormat(val.count) : val.count;
+  //       const isHidden = idx >= this.displayLimit;
+
+  //       limitedResults += `
+  //               <tr style="${isHidden ? "display:none;" : ""}">
+  //                 <td>
+  //                   <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
+  //         val.term
+  //       )}">
+  //                     <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
+  //                     ${edges.util.escapeHtml(val.display)}
+  //                   </a>
+  //                 </td>
+  //                 <td>${count}</td>
+  //               </tr>
+  //           `;
+  //     }
+  //   });
+
+  //   // Full list for modal display (NO displayLimit applied)
+  //   let fullResults = "";
+  //   ts.values.forEach((val) => {
+  //     if (val.count > 0) {
+  //       let count = this.countFormat ? this.countFormat(val.count) : val.count;
+  //       fullResults += `
+  //               <tr>
+  //                 <td>
+  //                   <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
+  //         val.term
+  //       )}">
+  //                     <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
+  //                     ${edges.util.escapeHtml(val.display)}
+  //                   </a>
+  //                 </td>
+  //                 <td>${count}</td>
+  //               </tr>
+  //           `;
+  //     }
+  //   });
+
+  //   // "Show more" button
+  //   let showMoreFrag = "";
+  //   if (ts.values.length > this.displayLimit) {
+  //     showMoreFrag = `
+  //           <tr>
+  //             <td id="${showMoreId}" class="btn btn-link">
+  //               Click to show more...
+  //             </td>
+  //           </tr>
+  //       `;
+  //   }
+
+  //   // Modal structure (Full list shown here)
+  //   let modalFrag = `
+  //       <div id="${modalId}" class="facet-modal">
+  //           <div class="facet-modal-content">
+  //               <span id="${modalCloseId}" class="facet-modal-close">&times;</span>
+  //               <h3>${this.title}</h3>
+  //               <div id="${modalContentId}">
+  //                   <table class="facet">
+  //                       <tbody>
+  //                           ${fullResults}  <!-- FULL list here -->
+  //                       </tbody>
+  //                   </table>
+  //               </div>
+  //           </div>
+  //       </div>
+  //   `;
+
+  //   // Final HTML fragment
+  //   let frag = `
+  //       <div class="facet">
+  //           <div class="facet-header">
+  //               <h4 class="main">${this.title}</h4>
+  //           </div>
+  //           <div class="facet-results">
+  //               <table class="facet">
+  //                   <tbody>
+  //                       ${limitedResults}  <!-- Limited list here -->
+  //                       ${showMoreFrag}
+  //                   </tbody>
+  //               </table>
+  //           </div>
+  //       </div>
+  //       ${modalFrag}
+  //   `;
+
+  //   ts.context.html(frag);
+
+  //   // Event bindings
+  //   const showMoreSelector = edges.util.idSelector(
+  //     this.namespace,
+  //     "show-more",
+  //     this.component.id
+  //   );
+  //   const modalSelector = edges.util.idSelector(
+  //     this.namespace,
+  //     "facet-modal",
+  //     this.component.id
+  //   );
+  //   const modalCloseSelector = edges.util.idSelector(
+  //     this.namespace,
+  //     "facet-modal-close",
+  //     this.component.id
+  //   );
+
+  //   if (this.component.jq(showMoreSelector).length > 0) {
+  //     edges.on(showMoreSelector, "click", this, "openModal");
+  //   }
+  //   edges.on(modalCloseSelector, "click", this, "closeModal");
+  // }
+
   draw() {
     let ts = this.component;
 
@@ -1114,17 +1546,11 @@ emlo.FacetRenderer = class extends edges.Renderer {
       return;
     }
 
-    // If there are no values for the facet, hide the entire facet
     if (!ts.values || ts.values.length === 0) {
       ts.context.html("");
       return;
     }
 
-    const valClass = edges.util.allClasses(
-      this.namespace,
-      "value",
-      this.component.id
-    );
     const filterRemoveClass = edges.util.allClasses(
       this.namespace,
       "filter-remove",
@@ -1183,22 +1609,32 @@ emlo.FacetRenderer = class extends edges.Renderer {
       "results",
       this.component.id
     );
+
+    const valClass = edges.util.allClasses(
+      this.namespace,
+      "value",
+      this.component.id
+    );
     const showMoreId = edges.util.htmlID(
       this.namespace,
       "show-more",
       this.component.id
     );
-
-    let results = "Loading...";
-    if (ts.values !== false) {
-      results = `
-        <tr>
-          <td>
-            None
-          </td>
-        </tr>
-      `;
-    }
+    const modalId = edges.util.htmlID(
+      this.namespace,
+      "facet-modal",
+      this.component.id
+    );
+    const modalCloseId = edges.util.htmlID(
+      this.namespace,
+      "facet-modal-close",
+      this.component.id
+    );
+    const modalContentId = edges.util.htmlID(
+      this.namespace,
+      "facet-modal-content",
+      this.component.id
+    );
 
     const filterTerms = ts.filters.map((filter) =>
       filter.term ? filter.term.toString() : ""
@@ -1208,102 +1644,69 @@ emlo.FacetRenderer = class extends edges.Renderer {
       filter.field ? filter.field.toString() : ""
     );
 
-    if (ts.values && ts.values.length > 0) {
-      results = "";
+    let limitedResults = "";
+    ts.values.forEach((val, idx) => {
+      if (val.count > 0) {
+        const isHidden = idx >= this.displayLimit;
+        limitedResults += `
+                <tr style="${isHidden ? "display:none;" : ""}">
+                  <td>
+                    <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
+          val.term
+        )}">
+                    <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
+                    ${edges.util.escapeHtml(val.display)}
+                    </a>
+                    </td>
+                  <td>${val.count}</td>
+                </tr>
+            `;
+      }
+    });
 
-      ts.values.forEach((val, idx) => {
-        // Skip facets where count is zero
-        if (!filterTerms.includes(val.term.toString()) && val.count > 0) {
-          let count = val.count;
-          if (this.countFormat) {
-            count = this.countFormat(count);
-          }
-          const isHidden = idx >= this.displayLimit && !this.showAll;
-          results += `
-            <tr style="${isHidden ? "display:none;" : ""}">
-              <td>
-                <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
-            val.term
-          )}">
+    let fullResults = "";
+    ts.values.forEach((val) => {
+      if (val.count > 0) {
+        fullResults += `
+                <tr>
+                  <td>
+                  <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
+          val.term
+        )}">
                   <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
                   ${edges.util.escapeHtml(val.display)}
-                </a>
-              </td>
-              <td>
-                ${count}
-              </td>
-            </tr>
-          `;
-        }
-      });
-    }
+                  </a>
+                  </td>
+                  <td>${val.count}</td>
+                </tr>
+            `;
+      }
+    });
 
-    // If no results were found, hide the facet altogether
-    if (results === "Loading..." || results === "" || ts.values.length === 0) {
-      ts.context.html(""); // Remove the entire facet from the DOM
-      return; // Stop execution as no content is needed
-    }
-
-    // Add "Show more" button if there are more than 10 entries
-    let showMoreFrag = "";
-    if (ts.values.length > this.displayLimit) {
-      showMoreFrag = `
+    let showMoreFrag =
+      ts.values.length > this.displayLimit
+        ? `
         <tr>
-          <td id="${showMoreId}" class="btn btn-link">
-            ${this.showAll ? "Click to hide" : "Click to show more..."}
-          </td>
-          <td>
-          </td>
+          <td id="${showMoreId}" class="btn btn-link">Click to show more...</td>
         </tr>
-      `;
-    }
+    `
+        : "";
 
-    let tooltipFrag = "";
-    if (this.tooltipText) {
-      const tt = this._shortTooltip();
-      const tooltipClass = edges.util.styleClasses(
-        this.namespace,
-        "tooltip",
-        this.component.id
-      );
-      const tooltipId = edges.util.htmlID(
-        this.namespace,
-        "tooltip",
-        this.component.id
-      );
-      tooltipFrag = `<div id="${tooltipId}" class="${tooltipClass}" style="display:none"><div class="row"><div class="col-md-12">${tt}</div></div></div>`;
-    }
-
-    let controlFrag = "";
-    if (this.controls) {
-      controlFrag = `<div class="${controlClass}" style="display:none" id="${controlId}"><div class="row">
-                      <div class="col-md-12">
-                          <div class="btn-group">
-                              <button type="button" class="btn btn-default btn-sm" id="${sizeId}" title="List Size">0</button>
-                              <button type="button" class="btn btn-default btn-sm" id="${orderId}" title="List Order"></button>
-                          </div>
-                      </div>
-                  </div></div>`;
-    }
-
-    let filterFrag = "";
-    if (ts.filters.length > 0 && this.showSelected) {
-      ts.filters.forEach((filt) => {
-        filterFrag += `<div class="${resultClass}"><strong>${edges.util.escapeHtml(
-          filt.display
-        )}&nbsp;`;
-        filterFrag += `<a href="#" class="${filterRemoveClass}" data-key="${edges.util.escapeHtml(
-          filt.term
-        )}">`;
-        filterFrag += '<i class="fas fa-times"></i></a>';
-        filterFrag += "</strong></a></div>";
-      });
-    }
-
-    let tog = this.title;
-    if (this.togglable) {
-      tog = `<h4 class="main">${this.title}</h4>`;
-    }
+    let modalFrag = `
+        <div id="${modalId}" class="facet-modal">
+            <div class="facet-modal-content">
+                <div class="facet-modal-header">
+                    <span>${this.title}</span>
+                    <span id="${modalCloseId}" class="facet-modal-close">&times;</span>
+                </div>
+                <div class="facet-modal-content-wrapper">
+                    <table class="facet">
+                        <tbody>${fullResults}</tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
 
     let isHideCount = false;
 
@@ -1315,32 +1718,15 @@ emlo.FacetRenderer = class extends edges.Renderer {
       isHideCount = true;
     }
 
-    let frag = `<div class="${facetClass}" style="${
-      isHideCount ? "display:none;" : ""
-    }">
-                      <div class="${headerClass}"><div class="row">
-                          <div class="col-md-12">
-                              ${tog}
-                          </div>
-                      </div></div>
-                      ${tooltipFrag}
-                      {{CONTROLS}}
-                      <div class="row" style="display:none" id="${resultsId}">
-                          <div class="col-md-12">
-                            <table class="facet">
-                              <tbody>
-                                {{RESULTS}}
-                                {{SHOWMOREFRAG}}
-                              </tbody>
-                            </table>
-                          </div>
-                      </div></div>`;
-
-    frag = frag
-      .replace(/{{RESULTS}}/g, results)
-      .replace(/{{CONTROLS}}/g, controlFrag)
-      .replace(/{{SELECTED}}/g, filterFrag)
-      .replace(/{{SHOWMOREFRAG}}/g, showMoreFrag);
+    let frag = `
+        <div class="facet"  style="${isHideCount ? "display:none;" : ""}">
+            <h4>${this.title}</h4>
+            <table class="facet">
+                <tbody>${limitedResults}${showMoreFrag}</tbody>
+            </table>
+        </div>
+        ${modalFrag}
+    `;
 
     ts.context.html(frag);
 
@@ -1363,13 +1749,25 @@ emlo.FacetRenderer = class extends edges.Renderer {
       "toggle",
       this
     );
-    const sizeSelector = edges.util.idSelector(this.namespace, "size", this);
-    const orderSelector = edges.util.idSelector(this.namespace, "order", this);
+
     const showMoreSelector = edges.util.idSelector(
       this.namespace,
       "show-more",
-      this
+      this.component.id
     );
+    const modalSelector = edges.util.idSelector(
+      this.namespace,
+      "facet-modal",
+      this.component.id
+    );
+    const modalCloseSelector = edges.util.idSelector(
+      this.namespace,
+      "facet-modal-close",
+      this.component.id
+    );
+
+    const sizeSelector = edges.util.idSelector(this.namespace, "size", this);
+    const orderSelector = edges.util.idSelector(this.namespace, "order", this);
 
     edges.on(valueSelector, "click", this, "termSelected");
     edges.on(toggleSelector, "click", this, "toggleOpen");
@@ -1378,8 +1776,27 @@ emlo.FacetRenderer = class extends edges.Renderer {
     edges.on(orderSelector, "click", this, "changeSort");
 
     if (this.component.jq(showMoreSelector).length > 0) {
-      edges.on(showMoreSelector, "click", this, "showMoreEntries");
+      edges.on(showMoreSelector, "click", this, "openModal");
     }
+    edges.on(modalCloseSelector, "click", this, "closeModal");
+  }
+
+  openModal() {
+    const modalSelector = edges.util.idSelector(
+      this.namespace,
+      "facet-modal",
+      this.component.id
+    );
+    this.component.jq(modalSelector).css("display", "block");
+  }
+
+  closeModal() {
+    const modalSelector = edges.util.idSelector(
+      this.namespace,
+      "facet-modal",
+      this.component.id
+    );
+    this.component.jq(modalSelector).css("display", "none");
   }
 
   showMoreEntries() {
@@ -1864,6 +2281,12 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       "No results to display"
     );
     this.contentTitle = edges.util.getParam(params, "contentTitle", "");
+    this.dynamicTitle = edges.util.getParam(params, "dynamicTitle", "");
+    this.dynamicTitleField = edges.util.getParam(
+      params,
+      "dynamicTitleField",
+      ""
+    );
     this.contentTitleImage = edges.util.getParam(
       params,
       "contentTitleImage",
@@ -2012,18 +2435,35 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   }
 
   _sideTitle() {
+    let title;
+    const result = this.component.results[0];
+    if (this.dynamicTitle != "" && this.dynamicTitleField != "") {
+      let val;
+      if (result.hasOwnProperty(this.dynamicTitleField)) {
+        val = result[this.dynamicTitleField];
+      }
+
+      if (typeof val === "boolean") {
+        title = val ? this.dynamicTitle : "";
+      } else {
+        title = val != "" ? val : this.dynamicTitle;
+      }
+    }
+
+    if (title == "") {
+      title = this.contentTitle;
+    }
+
     const imageTag = this.contentTitleImage
       ? `<img src="${edges.util.escapeHtml(
           this.contentTitleImage
-        )}" alt="${edges.util.escapeHtml(
-          this.contentTitle
-        )}" class="profile-icon">`
+        )}" alt="${edges.util.escapeHtml(title)}" class="profile-icon">`
       : "";
 
     return `
     <h4 class="main">
       ${imageTag}
-      <strong>${edges.util.escapeHtml(this.contentTitle)}</strong>
+      <strong>${edges.util.escapeHtml(title)}</strong>
     </h4>
     <hr class="yellow-divider" />`;
   }
@@ -2234,12 +2674,13 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       ${this.fields
         .map(
           (field) =>
-            `
-               <strong> ${field.title} </strong>
+            ` 
+            <dl>
+               <dt><strong> ${field.title} </strong></dt>
                <dd> ${edges.util.escapeHtml(
                  this.component.results[0][field.key] || ""
                )} </dd>
-              <br/>
+            </dl>
             `
         )
         .join("")}</div>
@@ -2414,7 +2855,8 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const month = months[date.getMonth()];
     const year = date.getFullYear();
 
-    return `${day} ${month} ${year}`;
+    // return `${day} ${month} ${year}`;
+    return year === 9999 ? `${day} ${month}` : `${day} ${month} ${year}`;
   }
 
   _renderStats() {
@@ -3203,7 +3645,7 @@ emlo.StatsRenderer = class extends edges.Renderer {
     let container = `
       <div class="row">
         <div class="large-12 columns">
-          <ul class="small-block-grid-2 medium-block-grid-5 large-block-grid-10">
+          <ul class="small-block-grid-2 medium-block-grid-6 large-block-grid-12">
     `;
 
     if (this.statsEntries.length > 0) {
@@ -3229,11 +3671,15 @@ emlo.StatsRenderer = class extends edges.Renderer {
           <br />
           
           <span>
-            ${this._getStatCount(
-              item.statKey,
-              item.tweakCount,
-              item.upperLimit
-            )}
+            ${
+              item.dontFetch
+                ? item.hardCodedCount
+                : this._getStatCount(
+                    item.statKey,
+                    item.tweakCount,
+                    item.upperLimit
+                  )
+            }
           </span>
           
           <br />
@@ -3327,7 +3773,7 @@ emlo.BarGraph = class extends edges.Component {
       const uuidArray = Array.from(uuids);
       const fieldData = await this._fetchGraphData(solrCore, uuidArray);
 
-      for (const doc of fieldData.response.docs) {
+      for (const doc of fieldData) {
         const fieldKey = uuidToFieldKeyMap.get(doc.uuid);
         if (fieldKey) {
           if (!this.graphData[fieldKey]) {
@@ -3355,7 +3801,7 @@ emlo.BarGraph = class extends edges.Component {
     };
 
     try {
-      const response = await fetch("/stats", {
+      const response = await fetch("/stats-new", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -3465,7 +3911,8 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
     for (const [fieldKey, fieldData] of Object.entries(
       this.component.graphData
     )) {
-      const reducedData = this._reduceData(fieldData);
+      // const reducedData = this._reduceData(fieldData);
+      const reducedData = fieldData;
       const valueCounts = this._countOccurrences(
         reducedData,
         this.component.xAxisField
@@ -3531,9 +3978,14 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       .range([0, this.graphWidth])
       .padding(0.1);
 
+    // Calculate a reasonable range for the Y-axis based on maxYValue
+    const numTicks = 5;
+    const tickStep = Math.ceil(maxYValue / numTicks);
+    const yMax = Math.ceil(maxYValue / tickStep) * tickStep;
+
     const y = d3
       .scaleLinear()
-      .domain([0, maxYValue])
+      .domain([0, yMax]) // Use adjusted yMax for a clean range
       .nice()
       .range([this.graphHeight, 0]);
 
@@ -3543,8 +3995,8 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       .attr("transform", `translate(0,${this.graphHeight})`)
       .call(d3.axisBottom(x));
 
-    // Add Y-axis (with no decimal values)
-    svg.append("g").call(d3.axisLeft(y).ticks(Math.ceil(maxYValue / 10))); // Adjust number of ticks based on the max value
+    // Add Y-axis with dynamically calculated ticks
+    svg.append("g").call(d3.axisLeft(y).ticks(numTicks)); // Limiting to 5 ticks
 
     // Draw bars
     svg
@@ -3602,9 +4054,14 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       .range([0, this.graphWidth])
       .padding(0.2);
 
+    // Calculate a reasonable range for the Y-axis based on maxYValue
+    const numTicks = 5;
+    const tickStep = Math.ceil(maxYValue / numTicks);
+    const yMax = Math.ceil(maxYValue / tickStep) * tickStep;
+
     const y = d3
       .scaleLinear()
-      .domain([0, maxYValue])
+      .domain([0, yMax]) // Use adjusted yMax for a clean range
       .nice()
       .range([this.graphHeight, 0]);
 
@@ -3619,8 +4076,8 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       .attr("transform", `translate(0,${this.graphHeight})`)
       .call(d3.axisBottom(x));
 
-    // Add Y-axis
-    svg.append("g").call(d3.axisLeft(y));
+    // Add Y-axis with dynamically calculated ticks
+    svg.append("g").call(d3.axisLeft(y).ticks(numTicks)); // Limiting to 5 ticks
 
     if (this.currentView === "stacked") {
       // Clear existing content
@@ -3642,9 +4099,13 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
         .range([0, this.graphWidth])
         .padding(0.1);
 
+      const numTicks = 5;
+      const tickStep = Math.ceil(maxYValue / numTicks);
+      const yMax = Math.ceil(maxYValue / tickStep) * tickStep;
+
       const y = d3
         .scaleLinear()
-        .domain([0, maxYValue])
+        .domain([0, yMax]) // Use adjusted yMax for a clean range
         .nice()
         .range([this.graphHeight, 0]);
 
@@ -3700,42 +4161,316 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
         });
       });
     } else if (this.currentView === "split") {
-      // Split (grouped) bar chart
-      const subX = d3
-        .scaleBand()
-        .domain(datasets.map((d) => d.label))
-        .range([0, x.bandwidth()])
-        .padding(0.05);
+      // Split Bar chart logic here...
+      const barWidth = x.bandwidth() / datasets.length; // Adjust width for each dataset
 
-      datasets.forEach((dataset, datasetIndex) => {
+      datasets.forEach((dataset, index) => {
         svg
-          .selectAll(`.bar-group-${datasetIndex}`)
+          .selectAll(`.split-bar-${dataset.label}`)
           .data(labels)
           .enter()
           .append("rect")
-          .attr("class", `bar-group-${datasetIndex}`)
-          .attr("x", (d) => x(d) + subX(dataset.label))
-          .attr("y", (d) => y(dataset.data[d] || 0))
-          .attr("width", subX.bandwidth())
+          .attr("class", `split-bar-${dataset.label}`)
+          .attr("x", (d, i) => x(d) + barWidth * index) // Offset bars for each dataset
+          .attr("y", (d) => y(dataset.data[d] || 0)) // Y position based on data value
+          .attr("width", barWidth) // Width of each bar in the group
           .attr("height", (d) => this.graphHeight - y(dataset.data[d] || 0))
-          .attr("fill", dataset.config.barColor || this.barColor)
+          .attr("fill", colorScale(dataset.label))
           .on("mouseover", (event, d) => {
+            // Hover effect
             d3.select(event.target).attr("fill", this.hoverColor);
             this._showTooltip(
               event,
-              `${dataset.label}: ${dataset.data[d] || 0}`
+              `${dataset.label}: ${dataset.data[d]} ${dataset.config.graphTitle}`
             );
           })
           .on("mouseout", (event) => {
-            d3.select(event.target).attr(
-              "fill",
-              dataset.config.barColor || this.barColor
-            );
+            // Reset hover effect
+            d3.select(event.target).attr("fill", colorScale(dataset.label));
             this._hideTooltip();
           });
       });
     }
   }
+
+  // _drawCombinedGraph(datasets, labels, maxYValue, container) {
+  //   // Clear existing content
+  //   container.innerHTML = "";
+
+  //   // Set up SVG for the D3 chart
+  //   const svg = d3
+  //     .select(container)
+  //     .append("svg")
+  //     .attr("width", this.graphWidth + this.margin.left + this.margin.right)
+  //     .attr("height", this.graphHeight + this.margin.top + this.margin.bottom)
+  //     .append("g")
+  //     .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
+
+  //   // Define scales
+  //   const x = d3
+  //     .scaleBand()
+  //     .domain(labels)
+  //     .range([0, this.graphWidth])
+  //     .padding(0.2);
+
+  //   // Calculate a reasonable range for the Y-axis based on maxYValue
+  //   const numTicks = 5;
+  //   const tickStep = Math.ceil(maxYValue / numTicks);
+  //   const yMax = Math.ceil(maxYValue / tickStep) * tickStep;
+
+  //   const y = d3
+  //     .scaleLinear()
+  //     .domain([0, yMax]) // Use adjusted yMax for a clean range
+  //     .nice()
+  //     .range([this.graphHeight, 0]);
+
+  //   const colorScale = d3
+  //     .scaleOrdinal()
+  //     .domain(datasets.map((d) => d.label))
+  //     .range(datasets.map((d) => d.config.barColor || this.barColor));
+
+  //   // Add X-axis
+  //   svg
+  //     .append("g")
+  //     .attr("transform", `translate(0,${this.graphHeight})`)
+  //     .call(d3.axisBottom(x));
+
+  //   // Add Y-axis with dynamically calculated ticks
+  //   svg.append("g").call(d3.axisLeft(y).ticks(numTicks)); // Limiting to 5 ticks
+
+  //   if (this.currentView === "stacked") {
+  //     // Prepare data for stacking by ensuring missing data has 0
+  //     const stack = d3
+  //       .stack()
+  //       .keys(datasets.map((d) => d.label)) // Keys should correspond to labels
+  //       .value((d, key, index) => {
+  //         console.log("key", key, index, JSON.stringify(d));
+  //         // Ensure we handle missing data by setting default 0 for missing keys
+  //         return d.data[key] || 0; // Use 0 if data is missing
+  //       });
+
+  //     // Transform the dataset into stacked data
+  //     const stackedData = stack(datasets);
+  //     console.log("stackedData", stackedData);
+  //     // Add stacked bars
+  //     svg
+  //       .selectAll(".stacked-bar")
+  //       .data(stackedData)
+  //       .enter()
+  //       .append("g")
+  //       .attr("class", "stacked-bar")
+  //       .selectAll("rect")
+  //       .data((d) => d)
+  //       .enter()
+  //       .append("rect")
+  //       .attr("x", (d) => x(d.data.label)) // Position on the x-axis
+  //       .attr("y", (d) => y(d[1])) // Position the top of the bar (stacked)
+  //       .attr("height", (d) => y(d[0]) - y(d[1])) // Height based on stacked range
+  //       .attr("width", x.bandwidth()) // Width of the bar
+  //       .attr("fill", (d, i) => colorScale(d.key)) // Color each segment
+  //       .on("mouseover", (event, d) => {
+  //         // Hover effect
+  //         d3.select(event.target).attr("fill", this.hoverColor);
+  //         this._showTooltip(
+  //           event,
+  //           `${d.data.label}: ${d[1] - d[0]} ${d.data.graphTitle}`
+  //         );
+  //       })
+  //       .on("mouseout", (event) => {
+  //         // Reset hover effect
+  //         d3.select(event.target).attr("fill", colorScale(d.key));
+  //         this._hideTooltip();
+  //       });
+  //   } else if (this.currentView === "split") {
+  //     // Split Bar chart logic here...
+  //     const barWidth = x.bandwidth() / datasets.length; // Adjust width for each dataset
+
+  //     datasets.forEach((dataset, index) => {
+  //       svg
+  //         .selectAll(`.split-bar-${dataset.label}`)
+  //         .data(labels)
+  //         .enter()
+  //         .append("rect")
+  //         .attr("class", `split-bar-${dataset.label}`)
+  //         .attr("x", (d, i) => x(d) + barWidth * index) // Offset bars for each dataset
+  //         .attr("y", (d) => y(dataset.data[d] || 0)) // Y position based on data value
+  //         .attr("width", barWidth) // Width of each bar in the group
+  //         .attr("height", (d) => this.graphHeight - y(dataset.data[d] || 0))
+  //         .attr("fill", colorScale(dataset.label))
+  //         .on("mouseover", (event, d) => {
+  //           // Hover effect
+  //           d3.select(event.target).attr("fill", this.hoverColor);
+  //           this._showTooltip(
+  //             event,
+  //             `${dataset.label}: ${dataset.data[d]} ${dataset.config.graphTitle}`
+  //           );
+  //         })
+  //         .on("mouseout", (event) => {
+  //           // Reset hover effect
+  //           d3.select(event.target).attr("fill", colorScale(dataset.label));
+  //           this._hideTooltip();
+  //         });
+  //     });
+  //   }
+  // }
+
+  // _drawCombinedGraph(datasets, labels, maxYValue, container) {
+  //   // Clear existing content
+  //   container.innerHTML = "";
+
+  //   // Set up SVG for the D3 chart
+  //   const svg = d3
+  //     .select(container)
+  //     .append("svg")
+  //     .attr("width", this.graphWidth + this.margin.left + this.margin.right)
+  //     .attr("height", this.graphHeight + this.margin.top + this.margin.bottom)
+  //     .append("g")
+  //     .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
+
+  //   // Define scales
+  //   const x = d3
+  //     .scaleBand()
+  //     .domain(labels)
+  //     .range([0, this.graphWidth])
+  //     .padding(0.2);
+
+  //   // Calculate a reasonable range for the Y-axis based on maxYValue
+  //   const numTicks = 5;
+  //   const tickStep = Math.ceil(maxYValue / numTicks);
+  //   const yMax = Math.ceil(maxYValue / tickStep) * tickStep;
+
+  //   const y = d3
+  //     .scaleLinear()
+  //     .domain([0, yMax]) // Use adjusted yMax for a clean range
+  //     .nice()
+  //     .range([this.graphHeight, 0]);
+
+  //   const colorScale = d3
+  //     .scaleOrdinal()
+  //     .domain(datasets.map((d) => d.label))
+  //     .range(datasets.map((d) => d.config.barColor || this.barColor));
+
+  //   // Add X-axis
+  //   svg
+  //     .append("g")
+  //     .attr("transform", `translate(0,${this.graphHeight})`)
+  //     .call(d3.axisBottom(x));
+
+  //   // Add Y-axis with dynamically calculated ticks
+  //   svg.append("g").call(d3.axisLeft(y).ticks(numTicks)); // Limiting to 5 ticks
+
+  //   if (this.currentView === "stacked") {
+  //     // Stacked Bar chart logic here...
+  //     console.log("datasets", JSON.stringify(datasets));
+  //     // Use d3.stack() to  create stacked data
+  //     const stack = d3
+  //       .stack()
+  //       .keys(datasets.map((d) => d.label))
+  //       .value((d, key) => d.data[key]);
+
+  //     const stackedData = stack(datasets.map((dataset) => dataset.data)); // Stack the data
+
+  //     // Add stacked bars
+  //     svg
+  //       .selectAll(".stacked-bar")
+  //       .data(stackedData)
+  //       .enter()
+  //       .append("g")
+  //       .attr("class", "stacked-bar")
+  //       .attr("fill", (d, i) => colorScale(d.key))
+  //       .selectAll("rect")
+  //       .data((d) => d)
+  //       .enter()
+  //       .append("rect")
+  //       .attr("x", (d) => x(d.data.label)) // Position on the x-axis
+  //       .attr("y", (d) => y(d[1])) // Position the top of the bar
+  //       .attr("height", (d) => y(d[0]) - y(d[1])) // Height based on stacked range
+  //       .attr("width", x.bandwidth());
+  //   } else if (this.currentView === "split") {
+  //     // Split (grouped) Bar chart logic here...
+
+  //     const barWidth = x.bandwidth() / datasets.length; // Adjust width for each dataset
+
+  //     datasets.forEach((dataset, index) => {
+  //       svg
+  //         .selectAll(`.split-bar-${dataset.label}`)
+  //         .data(labels)
+  //         .enter()
+  //         .append("rect")
+  //         .attr("class", `split-bar-${dataset.label}`)
+  //         .attr("x", (d, i) => x(d) + barWidth * index) // Offset bars for each dataset
+  //         .attr("y", (d) => y(dataset.data[d] || 0)) // Y position based on data value
+  //         .attr("width", barWidth) // Width of each bar in the group
+  //         .attr("height", (d) => this.graphHeight - y(dataset.data[d] || 0))
+  //         .attr("fill", colorScale(dataset.label))
+  //         .on("mouseover", (event, d) => {
+  //           // Hover effect
+  //           d3.select(event.target).attr("fill", this.hoverColor);
+  //           this._showTooltip(
+  //             event,
+  //             `${dataset.label}: ${dataset.data[d]} ${dataset.config.graphTitle}`
+  //           );
+  //         })
+  //         .on("mouseout", (event) => {
+  //           // Reset hover effect
+  //           d3.select(event.target).attr("fill", colorScale(dataset.label));
+  //           this._hideTooltip();
+  //         });
+  //     });
+  //   }
+  // }
+
+  // _drawCombinedGraph(datasets, labels, maxYValue, container) {
+  //   // Clear existing content
+  //   container.innerHTML = "";
+
+  //   // Set up SVG for the D3 chart
+  //   const svg = d3
+  //     .select(container)
+  //     .append("svg")
+  //     .attr("width", this.graphWidth + this.margin.left + this.margin.right)
+  //     .attr("height", this.graphHeight + this.margin.top + this.margin.bottom)
+  //     .append("g")
+  //     .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
+
+  //   // Define scales
+  //   const x = d3
+  //     .scaleBand()
+  //     .domain(labels)
+  //     .range([0, this.graphWidth])
+  //     .padding(0.2);
+
+  //   // Calculate a reasonable range for the Y-axis based on maxYValue
+  //   const numTicks = 5;
+  //   const tickStep = Math.ceil(maxYValue / numTicks);
+  //   const yMax = Math.ceil(maxYValue / tickStep) * tickStep;
+
+  //   const y = d3
+  //     .scaleLinear()
+  //     .domain([0, yMax]) // Use adjusted yMax for a clean range
+  //     .nice()
+  //     .range([this.graphHeight, 0]);
+
+  //   const colorScale = d3
+  //     .scaleOrdinal()
+  //     .domain(datasets.map((d) => d.label))
+  //     .range(datasets.map((d) => d.config.barColor || this.barColor));
+
+  //   // Add X-axis
+  //   svg
+  //     .append("g")
+  //     .attr("transform", `translate(0,${this.graphHeight})`)
+  //     .call(d3.axisBottom(x));
+
+  //   // Add Y-axis with dynamically calculated ticks
+  //   svg.append("g").call(d3.axisLeft(y).ticks(numTicks)); // Limiting to 5 ticks
+
+  //   if (this.currentView === "stacked") {
+  //     // Stacked Bar chart logic here...
+  //   } else if (this.currentView === "split") {
+  //     // Split (grouped) bar chart logic here...
+  //   }
+  // }
 
   bindGraphEvents() {
     const fullscreenSelector = edges.util.jsClassSelector(

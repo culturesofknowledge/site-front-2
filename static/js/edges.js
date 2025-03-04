@@ -4099,15 +4099,29 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
         .range([0, this.graphWidth])
         .padding(0.1);
 
+      // Calculate cumulative maximum Y value from the stacked data
+      const maxYValue = d3.max(
+        labels.map((label) => {
+          return datasets.reduce((sum, dataset) => {
+            return sum + (dataset.data[label] || 0); // Cumulative sum of all datasets for a given label
+          }, 0);
+        })
+      );
+
+      // Calculate appropriate tick step for Y-axis based on the height of the graph
       const numTicks = 5;
       const tickStep = Math.ceil(maxYValue / numTicks);
       const yMax = Math.ceil(maxYValue / tickStep) * tickStep;
 
+      // Adjust the Y-scale to fit within the number of ticks
       const y = d3
         .scaleLinear()
-        .domain([0, yMax]) // Use adjusted yMax for a clean range
+        .domain([0, yMax]) // Use the cumulative max Y value
         .nice()
         .range([this.graphHeight, 0]);
+
+      // Calculate the range of values for the Y-axis and use them to limit to 5 ticks
+      const yTicks = y.ticks(numTicks); // This will calculate tick values based on the domain and range of the scale
 
       const colorScale = d3
         .scaleOrdinal()
@@ -4120,8 +4134,8 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
         .attr("transform", `translate(0,${this.graphHeight})`)
         .call(d3.axisBottom(x));
 
-      // Add Y-axis
-      svg.append("g").call(d3.axisLeft(y));
+      // Add Y-axis with cumulative range and only 5 ticks
+      svg.append("g").call(d3.axisLeft(y).ticks(numTicks));
 
       // Prepare stacked data
       const stackedData = labels.map((label) => {

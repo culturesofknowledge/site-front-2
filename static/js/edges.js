@@ -212,14 +212,13 @@ emlo.ProfileTemplate = class extends edges.Template {
       <div class="row row-with-side">
         <div class="large-12 columns" style="padding-left:0px">
             <div id="profile">
-                <br/>
-                <h2 class="main">
+                <h2 class="main" style="margin-top:0px">
                     <span id="profile-header" class="font-18">
                     </span>
                 </h2>
             </div>
    
-             <div id="" class="large-12 columns" style="margin-left:25px">
+             <div id="" class="large-12 columns">
               ${results}
             </div>
         </div>
@@ -2449,7 +2448,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         title = val != "" ? val : this.dynamicTitle;
       }
     }
-    
+
     if (title == "") {
       title = this.contentTitle;
     }

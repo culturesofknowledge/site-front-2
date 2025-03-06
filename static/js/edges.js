@@ -3361,10 +3361,10 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     if (this.field == "cito_Catalog") {
       return value
         ? `
-        <em>
+        <p style="margin-top: 10px;font-style: oblique;">
           Collection details: 
           <a href="http://emlo-portal.bodleian.ox.ac.uk/collections/?catalogue=${value}"> The Correspondence ${value} </a>
-        <em>
+        <p>
       `
         : "";
     }

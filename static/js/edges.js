@@ -1,3 +1,5 @@
+import { getCollectionTitle } from "../js/profile/collectionDetails.js"
+
 const emlo = {
   active: {},
   selector: "",
@@ -3363,7 +3365,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         ? `
         <p style="margin-top: 10px;font-style: oblique;">
           Collection details: 
-          <a href="http://emlo-portal.bodleian.ox.ac.uk/collections/?catalogue=${value}"> The Correspondence ${value} </a>
+          <a href="http://emlo-portal.bodleian.ox.ac.uk/collections/?catalogue=${getCollectionTitle(value).href}"> ${getCollectionTitle(value).title} </a>
         <p>
       `
         : "";

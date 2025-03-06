@@ -2435,7 +2435,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   }
 
   _sideTitle() {
-    let title;
+    let title = ""
     const result = this.component.results[0];
     if (this.dynamicTitle != "" && this.dynamicTitleField != "") {
       let val;
@@ -2449,7 +2449,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         title = val != "" ? val : this.dynamicTitle;
       }
     }
-
+    
     if (title == "") {
       title = this.contentTitle;
     }

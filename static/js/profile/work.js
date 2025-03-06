@@ -6,7 +6,7 @@ export function getWorkComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-title",
         contentTitle: "Letter",
-        contentTitleImage: "/static/img/person-icon.png",
+        contentTitleImage: "/static/img/letter_icon.png",
       }),
     }),
 

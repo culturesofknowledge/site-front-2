@@ -3773,7 +3773,7 @@ emlo.BarGraph = class extends edges.Component {
       const uuidArray = Array.from(uuids);
       const fieldData = await this._fetchGraphData(solrCore, uuidArray);
 
-      for (const doc of fieldData.response.docs) {
+      for (const doc of fieldData) {
         const fieldKey = uuidToFieldKeyMap.get(doc.uuid);
         if (fieldKey) {
           if (!this.graphData[fieldKey]) {
@@ -3801,7 +3801,7 @@ emlo.BarGraph = class extends edges.Component {
     };
 
     try {
-      const response = await fetch("/stats", {
+      const response = await fetch("/stats-new", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -3911,7 +3911,8 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
     for (const [fieldKey, fieldData] of Object.entries(
       this.component.graphData
     )) {
-      const reducedData = this._reduceData(fieldData);
+      // const reducedData = this._reduceData(fieldData);
+      const reducedData = fieldData;
       const valueCounts = this._countOccurrences(
         reducedData,
         this.component.xAxisField
@@ -3977,9 +3978,14 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       .range([0, this.graphWidth])
       .padding(0.1);
 
+    // Calculate a reasonable range for the Y-axis based on maxYValue
+    const numTicks = 5;
+    const tickStep = Math.ceil(maxYValue / numTicks);
+    const yMax = Math.ceil(maxYValue / tickStep) * tickStep;
+
     const y = d3
       .scaleLinear()
-      .domain([0, maxYValue])
+      .domain([0, yMax]) // Use adjusted yMax for a clean range
       .nice()
       .range([this.graphHeight, 0]);
 
@@ -3989,8 +3995,8 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       .attr("transform", `translate(0,${this.graphHeight})`)
       .call(d3.axisBottom(x));
 
-    // Add Y-axis (with no decimal values)
-    svg.append("g").call(d3.axisLeft(y).ticks(Math.ceil(maxYValue / 10))); // Adjust number of ticks based on the max value
+    // Add Y-axis with dynamically calculated ticks
+    svg.append("g").call(d3.axisLeft(y).ticks(numTicks)); // Limiting to 5 ticks
 
     // Draw bars
     svg
@@ -4048,9 +4054,14 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       .range([0, this.graphWidth])
       .padding(0.2);
 
+    // Calculate a reasonable range for the Y-axis based on maxYValue
+    const numTicks = 5;
+    const tickStep = Math.ceil(maxYValue / numTicks);
+    const yMax = Math.ceil(maxYValue / tickStep) * tickStep;
+
     const y = d3
       .scaleLinear()
-      .domain([0, maxYValue])
+      .domain([0, yMax]) // Use adjusted yMax for a clean range
       .nice()
       .range([this.graphHeight, 0]);
 
@@ -4065,8 +4076,8 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       .attr("transform", `translate(0,${this.graphHeight})`)
       .call(d3.axisBottom(x));
 
-    // Add Y-axis
-    svg.append("g").call(d3.axisLeft(y));
+    // Add Y-axis with dynamically calculated ticks
+    svg.append("g").call(d3.axisLeft(y).ticks(numTicks)); // Limiting to 5 ticks
 
     if (this.currentView === "stacked") {
       // Clear existing content
@@ -4088,11 +4099,29 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
         .range([0, this.graphWidth])
         .padding(0.1);
 
+      // Calculate cumulative maximum Y value from the stacked data
+      const maxYValue = d3.max(
+        labels.map((label) => {
+          return datasets.reduce((sum, dataset) => {
+            return sum + (dataset.data[label] || 0); // Cumulative sum of all datasets for a given label
+          }, 0);
+        })
+      );
+
+      // Calculate appropriate tick step for Y-axis based on the height of the graph
+      const numTicks = 5;
+      const tickStep = Math.ceil(maxYValue / numTicks);
+      const yMax = Math.ceil(maxYValue / tickStep) * tickStep;
+
+      // Adjust the Y-scale to fit within the number of ticks
       const y = d3
         .scaleLinear()
-        .domain([0, maxYValue])
+        .domain([0, yMax]) // Use the cumulative max Y value
         .nice()
         .range([this.graphHeight, 0]);
+
+      // Calculate the range of values for the Y-axis and use them to limit to 5 ticks
+      const yTicks = y.ticks(numTicks); // This will calculate tick values based on the domain and range of the scale
 
       const colorScale = d3
         .scaleOrdinal()
@@ -4105,8 +4134,8 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
         .attr("transform", `translate(0,${this.graphHeight})`)
         .call(d3.axisBottom(x));
 
-      // Add Y-axis
-      svg.append("g").call(d3.axisLeft(y));
+      // Add Y-axis with cumulative range and only 5 ticks
+      svg.append("g").call(d3.axisLeft(y).ticks(numTicks));
 
       // Prepare stacked data
       const stackedData = labels.map((label) => {
@@ -4146,42 +4175,316 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
         });
       });
     } else if (this.currentView === "split") {
-      // Split (grouped) bar chart
-      const subX = d3
-        .scaleBand()
-        .domain(datasets.map((d) => d.label))
-        .range([0, x.bandwidth()])
-        .padding(0.05);
+      // Split Bar chart logic here...
+      const barWidth = x.bandwidth() / datasets.length; // Adjust width for each dataset
 
-      datasets.forEach((dataset, datasetIndex) => {
+      datasets.forEach((dataset, index) => {
         svg
-          .selectAll(`.bar-group-${datasetIndex}`)
+          .selectAll(`.split-bar-${dataset.label}`)
           .data(labels)
           .enter()
           .append("rect")
-          .attr("class", `bar-group-${datasetIndex}`)
-          .attr("x", (d) => x(d) + subX(dataset.label))
-          .attr("y", (d) => y(dataset.data[d] || 0))
-          .attr("width", subX.bandwidth())
+          .attr("class", `split-bar-${dataset.label}`)
+          .attr("x", (d, i) => x(d) + barWidth * index) // Offset bars for each dataset
+          .attr("y", (d) => y(dataset.data[d] || 0)) // Y position based on data value
+          .attr("width", barWidth) // Width of each bar in the group
           .attr("height", (d) => this.graphHeight - y(dataset.data[d] || 0))
-          .attr("fill", dataset.config.barColor || this.barColor)
+          .attr("fill", colorScale(dataset.label))
           .on("mouseover", (event, d) => {
+            // Hover effect
             d3.select(event.target).attr("fill", this.hoverColor);
             this._showTooltip(
               event,
-              `${dataset.label}: ${dataset.data[d] || 0}`
+              `${dataset.label}: ${dataset.data[d]} ${dataset.config.graphTitle}`
             );
           })
           .on("mouseout", (event) => {
-            d3.select(event.target).attr(
-              "fill",
-              dataset.config.barColor || this.barColor
-            );
+            // Reset hover effect
+            d3.select(event.target).attr("fill", colorScale(dataset.label));
             this._hideTooltip();
           });
       });
     }
   }
+
+  // _drawCombinedGraph(datasets, labels, maxYValue, container) {
+  //   // Clear existing content
+  //   container.innerHTML = "";
+
+  //   // Set up SVG for the D3 chart
+  //   const svg = d3
+  //     .select(container)
+  //     .append("svg")
+  //     .attr("width", this.graphWidth + this.margin.left + this.margin.right)
+  //     .attr("height", this.graphHeight + this.margin.top + this.margin.bottom)
+  //     .append("g")
+  //     .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
+
+  //   // Define scales
+  //   const x = d3
+  //     .scaleBand()
+  //     .domain(labels)
+  //     .range([0, this.graphWidth])
+  //     .padding(0.2);
+
+  //   // Calculate a reasonable range for the Y-axis based on maxYValue
+  //   const numTicks = 5;
+  //   const tickStep = Math.ceil(maxYValue / numTicks);
+  //   const yMax = Math.ceil(maxYValue / tickStep) * tickStep;
+
+  //   const y = d3
+  //     .scaleLinear()
+  //     .domain([0, yMax]) // Use adjusted yMax for a clean range
+  //     .nice()
+  //     .range([this.graphHeight, 0]);
+
+  //   const colorScale = d3
+  //     .scaleOrdinal()
+  //     .domain(datasets.map((d) => d.label))
+  //     .range(datasets.map((d) => d.config.barColor || this.barColor));
+
+  //   // Add X-axis
+  //   svg
+  //     .append("g")
+  //     .attr("transform", `translate(0,${this.graphHeight})`)
+  //     .call(d3.axisBottom(x));
+
+  //   // Add Y-axis with dynamically calculated ticks
+  //   svg.append("g").call(d3.axisLeft(y).ticks(numTicks)); // Limiting to 5 ticks
+
+  //   if (this.currentView === "stacked") {
+  //     // Prepare data for stacking by ensuring missing data has 0
+  //     const stack = d3
+  //       .stack()
+  //       .keys(datasets.map((d) => d.label)) // Keys should correspond to labels
+  //       .value((d, key, index) => {
+  //         console.log("key", key, index, JSON.stringify(d));
+  //         // Ensure we handle missing data by setting default 0 for missing keys
+  //         return d.data[key] || 0; // Use 0 if data is missing
+  //       });
+
+  //     // Transform the dataset into stacked data
+  //     const stackedData = stack(datasets);
+  //     console.log("stackedData", stackedData);
+  //     // Add stacked bars
+  //     svg
+  //       .selectAll(".stacked-bar")
+  //       .data(stackedData)
+  //       .enter()
+  //       .append("g")
+  //       .attr("class", "stacked-bar")
+  //       .selectAll("rect")
+  //       .data((d) => d)
+  //       .enter()
+  //       .append("rect")
+  //       .attr("x", (d) => x(d.data.label)) // Position on the x-axis
+  //       .attr("y", (d) => y(d[1])) // Position the top of the bar (stacked)
+  //       .attr("height", (d) => y(d[0]) - y(d[1])) // Height based on stacked range
+  //       .attr("width", x.bandwidth()) // Width of the bar
+  //       .attr("fill", (d, i) => colorScale(d.key)) // Color each segment
+  //       .on("mouseover", (event, d) => {
+  //         // Hover effect
+  //         d3.select(event.target).attr("fill", this.hoverColor);
+  //         this._showTooltip(
+  //           event,
+  //           `${d.data.label}: ${d[1] - d[0]} ${d.data.graphTitle}`
+  //         );
+  //       })
+  //       .on("mouseout", (event) => {
+  //         // Reset hover effect
+  //         d3.select(event.target).attr("fill", colorScale(d.key));
+  //         this._hideTooltip();
+  //       });
+  //   } else if (this.currentView === "split") {
+  //     // Split Bar chart logic here...
+  //     const barWidth = x.bandwidth() / datasets.length; // Adjust width for each dataset
+
+  //     datasets.forEach((dataset, index) => {
+  //       svg
+  //         .selectAll(`.split-bar-${dataset.label}`)
+  //         .data(labels)
+  //         .enter()
+  //         .append("rect")
+  //         .attr("class", `split-bar-${dataset.label}`)
+  //         .attr("x", (d, i) => x(d) + barWidth * index) // Offset bars for each dataset
+  //         .attr("y", (d) => y(dataset.data[d] || 0)) // Y position based on data value
+  //         .attr("width", barWidth) // Width of each bar in the group
+  //         .attr("height", (d) => this.graphHeight - y(dataset.data[d] || 0))
+  //         .attr("fill", colorScale(dataset.label))
+  //         .on("mouseover", (event, d) => {
+  //           // Hover effect
+  //           d3.select(event.target).attr("fill", this.hoverColor);
+  //           this._showTooltip(
+  //             event,
+  //             `${dataset.label}: ${dataset.data[d]} ${dataset.config.graphTitle}`
+  //           );
+  //         })
+  //         .on("mouseout", (event) => {
+  //           // Reset hover effect
+  //           d3.select(event.target).attr("fill", colorScale(dataset.label));
+  //           this._hideTooltip();
+  //         });
+  //     });
+  //   }
+  // }
+
+  // _drawCombinedGraph(datasets, labels, maxYValue, container) {
+  //   // Clear existing content
+  //   container.innerHTML = "";
+
+  //   // Set up SVG for the D3 chart
+  //   const svg = d3
+  //     .select(container)
+  //     .append("svg")
+  //     .attr("width", this.graphWidth + this.margin.left + this.margin.right)
+  //     .attr("height", this.graphHeight + this.margin.top + this.margin.bottom)
+  //     .append("g")
+  //     .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
+
+  //   // Define scales
+  //   const x = d3
+  //     .scaleBand()
+  //     .domain(labels)
+  //     .range([0, this.graphWidth])
+  //     .padding(0.2);
+
+  //   // Calculate a reasonable range for the Y-axis based on maxYValue
+  //   const numTicks = 5;
+  //   const tickStep = Math.ceil(maxYValue / numTicks);
+  //   const yMax = Math.ceil(maxYValue / tickStep) * tickStep;
+
+  //   const y = d3
+  //     .scaleLinear()
+  //     .domain([0, yMax]) // Use adjusted yMax for a clean range
+  //     .nice()
+  //     .range([this.graphHeight, 0]);
+
+  //   const colorScale = d3
+  //     .scaleOrdinal()
+  //     .domain(datasets.map((d) => d.label))
+  //     .range(datasets.map((d) => d.config.barColor || this.barColor));
+
+  //   // Add X-axis
+  //   svg
+  //     .append("g")
+  //     .attr("transform", `translate(0,${this.graphHeight})`)
+  //     .call(d3.axisBottom(x));
+
+  //   // Add Y-axis with dynamically calculated ticks
+  //   svg.append("g").call(d3.axisLeft(y).ticks(numTicks)); // Limiting to 5 ticks
+
+  //   if (this.currentView === "stacked") {
+  //     // Stacked Bar chart logic here...
+  //     console.log("datasets", JSON.stringify(datasets));
+  //     // Use d3.stack() to  create stacked data
+  //     const stack = d3
+  //       .stack()
+  //       .keys(datasets.map((d) => d.label))
+  //       .value((d, key) => d.data[key]);
+
+  //     const stackedData = stack(datasets.map((dataset) => dataset.data)); // Stack the data
+
+  //     // Add stacked bars
+  //     svg
+  //       .selectAll(".stacked-bar")
+  //       .data(stackedData)
+  //       .enter()
+  //       .append("g")
+  //       .attr("class", "stacked-bar")
+  //       .attr("fill", (d, i) => colorScale(d.key))
+  //       .selectAll("rect")
+  //       .data((d) => d)
+  //       .enter()
+  //       .append("rect")
+  //       .attr("x", (d) => x(d.data.label)) // Position on the x-axis
+  //       .attr("y", (d) => y(d[1])) // Position the top of the bar
+  //       .attr("height", (d) => y(d[0]) - y(d[1])) // Height based on stacked range
+  //       .attr("width", x.bandwidth());
+  //   } else if (this.currentView === "split") {
+  //     // Split (grouped) Bar chart logic here...
+
+  //     const barWidth = x.bandwidth() / datasets.length; // Adjust width for each dataset
+
+  //     datasets.forEach((dataset, index) => {
+  //       svg
+  //         .selectAll(`.split-bar-${dataset.label}`)
+  //         .data(labels)
+  //         .enter()
+  //         .append("rect")
+  //         .attr("class", `split-bar-${dataset.label}`)
+  //         .attr("x", (d, i) => x(d) + barWidth * index) // Offset bars for each dataset
+  //         .attr("y", (d) => y(dataset.data[d] || 0)) // Y position based on data value
+  //         .attr("width", barWidth) // Width of each bar in the group
+  //         .attr("height", (d) => this.graphHeight - y(dataset.data[d] || 0))
+  //         .attr("fill", colorScale(dataset.label))
+  //         .on("mouseover", (event, d) => {
+  //           // Hover effect
+  //           d3.select(event.target).attr("fill", this.hoverColor);
+  //           this._showTooltip(
+  //             event,
+  //             `${dataset.label}: ${dataset.data[d]} ${dataset.config.graphTitle}`
+  //           );
+  //         })
+  //         .on("mouseout", (event) => {
+  //           // Reset hover effect
+  //           d3.select(event.target).attr("fill", colorScale(dataset.label));
+  //           this._hideTooltip();
+  //         });
+  //     });
+  //   }
+  // }
+
+  // _drawCombinedGraph(datasets, labels, maxYValue, container) {
+  //   // Clear existing content
+  //   container.innerHTML = "";
+
+  //   // Set up SVG for the D3 chart
+  //   const svg = d3
+  //     .select(container)
+  //     .append("svg")
+  //     .attr("width", this.graphWidth + this.margin.left + this.margin.right)
+  //     .attr("height", this.graphHeight + this.margin.top + this.margin.bottom)
+  //     .append("g")
+  //     .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
+
+  //   // Define scales
+  //   const x = d3
+  //     .scaleBand()
+  //     .domain(labels)
+  //     .range([0, this.graphWidth])
+  //     .padding(0.2);
+
+  //   // Calculate a reasonable range for the Y-axis based on maxYValue
+  //   const numTicks = 5;
+  //   const tickStep = Math.ceil(maxYValue / numTicks);
+  //   const yMax = Math.ceil(maxYValue / tickStep) * tickStep;
+
+  //   const y = d3
+  //     .scaleLinear()
+  //     .domain([0, yMax]) // Use adjusted yMax for a clean range
+  //     .nice()
+  //     .range([this.graphHeight, 0]);
+
+  //   const colorScale = d3
+  //     .scaleOrdinal()
+  //     .domain(datasets.map((d) => d.label))
+  //     .range(datasets.map((d) => d.config.barColor || this.barColor));
+
+  //   // Add X-axis
+  //   svg
+  //     .append("g")
+  //     .attr("transform", `translate(0,${this.graphHeight})`)
+  //     .call(d3.axisBottom(x));
+
+  //   // Add Y-axis with dynamically calculated ticks
+  //   svg.append("g").call(d3.axisLeft(y).ticks(numTicks)); // Limiting to 5 ticks
+
+  //   if (this.currentView === "stacked") {
+  //     // Stacked Bar chart logic here...
+  //   } else if (this.currentView === "split") {
+  //     // Split (grouped) bar chart logic here...
+  //   }
+  // }
 
   bindGraphEvents() {
     const fullscreenSelector = edges.util.jsClassSelector(

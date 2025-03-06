@@ -3381,7 +3381,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   _renderPlainText() {
     return this.component.results[0][this.field]
       ? `
-          <p style="margin-left:40px">
+          <p>
             ${edges.util.escapeHtml(
               this.component.results[0][this.field] || ""
             )}

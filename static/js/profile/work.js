@@ -44,7 +44,7 @@ export function getWorkComponents(emlo) {
       id: "source-record",
       category: "sidebar",
       renderer: new emlo.MultiFieldsRenderer({
-        type: "text",
+        type: "plain-text",
         divider: true,
         sectionTitle: "Source of record",
         field: "ox_sourceOfData",

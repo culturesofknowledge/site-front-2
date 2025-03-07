@@ -800,7 +800,13 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       .slice(0, this.checkboxLimit)
       .map((uuid) => {
         const displayName = this._getDisplayName(uuid) || uuid;
-        return `<div><input type="checkbox" class="side-nav-item" data-uuid="${uuid}" checked> ${displayName}</div>`;
+        return `
+          <input type="checkbox" class="side-nav-item" data-uuid="${uuid}" checked>
+          <label> 
+            <span> ${displayName} </span>
+          </label>
+          <br/>
+        `;
       })
       .join("");
 
@@ -5063,6 +5069,31 @@ emlo.SortRenderer = class extends edges.Renderer {
     // Trigger the sort logic (update the query or API call)
     this.component.synchronise(selectedOption.field);
   };
+};
+
+emlo.AlertBox = class extends edges.Component {
+  constructor(params) {
+    super(params);
+  }
+};
+
+emlo.AlertBoxRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+    this.namespace = "edges-alert-renderer";
+    this.message = edges.util.getParam(params, "message", "");
+  }
+
+  draw() {
+    let frag = `
+          <div data-alert="" class="alert-box info radius">
+            ${this.message}
+			      <a href="#" class="close">×</a>
+				  </div>
+    `;
+
+    this.component.context.html(frag);
+  }
 };
 
 emlo.Checkbox = class extends edges.Component {

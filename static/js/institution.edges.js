@@ -52,6 +52,14 @@ try {
   emlo.collection = "/solr/institutions/select";
 
   emlo.components = [
+    new emlo.AlertBox({
+      id: "alert-box",
+      category: "results",
+      renderer: new emlo.AlertBoxRenderer({
+        message: `  Note: every manifestation of a letter is counted, so the number of documents in a repository may be larger than the number of letters.
+              `,
+      }),
+    }),
     new emlo.ResultTable({
       id: "results",
       category: "results",

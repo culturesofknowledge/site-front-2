@@ -487,6 +487,48 @@ function advanceSearch(params) {
       });
     }
 
+    if (params.get("mail_origin-location")) {
+      openingQuery.must.push({
+        field: "mail_origin-location",
+        value: `*${params.get("mail_origin-location")}*`,
+      });
+    }
+
+    if (params.get("mail_destination-location")) {
+      openingQuery.must.push({
+        field: "mail_destination-location",
+        value: `*${params.get("mail_destination-location")}*`,
+      });
+    }
+
+    if (params.get("dcterms_references-location")) {
+      openingQuery.must.push({
+        field: "dcterms_references-location",
+        value: `*${params.get("dcterms_references-location")}*`,
+      });
+    }
+
+    if (params.get("frbr_creator-person")) {
+      openingQuery.must.push({
+        field: "frbr_creator-person",
+        value: `*${params.get("frbr_creator-person")}*`,
+      });
+    }
+
+    if (params.get("dcterms_references-person")) {
+      openingQuery.must.push({
+        field: "dcterms_references-person",
+        value: `*${params.get("dcterms_references-person")}*`,
+      });
+    }
+
+    if (params.get("mail_recipient-person")) {
+      openingQuery.must.push({
+        field: "mail_recipient-person",
+        value: `*${params.get("mail_recipient-person")}*`,
+      });
+    }
+
     if (params.get("ox_started-ox_year")) {
       openingQuery.must.push({
         field: "ox_started-ox_year",
@@ -514,13 +556,22 @@ function advanceSearch(params) {
     const toDay = params.get("dat_to_day");
 
     if (sinYear) {
-      openingQuery.queryStrings.push({
-        queryString: sinYear,
-        fields: [
-          { field: "ox_started-ox_year", operator: "OR" },
-          { field: "ox_completed-ox_year", operator: "OR" },
-        ],
-      });
+      if (sinYear == "Unknown year") {
+        openingQuery.query.range = {
+          started_date_sort: {
+            lte: "9999-12-31T00:00:00Z",
+            gte: "9999-1-1T00:00:00Z",
+          },
+        };
+      } else {
+        openingQuery.queryStrings.push({
+          queryString: sinYear,
+          fields: [
+            { field: "ox_started-ox_year", operator: "OR" },
+            { field: "ox_completed-ox_year", operator: "OR" },
+          ],
+        });
+      }
     }
 
     if (sinMonth) {

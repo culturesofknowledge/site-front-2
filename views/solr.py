@@ -38,6 +38,71 @@ def solr_proxy(subpath):
         print(f"Got error: {err}")
         return jsonify({"error": str(err)}), 500
     
+
+@solr_bp.route('/stats-new', methods=['POST'])
+def fetchStatsNew():
+    try:
+        SOLR_URL = getSolrURL()
+
+        # Get data from the request
+        data = request.json
+        solr_core = data.get('solrCore')
+        uuids = data.get('uuids', [])
+        filter_query = data.get('filter', '')
+
+        # Validate input
+        if not solr_core or not uuids:
+            return jsonify({'error': 'solrCore and uuids are required'}), 400
+
+        # Split the uuids list into batches of 100
+        batch_size = 100
+        batches = [uuids[i:i + batch_size] for i in range(0, len(uuids), batch_size)]
+
+        # Initialize an empty list to store results from each batch
+        all_results = []
+
+        # Loop through each batch and query Solr
+        for batch in batches:
+            # Construct the Solr query for the current batch
+            uuid_query = ' OR '.join([f'"{uuid}"' for uuid in batch])  # Ensure UUIDs are quoted correctly
+            solr_query = f'uuid:({uuid_query})'
+
+            if filter_query:
+                solr_query += f' AND ({filter_query})'
+
+            # Build the Solr URL
+            solr_url = f'{SOLR_URL}{solr_core}s/select'
+            params = {
+                'q': solr_query,
+                'wt': 'json',
+                'rows': len(batch)  # Fetch results only for the current batch
+            }
+
+            # Make the request to Solr
+            try:
+                response = requests.get(solr_url, params=params)
+                response.raise_for_status()  # Ensure we raise an error for bad responses
+                solr_data = response.json()
+
+                # Debugging: print the query and the response to check for issues
+                print(f"Solr Query: {solr_query}")
+                print(f"Solr Response: {solr_data}")
+                
+                # Append the results from the current batch
+                all_results.extend(solr_data.get('response', {}).get('docs', []))  # Assuming 'docs' contains the results
+                # Debugging: Print how many results we fetched for this batch
+                print(f"Results for batch: {len(solr_data.get('response', {}).get('docs', []))}")
+
+            except requests.RequestException as e:
+                return jsonify({'error': 'Error fetching data from Solr', 'details': str(e)}), 500
+
+        # Return all collected results in one go
+        return jsonify(all_results)
+
+    except Exception as e:
+        return jsonify({'error': 'Internal Server Error', 'details': str(e)}), 500
+
+## Will be deleted by next deployment, keeping this untill that time
 @solr_bp.route('/stats', methods=['POST'])  # Include methods you need
 def fetchStats():
     try:

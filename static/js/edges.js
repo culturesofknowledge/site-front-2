@@ -800,7 +800,13 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       .slice(0, this.checkboxLimit)
       .map((uuid) => {
         const displayName = this._getDisplayName(uuid) || uuid;
-        return `<div><input type="checkbox" class="side-nav-item" data-uuid="${uuid}" checked> ${displayName}</div>`;
+        return `
+          <input type="checkbox" class="side-nav-item" data-uuid="${uuid}" checked>
+          <label> 
+            <span> ${displayName} </span>
+          </label>
+          <br/>
+        `;
       })
       .join("");
 

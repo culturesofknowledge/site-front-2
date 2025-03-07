@@ -210,7 +210,7 @@ emlo.ProfileTemplate = class extends edges.Template {
       </div>
 
       <div class="row row-with-side">
-        <div class="large-12 columns" style="margin-left:25px">
+        <div class="large-12 columns" style="padding-left:0px">
             <div id="profile">
                 <br/>
                 <h2 class="main">
@@ -800,7 +800,13 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       .slice(0, this.checkboxLimit)
       .map((uuid) => {
         const displayName = this._getDisplayName(uuid) || uuid;
-        return `<div><input type="checkbox" class="side-nav-item" data-uuid="${uuid}" checked> ${displayName}</div>`;
+        return `
+          <input type="checkbox" class="side-nav-item" data-uuid="${uuid}" checked>
+          <label> 
+            <span> ${displayName} </span>
+          </label>
+          <br/>
+        `;
       })
       .join("");
 
@@ -960,7 +966,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
     const month = months[date.getMonth()];
     const year = date.getFullYear();
 
-    return year == 9999 ? `${day} ${month}` : `${day} ${month} ${year}`;
+    return year === 9999 ? `${day} ${month}` : `${day} ${month} ${year}`;
   }
 };
 
@@ -1106,6 +1112,438 @@ emlo.FacetRenderer = class extends edges.Renderer {
     this.showAll = false; // Track whether to show all entries
   }
 
+  // Older code
+  // draw() {
+  //   let ts = this.component;
+
+  //   if (!ts.active && this.hideInactive) {
+  //     ts.context.html("");
+  //     return;
+  //   }
+
+  //   // If there are no values for the facet, hide the entire facet
+  //   if (!ts.values || ts.values.length === 0) {
+  //     ts.context.html("");
+  //     return;
+  //   }
+
+  //   const valClass = edges.util.allClasses(
+  //     this.namespace,
+  //     "value",
+  //     this.component.id
+  //   );
+  //   const filterRemoveClass = edges.util.allClasses(
+  //     this.namespace,
+  //     "filter-remove",
+  //     this.component.id
+  //   );
+
+  //   const resultsListClass = edges.util.styleClasses(
+  //     this.namespace,
+  //     "results-list",
+  //     this.component.id
+  //   );
+  //   const resultClass = edges.util.styleClasses(
+  //     this.namespace,
+  //     "result",
+  //     this.component.id
+  //   );
+  //   const controlClass = edges.util.styleClasses(
+  //     this.namespace,
+  //     "controls",
+  //     this.component.id
+  //   );
+  //   const facetClass = edges.util.styleClasses(
+  //     this.namespace,
+  //     "facet",
+  //     this.component.id
+  //   );
+  //   const headerClass = edges.util.styleClasses(
+  //     this.namespace,
+  //     "header",
+  //     this.component.id
+  //   );
+  //   const selectedClass = edges.util.styleClasses(
+  //     this.namespace,
+  //     "selected",
+  //     this.component.id
+  //   );
+
+  //   const controlId = edges.util.htmlID(
+  //     this.namespace,
+  //     "controls",
+  //     this.component.id
+  //   );
+  //   const sizeId = edges.util.htmlID(this.namespace, "size", this.component.id);
+  //   const orderId = edges.util.htmlID(
+  //     this.namespace,
+  //     "order",
+  //     this.component.id
+  //   );
+  //   const toggleId = edges.util.htmlID(
+  //     this.namespace,
+  //     "toggle",
+  //     this.component.id
+  //   );
+  //   const resultsId = edges.util.htmlID(
+  //     this.namespace,
+  //     "results",
+  //     this.component.id
+  //   );
+  //   const showMoreId = edges.util.htmlID(
+  //     this.namespace,
+  //     "show-more",
+  //     this.component.id
+  //   );
+
+  //   let results = "Loading...";
+  //   if (ts.values !== false) {
+  //     results = `
+  //       <tr>
+  //         <td>
+  //           None
+  //         </td>
+  //       </tr>
+  //     `;
+  //   }
+
+  //   const filterTerms = ts.filters.map((filter) =>
+  //     filter.term ? filter.term.toString() : ""
+  //   );
+
+  //   const filterFields = ts.filters.map((filter) =>
+  //     filter.field ? filter.field.toString() : ""
+  //   );
+
+  //   if (ts.values && ts.values.length > 0) {
+  //     results = "";
+
+  //     ts.values.forEach((val, idx) => {
+  //       // Skip facets where count is zero
+  //       if (!filterTerms.includes(val.term.toString()) && val.count > 0) {
+  //         let count = val.count;
+  //         if (this.countFormat) {
+  //           count = this.countFormat(count);
+  //         }
+  //         const isHidden = idx >= this.displayLimit && !this.showAll;
+  //         results += `
+  //           <tr style="${isHidden ? "display:none;" : ""}">
+  //             <td>
+  //               <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
+  //           val.term
+  //         )}">
+  //                 <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
+  //                 ${edges.util.escapeHtml(val.display)}
+  //               </a>
+  //             </td>
+  //             <td>
+  //               ${count}
+  //             </td>
+  //           </tr>
+  //         `;
+  //       }
+  //     });
+  //   }
+
+  //   // If no results were found, hide the facet altogether
+  //   if (results === "Loading..." || results === "" || ts.values.length === 0) {
+  //     ts.context.html(""); // Remove the entire facet from the DOM
+  //     return; // Stop execution as no content is needed
+  //   }
+
+  //   // Add "Show more" button if there are more than 10 entries
+  //   let showMoreFrag = "";
+  //   if (ts.values.length > this.displayLimit) {
+  //     showMoreFrag = `
+  //       <tr>
+  //         <td id="${showMoreId}" class="btn btn-link">
+  //           ${this.showAll ? "Click to hide" : "Click to show more..."}
+  //         </td>
+  //         <td>
+  //         </td>
+  //       </tr>
+  //     `;
+  //   }
+
+  //   let tooltipFrag = "";
+  //   if (this.tooltipText) {
+  //     const tt = this._shortTooltip();
+  //     const tooltipClass = edges.util.styleClasses(
+  //       this.namespace,
+  //       "tooltip",
+  //       this.component.id
+  //     );
+  //     const tooltipId = edges.util.htmlID(
+  //       this.namespace,
+  //       "tooltip",
+  //       this.component.id
+  //     );
+  //     tooltipFrag = `<div id="${tooltipId}" class="${tooltipClass}" style="display:none"><div class="row"><div class="col-md-12">${tt}</div></div></div>`;
+  //   }
+
+  //   let controlFrag = "";
+  //   if (this.controls) {
+  //     controlFrag = `<div class="${controlClass}" style="display:none" id="${controlId}"><div class="row">
+  //                     <div class="col-md-12">
+  //                         <div class="btn-group">
+  //                             <button type="button" class="btn btn-default btn-sm" id="${sizeId}" title="List Size">0</button>
+  //                             <button type="button" class="btn btn-default btn-sm" id="${orderId}" title="List Order"></button>
+  //                         </div>
+  //                     </div>
+  //                 </div></div>`;
+  //   }
+
+  //   let filterFrag = "";
+  //   if (ts.filters.length > 0 && this.showSelected) {
+  //     ts.filters.forEach((filt) => {
+  //       filterFrag += `<div class="${resultClass}"><strong>${edges.util.escapeHtml(
+  //         filt.display
+  //       )}&nbsp;`;
+  //       filterFrag += `<a href="#" class="${filterRemoveClass}" data-key="${edges.util.escapeHtml(
+  //         filt.term
+  //       )}">`;
+  //       filterFrag += '<i class="fas fa-times"></i></a>';
+  //       filterFrag += "</strong></a></div>";
+  //     });
+  //   }
+
+  //   let tog = this.title;
+  //   if (this.togglable) {
+  //     tog = `<h4 class="main">${this.title}</h4>`;
+  //   }
+
+  //   let isHideCount = false;
+
+  //   const filterFieldsCount = filterFields.reduce((acc, item) => {
+  //     return item === this.component.field ? acc + 1 : acc;
+  //   }, 0);
+
+  //   if (filterFieldsCount >= this.hideCount && this.hideCount > 0) {
+  //     isHideCount = true;
+  //   }
+
+  //   let frag = `<div class="${facetClass}" style="${
+  //     isHideCount ? "display:none;" : ""
+  //   }">
+  //                     <div class="${headerClass}"><div class="row">
+  //                         <div class="col-md-12">
+  //                             ${tog}
+  //                         </div>
+  //                     </div></div>
+  //                     ${tooltipFrag}
+  //                     {{CONTROLS}}
+  //                     <div class="row" style="display:none" id="${resultsId}">
+  //                         <div class="col-md-12">
+  //                           <table class="facet">
+  //                             <tbody>
+  //                               {{RESULTS}}
+  //                               {{SHOWMOREFRAG}}
+  //                             </tbody>
+  //                           </table>
+  //                         </div>
+  //                     </div></div>`;
+
+  //   frag = frag
+  //     .replace(/{{RESULTS}}/g, results)
+  //     .replace(/{{CONTROLS}}/g, controlFrag)
+  //     .replace(/{{SELECTED}}/g, filterFrag)
+  //     .replace(/{{SHOWMOREFRAG}}/g, showMoreFrag);
+
+  //   ts.context.html(frag);
+
+  //   this.setUISize();
+  //   this.setUISort();
+  //   this.setUIOpen();
+
+  //   const valueSelector = edges.util.jsClassSelector(
+  //     this.namespace,
+  //     "value",
+  //     this.component.id
+  //   );
+  //   const filterRemoveSelector = edges.util.jsClassSelector(
+  //     this.namespace,
+  //     "filter-remove",
+  //     this
+  //   );
+  //   const toggleSelector = edges.util.idSelector(
+  //     this.namespace,
+  //     "toggle",
+  //     this
+  //   );
+  //   const sizeSelector = edges.util.idSelector(this.namespace, "size", this);
+  //   const orderSelector = edges.util.idSelector(this.namespace, "order", this);
+  //   const showMoreSelector = edges.util.idSelector(
+  //     this.namespace,
+  //     "show-more",
+  //     this
+  //   );
+
+  //   edges.on(valueSelector, "click", this, "termSelected");
+  //   edges.on(toggleSelector, "click", this, "toggleOpen");
+  //   edges.on(filterRemoveSelector, "click", this, "removeFilter");
+  //   edges.on(sizeSelector, "click", this, "changeSize");
+  //   edges.on(orderSelector, "click", this, "changeSort");
+
+  //   if (this.component.jq(showMoreSelector).length > 0) {
+  //     edges.on(showMoreSelector, "click", this, "showMoreEntries");
+  //   }
+  // }
+
+  // draw() {
+  //   let ts = this.component;
+
+  //   if (!ts.active && this.hideInactive) {
+  //     ts.context.html("");
+  //     return;
+  //   }
+
+  //   if (!ts.values || ts.values.length === 0) {
+  //     ts.context.html("");
+  //     return;
+  //   }
+
+  //   const valClass = edges.util.allClasses(
+  //     this.namespace,
+  //     "value",
+  //     this.component.id
+  //   );
+  //   const showMoreId = edges.util.htmlID(
+  //     this.namespace,
+  //     "show-more",
+  //     this.component.id
+  //   );
+  //   const modalId = edges.util.htmlID(
+  //     this.namespace,
+  //     "facet-modal",
+  //     this.component.id
+  //   );
+  //   const modalCloseId = edges.util.htmlID(
+  //     this.namespace,
+  //     "facet-modal-close",
+  //     this.component.id
+  //   );
+  //   const modalContentId = edges.util.htmlID(
+  //     this.namespace,
+  //     "facet-modal-content",
+  //     this.component.id
+  //   );
+
+  //   // Limited list for inline display
+  //   let limitedResults = "";
+  //   ts.values.forEach((val, idx) => {
+  //     if (val.count > 0) {
+  //       let count = this.countFormat ? this.countFormat(val.count) : val.count;
+  //       const isHidden = idx >= this.displayLimit;
+
+  //       limitedResults += `
+  //               <tr style="${isHidden ? "display:none;" : ""}">
+  //                 <td>
+  //                   <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
+  //         val.term
+  //       )}">
+  //                     <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
+  //                     ${edges.util.escapeHtml(val.display)}
+  //                   </a>
+  //                 </td>
+  //                 <td>${count}</td>
+  //               </tr>
+  //           `;
+  //     }
+  //   });
+
+  //   // Full list for modal display (NO displayLimit applied)
+  //   let fullResults = "";
+  //   ts.values.forEach((val) => {
+  //     if (val.count > 0) {
+  //       let count = this.countFormat ? this.countFormat(val.count) : val.count;
+  //       fullResults += `
+  //               <tr>
+  //                 <td>
+  //                   <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
+  //         val.term
+  //       )}">
+  //                     <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
+  //                     ${edges.util.escapeHtml(val.display)}
+  //                   </a>
+  //                 </td>
+  //                 <td>${count}</td>
+  //               </tr>
+  //           `;
+  //     }
+  //   });
+
+  //   // "Show more" button
+  //   let showMoreFrag = "";
+  //   if (ts.values.length > this.displayLimit) {
+  //     showMoreFrag = `
+  //           <tr>
+  //             <td id="${showMoreId}" class="btn btn-link">
+  //               Click to show more...
+  //             </td>
+  //           </tr>
+  //       `;
+  //   }
+
+  //   // Modal structure (Full list shown here)
+  //   let modalFrag = `
+  //       <div id="${modalId}" class="facet-modal">
+  //           <div class="facet-modal-content">
+  //               <span id="${modalCloseId}" class="facet-modal-close">&times;</span>
+  //               <h3>${this.title}</h3>
+  //               <div id="${modalContentId}">
+  //                   <table class="facet">
+  //                       <tbody>
+  //                           ${fullResults}  <!-- FULL list here -->
+  //                       </tbody>
+  //                   </table>
+  //               </div>
+  //           </div>
+  //       </div>
+  //   `;
+
+  //   // Final HTML fragment
+  //   let frag = `
+  //       <div class="facet">
+  //           <div class="facet-header">
+  //               <h4 class="main">${this.title}</h4>
+  //           </div>
+  //           <div class="facet-results">
+  //               <table class="facet">
+  //                   <tbody>
+  //                       ${limitedResults}  <!-- Limited list here -->
+  //                       ${showMoreFrag}
+  //                   </tbody>
+  //               </table>
+  //           </div>
+  //       </div>
+  //       ${modalFrag}
+  //   `;
+
+  //   ts.context.html(frag);
+
+  //   // Event bindings
+  //   const showMoreSelector = edges.util.idSelector(
+  //     this.namespace,
+  //     "show-more",
+  //     this.component.id
+  //   );
+  //   const modalSelector = edges.util.idSelector(
+  //     this.namespace,
+  //     "facet-modal",
+  //     this.component.id
+  //   );
+  //   const modalCloseSelector = edges.util.idSelector(
+  //     this.namespace,
+  //     "facet-modal-close",
+  //     this.component.id
+  //   );
+
+  //   if (this.component.jq(showMoreSelector).length > 0) {
+  //     edges.on(showMoreSelector, "click", this, "openModal");
+  //   }
+  //   edges.on(modalCloseSelector, "click", this, "closeModal");
+  // }
+
   draw() {
     let ts = this.component;
 
@@ -1114,17 +1552,11 @@ emlo.FacetRenderer = class extends edges.Renderer {
       return;
     }
 
-    // If there are no values for the facet, hide the entire facet
     if (!ts.values || ts.values.length === 0) {
       ts.context.html("");
       return;
     }
 
-    const valClass = edges.util.allClasses(
-      this.namespace,
-      "value",
-      this.component.id
-    );
     const filterRemoveClass = edges.util.allClasses(
       this.namespace,
       "filter-remove",
@@ -1183,22 +1615,32 @@ emlo.FacetRenderer = class extends edges.Renderer {
       "results",
       this.component.id
     );
+
+    const valClass = edges.util.allClasses(
+      this.namespace,
+      "value",
+      this.component.id
+    );
     const showMoreId = edges.util.htmlID(
       this.namespace,
       "show-more",
       this.component.id
     );
-
-    let results = "Loading...";
-    if (ts.values !== false) {
-      results = `
-        <tr>
-          <td>
-            None
-          </td>
-        </tr>
-      `;
-    }
+    const modalId = edges.util.htmlID(
+      this.namespace,
+      "facet-modal",
+      this.component.id
+    );
+    const modalCloseId = edges.util.htmlID(
+      this.namespace,
+      "facet-modal-close",
+      this.component.id
+    );
+    const modalContentId = edges.util.htmlID(
+      this.namespace,
+      "facet-modal-content",
+      this.component.id
+    );
 
     const filterTerms = ts.filters.map((filter) =>
       filter.term ? filter.term.toString() : ""
@@ -1208,102 +1650,69 @@ emlo.FacetRenderer = class extends edges.Renderer {
       filter.field ? filter.field.toString() : ""
     );
 
-    if (ts.values && ts.values.length > 0) {
-      results = "";
+    let limitedResults = "";
+    ts.values.forEach((val, idx) => {
+      if (val.count > 0) {
+        const isHidden = idx >= this.displayLimit;
+        limitedResults += `
+                <tr style="${isHidden ? "display:none;" : ""}">
+                  <td>
+                    <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
+          val.term
+        )}">
+                    <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
+                    ${edges.util.escapeHtml(val.display)}
+                    </a>
+                    </td>
+                  <td>${val.count}</td>
+                </tr>
+            `;
+      }
+    });
 
-      ts.values.forEach((val, idx) => {
-        // Skip facets where count is zero
-        if (!filterTerms.includes(val.term.toString()) && val.count > 0) {
-          let count = val.count;
-          if (this.countFormat) {
-            count = this.countFormat(count);
-          }
-          const isHidden = idx >= this.displayLimit && !this.showAll;
-          results += `
-            <tr style="${isHidden ? "display:none;" : ""}">
-              <td>
-                <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
-            val.term
-          )}">
+    let fullResults = "";
+    ts.values.forEach((val) => {
+      if (val.count > 0) {
+        fullResults += `
+                <tr>
+                  <td>
+                  <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
+          val.term
+        )}">
                   <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
                   ${edges.util.escapeHtml(val.display)}
-                </a>
-              </td>
-              <td>
-                ${count}
-              </td>
-            </tr>
-          `;
-        }
-      });
-    }
+                  </a>
+                  </td>
+                  <td>${val.count}</td>
+                </tr>
+            `;
+      }
+    });
 
-    // If no results were found, hide the facet altogether
-    if (results === "Loading..." || results === "" || ts.values.length === 0) {
-      ts.context.html(""); // Remove the entire facet from the DOM
-      return; // Stop execution as no content is needed
-    }
-
-    // Add "Show more" button if there are more than 10 entries
-    let showMoreFrag = "";
-    if (ts.values.length > this.displayLimit) {
-      showMoreFrag = `
+    let showMoreFrag =
+      ts.values.length > this.displayLimit
+        ? `
         <tr>
-          <td id="${showMoreId}" class="btn btn-link">
-            ${this.showAll ? "Click to hide" : "Click to show more..."}
-          </td>
-          <td>
-          </td>
+          <td id="${showMoreId}" class="btn btn-link">Click to show more...</td>
         </tr>
-      `;
-    }
+    `
+        : "";
 
-    let tooltipFrag = "";
-    if (this.tooltipText) {
-      const tt = this._shortTooltip();
-      const tooltipClass = edges.util.styleClasses(
-        this.namespace,
-        "tooltip",
-        this.component.id
-      );
-      const tooltipId = edges.util.htmlID(
-        this.namespace,
-        "tooltip",
-        this.component.id
-      );
-      tooltipFrag = `<div id="${tooltipId}" class="${tooltipClass}" style="display:none"><div class="row"><div class="col-md-12">${tt}</div></div></div>`;
-    }
-
-    let controlFrag = "";
-    if (this.controls) {
-      controlFrag = `<div class="${controlClass}" style="display:none" id="${controlId}"><div class="row">
-                      <div class="col-md-12">
-                          <div class="btn-group">
-                              <button type="button" class="btn btn-default btn-sm" id="${sizeId}" title="List Size">0</button>
-                              <button type="button" class="btn btn-default btn-sm" id="${orderId}" title="List Order"></button>
-                          </div>
-                      </div>
-                  </div></div>`;
-    }
-
-    let filterFrag = "";
-    if (ts.filters.length > 0 && this.showSelected) {
-      ts.filters.forEach((filt) => {
-        filterFrag += `<div class="${resultClass}"><strong>${edges.util.escapeHtml(
-          filt.display
-        )}&nbsp;`;
-        filterFrag += `<a href="#" class="${filterRemoveClass}" data-key="${edges.util.escapeHtml(
-          filt.term
-        )}">`;
-        filterFrag += '<i class="fas fa-times"></i></a>';
-        filterFrag += "</strong></a></div>";
-      });
-    }
-
-    let tog = this.title;
-    if (this.togglable) {
-      tog = `<p class="main">${this.title}</p>`;
-    }
+    let modalFrag = `
+        <div id="${modalId}" class="facet-modal">
+            <div class="facet-modal-content">
+                <div class="facet-modal-header">
+                    <span>${this.title}</span>
+                    <span id="${modalCloseId}" class="facet-modal-close">&times;</span>
+                </div>
+                <div class="facet-modal-content-wrapper">
+                    <table class="facet">
+                        <tbody>${fullResults}</tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
 
     let isHideCount = false;
 
@@ -1315,32 +1724,15 @@ emlo.FacetRenderer = class extends edges.Renderer {
       isHideCount = true;
     }
 
-    let frag = `<div class="${facetClass}" style="${
-      isHideCount ? "display:none;" : ""
-    }">
-                      <div class="${headerClass}"><div class="row">
-                          <div class="col-md-12">
-                              ${tog}
-                          </div>
-                      </div></div>
-                      ${tooltipFrag}
-                      {{CONTROLS}}
-                      <div class="row" style="display:none" id="${resultsId}">
-                          <div class="col-md-12">
-                            <table class="facet">
-                              <tbody>
-                                {{RESULTS}}
-                                {{SHOWMOREFRAG}}
-                              </tbody>
-                            </table>
-                          </div>
-                      </div></div>`;
-
-    frag = frag
-      .replace(/{{RESULTS}}/g, results)
-      .replace(/{{CONTROLS}}/g, controlFrag)
-      .replace(/{{SELECTED}}/g, filterFrag)
-      .replace(/{{SHOWMOREFRAG}}/g, showMoreFrag);
+    let frag = `
+        <div class="facet"  style="${isHideCount ? "display:none;" : ""}">
+            <h4>${this.title}</h4>
+            <table class="facet">
+                <tbody>${limitedResults}${showMoreFrag}</tbody>
+            </table>
+        </div>
+        ${modalFrag}
+    `;
 
     ts.context.html(frag);
 
@@ -1363,13 +1755,25 @@ emlo.FacetRenderer = class extends edges.Renderer {
       "toggle",
       this
     );
-    const sizeSelector = edges.util.idSelector(this.namespace, "size", this);
-    const orderSelector = edges.util.idSelector(this.namespace, "order", this);
+
     const showMoreSelector = edges.util.idSelector(
       this.namespace,
       "show-more",
-      this
+      this.component.id
     );
+    const modalSelector = edges.util.idSelector(
+      this.namespace,
+      "facet-modal",
+      this.component.id
+    );
+    const modalCloseSelector = edges.util.idSelector(
+      this.namespace,
+      "facet-modal-close",
+      this.component.id
+    );
+
+    const sizeSelector = edges.util.idSelector(this.namespace, "size", this);
+    const orderSelector = edges.util.idSelector(this.namespace, "order", this);
 
     edges.on(valueSelector, "click", this, "termSelected");
     edges.on(toggleSelector, "click", this, "toggleOpen");
@@ -1378,8 +1782,27 @@ emlo.FacetRenderer = class extends edges.Renderer {
     edges.on(orderSelector, "click", this, "changeSort");
 
     if (this.component.jq(showMoreSelector).length > 0) {
-      edges.on(showMoreSelector, "click", this, "showMoreEntries");
+      edges.on(showMoreSelector, "click", this, "openModal");
     }
+    edges.on(modalCloseSelector, "click", this, "closeModal");
+  }
+
+  openModal() {
+    const modalSelector = edges.util.idSelector(
+      this.namespace,
+      "facet-modal",
+      this.component.id
+    );
+    this.component.jq(modalSelector).css("display", "block");
+  }
+
+  closeModal() {
+    const modalSelector = edges.util.idSelector(
+      this.namespace,
+      "facet-modal",
+      this.component.id
+    );
+    this.component.jq(modalSelector).css("display", "none");
   }
 
   showMoreEntries() {
@@ -1613,20 +2036,45 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
 
   // PATCH: currently we do not have anything in edges that can help us with this.
   _getDisplayValue(field, value) {
-    if (field === "uuid_related") {
+    const colMap = {
+      "mail_origin-location": "locations",
+      "mail_destination-location": "locations",
+      "dcterms_references-location": "locations",
+      "frbr_creator-person": "people",
+      "mail_recipient-person": "people",
+      "dcterms_references-person": "people",
+    };
+
+    const validFields = [
+      "uuid_related",
+      "dcterms_references-location",
+      "mail_destination-location",
+      "mail_origin-location",
+      "frbr_creator-person",
+      "mail_recipient-person",
+      "dcterms_references-person",
+    ];
+
+    if (validFields.includes(field)) {
       // Return a placeholder value immediately
       const placeholder = "Loading...";
 
+      if (value && value.startsWith("*") && value.endsWith("*")) {
+        value = value.slice(1, -1);
+      }
+
+      let collectionName = "";
+
+      if (colMap.hasOwnProperty(field)) {
+        collectionName = colMap[field];
+      }
+
       // Fetch names asynchronously
-      this._fetchNames(value).then((names) => {
+      this._fetchNames(value, collectionName).then((names) => {
         if (names) {
           // Find all matching elements dynamically and update their content
           document
-            .querySelectorAll(
-              `[data-field="${edges.util.escapeHtml(
-                field
-              )}"][data-key="${edges.util.escapeHtml(value)}"]`
-            )
+            .querySelectorAll(`[data-field="${edges.util.escapeHtml(field)}"]`)
             .forEach((el) => {
               el.innerHTML = `
                 ${edges.util.escapeHtml(names)}
@@ -1642,13 +2090,19 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
     }
   }
 
-  async _fetchNames(value) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const browsing = urlParams.get("browsing");
+  async _fetchNames(value, colName) {
+    let collectionName = "";
     let fl = "browse";
 
-    const collectionName =
-      browsing && browsing != "organisations" ? `${browsing}` : `people`;
+    if (colName) {
+      collectionName = colName;
+    } else {
+      const urlParams = new URLSearchParams(window.location.search);
+      const browsing = urlParams.get("browsing");
+
+      collectionName =
+        browsing && browsing != "organisations" ? `${browsing}` : `people`;
+    }
 
     if (!collectionName) {
       console.error("Collection name not found in the URL.");
@@ -1671,9 +2125,13 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
   _getSelectedFieldLabel(field) {
     switch (field) {
       case "author_sort":
+      case "frbr_creator-person":
         return "Author";
       case "recipient_sort":
+      case "mail_recipient-person":
         return "Recipient";
+      case "dcterms_references-person":
+        return "Mentions";
       case "origin_sort":
         return "Origin of letter";
       case "destination_sort":
@@ -1682,6 +2140,15 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
         return "Catalogue";
       case "ox_started-ox_year":
         return "Year";
+      case "mail_origin-location":
+      case "pla_ori_name":
+        return " Origin of letter";
+      case "mail_destination-location":
+      case "pla_des_name":
+        return " Origin of letter";
+      case "dcterms_references-location":
+      case "pla_ment_name":
+        return " Places mentioned";
       case "uuid_related":
         return "Any from list";
       default:
@@ -1820,6 +2287,12 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       "No results to display"
     );
     this.contentTitle = edges.util.getParam(params, "contentTitle", "");
+    this.dynamicTitle = edges.util.getParam(params, "dynamicTitle", "");
+    this.dynamicTitleField = edges.util.getParam(
+      params,
+      "dynamicTitleField",
+      ""
+    );
     this.contentTitleImage = edges.util.getParam(
       params,
       "contentTitleImage",
@@ -1827,6 +2300,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     );
     this.fields = edges.util.getParam(params, "fields", []);
     this.primaryField = edges.util.getParam(params, "primaryField", "");
+    this.primaryResultKey = edges.util.getParam(params, "primaryResultKey", "");
     this.lat_field = edges.util.getParam(params, "lat_field", "");
     this.long_field = edges.util.getParam(params, "long_field", "");
     this.divider = edges.util.getParam(params, "divider", false); // Whether to include a divider
@@ -1875,6 +2349,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
           break;
         case "dates":
           frag = this._renderDates();
+          break;
+        case "date-people":
+          frag = this._renderDatesForPeople();
           break;
         case "stats":
           frag = this._renderStats();
@@ -1931,18 +2408,24 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   }
 
   _renderSectionTitle() {
-    if (this.component.results && this.component.results.length > 0) {
+    if (
+      this.component.results &&
+      this.component.results.length > 0 &&
+      this.sectionTitle
+    ) {
       const imageTag = this.sectionTitleImage
-        ? `<img style="float:left;height:25px;width:25px;margin-right:15px;" src="${edges.util.escapeHtml(
+        ? `<img style="float:left;" src="${edges.util.escapeHtml(
             this.sectionTitleImage
           )}" alt="${edges.util.escapeHtml(
             this.sectionTitle
           )}" class="title-image">`
         : "";
 
-      return `<${this.sectionTitleStyle} class="section-title">
+      return `
+          <div class="column profilepart">
+      <${this.sectionTitleStyle}>
       ${imageTag} ${edges.util.escapeHtml(this.sectionTitle)}
-    </${this.sectionTitleStyle}>`;
+    </${this.sectionTitleStyle}> </div><br/>`;
     } else {
       return "";
     }
@@ -1958,18 +2441,35 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   }
 
   _sideTitle() {
+    let title;
+    const result = this.component.results[0];
+    if (this.dynamicTitle != "" && this.dynamicTitleField != "") {
+      let val;
+      if (result.hasOwnProperty(this.dynamicTitleField)) {
+        val = result[this.dynamicTitleField];
+      }
+
+      if (typeof val === "boolean") {
+        title = val ? this.dynamicTitle : "";
+      } else {
+        title = val != "" ? val : this.dynamicTitle;
+      }
+    }
+
+    if (title == "") {
+      title = this.contentTitle;
+    }
+
     const imageTag = this.contentTitleImage
       ? `<img src="${edges.util.escapeHtml(
           this.contentTitleImage
-        )}" alt="${edges.util.escapeHtml(
-          this.contentTitle
-        )}" class="profile-icon">`
+        )}" alt="${edges.util.escapeHtml(title)}" class="profile-icon">`
       : "";
 
     return `
     <h4 class="main">
       ${imageTag}
-      ${edges.util.escapeHtml(this.contentTitle)}
+      <strong>${edges.util.escapeHtml(title)}</strong>
     </h4>
     <hr class="yellow-divider" />`;
   }
@@ -2154,13 +2654,25 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     // Render custom content
 
     if (this.field) {
-      return this.component.results[0][this.field]
-        ? ` 
-    <div class="custom-content">
-      ${edges.util.escapeHtml(this.component.results[0][this.field])}
-    </div>
-    `
-        : "";
+      const result = this.component.results[0][this.field];
+
+      if (result) {
+        if (this.field == "ox_locationAlternateName") {
+          const alt_name = result.split("\n").join("; ");
+
+          return `
+            <div class="custom-content">
+              ${edges.util.escapeHtml(alt_name)}
+            </div>`;
+        } else {
+          return `
+            <div class="custom-content">
+              ${edges.util.escapeHtml(result)}
+            </div>`;
+        }
+      } else {
+        return "";
+      }
     }
 
     if (this.fields.length > 0) {
@@ -2168,12 +2680,13 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       ${this.fields
         .map(
           (field) =>
-            `
-               <strong> ${field.title} </strong>
+            ` 
+            <dl>
+               <dt><strong> ${field.title} </strong></dt>
                <dd> ${edges.util.escapeHtml(
                  this.component.results[0][field.key] || ""
                )} </dd>
-              <br/>
+            </dl>
             `
         )
         .join("")}</div>
@@ -2195,49 +2708,132 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const lat = this.component.results[0][this.lat_field];
     const lon = this.component.results[0][this.long_field];
 
-    // Generate a unique ID for the map container (to avoid clashes if multiple maps are rendered)
-    const mapContainerId = `map-${Math.random().toString(36).substr(2, 9)}`;
+    if (lat && lon) {
+      // Generate a unique ID for the map container (to avoid clashes if multiple maps are rendered)
+      const mapContainerId = `map-${Math.random().toString(36).substr(2, 9)}`;
 
-    // Render the location and include a map container
-    return `<div class="location">
-        <span>  
-            <div>
-              <dl> 
-                <strong> Latitude </strong>
-              </dl>
-              <dd>
-                ${lat}
-              </dd>
-            </div>
-            <div>
-              <dl> 
-                <strong> Longitude </strong>
-              </dl>
-              <dd>
-                ${lon}
-              </dd>
-            </div>
-        </span>
+      // Render the location and include a map container
+      return `<div class="content">
+    <div class="content">
+        <dl>  
+            <dt> 
+              <strong> Latitude </strong>
+            </dt>
+            <dd>
+              ${lat}
+            </dd>
+            
+            <dt> 
+              <strong> Longitude </strong>
+            </dt>
+            <dd>
+              ${lon}
+            </dd>
+        </dl>
         <div id="location-map" data-lat="${lat}" data-long="${lon}" style="height: 300px; width: 100%; margin-top: 10px;"></div>
-    </div>
+    </div></div>
     `;
+    } else {
+      return "";
+    }
   }
 
   _renderDates() {
-    console.log("Change");
-    return `<div class="content">
-      ${this.fields
-        .map(
-          (field) =>
-            `
-              <strong> ${field.title} </strong>
-              <dd> 
-                ${_formatDate(this.component.results[0][field.key])}
-              </dd>
-            `
-        )
-        .join("")}</div>
-      `;
+    let content = "";
+    this.fields.map((field) => {
+      const val = this.component.results[0][field.key];
+
+      if (val) {
+        content += `
+          <dt>
+            <strong> ${field.title} </strong>
+          </dt>
+          <dd> 
+            ${this._formatDate(val)}
+          </dd>
+        `;
+      }
+    });
+
+    if (content) {
+      return `<div class="content"><dl> ${content} </dl></div>`;
+    } else {
+      return "";
+    }
+  }
+
+  // Specific for people on profile
+  _renderDatesForPeople() {
+    let content = "";
+    let resultObj = this.component.results[0];
+
+    this.fields.map((field) => {
+      let displayValue = "";
+
+      if (field.keys.date) {
+        let day = field.keys.date.day
+          ? resultObj[field.keys.date.day] || ""
+          : "";
+        let month = field.keys.date.month
+          ? resultObj[field.keys.date.month]
+            ? this._getMonthName(resultObj[field.keys.date.month])
+            : ""
+          : "";
+        let year =
+          field.keys.date.year && resultObj[field.keys.date.year] !== 9999
+            ? resultObj[field.keys.date.year]
+            : "";
+
+        let dateParts = [day, month, year].filter(Boolean).join(" ");
+        if (dateParts) {
+          displayValue = dateParts;
+        }
+      }
+
+      if (field.keys.flag) {
+        Object.keys(field.keys.flag).forEach((item) => {
+          // const key = field.keys.flag[item];
+          if (resultObj[item]) {
+            displayValue += ` ${field.keys.flag[item]}`;
+          }
+        });
+      }
+
+      if (displayValue) {
+        content += `
+      <dt>
+        <strong> ${field.title || ""} </strong>
+      </dt>
+      <dd> 
+        ${displayValue}
+      </dd>
+    `;
+      }
+    });
+
+    if (content) {
+      return `<div class="content"><dl> ${content} </dl></div>`;
+    } else {
+      return "";
+    }
+  }
+
+  _getMonthName(monthKey) {
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    return months[monthKey - 1] || "";
   }
 
   _formatDate(timestamp) {
@@ -2265,7 +2861,8 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const month = months[date.getMonth()];
     const year = date.getFullYear();
 
-    return year == 9999 ? `${day} ${month}` : `${day} ${month} ${year}`;
+    // return `${day} ${month} ${year}`;
+    return year === 9999 ? `${day} ${month}` : `${day} ${month} ${year}`;
   }
 
   _renderStats() {
@@ -2314,78 +2911,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       `;
   }
 
-  // _renderNestedTable() {
-  //   const parentField = this.primaryField;
-  //   const field = this.field;
-  //   const subFields = this.fields;
-
-  //   // Validate required fields
-  //   if (!parentField || (!field && !(subFields && subFields.length > 0))) {
-  //     return "";
-  //   }
-
-  //   // Iterate through results and build rows
-  //   const rows = this.component.results
-  //     .map((result) => {
-  //       const parentObjects = result[parentField]; // Get all objects in the primary field array
-  //       if (!parentObjects || parentObjects.length === 0) return ""; // Skip if no data in primary field
-
-  //       // Iterate over each object in the parent field array
-  //       return parentObjects
-  //         .map((parentObject) => {
-  //           if (!parentObject) return ""; // Skip if the object is invalid
-
-  //           // Generate row content
-  //           const cells = [];
-  //           if (field) {
-  //             // Handle single field
-  //             const value = parentObject[field];
-  //             cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
-  //           }
-
-  //           if (subFields) {
-  //             // Handle multiple fields
-  //             subFields.forEach((subField) => {
-  //               const value = parentObject[subField.key]; // Access value directly using the key
-
-  //               if (subField.clickable) {
-  //                 // Create clickable cell
-  //                 cells.push(`
-  //                   <td>
-  //                     <a href="/profile/${subField.collectionName}/${
-  //                   parentObject["uuid"]
-  //                 }" class="clickable-row">${edges.util.escapeHtml(
-  //                   value || ""
-  //                 )}</a>
-  //                   </td>
-  //                 `);
-  //               } else {
-  //                 // Create non-clickable cell
-  //                 cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
-  //               }
-  //             });
-  //           }
-
-  //           // Return the row
-  //           return `<tr>${cells.join("")}</tr>`;
-  //         })
-  //         .join(""); // Combine all rows for the parent objects
-  //     })
-  //     .filter((row) => row) // Remove empty rows
-  //     .join(""); // Combine all rows into a single HTML string
-
-  //   // Wrap rows into table structure
-  //   const table = `
-  //     <table class="nested-table">
-  //       <tbody>
-  //         ${rows}
-  //       </tbody>
-  //     </table>
-  //   `;
-
-  //   return rows ? table : ""; // Return table or no results
-  // }
-
   _renderNestedTable() {
     const parentField = this.primaryField;
     const field = this.field;
@@ -2404,19 +2929,30 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     // Check if total parentObject count exceeds 30
     if (allParentObjects.length > 30) {
       // Summarized format for large datasets
-      let aut = "";
+      let queryVal = "";
+      let queryKey = this.field;
+
       const decadeSummary = allParentObjects.reduce((acc, parentObject) => {
         if (!parentObject) return acc;
 
-        const year = parentObject["ox_started-ox_year"];
-        aut = parentObject["author_sort"];
+        const year =
+          parentObject["ox_started-ox_year"] ||
+          parentObject["ox_completed-ox_year"];
+
+        if (this.primaryResultKey) {
+          queryVal = this.component.results[0][this.primaryResultKey];
+        } else {
+          queryVal = parentObject["author_sort"];
+        }
 
         if (year) {
           const decade = Math.floor(year / 10) * 10; // Calculate decade
+
           if (!acc[decade]) acc[decade] = {};
           acc[decade][year] = (acc[decade][year] || 0) + 1;
         } else {
-          console.log("Unkown year");
+          if (!acc["????"]) acc["????"] = {};
+          acc["????"]["Unknown year"] = (acc["????"]["Unknown year"] || 0) + 1;
         }
 
         return acc;
@@ -2428,12 +2964,12 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
           const yearCounts = Object.entries(years)
             .map(
               ([year, count]) =>
-                `<a href="/forms/advance?aut=${aut}&dat_sin_year=${year}"> ${year}: ${count} </a>`
+                `<a href="/forms/advance?${queryKey}=${queryVal}&dat_sin_year=${year}"> ${year}: ${count} </a>`
             )
             .join(" ♦ ");
           return `
           <tr>
-            <td>${decade}</td>
+            <td>${decade}s</td>
             <td> ${yearCounts} </td>
           </tr>`;
         })
@@ -2461,19 +2997,23 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     // Current format for datasets with parentObject count <= 30
     const rows = this.component.results
       .map((result) => {
-        const parentObjects = result[parentField];
+        let parentObjects = result[parentField];
         if (!parentObjects || parentObjects.length === 0) return "";
+
+        parentObjects.sort(
+          (a, b) => a["ox_started-ox_year"] - b["ox_started-ox_year"]
+        );
+        let lastfieldKey = 0;
 
         return parentObjects
           .map((parentObject) => {
             if (!parentObject) return "";
 
             const cells = [];
-            if (field) {
-              const value = parentObject[field];
-              cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
-            }
-
+            // if (field) {
+            //   const value = parentObject[field];
+            //   cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
+            // }
             if (subFields) {
               subFields.forEach((subField) => {
                 const value = parentObject[subField.key];
@@ -2488,7 +3028,19 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                     </td>
                   `);
                 } else {
-                  cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
+                  if (
+                    subField.key == "ox_started-ox_year" ||
+                    subField.key == "ox_completed-ox_year"
+                  ) {
+                    if (lastfieldKey !== value) {
+                      lastfieldKey = value;
+                      cells.push(
+                        `<td>${edges.util.escapeHtml(value || "")}</td>`
+                      );
+                    } else {
+                      cells.push(`<td></td>`);
+                    }
+                  }
                 }
               });
             }
@@ -2558,7 +3110,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                   `);
                 } else {
                   // Create non-clickable cell
-                  cells.push(`<li>${edges.util.escapeHtml(value || "")}</li>`);
+                  cells.push(
+                    `<li style="white-space: break-spaces;">${edges.util.escapeHtml(
+                      value || ""
+                    )}</li>`
+                  );
                 }
               });
             }
@@ -2754,39 +3310,41 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                     const collectionName = parentObject["object_type"];
 
                     cells.push(`
-                      <div>
+                      <dd><p>
                         <a  href="/profile/${collectionName}/${
                       parentObject["uuid"]
                     }" class="clickable-row">${edges.util.escapeHtml(
                       value || ""
                     )}</a>
                       ${otherInfoDiv}
-                      </div>
+                      </p></dd>
                     `);
                   } else {
                     cells.push(`
-                      <div>
+                      <dd><p>
                         <a target="_blank" href="${edges.util.escapeHtml(
                           parentObject[subField.linkKey]
                         )}" class="clickable-row">${edges.util.escapeHtml(
                       value || ""
                     )}</a>
                       ${otherInfoDiv}
-                      </div>
+                      </p></dd>
                     `);
                   }
                 } else {
                   // Create non-clickable cell
                   cells.push(
-                    `<div>${edges.util.escapeHtml(
+                    `
+                    <dd><p>
+                    <div>${edges.util.escapeHtml(
                       value || ""
-                    )}</div> ${otherInfoDiv}`
+                    )}</div> ${otherInfoDiv} </p> </dd>`
                   );
                 }
               });
             }
             // Return the row
-            return `<div>${cells.join("")}</div>`;
+            return `<dl>${cells.join("")}</dl>`;
           })
           .join(""); // Combine all rows for the parent objects
       })
@@ -2794,7 +3352,10 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       .join(""); // Combine all rows into a single HTML string
 
     const labelsList = `
-      <div class="content">
+      <div>
+        <dt> 
+          <strong> ${this.contentTitle} </strong> 
+        </dt>
         ${rows}
       </div>
     `;
@@ -3090,7 +3651,7 @@ emlo.StatsRenderer = class extends edges.Renderer {
     let container = `
       <div class="row">
         <div class="large-12 columns">
-          <ul class="small-block-grid-2 medium-block-grid-5 large-block-grid-10">
+          <ul class="small-block-grid-2 medium-block-grid-6 large-block-grid-12">
     `;
 
     if (this.statsEntries.length > 0) {
@@ -3116,11 +3677,15 @@ emlo.StatsRenderer = class extends edges.Renderer {
           <br />
           
           <span>
-            ${this._getStatCount(
-              item.statKey,
-              item.tweakCount,
-              item.upperLimit
-            )}
+            ${
+              item.dontFetch
+                ? item.hardCodedCount
+                : this._getStatCount(
+                    item.statKey,
+                    item.tweakCount,
+                    item.upperLimit
+                  )
+            }
           </span>
           
           <br />
@@ -3214,7 +3779,7 @@ emlo.BarGraph = class extends edges.Component {
       const uuidArray = Array.from(uuids);
       const fieldData = await this._fetchGraphData(solrCore, uuidArray);
 
-      for (const doc of fieldData.response.docs) {
+      for (const doc of fieldData) {
         const fieldKey = uuidToFieldKeyMap.get(doc.uuid);
         if (fieldKey) {
           if (!this.graphData[fieldKey]) {
@@ -3242,7 +3807,7 @@ emlo.BarGraph = class extends edges.Component {
     };
 
     try {
-      const response = await fetch("/stats", {
+      const response = await fetch("/stats-new", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -3352,7 +3917,8 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
     for (const [fieldKey, fieldData] of Object.entries(
       this.component.graphData
     )) {
-      const reducedData = this._reduceData(fieldData);
+      // const reducedData = this._reduceData(fieldData);
+      const reducedData = fieldData;
       const valueCounts = this._countOccurrences(
         reducedData,
         this.component.xAxisField
@@ -3418,9 +3984,14 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       .range([0, this.graphWidth])
       .padding(0.1);
 
+    // Calculate a reasonable range for the Y-axis based on maxYValue
+    const numTicks = 5;
+    const tickStep = Math.ceil(maxYValue / numTicks);
+    const yMax = Math.ceil(maxYValue / tickStep) * tickStep;
+
     const y = d3
       .scaleLinear()
-      .domain([0, maxYValue])
+      .domain([0, yMax]) // Use adjusted yMax for a clean range
       .nice()
       .range([this.graphHeight, 0]);
 
@@ -3430,8 +4001,8 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       .attr("transform", `translate(0,${this.graphHeight})`)
       .call(d3.axisBottom(x));
 
-    // Add Y-axis (with no decimal values)
-    svg.append("g").call(d3.axisLeft(y).ticks(Math.ceil(maxYValue / 10))); // Adjust number of ticks based on the max value
+    // Add Y-axis with dynamically calculated ticks
+    svg.append("g").call(d3.axisLeft(y).ticks(numTicks)); // Limiting to 5 ticks
 
     // Draw bars
     svg
@@ -3489,9 +4060,14 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       .range([0, this.graphWidth])
       .padding(0.2);
 
+    // Calculate a reasonable range for the Y-axis based on maxYValue
+    const numTicks = 5;
+    const tickStep = Math.ceil(maxYValue / numTicks);
+    const yMax = Math.ceil(maxYValue / tickStep) * tickStep;
+
     const y = d3
       .scaleLinear()
-      .domain([0, maxYValue])
+      .domain([0, yMax]) // Use adjusted yMax for a clean range
       .nice()
       .range([this.graphHeight, 0]);
 
@@ -3506,8 +4082,8 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       .attr("transform", `translate(0,${this.graphHeight})`)
       .call(d3.axisBottom(x));
 
-    // Add Y-axis
-    svg.append("g").call(d3.axisLeft(y));
+    // Add Y-axis with dynamically calculated ticks
+    svg.append("g").call(d3.axisLeft(y).ticks(numTicks)); // Limiting to 5 ticks
 
     if (this.currentView === "stacked") {
       // Clear existing content
@@ -3529,11 +4105,29 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
         .range([0, this.graphWidth])
         .padding(0.1);
 
+      // Calculate cumulative maximum Y value from the stacked data
+      const maxYValue = d3.max(
+        labels.map((label) => {
+          return datasets.reduce((sum, dataset) => {
+            return sum + (dataset.data[label] || 0); // Cumulative sum of all datasets for a given label
+          }, 0);
+        })
+      );
+
+      // Calculate appropriate tick step for Y-axis based on the height of the graph
+      const numTicks = 5;
+      const tickStep = Math.ceil(maxYValue / numTicks);
+      const yMax = Math.ceil(maxYValue / tickStep) * tickStep;
+
+      // Adjust the Y-scale to fit within the number of ticks
       const y = d3
         .scaleLinear()
-        .domain([0, maxYValue])
+        .domain([0, yMax]) // Use the cumulative max Y value
         .nice()
         .range([this.graphHeight, 0]);
+
+      // Calculate the range of values for the Y-axis and use them to limit to 5 ticks
+      const yTicks = y.ticks(numTicks); // This will calculate tick values based on the domain and range of the scale
 
       const colorScale = d3
         .scaleOrdinal()
@@ -3546,8 +4140,8 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
         .attr("transform", `translate(0,${this.graphHeight})`)
         .call(d3.axisBottom(x));
 
-      // Add Y-axis
-      svg.append("g").call(d3.axisLeft(y));
+      // Add Y-axis with cumulative range and only 5 ticks
+      svg.append("g").call(d3.axisLeft(y).ticks(numTicks));
 
       // Prepare stacked data
       const stackedData = labels.map((label) => {
@@ -3587,42 +4181,316 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
         });
       });
     } else if (this.currentView === "split") {
-      // Split (grouped) bar chart
-      const subX = d3
-        .scaleBand()
-        .domain(datasets.map((d) => d.label))
-        .range([0, x.bandwidth()])
-        .padding(0.05);
+      // Split Bar chart logic here...
+      const barWidth = x.bandwidth() / datasets.length; // Adjust width for each dataset
 
-      datasets.forEach((dataset, datasetIndex) => {
+      datasets.forEach((dataset, index) => {
         svg
-          .selectAll(`.bar-group-${datasetIndex}`)
+          .selectAll(`.split-bar-${dataset.label}`)
           .data(labels)
           .enter()
           .append("rect")
-          .attr("class", `bar-group-${datasetIndex}`)
-          .attr("x", (d) => x(d) + subX(dataset.label))
-          .attr("y", (d) => y(dataset.data[d] || 0))
-          .attr("width", subX.bandwidth())
+          .attr("class", `split-bar-${dataset.label}`)
+          .attr("x", (d, i) => x(d) + barWidth * index) // Offset bars for each dataset
+          .attr("y", (d) => y(dataset.data[d] || 0)) // Y position based on data value
+          .attr("width", barWidth) // Width of each bar in the group
           .attr("height", (d) => this.graphHeight - y(dataset.data[d] || 0))
-          .attr("fill", dataset.config.barColor || this.barColor)
+          .attr("fill", colorScale(dataset.label))
           .on("mouseover", (event, d) => {
+            // Hover effect
             d3.select(event.target).attr("fill", this.hoverColor);
             this._showTooltip(
               event,
-              `${dataset.label}: ${dataset.data[d] || 0}`
+              `${dataset.label}: ${dataset.data[d]} ${dataset.config.graphTitle}`
             );
           })
           .on("mouseout", (event) => {
-            d3.select(event.target).attr(
-              "fill",
-              dataset.config.barColor || this.barColor
-            );
+            // Reset hover effect
+            d3.select(event.target).attr("fill", colorScale(dataset.label));
             this._hideTooltip();
           });
       });
     }
   }
+
+  // _drawCombinedGraph(datasets, labels, maxYValue, container) {
+  //   // Clear existing content
+  //   container.innerHTML = "";
+
+  //   // Set up SVG for the D3 chart
+  //   const svg = d3
+  //     .select(container)
+  //     .append("svg")
+  //     .attr("width", this.graphWidth + this.margin.left + this.margin.right)
+  //     .attr("height", this.graphHeight + this.margin.top + this.margin.bottom)
+  //     .append("g")
+  //     .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
+
+  //   // Define scales
+  //   const x = d3
+  //     .scaleBand()
+  //     .domain(labels)
+  //     .range([0, this.graphWidth])
+  //     .padding(0.2);
+
+  //   // Calculate a reasonable range for the Y-axis based on maxYValue
+  //   const numTicks = 5;
+  //   const tickStep = Math.ceil(maxYValue / numTicks);
+  //   const yMax = Math.ceil(maxYValue / tickStep) * tickStep;
+
+  //   const y = d3
+  //     .scaleLinear()
+  //     .domain([0, yMax]) // Use adjusted yMax for a clean range
+  //     .nice()
+  //     .range([this.graphHeight, 0]);
+
+  //   const colorScale = d3
+  //     .scaleOrdinal()
+  //     .domain(datasets.map((d) => d.label))
+  //     .range(datasets.map((d) => d.config.barColor || this.barColor));
+
+  //   // Add X-axis
+  //   svg
+  //     .append("g")
+  //     .attr("transform", `translate(0,${this.graphHeight})`)
+  //     .call(d3.axisBottom(x));
+
+  //   // Add Y-axis with dynamically calculated ticks
+  //   svg.append("g").call(d3.axisLeft(y).ticks(numTicks)); // Limiting to 5 ticks
+
+  //   if (this.currentView === "stacked") {
+  //     // Prepare data for stacking by ensuring missing data has 0
+  //     const stack = d3
+  //       .stack()
+  //       .keys(datasets.map((d) => d.label)) // Keys should correspond to labels
+  //       .value((d, key, index) => {
+  //         console.log("key", key, index, JSON.stringify(d));
+  //         // Ensure we handle missing data by setting default 0 for missing keys
+  //         return d.data[key] || 0; // Use 0 if data is missing
+  //       });
+
+  //     // Transform the dataset into stacked data
+  //     const stackedData = stack(datasets);
+  //     console.log("stackedData", stackedData);
+  //     // Add stacked bars
+  //     svg
+  //       .selectAll(".stacked-bar")
+  //       .data(stackedData)
+  //       .enter()
+  //       .append("g")
+  //       .attr("class", "stacked-bar")
+  //       .selectAll("rect")
+  //       .data((d) => d)
+  //       .enter()
+  //       .append("rect")
+  //       .attr("x", (d) => x(d.data.label)) // Position on the x-axis
+  //       .attr("y", (d) => y(d[1])) // Position the top of the bar (stacked)
+  //       .attr("height", (d) => y(d[0]) - y(d[1])) // Height based on stacked range
+  //       .attr("width", x.bandwidth()) // Width of the bar
+  //       .attr("fill", (d, i) => colorScale(d.key)) // Color each segment
+  //       .on("mouseover", (event, d) => {
+  //         // Hover effect
+  //         d3.select(event.target).attr("fill", this.hoverColor);
+  //         this._showTooltip(
+  //           event,
+  //           `${d.data.label}: ${d[1] - d[0]} ${d.data.graphTitle}`
+  //         );
+  //       })
+  //       .on("mouseout", (event) => {
+  //         // Reset hover effect
+  //         d3.select(event.target).attr("fill", colorScale(d.key));
+  //         this._hideTooltip();
+  //       });
+  //   } else if (this.currentView === "split") {
+  //     // Split Bar chart logic here...
+  //     const barWidth = x.bandwidth() / datasets.length; // Adjust width for each dataset
+
+  //     datasets.forEach((dataset, index) => {
+  //       svg
+  //         .selectAll(`.split-bar-${dataset.label}`)
+  //         .data(labels)
+  //         .enter()
+  //         .append("rect")
+  //         .attr("class", `split-bar-${dataset.label}`)
+  //         .attr("x", (d, i) => x(d) + barWidth * index) // Offset bars for each dataset
+  //         .attr("y", (d) => y(dataset.data[d] || 0)) // Y position based on data value
+  //         .attr("width", barWidth) // Width of each bar in the group
+  //         .attr("height", (d) => this.graphHeight - y(dataset.data[d] || 0))
+  //         .attr("fill", colorScale(dataset.label))
+  //         .on("mouseover", (event, d) => {
+  //           // Hover effect
+  //           d3.select(event.target).attr("fill", this.hoverColor);
+  //           this._showTooltip(
+  //             event,
+  //             `${dataset.label}: ${dataset.data[d]} ${dataset.config.graphTitle}`
+  //           );
+  //         })
+  //         .on("mouseout", (event) => {
+  //           // Reset hover effect
+  //           d3.select(event.target).attr("fill", colorScale(dataset.label));
+  //           this._hideTooltip();
+  //         });
+  //     });
+  //   }
+  // }
+
+  // _drawCombinedGraph(datasets, labels, maxYValue, container) {
+  //   // Clear existing content
+  //   container.innerHTML = "";
+
+  //   // Set up SVG for the D3 chart
+  //   const svg = d3
+  //     .select(container)
+  //     .append("svg")
+  //     .attr("width", this.graphWidth + this.margin.left + this.margin.right)
+  //     .attr("height", this.graphHeight + this.margin.top + this.margin.bottom)
+  //     .append("g")
+  //     .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
+
+  //   // Define scales
+  //   const x = d3
+  //     .scaleBand()
+  //     .domain(labels)
+  //     .range([0, this.graphWidth])
+  //     .padding(0.2);
+
+  //   // Calculate a reasonable range for the Y-axis based on maxYValue
+  //   const numTicks = 5;
+  //   const tickStep = Math.ceil(maxYValue / numTicks);
+  //   const yMax = Math.ceil(maxYValue / tickStep) * tickStep;
+
+  //   const y = d3
+  //     .scaleLinear()
+  //     .domain([0, yMax]) // Use adjusted yMax for a clean range
+  //     .nice()
+  //     .range([this.graphHeight, 0]);
+
+  //   const colorScale = d3
+  //     .scaleOrdinal()
+  //     .domain(datasets.map((d) => d.label))
+  //     .range(datasets.map((d) => d.config.barColor || this.barColor));
+
+  //   // Add X-axis
+  //   svg
+  //     .append("g")
+  //     .attr("transform", `translate(0,${this.graphHeight})`)
+  //     .call(d3.axisBottom(x));
+
+  //   // Add Y-axis with dynamically calculated ticks
+  //   svg.append("g").call(d3.axisLeft(y).ticks(numTicks)); // Limiting to 5 ticks
+
+  //   if (this.currentView === "stacked") {
+  //     // Stacked Bar chart logic here...
+  //     console.log("datasets", JSON.stringify(datasets));
+  //     // Use d3.stack() to  create stacked data
+  //     const stack = d3
+  //       .stack()
+  //       .keys(datasets.map((d) => d.label))
+  //       .value((d, key) => d.data[key]);
+
+  //     const stackedData = stack(datasets.map((dataset) => dataset.data)); // Stack the data
+
+  //     // Add stacked bars
+  //     svg
+  //       .selectAll(".stacked-bar")
+  //       .data(stackedData)
+  //       .enter()
+  //       .append("g")
+  //       .attr("class", "stacked-bar")
+  //       .attr("fill", (d, i) => colorScale(d.key))
+  //       .selectAll("rect")
+  //       .data((d) => d)
+  //       .enter()
+  //       .append("rect")
+  //       .attr("x", (d) => x(d.data.label)) // Position on the x-axis
+  //       .attr("y", (d) => y(d[1])) // Position the top of the bar
+  //       .attr("height", (d) => y(d[0]) - y(d[1])) // Height based on stacked range
+  //       .attr("width", x.bandwidth());
+  //   } else if (this.currentView === "split") {
+  //     // Split (grouped) Bar chart logic here...
+
+  //     const barWidth = x.bandwidth() / datasets.length; // Adjust width for each dataset
+
+  //     datasets.forEach((dataset, index) => {
+  //       svg
+  //         .selectAll(`.split-bar-${dataset.label}`)
+  //         .data(labels)
+  //         .enter()
+  //         .append("rect")
+  //         .attr("class", `split-bar-${dataset.label}`)
+  //         .attr("x", (d, i) => x(d) + barWidth * index) // Offset bars for each dataset
+  //         .attr("y", (d) => y(dataset.data[d] || 0)) // Y position based on data value
+  //         .attr("width", barWidth) // Width of each bar in the group
+  //         .attr("height", (d) => this.graphHeight - y(dataset.data[d] || 0))
+  //         .attr("fill", colorScale(dataset.label))
+  //         .on("mouseover", (event, d) => {
+  //           // Hover effect
+  //           d3.select(event.target).attr("fill", this.hoverColor);
+  //           this._showTooltip(
+  //             event,
+  //             `${dataset.label}: ${dataset.data[d]} ${dataset.config.graphTitle}`
+  //           );
+  //         })
+  //         .on("mouseout", (event) => {
+  //           // Reset hover effect
+  //           d3.select(event.target).attr("fill", colorScale(dataset.label));
+  //           this._hideTooltip();
+  //         });
+  //     });
+  //   }
+  // }
+
+  // _drawCombinedGraph(datasets, labels, maxYValue, container) {
+  //   // Clear existing content
+  //   container.innerHTML = "";
+
+  //   // Set up SVG for the D3 chart
+  //   const svg = d3
+  //     .select(container)
+  //     .append("svg")
+  //     .attr("width", this.graphWidth + this.margin.left + this.margin.right)
+  //     .attr("height", this.graphHeight + this.margin.top + this.margin.bottom)
+  //     .append("g")
+  //     .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
+
+  //   // Define scales
+  //   const x = d3
+  //     .scaleBand()
+  //     .domain(labels)
+  //     .range([0, this.graphWidth])
+  //     .padding(0.2);
+
+  //   // Calculate a reasonable range for the Y-axis based on maxYValue
+  //   const numTicks = 5;
+  //   const tickStep = Math.ceil(maxYValue / numTicks);
+  //   const yMax = Math.ceil(maxYValue / tickStep) * tickStep;
+
+  //   const y = d3
+  //     .scaleLinear()
+  //     .domain([0, yMax]) // Use adjusted yMax for a clean range
+  //     .nice()
+  //     .range([this.graphHeight, 0]);
+
+  //   const colorScale = d3
+  //     .scaleOrdinal()
+  //     .domain(datasets.map((d) => d.label))
+  //     .range(datasets.map((d) => d.config.barColor || this.barColor));
+
+  //   // Add X-axis
+  //   svg
+  //     .append("g")
+  //     .attr("transform", `translate(0,${this.graphHeight})`)
+  //     .call(d3.axisBottom(x));
+
+  //   // Add Y-axis with dynamically calculated ticks
+  //   svg.append("g").call(d3.axisLeft(y).ticks(numTicks)); // Limiting to 5 ticks
+
+  //   if (this.currentView === "stacked") {
+  //     // Stacked Bar chart logic here...
+  //   } else if (this.currentView === "split") {
+  //     // Split (grouped) bar chart logic here...
+  //   }
+  // }
 
   bindGraphEvents() {
     const fullscreenSelector = edges.util.jsClassSelector(
@@ -4203,6 +5071,31 @@ emlo.SortRenderer = class extends edges.Renderer {
   };
 };
 
+emlo.AlertBox = class extends edges.Component {
+  constructor(params) {
+    super(params);
+  }
+};
+
+emlo.AlertBoxRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+    this.namespace = "edges-alert-renderer";
+    this.message = edges.util.getParam(params, "message", "");
+  }
+
+  draw() {
+    let frag = `
+          <div data-alert="" class="alert-box info radius">
+            ${this.message}
+			      <a href="#" class="close">×</a>
+				  </div>
+    `;
+
+    this.component.context.html(frag);
+  }
+};
+
 emlo.Checkbox = class extends edges.Component {
   constructor(params) {
     super(params);
@@ -4436,6 +5329,20 @@ function _removeUrlParam(field) {
   if (field == "uuid_related") {
     delete_field = "uuids";
   }
+
+  const validFields = [
+    "dcterms_references-location",
+    "mail_destination-location",
+    "mail_origin-location",
+    "frbr_creator-person",
+    "mail_recipient-person",
+    "dcterms_references-person",
+  ];
+
+  if (validFields.includes(field)) {
+    delete_field = field;
+  }
+
   if (fieldMap.hasOwnProperty(field)) {
     delete_field = fieldMap[field].primary;
     secondaryField = fieldMap[field].secondary;

@@ -13,7 +13,12 @@ $(document).ready(function () {
     // Function to show tooltip
     const showTooltip = (event, applyDelay = true) => {
       let tooltipX = event.pageX - 15;
-      let tooltipY = event.pageY + 8; // Position tooltip 15px below pointer
+      let tooltipY = event.pageY - tooltip.outerHeight() - 30; // Position tooltip above pointer
+
+      // Check if the tooltip goes beyond the top of the screen
+      if (tooltipY < $(window).scrollTop()) {
+        tooltipY = event.pageY + 15; // Move it below the pointer if there's no space above
+      }
 
       // Check if the tooltip overflows the right edge of the window
       const windowWidth = $(window).width();

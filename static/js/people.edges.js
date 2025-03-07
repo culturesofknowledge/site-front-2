@@ -132,6 +132,14 @@ try {
         label: "",
       }),
     }),
+    new emlo.AlertBox({
+      id: "alert-box",
+      category: "results",
+      renderer: new emlo.AlertBoxRenderer({
+        message: `You can select up to 10 people using the checkboxes below, and then display associated letters.
+        To save your selection for later use, bookmark this page.`,
+      }),
+    }),
     new emlo.ResultTable({
       id: "results",
       category: "results",

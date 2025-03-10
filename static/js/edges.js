@@ -2417,10 +2417,10 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         : "";
 
       return `
-          <div class="column profilepart">
+          <div class="column">
       <${this.sectionTitleStyle}>
       ${imageTag} ${edges.util.escapeHtml(this.sectionTitle)}
-    </${this.sectionTitleStyle}> </div><br/>`;
+    </${this.sectionTitleStyle}> </div><br/><br/>`;
     } else {
       return "";
     }
@@ -3196,7 +3196,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
     // Wrap rows into table structure
     const list = `
-      <ul style="line-height:0px">
+      <ul>
         ${rows}
       </ul>
     `;

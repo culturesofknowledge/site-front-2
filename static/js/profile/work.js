@@ -399,14 +399,14 @@ export function getWorkComponents(emlo) {
       }),
     }),
 
-    new emlo.MultiFields({
-      id: "places-ment-heading",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "",
-        sectionTitle: "Mentions",
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "places-ment-heading",
+    //   category: "results",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "",
+    //     sectionTitle: "Mentions",
+    //   }),
+    // }),
 
     new emlo.MultiFields({
       id: "places-mentioned",

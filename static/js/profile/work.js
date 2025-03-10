@@ -160,6 +160,16 @@ export function getWorkComponents(emlo) {
                 secondaryKey: "mail_authors-rdf_value",
                 text: "(Authors is inferred)",
               },
+              {
+                mainKey: "mail_authors-indef_uncertain",
+                secondaryKey: "mail_authors-rdf_value",
+                text: "(Authors is uncertain)",
+              },
+              {
+                mainKey: "mail_authors-indef_approximate",
+                secondaryKey: "mail_authors-rdf_value",
+                text: "(Authors is approximate)",
+              },
             ],
           },
         ],
@@ -190,6 +200,16 @@ export function getWorkComponents(emlo) {
                 mainKey: "mail_addressees-indef_inferred",
                 secondaryKey: "mail_addressees-rdf_value",
                 text: "(Recipient is inferred)",
+              },
+              {
+                mainKey: "mail_addressees-indef_uncertain",
+                secondaryKey: "mail_addressees-rdf_value",
+                text: "(Recipient is uncertain)",
+              },
+              {
+                mainKey: "mail_addressees-indef_approximate",
+                secondaryKey: "mail_addressees-rdf_value",
+                text: "(Recipient is approximate)",
               },
             ],
           },

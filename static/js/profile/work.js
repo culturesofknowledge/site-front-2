@@ -177,6 +177,25 @@ export function getWorkComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "aut-commnents",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "ox_authorAnnotate-comment",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested-list",
+        sectionTitle: "Comments about the author:",
+        sectionTitleStyle: "span",
+        primaryField: "ox_authorAnnotate-comment",
+        fields: [
+          {
+            title: "",
+            key: "bibo_Note",
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "people-recipient",
       category: "results",
       fetchSecondaryData: true,
@@ -212,6 +231,25 @@ export function getWorkComponents(emlo) {
                 text: "(Recipient is approximate)",
               },
             ],
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "aut-commnents",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: " ox_addresseeAnnotate-comment",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested-list",
+        sectionTitle: "Comments about the recipient:",
+        sectionTitleStyle: "span",
+        primaryField: " ox_addresseeAnnotate-comment",
+        fields: [
+          {
+            title: "",
+            key: "bibo_Note",
           },
         ],
       }),

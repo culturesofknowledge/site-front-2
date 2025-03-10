@@ -2619,11 +2619,13 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
                   return edges.util.escapeHtml(displayValue || "");
                 })
-                .join("<br/>");
+                .join("");
             }
 
             if (field.type == "date") {
               value = this._formatDate(this.component.results[0][field.key]);
+            } else if (field.type == "work-date") {
+              value = this._getWorkDate();
             } else {
               value = this.component.results[0][field.key];
             }
@@ -2637,7 +2639,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                        )} </span><span>${edges.util.escapeHtml(value)}</span>`
                      : ""
                  }
-                 ${additionalInfo ? `<span>${additionalInfo}</span>` : ""}
+                 ${
+                   additionalInfo
+                     ? `<span style="font-size:smaller">${additionalInfo}</span>`
+                     : ""
+                 }
                </div>`
               : "";
           })
@@ -2754,6 +2760,65 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       return `<div class="content"><dl> ${content} </dl></div>`;
     } else {
       return "";
+    }
+  }
+
+  _getWorkDate() {
+    // Data from this.component.results[0]
+    const result = this.component.results[0];
+
+    // Month names array
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    // Get the date fields
+    const startDay = result["ox_started-ox_day"] || "";
+    const startMonth = result["ox_started-ox_month"] || 13; // Default to 13 (invalid month)
+    const startYear = result["ox_started-ox_year"] || "";
+
+    const endDay = result["ox_completed-ox_day"] || "";
+    const endMonth = result["ox_completed-ox_month"] || 13; // Default to 13 (invalid month)
+    const endYear = result["ox_completed-ox_year"] || "";
+
+    // Construct the date string for the start
+    let date = `${startDay} ${months[startMonth - 1]} ${startYear}`;
+
+    // Check if the date is a range
+    const isRange = result["ox_dateIsRange"] || false;
+
+    // Construct the date string for the end
+    let dateTo = `${endDay} ${months[endMonth - 1]} ${endYear}`;
+
+    // Remove spaces from the date strings
+    const dateNoSpaces = date.replace(" ", "");
+    const dateToNoSpaces = dateTo.replace(" ", "");
+
+    // Handle cases where the date strings are empty
+    if (dateNoSpaces + dateToNoSpaces === "") {
+      date = "Unknown date";
+    }
+
+    // Output the date information
+    if (!isRange) {
+      return `${date}`;
+    } else if (dateNoSpaces > "" && dateToNoSpaces > "") {
+      return `Between ${date} and ${dateTo}`;
+    } else if (dateNoSpaces > "") {
+      return `On or after ${date}`;
+    } else {
+      return `On or before ${dateTo}`;
     }
   }
 

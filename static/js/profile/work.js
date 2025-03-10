@@ -70,7 +70,7 @@ export function getWorkComponents(emlo) {
         sectionTitleImage: "/static/img/icon-calendar.png",
         divider: true,
         fields: [
-          { title: "", key: "started_date_sort", type: "date" },
+          { title: "", key: "started_date_sort", type: "work-date" },
           { title: "Calendar", key: "ox_originalCalendar" },
           {
             title: "Marked as",

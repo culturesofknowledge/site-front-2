@@ -1,3 +1,5 @@
+import { getCollectionTitle } from "../js/profile/collectionDetails.js"
+
 const emlo = {
   active: {},
   selector: "",
@@ -212,14 +214,13 @@ emlo.ProfileTemplate = class extends edges.Template {
       <div class="row row-with-side">
         <div class="large-12 columns" style="padding-left:0px">
             <div id="profile">
-                <br/>
-                <h2 class="main">
+                <h2 class="main" style="margin-top:0px">
                     <span id="profile-header" class="font-18">
                     </span>
                 </h2>
             </div>
    
-             <div id="" class="large-12 columns" style="margin-left:25px">
+             <div id="" class="large-12 columns">
               ${results}
             </div>
         </div>
@@ -2441,7 +2442,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   }
 
   _sideTitle() {
-    let title;
+    let title = ""
     const result = this.component.results[0];
     if (this.dynamicTitle != "" && this.dynamicTitleField != "") {
       let val;
@@ -3368,10 +3369,10 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     if (this.field == "cito_Catalog") {
       return value
         ? `
-        <em>
+        <p style="margin-top: 10px;font-style: oblique;">
           Collection details: 
-          <a href="http://emlo-portal.bodleian.ox.ac.uk/collections/?catalogue=${value}"> The Correspondence ${value} </a>
-        <em>
+          <a href="http://emlo-portal.bodleian.ox.ac.uk/collections/?catalogue=${getCollectionTitle(value).href}"> ${getCollectionTitle(value).title} </a>
+        <p>
       `
         : "";
     }
@@ -3388,7 +3389,10 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   _renderPlainText() {
     return this.component.results[0][this.field]
       ? `
-          <p style="margin-left:40px">
+          <dt>
+            <strong> ${this.contentTitle} </strong>
+          </dt>
+          <p>
             ${edges.util.escapeHtml(
               this.component.results[0][this.field] || ""
             )}

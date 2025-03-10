@@ -3254,7 +3254,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                         if (typeof mainValue === "boolean") {
                           displayValue = mainValue ? info.text : "";
                         } else if (mainValue) {
-                          displayValue = `Marked as:   ${mainValue}`;
+                          displayValue = `${mainValue}`;
                         }
                       }
 
@@ -3263,7 +3263,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                         if (typeof secondaryValue === "boolean") {
                           displayValue = secondaryValue ? info.text : "";
                         } else if (secondaryValue) {
-                          displayValue = `Marked as:   ${secondaryValue}`;
+                          displayValue = `${secondaryValue}`;
                         }
                       }
 
@@ -3274,11 +3274,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
                 if (subField.additionalInfoKey) {
                   additionalInfoVal = parentObject[subField.additionalInfoKey];
-                  console.log(
-                    "yes sir I have key",
-                    subField.additionalInfoKey,
-                    additionalInfoVal
-                  );
                 }
 
                 if (subField.clickable) {
@@ -3301,8 +3296,12 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                 } else {
                   // Create non-clickable cell
                   cells.push(
-                    `<div>${edges.util.escapeHtml(value || "")}</div>  <br/>
-                    ${additionalInfo}`
+                    `<div>${edges.util.escapeHtml(value || "")}</div>
+                     ${
+                       additionalInfo
+                         ? `<span class="fieldlabel">Marked as: </span> <span class="as-marked">${additionalInfo}</span>`
+                         : ""
+                     }`
                   );
                 }
               });

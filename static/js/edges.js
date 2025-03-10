@@ -2632,13 +2632,20 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
             return additionalInfo || value
               ? `<div class="content">
-                 ${
-                   value
-                     ? `<span>${edges.util.escapeHtml(
-                         field.title
-                       )} </span><span>${edges.util.escapeHtml(value)}</span>`
-                     : ""
-                 }
+              ${
+                value
+                  ? `
+                  ${
+                    field.title
+                      ? `<span class="fieldlabel">${edges.util.escapeHtml(
+                          field.title
+                        )}</span>`
+                      : ""
+                  }
+                  <span>${edges.util.escapeHtml(value)}</span>`
+                  : ""
+              }
+              
                  ${
                    additionalInfo
                      ? `<span style="font-size:smaller">${additionalInfo}</span>`

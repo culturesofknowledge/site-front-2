@@ -2475,7 +2475,16 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     this.component.results[0][this.primaryField].forEach((item) => {
       if (item.dcterms_type == "Letter") {
         frag += this._getLetterReopContent(item);
-        this._getInstituteData(item["ox_resourceAt-institution"]);
+
+        if (item.hasOwnProperty("ox_resourceAt-institution")) {
+          this._getInstituteData(item["ox_resourceAt-institution"]);
+        }
+      } else if (item.dcterms_type == "Manuscript copy") {
+        frag += this.__getManuRepoContent(item);
+        console.log("fdrag", frag);
+        if (item.hasOwnProperty("ox_resourceAt-institution")) {
+          this._getInstituteData(item["ox_resourceAt-institution"]);
+        }
       } else {
         frag += `
           <h3>Version: ${item.dcterms_type}</h3>
@@ -2495,7 +2504,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 	  <h3>Version: Letter</h3>
 		
     <p><span class="fieldlabel">Repository:</span></p>
-      <div id="repo-section"></p>
+      <div id="repo-section"></div>
 		  <p>
         <span class="fieldlabel">Shelfmark:</span> ${content["dcterms_identifier-shelf_"]} 
       </p>
@@ -2503,7 +2512,32 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         <span class="fieldlabel">Postage mark:</span>${content.mail_postageMark}
       </p>
 	</div>
+  <br/>
     `;
+  }
+
+  __getManuRepoContent(content) {
+    return `
+    <div class="display_details_of_one_object False">
+      <h3>Version:  Manuscript copy </h3>
+      
+      <p><span class="fieldlabel">Repository:</span></p>
+        <div id="repo-section"></div>
+        <p>
+          <span class="fieldlabel">Shelfmark:</span> ${content["dcterms_identifier-shelf_"]} 
+        </p>
+        <p>
+          <span class="fieldlabel">Paper size:</span> ${content["mail_paperSize"]} 
+        </p>
+        <p>
+          <span class="fieldlabel">Number of pages of document:</span> ${content["bibo_numPages"]} 
+        </p>
+        <p>
+          <span class="fieldlabel">Number of pages of text:</span>${content.ox_numPageText}
+        </p>
+    </div>
+    <br/>
+      `;
   }
 
   _getInstituteData(institutions) {
@@ -2548,6 +2582,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         `;
 
         const repo = document.getElementById("repo-section");
+        console.log("repo", repo);
         if (repo) {
           repo.innerHTML = frag;
         }

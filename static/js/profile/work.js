@@ -149,10 +149,11 @@ export function getWorkComponents(emlo) {
             key: "browse",
             clickable: true,
             collectionName: "person",
+            additionalInfoKey: "ox_titlesRolesOccupations",
           },
           {
             title: "",
-            key: "ox_titlesRolesOccupations",
+            key: "",
             additonalInfo: [
               {
                 mainKey: "mail_authors-indef_inferred",
@@ -180,10 +181,10 @@ export function getWorkComponents(emlo) {
             key: "browse",
             clickable: true,
             collectionName: "person",
+            additionalInfoKey: "ox_titlesRolesOccupations",
           },
           {
             title: "",
-            key: "ox_titlesRolesOccupations",
             additonalInfo: [
               {
                 mainKey: "mail_addressees-indef_inferred",
@@ -211,8 +212,8 @@ export function getWorkComponents(emlo) {
             key: "browse",
             clickable: true,
             collectionName: "person",
+            additionalInfoKey: "ox_titlesRolesOccupations",
           },
-          { title: "", key: "ox_titlesRolesOccupations" },
         ],
       }),
     }),

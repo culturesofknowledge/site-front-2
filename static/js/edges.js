@@ -3240,7 +3240,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                 const value = parentObject[subField.key]; // Access value directly using the key
 
                 let additionalInfo = "";
-
+                let additionalInfoVal = "";
                 if (
                   subField.additonalInfo &&
                   subField.additonalInfo.length > 0
@@ -3272,18 +3272,31 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                     .join("<br/>");
                 }
 
+                if (subField.additionalInfoKey) {
+                  additionalInfoVal = parentObject[subField.additionalInfoKey];
+                  console.log(
+                    "yes sir I have key",
+                    subField.additionalInfoKey,
+                    additionalInfoVal
+                  );
+                }
+
                 if (subField.clickable) {
                   // Create clickable cell
                   cells.push(`
-                    <div>
+                    <span>
                       <a href="/profile/${subField.collectionName}/${
                     parentObject["uuid"]
                   }" class="clickable-row">${edges.util.escapeHtml(
                     value || ""
-                  )}</a>
-                      <br/>
-                    ${additionalInfo}
-                    </div>
+                  )}</a> - 
+
+                    ${
+                      additionalInfoVal
+                        ? edges.util.escapeHtml(additionalInfoVal)
+                        : edges.util.escapeHtml(additionalInfo || "")
+                    }
+                    </span>
                   `);
                 } else {
                   // Create non-clickable cell

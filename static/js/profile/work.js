@@ -237,7 +237,7 @@ export function getWorkComponents(emlo) {
     }),
 
     new emlo.MultiFields({
-      id: "aut-commnents",
+      id: "rec-commnents",
       category: "results",
       fetchSecondaryData: true,
       primaryField: " ox_addresseeAnnotate-comment",
@@ -325,6 +325,25 @@ export function getWorkComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "ori-commnents",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "ox_originAnnotate-comment",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested-list",
+        sectionTitle: "Comments about the origin:",
+        sectionTitleStyle: "span",
+        primaryField: "ox_originAnnotate-comment",
+        fields: [
+          {
+            title: "",
+            key: "bibo_Note",
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "places-destionation",
       category: "results",
       fetchSecondaryData: true,
@@ -356,6 +375,25 @@ export function getWorkComponents(emlo) {
                 text: "(Destination is approximate)",
               },
             ],
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "des-commnents",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "ox_destinationAnnotate-comment",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested-list",
+        sectionTitle: "Comments about the destination:",
+        sectionTitleStyle: "span",
+        primaryField: "ox_destinationAnnotate-comment",
+        fields: [
+          {
+            title: "",
+            key: "bibo_Note",
           },
         ],
       }),

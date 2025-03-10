@@ -108,12 +108,12 @@ export function getWorkComponents(emlo) {
       id: "comments-new",
       category: "results",
       fetchSecondaryData: true,
-      primaryField: "comments",
+      primaryField: "ox_dateAnnotate-comment",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested-list",
         sectionTitle: "Comments about the date:",
         sectionTitleStyle: "span",
-        primaryField: "comments",
+        primaryField: "ox_dateAnnotate-comment",
         fields: [
           {
             title: "",

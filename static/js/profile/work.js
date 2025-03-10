@@ -491,7 +491,7 @@ export function getWorkComponents(emlo) {
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
         type: "plain-text",
-        sectionTitle: "Excipit",
+        sectionTitle: "Explicit",
         field: "ox_excipit",
       }),
     }),

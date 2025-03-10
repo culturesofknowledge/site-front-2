@@ -440,7 +440,7 @@ export function getWorkComponents(emlo) {
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
         type: "",
-        sectionTitle: "Contents",
+        sectionTitle: "Content",
         sectionTitleImage: "/static/img/icon-quill.png",
         divider: true,
       }),

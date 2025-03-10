@@ -308,6 +308,16 @@ export function getWorkComponents(emlo) {
                 secondaryKey: "mail_origin-rdf_value",
                 text: "(Origin is inferred)",
               },
+              {
+                mainKey: "mail_origin-indef_uncertain",
+                secondaryKey: "mail_origin-rdf_value",
+                text: "(Origin is uncertain)",
+              },
+              {
+                mainKey: "mail_origin-indef_approximate",
+                secondaryKey: "mail_origin-rdf_value",
+                text: "(Origin is approximate)",
+              },
             ],
           },
         ],
@@ -334,6 +344,16 @@ export function getWorkComponents(emlo) {
                 mainKey: "mail_destination-indef_inferred",
                 secondaryKey: "mail_destination-rdf_value",
                 text: "(Destination is inferred)",
+              },
+              {
+                mainKey: "mail_destination-indef_uncertain",
+                secondaryKey: "mail_destination-rdf_value",
+                text: "(Destination is uncertain)",
+              },
+              {
+                mainKey: "mail_destination-indef_approximate",
+                secondaryKey: "mail_destination-rdf_value",
+                text: "(Destination is approximate)",
               },
             ],
           },

@@ -3241,6 +3241,10 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
                 let additionalInfo = "";
                 let additionalInfoVal = "";
+                let secondaryField = false;
+
+                // Hot fix for multiple fields inside work
+                let valueAdded = false;
                 if (
                   subField.additonalInfo &&
                   subField.additonalInfo.length > 0
@@ -3248,13 +3252,15 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                   // Handle additionalInfo array
                   additionalInfo = subField.additonalInfo
                     .map((info) => {
+                      if (valueAdded != "") return;
+
                       let displayValue = "";
                       if (info.mainKey in result) {
                         const mainValue = result[info.mainKey];
                         if (typeof mainValue === "boolean") {
                           displayValue = mainValue ? info.text : "";
                         } else if (mainValue) {
-                          displayValue = `${mainValue}`;
+                          displayValue = mainValue;
                         }
                       }
 
@@ -3263,13 +3269,18 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                         if (typeof secondaryValue === "boolean") {
                           displayValue = secondaryValue ? info.text : "";
                         } else if (secondaryValue) {
-                          displayValue = `${secondaryValue}`;
+                          displayValue = secondaryValue;
+                          secondaryField = true;
                         }
+                      }
+
+                      if (displayValue != "") {
+                        valueAdded = true;
                       }
 
                       return edges.util.escapeHtml(displayValue || "");
                     })
-                    .join("<br/>");
+                    .join("");
                 }
 
                 if (subField.additionalInfoKey) {
@@ -3299,9 +3310,14 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                     `<div>${edges.util.escapeHtml(value || "")}</div>
                      ${
                        additionalInfo
-                         ? `<span class="fieldlabel">Marked as: </span> <span class="as-marked">${additionalInfo}</span>`
+                         ? secondaryField
+                           ? `<span class="fieldlabel">Marked as: </span> <span class="as-marked">${edges.util.escapeHtml(
+                               additionalInfo
+                             )}</span>`
+                           : `<span style="font-size: smaller">${additionalInfo}</span>`
                          : ""
-                     }`
+                     }
+                    `
                   );
                 }
               });

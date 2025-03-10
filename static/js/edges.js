@@ -1,4 +1,4 @@
-import { getCollectionTitle } from "../js/profile/collectionDetails.js"
+import { getCollectionTitle } from "../js/profile/collectionDetails.js";
 
 const emlo = {
   active: {},
@@ -2436,7 +2436,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   }
 
   _sideTitle() {
-    let title = ""
+    let title = "";
     const result = this.component.results[0];
     if (this.dynamicTitle != "" && this.dynamicTitleField != "") {
       let val;
@@ -3106,9 +3106,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                 } else {
                   // Create non-clickable cell
                   cells.push(
-                    `<li style="white-space: break-spaces;">${edges.util.escapeHtml(
-                      value || ""
-                    )}</li>`
+                    `<li style="list-style: none;margin-left:20px">
+                      ${value}
+                    </li>`
                   );
                 }
               });
@@ -3124,7 +3124,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
     // Wrap rows into table structure
     const list = `
-      <ul>
+      <ul style="line-height:0px">
         ${rows}
       </ul>
     `;
@@ -3365,7 +3365,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         ? `
         <p style="margin-top: 10px;font-style: oblique;">
           Collection details: 
-          <a href="http://emlo-portal.bodleian.ox.ac.uk/collections/?catalogue=${getCollectionTitle(value).href}"> ${getCollectionTitle(value).title} </a>
+          <a href="http://emlo-portal.bodleian.ox.ac.uk/collections/?catalogue=${
+            getCollectionTitle(value).href
+          }"> ${getCollectionTitle(value).title} </a>
         <p>
       `
         : "";

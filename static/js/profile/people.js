@@ -6,6 +6,8 @@ export function getPeopleComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-title",
         contentTitle: "Person",
+        dynamicTitle: "Organization",
+        dynamicTitleField: "ox_isOrganisation",
         contentTitleImage: "/static/img/person-icon.png",
       }),
     }),
@@ -409,7 +411,7 @@ export function getPeopleComponents(emlo) {
         divider: true,
         fields: [
           {
-            title: "Date of birth",
+            title: "Date of formation",
             keys: {
               date: {
                 day: "bio_Birth-ox_day",
@@ -424,7 +426,7 @@ export function getPeopleComponents(emlo) {
             },
           },
           {
-            title: "Date of death",
+            title: "Date of disbandment",
             keys: {
               date: {
                 day: "bio_Death-ox_day",

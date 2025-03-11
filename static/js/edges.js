@@ -1,3 +1,5 @@
+import { getCollectionTitle } from "../js/profile/collectionDetails.js";
+
 const emlo = {
   active: {},
   selector: "",
@@ -212,14 +214,13 @@ emlo.ProfileTemplate = class extends edges.Template {
       <div class="row row-with-side">
         <div class="large-12 columns" style="padding-left:0px">
             <div id="profile">
-                <br/>
-                <h2 class="main">
+                <h2 class="main" style="margin-top:0px">
                     <span id="profile-header" class="font-18">
                     </span>
                 </h2>
             </div>
    
-             <div id="" class="large-12 columns" style="margin-left:25px">
+             <div id="" class="large-12 columns">
               ${results}
             </div>
         </div>
@@ -2182,6 +2183,8 @@ emlo.MultiFields = class extends edges.Component {
       false
     ); // Enable/disable secondary data fetch
 
+    this.optimizedCode = edges.util.getParam(params, "optimizedCode", false);
+
     this.loading = true; // Track loading state
     this.errorMessage = ""; // Track error message
   }
@@ -2219,28 +2222,76 @@ emlo.MultiFields = class extends edges.Component {
     const results = params.results;
 
     if (this.fetchSecondaryData) {
-      for (const result of results) {
-        const fieldData = result[this.primaryField];
-        if (fieldData && Array.isArray(fieldData)) {
-          // Fetching secondary data for each fieldData URL
-          const secondaryResults = await Promise.all(
-            fieldData.map((url) => {
-              const collection = url.split("/")[3];
-              let collectionName = "";
+      if (this.optimizedCode) {
+        console.debug("running optimized code for:", this.primaryField);
 
-              if (collection == "person") {
-                collectionName = "people";
-              } else {
-                collectionName = collection;
-              }
+        const uuidArray = [];
+        let collectionName = "";
+        for (const result of results) {
+          const fieldData = result[this.primaryField];
+          if (fieldData && Array.isArray(fieldData)) {
+            fieldData.forEach((url) => {
+              const parts = url.split("/");
+              collectionName = parts[3] === "person" ? "people" : parts[3];
+              const id = parts[4];
+              uuidArray.push(id);
+            });
+          }
+        }
 
-              const id = url.split("/")[4];
+        const payload = {
+          solrCore: collectionName,
+          uuids: uuidArray,
+          filter: "", // Adjust if a filter is required
+        };
 
-              return this._fetchAndExtractSecondaryData(collectionName, id); // Await the result
-            })
-          );
+        try {
+          const response = await fetch("/stats-new", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
 
-          result[this.primaryField] = secondaryResults; // Replace with fetched data
+          if (!response.ok) {
+            console.error(
+              `Error fetching data for ${solrCore}: ${response.statusText}`
+            );
+            return {};
+          }
+
+          results[0][this.primaryField] = await response.json();
+          console.log("prim", results[0]);
+        } catch (err) {
+          console.error("got error while fetching details ", err);
+        }
+
+        // console.log("got uuid", uuidArray);
+      } else {
+        for (const result of results) {
+          const fieldData = result[this.primaryField];
+          if (fieldData && Array.isArray(fieldData)) {
+            // Fetching secondary data for each fieldData URL
+            const secondaryResults = await Promise.all(
+              fieldData.map((url) => {
+                const collection = url.split("/")[3];
+                let collectionName = "";
+
+                if (collection == "person") {
+                  collectionName = "people";
+                } else {
+                  collectionName = collection;
+                }
+
+                const id = url.split("/")[4];
+
+                return this._fetchAndExtractSecondaryData(collectionName, id); // Await the result
+              })
+            );
+
+            result[this.primaryField] = secondaryResults; // Replace with fetched data
+          }
         }
       }
     }
@@ -2427,7 +2478,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       this.sectionTitle
     ) {
       const imageTag = this.sectionTitleImage
-        ? `<img style="float:left;" src="${edges.util.escapeHtml(
+        ? `<img src="${edges.util.escapeHtml(
             this.sectionTitleImage
           )}" alt="${edges.util.escapeHtml(
             this.sectionTitle
@@ -2435,10 +2486,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         : "";
 
       return `
-          <div class="column profilepart">
       <${this.sectionTitleStyle}>
       ${imageTag} ${edges.util.escapeHtml(this.sectionTitle)}
-    </${this.sectionTitleStyle}> </div><br/>`;
+    </${this.sectionTitleStyle}>`;
     } else {
       return "";
     }
@@ -2454,7 +2504,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   }
 
   _sideTitle() {
-    let title;
+    let title = "";
     const result = this.component.results[0];
     if (this.dynamicTitle != "" && this.dynamicTitleField != "") {
       let val;
@@ -2493,7 +2543,15 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     this.component.results[0][this.primaryField].forEach((item) => {
       if (item.dcterms_type == "Letter") {
         frag += this._getLetterReopContent(item);
-        this._getInstituteData(item["ox_resourceAt-institution"]);
+
+        if (item.hasOwnProperty("ox_resourceAt-institution")) {
+          this._getInstituteData(item["ox_resourceAt-institution"]);
+        }
+      } else if (item.dcterms_type == "Manuscript copy") {
+        frag += this.__getManuRepoContent(item);
+        if (item.hasOwnProperty("ox_resourceAt-institution")) {
+          this._getInstituteData(item["ox_resourceAt-institution"]);
+        }
       } else {
         frag += `
           <h3>Version: ${item.dcterms_type}</h3>
@@ -2513,7 +2571,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 	  <h3>Version: Letter</h3>
 		
     <p><span class="fieldlabel">Repository:</span></p>
-      <div id="repo-section"></p>
+      <div id="repo-section"></div>
 		  <p>
         <span class="fieldlabel">Shelfmark:</span> ${content["dcterms_identifier-shelf_"]} 
       </p>
@@ -2521,7 +2579,32 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         <span class="fieldlabel">Postage mark:</span>${content.mail_postageMark}
       </p>
 	</div>
+  <br/>
     `;
+  }
+
+  __getManuRepoContent(content) {
+    return `
+    <div class="display_details_of_one_object False">
+      <h3>Version:  Manuscript copy </h3>
+      
+      <p><span class="fieldlabel">Repository:</span></p>
+        <div id="repo-section"></div>
+        <p>
+          <span class="fieldlabel">Shelfmark:</span> ${content["dcterms_identifier-shelf_"]} 
+        </p>
+        <p>
+          <span class="fieldlabel">Paper size:</span> ${content["mail_paperSize"]} 
+        </p>
+        <p>
+          <span class="fieldlabel">Number of pages of document:</span> ${content["bibo_numPages"]} 
+        </p>
+        <p>
+          <span class="fieldlabel">Number of pages of text:</span>${content.ox_numPageText}
+        </p>
+    </div>
+    <br/>
+      `;
   }
 
   _getInstituteData(institutions) {
@@ -2637,25 +2720,38 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
                   return edges.util.escapeHtml(displayValue || "");
                 })
-                .join("<br/>");
+                .join("");
             }
 
             if (field.type == "date") {
               value = this._formatDate(this.component.results[0][field.key]);
+            } else if (field.type == "work-date") {
+              value = this._getWorkDate();
             } else {
               value = this.component.results[0][field.key];
             }
 
             return additionalInfo || value
               ? `<div class="content">
+              ${
+                value
+                  ? `
+                  ${
+                    field.title
+                      ? `<span class="fieldlabel">${edges.util.escapeHtml(
+                          field.title
+                        )}: </span>`
+                      : ""
+                  }
+                  <span>${edges.util.escapeHtml(value)}</span>`
+                  : ""
+              }
+              
                  ${
-                   value
-                     ? `<span>${edges.util.escapeHtml(
-                         field.title
-                       )} </span><span>${edges.util.escapeHtml(value)}</span>`
+                   additionalInfo
+                     ? `<span style="font-size:smaller">${additionalInfo}</span>`
                      : ""
                  }
-                 ${additionalInfo ? `<span>${additionalInfo}</span>` : ""}
                </div>`
               : "";
           })
@@ -2772,6 +2868,65 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       return `<div class="content"><dl> ${content} </dl></div>`;
     } else {
       return "";
+    }
+  }
+
+  _getWorkDate() {
+    // Data from this.component.results[0]
+    const result = this.component.results[0];
+
+    // Month names array
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    // Get the date fields
+    const startDay = result["ox_started-ox_day"] || "";
+    const startMonth = result["ox_started-ox_month"] || 13; // Default to 13 (invalid month)
+    const startYear = result["ox_started-ox_year"] || "";
+
+    const endDay = result["ox_completed-ox_day"] || "";
+    const endMonth = result["ox_completed-ox_month"] || 13; // Default to 13 (invalid month)
+    const endYear = result["ox_completed-ox_year"] || "";
+
+    // Construct the date string for the start
+    let date = `${startDay} ${months[startMonth - 1]} ${startYear}`;
+
+    // Check if the date is a range
+    const isRange = result["ox_dateIsRange"] || false;
+
+    // Construct the date string for the end
+    let dateTo = `${endDay} ${months[endMonth - 1]} ${endYear}`;
+
+    // Remove spaces from the date strings
+    const dateNoSpaces = date.replace(" ", "");
+    const dateToNoSpaces = dateTo.replace(" ", "");
+
+    // Handle cases where the date strings are empty
+    if (dateNoSpaces + dateToNoSpaces === "") {
+      date = "Unknown date";
+    }
+
+    // Output the date information
+    if (!isRange) {
+      return `${date}`;
+    } else if (dateNoSpaces > "" && dateToNoSpaces > "") {
+      return `Between ${date} and ${dateTo}`;
+    } else if (dateNoSpaces > "") {
+      return `On or after ${date}`;
+    } else {
+      return `On or before ${dateTo}`;
     }
   }
 
@@ -2982,7 +3137,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
             .join(" ♦ ");
           return `
           <tr>
-            <td>${decade}s</td>
+            <td>
+              ${decade === "????" ? `????` : `${decade}s`}
+            </td>
             <td> ${yearCounts} </td>
           </tr>`;
         })
@@ -3013,43 +3170,104 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         let parentObjects = result[parentField];
         if (!parentObjects || parentObjects.length === 0) return "";
 
-        parentObjects.sort(
-          (a, b) => a["ox_started-ox_year"] - b["ox_started-ox_year"]
-        );
+        parentObjects.sort((a, b) => {
+          const startA = a["ox_started-ox_year"] ?? a["0x_completed-ox_year"];
+          const startB = b["ox_started-ox_year"] ?? b["0x_completed-ox_year"];
+
+          // If both values are undefined, consider them equal
+          if (startA === undefined && startB === undefined) return 0;
+
+          // If one value is undefined, treat it as larger (to push it to the end)
+          if (startA === undefined) return 1;
+          if (startB === undefined) return -1;
+
+          // Otherwise, compare the values normally
+          return startA - startB;
+        });
+
         let lastfieldKey = 0;
+
+        // return parentObjects
+        //   .map((parentObject) => {
+        //     if (!parentObject) return "";
+
+        //     const cells = [];
+        //     // if (field) {
+        //     //   const value = parentObject[field];
+        //     //   cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
+        //     // }
+        //     if (subFields) {
+        //       subFields.forEach((subField) => {
+        //         const value = parentObject[subField.key];
+        //         if (subField.clickable) {
+        //           cells.push(`
+        //             <td>
+        //               <a href="/profile/${subField.collectionName}/${
+        //             parentObject["uuid"]
+        //           }" class="clickable-row">${edges.util.escapeHtml(
+        //             value || ""
+        //           )}</a>
+        //             </td>
+        //           `);
+        //         } else {
+        //           if (
+        //             subField.key == "ox_started-ox_year" ||
+        //             subField.key == "ox_completed-ox_year"
+        //           ) {
+        //             if (lastfieldKey !== value) {
+        //               lastfieldKey = value;
+        //               cells.push(
+        //                 `<td>${edges.util.escapeHtml(value || "")}</td>`
+        //               );
+        //             } else {
+        //               cells.push(`<td></td>`);
+        //             }
+        //           }
+        //         }
+        //       });
+        //     }
+
+        //     return `<tr>${cells.join("")}</tr>`;
+        //   })
+        //   .join("");
 
         return parentObjects
           .map((parentObject) => {
             if (!parentObject) return "";
 
             const cells = [];
-            // if (field) {
-            //   const value = parentObject[field];
-            //   cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
-            // }
+            let rowStyle = ""; // Variable to hold the style for the row
+
             if (subFields) {
               subFields.forEach((subField) => {
                 const value = parentObject[subField.key];
+
                 if (subField.clickable) {
                   cells.push(`
-                    <td>
-                      <a href="/profile/${subField.collectionName}/${
+            <td>
+              <a href="/profile/${subField.collectionName}/${
                     parentObject["uuid"]
                   }" class="clickable-row">${edges.util.escapeHtml(
                     value || ""
                   )}</a>
-                    </td>
-                  `);
+            </td>
+          `);
                 } else {
                   if (
                     subField.key == "ox_started-ox_year" ||
                     subField.key == "ox_completed-ox_year"
                   ) {
+                    // Add dotted separation when current year is not the same as the last year
                     if (lastfieldKey !== value) {
                       lastfieldKey = value;
+                      // Use "????" if value is undefined
                       cells.push(
-                        `<td>${edges.util.escapeHtml(value || "")}</td>`
+                        `<td>${edges.util.escapeHtml(
+                          value !== undefined ? value : "????"
+                        )}</td>`
                       );
+                      rowStyle =
+                        "border-top: #999 dashed 1px; padding: 5px 0px 5px 10px;"; // Apply dotted separation on the top of the row
                     } else {
                       cells.push(`<td></td>`);
                     }
@@ -3057,8 +3275,8 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                 }
               });
             }
-
-            return `<tr>${cells.join("")}</tr>`;
+            // Add row style if the condition is met
+            return `<tr style="${rowStyle}">${cells.join("")}</tr>`;
           })
           .join("");
       })
@@ -3066,7 +3284,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       .join("");
 
     const table = `
-      <table class="nested-table">
+      <table class="nested-table" style="border-collapse: collapse;">
         <tbody>
           ${rows}
         </tbody>
@@ -3124,9 +3342,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                 } else {
                   // Create non-clickable cell
                   cells.push(
-                    `<li style="white-space: break-spaces;">${edges.util.escapeHtml(
-                      value || ""
-                    )}</li>`
+                    `<li style="list-style: none;margin-left:20px">
+                      ${value}
+                    </li>`
                   );
                 }
               });
@@ -3186,7 +3404,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                 const value = parentObject[subField.key]; // Access value directly using the key
 
                 let additionalInfo = "";
+                let additionalInfoVal = "";
+                let secondaryField = false;
 
+                // Hot fix for multiple fields inside work
+                let valueAdded = false;
                 if (
                   subField.additonalInfo &&
                   subField.additonalInfo.length > 0
@@ -3194,13 +3416,15 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                   // Handle additionalInfo array
                   additionalInfo = subField.additonalInfo
                     .map((info) => {
+                      if (valueAdded != "") return;
+
                       let displayValue = "";
                       if (info.mainKey in result) {
                         const mainValue = result[info.mainKey];
                         if (typeof mainValue === "boolean") {
                           displayValue = mainValue ? info.text : "";
                         } else if (mainValue) {
-                          displayValue = `Marked as:   ${mainValue}`;
+                          displayValue = mainValue;
                         }
                       }
 
@@ -3209,33 +3433,85 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                         if (typeof secondaryValue === "boolean") {
                           displayValue = secondaryValue ? info.text : "";
                         } else if (secondaryValue) {
-                          displayValue = `Marked as:   ${secondaryValue}`;
+                          displayValue = secondaryValue;
+                          secondaryField = true;
                         }
+                      }
+
+                      if (displayValue != "") {
+                        valueAdded = true;
                       }
 
                       return edges.util.escapeHtml(displayValue || "");
                     })
-                    .join("<br/>");
+                    .join("");
+                }
+
+                if (subField.additionalInfoKey) {
+                  additionalInfoVal = parentObject[subField.additionalInfoKey];
                 }
 
                 if (subField.clickable) {
-                  // Create clickable cell
-                  cells.push(`
-                    <div>
-                      <a href="/profile/${subField.collectionName}/${
-                    parentObject["uuid"]
-                  }" class="clickable-row">${edges.util.escapeHtml(
-                    value || ""
-                  )}</a>
-                      <br/>
-                    ${additionalInfo}
-                    </div>
-                  `);
+                  if (subField.collectionName == "dcterms_relation") {
+                    if (parentObject.hasOwnProperty("dcterms_relation")) {
+                      cells.push(`
+                      <span>
+                        <a href="${
+                          parentObject.dcterms_relation
+                        }" class="clickable-row">${edges.util.escapeHtml(
+                        value || ""
+                      )}</a> - 
+  
+                      ${
+                        additionalInfoVal
+                          ? edges.util.escapeHtml(additionalInfoVal)
+                          : edges.util.escapeHtml(additionalInfo || "")
+                      }
+                      </span>
+                    `);
+                    } else {
+                      cells.push(`
+                        <span>${edges.util.escapeHtml(value || "")} - 
+    
+                        ${
+                          additionalInfoVal
+                            ? edges.util.escapeHtml(additionalInfoVal)
+                            : edges.util.escapeHtml(additionalInfo || "")
+                        }
+                        </span>
+                      `);
+                    }
+                  } else {
+                    cells.push(`
+                      <span>
+                        <a href="/profile/${subField.collectionName}/${
+                      parentObject["uuid"]
+                    }" class="clickable-row">${edges.util.escapeHtml(
+                      value || ""
+                    )}</a> - 
+  
+                      ${
+                        additionalInfoVal
+                          ? edges.util.escapeHtml(additionalInfoVal)
+                          : edges.util.escapeHtml(additionalInfo || "")
+                      }
+                      </span>
+                    `);
+                  }
                 } else {
                   // Create non-clickable cell
                   cells.push(
-                    `<div>${edges.util.escapeHtml(value || "")}</div>  <br/>
-                    ${additionalInfo}`
+                    `<div>${edges.util.escapeHtml(value || "")}</div>
+                     ${
+                       additionalInfo
+                         ? secondaryField
+                           ? `<span class="fieldlabel">Marked as: </span> <span class="as-marked">${edges.util.escapeHtml(
+                               additionalInfo
+                             )}</span>`
+                           : `<span style="font-size: smaller">${additionalInfo}</span>`
+                         : ""
+                     }
+                    `
                   );
                 }
               });
@@ -3381,10 +3657,12 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     if (this.field == "cito_Catalog") {
       return value
         ? `
-        <em>
+        <p style="margin-top: 10px;font-style: oblique;">
           Collection details: 
-          <a href="http://emlo-portal.bodleian.ox.ac.uk/collections/?catalogue=${value}"> The Correspondence ${value} </a>
-        <em>
+          <a href="http://emlo-portal.bodleian.ox.ac.uk/collections/?catalogue=${
+            getCollectionTitle(value).href
+          }"> ${getCollectionTitle(value).title} </a>
+        <p>
       `
         : "";
     }
@@ -3401,7 +3679,10 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   _renderPlainText() {
     return this.component.results[0][this.field]
       ? `
-          <p style="margin-left:40px">
+          <dt>
+            <strong> ${this.contentTitle} </strong>
+          </dt>
+          <p>
             ${edges.util.escapeHtml(
               this.component.results[0][this.field] || ""
             )}

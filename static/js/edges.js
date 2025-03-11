@@ -2170,6 +2170,8 @@ emlo.MultiFields = class extends edges.Component {
       false
     ); // Enable/disable secondary data fetch
 
+    this.optimizedCode = edges.util.getParam(params, "optimizedCode", false);
+
     this.loading = true; // Track loading state
     this.errorMessage = ""; // Track error message
   }
@@ -2207,28 +2209,76 @@ emlo.MultiFields = class extends edges.Component {
     const results = params.results;
 
     if (this.fetchSecondaryData) {
-      for (const result of results) {
-        const fieldData = result[this.primaryField];
-        if (fieldData && Array.isArray(fieldData)) {
-          // Fetching secondary data for each fieldData URL
-          const secondaryResults = await Promise.all(
-            fieldData.map((url) => {
-              const collection = url.split("/")[3];
-              let collectionName = "";
+      if (this.optimizedCode) {
+        console.debug("running optimized code for:", this.primaryField);
 
-              if (collection == "person") {
-                collectionName = "people";
-              } else {
-                collectionName = collection;
-              }
+        const uuidArray = [];
+        let collectionName = "";
+        for (const result of results) {
+          const fieldData = result[this.primaryField];
+          if (fieldData && Array.isArray(fieldData)) {
+            fieldData.forEach((url) => {
+              const parts = url.split("/");
+              collectionName = parts[3] === "person" ? "people" : parts[3];
+              const id = parts[4];
+              uuidArray.push(id);
+            });
+          }
+        }
 
-              const id = url.split("/")[4];
+        const payload = {
+          solrCore: collectionName,
+          uuids: uuidArray,
+          filter: "", // Adjust if a filter is required
+        };
 
-              return this._fetchAndExtractSecondaryData(collectionName, id); // Await the result
-            })
-          );
+        try {
+          const response = await fetch("/stats-new", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
 
-          result[this.primaryField] = secondaryResults; // Replace with fetched data
+          if (!response.ok) {
+            console.error(
+              `Error fetching data for ${solrCore}: ${response.statusText}`
+            );
+            return {};
+          }
+
+          results[0][this.primaryField] = await response.json();
+          console.log("prim", results[0]);
+        } catch (err) {
+          console.error("got error while fetching details ", err);
+        }
+
+        // console.log("got uuid", uuidArray);
+      } else {
+        for (const result of results) {
+          const fieldData = result[this.primaryField];
+          if (fieldData && Array.isArray(fieldData)) {
+            // Fetching secondary data for each fieldData URL
+            const secondaryResults = await Promise.all(
+              fieldData.map((url) => {
+                const collection = url.split("/")[3];
+                let collectionName = "";
+
+                if (collection == "person") {
+                  collectionName = "people";
+                } else {
+                  collectionName = collection;
+                }
+
+                const id = url.split("/")[4];
+
+                return this._fetchAndExtractSecondaryData(collectionName, id); // Await the result
+              })
+            );
+
+            result[this.primaryField] = secondaryResults; // Replace with fetched data
+          }
         }
       }
     }

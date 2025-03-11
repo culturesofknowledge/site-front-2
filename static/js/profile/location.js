@@ -162,6 +162,7 @@ export function getLocationComponents(emlo) {
       id: "letters-sent-from",
       category: "results",
       fetchSecondaryData: true,
+      optimizedCode: true,
       primaryField: "mail_originOf-work",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",
@@ -187,6 +188,7 @@ export function getLocationComponents(emlo) {
       id: "letters-sent-to",
       category: "results",
       fetchSecondaryData: true,
+      optimizedCode: true,
       primaryField: "mail_destinationOf-work",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",
@@ -212,6 +214,7 @@ export function getLocationComponents(emlo) {
       id: "letters-mentioned",
       category: "results",
       fetchSecondaryData: true,
+      optimizedCode: true,
       primaryField: "dcterms_isReferencedBy-work",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",

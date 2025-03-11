@@ -511,6 +511,7 @@ export function getPeopleComponents(emlo) {
       id: "letters-written",
       category: "results",
       fetchSecondaryData: true,
+      optimizedCode: true,
       primaryField: "frbr_creatorOf-work",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",
@@ -536,6 +537,7 @@ export function getPeopleComponents(emlo) {
       id: "letters-recevied",
       category: "results",
       fetchSecondaryData: true,
+      optimizedCode: true,
       primaryField: "mail_recipientOf-work",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",
@@ -561,6 +563,7 @@ export function getPeopleComponents(emlo) {
       id: "letters-mentioned",
       category: "results",
       fetchSecondaryData: true,
+      optimizedCode: true,
       primaryField: "dcterms_isReferencedBy-work",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",

@@ -2963,7 +2963,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
             .join(" ♦ ");
           return `
           <tr>
-            <td>${decade}s</td>
+            <td>
+              ${decade === "????" ? `????` : `${decade}s`}
+            </td>
             <td> ${yearCounts} </td>
           </tr>`;
         })

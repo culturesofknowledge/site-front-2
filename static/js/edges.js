@@ -2465,7 +2465,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       this.sectionTitle
     ) {
       const imageTag = this.sectionTitleImage
-        ? `<img style="float:left;" src="${edges.util.escapeHtml(
+        ? `<img src="${edges.util.escapeHtml(
             this.sectionTitleImage
           )}" alt="${edges.util.escapeHtml(
             this.sectionTitle
@@ -2473,10 +2473,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         : "";
 
       return `
-          <div class="column">
       <${this.sectionTitleStyle}>
       ${imageTag} ${edges.util.escapeHtml(this.sectionTitle)}
-    </${this.sectionTitleStyle}> </div><br/><br/>`;
+    </${this.sectionTitleStyle}>`;
     } else {
       return "";
     }

@@ -568,6 +568,32 @@ export function getWorkComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "resources",
+      category: "results",
+      fetchSecondaryData: true,
+      primaryField: "resources",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested-label",
+        sectionTitle: "Related Resources",
+        sectionTitleImage: "/static/img/icon-related-resources.png",
+        divider: true,
+        primaryField: "resources",
+        fields: [
+          {
+            title: "",
+            key: "ox_titleOfResource",
+            clickable: true,
+            collectionName: "dcterms_relation",
+          },
+          {
+            title: "",
+            key: "ox_detailsOfResource",
+          },
+        ],
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "comments",
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
@@ -590,31 +616,6 @@ export function getWorkComponents(emlo) {
           {
             title: "",
             key: "bibo_Note",
-          },
-        ],
-      }),
-    }),
-
-    new emlo.MultiFields({
-      id: "resources",
-      category: "results",
-      fetchSecondaryData: true,
-      primaryField: "resources",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested-label",
-        sectionTitle: "Related Resources",
-        sectionTitleImage: "/static/img/icon-related-resources.png",
-        divider: true,
-        primaryField: "resources",
-        fields: [
-          {
-            title: "",
-            key: "ox_titleOfResource",
-            clickable: true,
-          },
-          {
-            title: "",
-            key: "ox_detailsOfResource",
           },
         ],
       }),

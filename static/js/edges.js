@@ -2481,7 +2481,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         }
       } else if (item.dcterms_type == "Manuscript copy") {
         frag += this.__getManuRepoContent(item);
-        console.log("fdrag", frag);
         if (item.hasOwnProperty("ox_resourceAt-institution")) {
           this._getInstituteData(item["ox_resourceAt-institution"]);
         }
@@ -2582,7 +2581,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         `;
 
         const repo = document.getElementById("repo-section");
-        console.log("repo", repo);
         if (repo) {
           repo.innerHTML = frag;
         }
@@ -3323,22 +3321,52 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                 }
 
                 if (subField.clickable) {
-                  // Create clickable cell
-                  cells.push(`
-                    <span>
-                      <a href="/profile/${subField.collectionName}/${
-                    parentObject["uuid"]
-                  }" class="clickable-row">${edges.util.escapeHtml(
-                    value || ""
-                  )}</a> - 
-
-                    ${
-                      additionalInfoVal
-                        ? edges.util.escapeHtml(additionalInfoVal)
-                        : edges.util.escapeHtml(additionalInfo || "")
+                  if (subField.collectionName == "dcterms_relation") {
+                    if (parentObject.hasOwnProperty("dcterms_relation")) {
+                      cells.push(`
+                      <span>
+                        <a href="${
+                          parentObject.dcterms_relation
+                        }" class="clickable-row">${edges.util.escapeHtml(
+                        value || ""
+                      )}</a> - 
+  
+                      ${
+                        additionalInfoVal
+                          ? edges.util.escapeHtml(additionalInfoVal)
+                          : edges.util.escapeHtml(additionalInfo || "")
+                      }
+                      </span>
+                    `);
+                    } else {
+                      cells.push(`
+                        <span>${edges.util.escapeHtml(value || "")} - 
+    
+                        ${
+                          additionalInfoVal
+                            ? edges.util.escapeHtml(additionalInfoVal)
+                            : edges.util.escapeHtml(additionalInfo || "")
+                        }
+                        </span>
+                      `);
                     }
-                    </span>
-                  `);
+                  } else {
+                    cells.push(`
+                      <span>
+                        <a href="/profile/${subField.collectionName}/${
+                      parentObject["uuid"]
+                    }" class="clickable-row">${edges.util.escapeHtml(
+                      value || ""
+                    )}</a> - 
+  
+                      ${
+                        additionalInfoVal
+                          ? edges.util.escapeHtml(additionalInfoVal)
+                          : edges.util.escapeHtml(additionalInfo || "")
+                      }
+                      </span>
+                    `);
+                  }
                 } else {
                   // Create non-clickable cell
                   cells.push(

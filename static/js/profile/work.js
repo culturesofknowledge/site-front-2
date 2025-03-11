@@ -610,7 +610,7 @@ export function getWorkComponents(emlo) {
       primaryField: "comments",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested-list",
-        sectionTitle: "General",
+        sectionTitle: "General Notes",
         primaryField: "comments",
         fields: [
           {

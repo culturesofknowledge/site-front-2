@@ -223,7 +223,7 @@ export function getPeopleComponents(emlo) {
       primaryField: "taught-person",
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-nested-links",
-        contentTitle: "Taught",
+        contentTitle: "Was taught by",
         primaryField: "taught-person",
         fields: [
           {
@@ -243,7 +243,7 @@ export function getPeopleComponents(emlo) {
       primaryField: "was_taught_by-person",
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-nested-links",
-        contentTitle: "Was taught by",
+        contentTitle: "Taught",
         primaryField: "was_taught_by-person",
         fields: [
           {
@@ -263,7 +263,7 @@ export function getPeopleComponents(emlo) {
       primaryField: "employed-person",
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-nested-links",
-        contentTitle: "Employed",
+        contentTitle: "Was employed by",
         primaryField: "employed-person",
         fields: [
           {
@@ -283,7 +283,7 @@ export function getPeopleComponents(emlo) {
       primaryField: "was_employed_by-person",
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-nested-links",
-        contentTitle: "Was employed by",
+        contentTitle: "Employed",
         primaryField: "was_employed_by-person",
         fields: [
           {
@@ -395,7 +395,7 @@ export function getPeopleComponents(emlo) {
         contentTitle: "",
         divider: true,
         fields: [
-          { title: "Alternative names", key: "skos_altLabel" },
+          { title: "Alternative name", key: "skos_altLabel" },
           { title: "Titles or roles", key: "ox_titlesRolesOccupations" },
         ],
       }),
@@ -455,21 +455,21 @@ export function getPeopleComponents(emlo) {
         fields: [
           {
             name: "text",
-            title: "Letters written",
+            title: "letters written",
             key: "ox_totalWorksByAgent",
             redirectUrl: "/forms/advance?aut=",
             redirectQueryName: "browse",
           },
           {
             name: "text",
-            title: "Letters received ",
+            title: "letters received ",
             key: "ox_totalWorksAddressedToAgent",
             redirectUrl: "/forms/advance?rec=",
             redirectQueryName: "browse",
           },
           {
             name: "text",
-            title: "Letters mentioning",
+            title: "letters mentioning",
             key: "ox_totalWorksMentioningAgent",
             redirectUrl: "/forms/advance?ment=",
             redirectQueryName: "browse",
@@ -511,6 +511,7 @@ export function getPeopleComponents(emlo) {
       id: "letters-written",
       category: "results",
       fetchSecondaryData: true,
+      optimizedCode: true,
       primaryField: "frbr_creatorOf-work",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",
@@ -536,6 +537,7 @@ export function getPeopleComponents(emlo) {
       id: "letters-recevied",
       category: "results",
       fetchSecondaryData: true,
+      optimizedCode: true,
       primaryField: "mail_recipientOf-work",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",
@@ -561,6 +563,7 @@ export function getPeopleComponents(emlo) {
       id: "letters-mentioned",
       category: "results",
       fetchSecondaryData: true,
+      optimizedCode: true,
       primaryField: "dcterms_isReferencedBy-work",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",

@@ -10567,3 +10567,8 @@ button.tiny {
   overflow-y: auto; /* Enables scrolling */
   padding: 15px;
 }
+
+#comments-new {
+  margin-top: 10px;
+  margin-left: 10px;
+}

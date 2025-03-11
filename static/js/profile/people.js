@@ -453,21 +453,21 @@ export function getPeopleComponents(emlo) {
         fields: [
           {
             name: "text",
-            title: "Letters written",
+            title: "letters written",
             key: "ox_totalWorksByAgent",
             redirectUrl: "/forms/advance?aut=",
             redirectQueryName: "browse",
           },
           {
             name: "text",
-            title: "Letters received ",
+            title: "letters received ",
             key: "ox_totalWorksAddressedToAgent",
             redirectUrl: "/forms/advance?rec=",
             redirectQueryName: "browse",
           },
           {
             name: "text",
-            title: "Letters mentioning",
+            title: "letters mentioning",
             key: "ox_totalWorksMentioningAgent",
             redirectUrl: "/forms/advance?ment=",
             redirectQueryName: "browse",

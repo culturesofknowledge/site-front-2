@@ -221,7 +221,7 @@ export function getPeopleComponents(emlo) {
       primaryField: "taught-person",
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-nested-links",
-        contentTitle: "Taught",
+        contentTitle: "Was taught by",
         primaryField: "taught-person",
         fields: [
           {
@@ -241,7 +241,7 @@ export function getPeopleComponents(emlo) {
       primaryField: "was_taught_by-person",
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-nested-links",
-        contentTitle: "Was taught by",
+        contentTitle: "Taught",
         primaryField: "was_taught_by-person",
         fields: [
           {
@@ -261,7 +261,7 @@ export function getPeopleComponents(emlo) {
       primaryField: "employed-person",
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-nested-links",
-        contentTitle: "Employed",
+        contentTitle: "Was employed by",
         primaryField: "employed-person",
         fields: [
           {
@@ -281,7 +281,7 @@ export function getPeopleComponents(emlo) {
       primaryField: "was_employed_by-person",
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-nested-links",
-        contentTitle: "Was employed by",
+        contentTitle: "Employed",
         primaryField: "was_employed_by-person",
         fields: [
           {

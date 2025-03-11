@@ -2996,43 +2996,104 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         let parentObjects = result[parentField];
         if (!parentObjects || parentObjects.length === 0) return "";
 
-        parentObjects.sort(
-          (a, b) => a["ox_started-ox_year"] - b["ox_started-ox_year"]
-        );
+        parentObjects.sort((a, b) => {
+          const startA = a["ox_started-ox_year"] ?? a["0x_completed-ox_year"];
+          const startB = b["ox_started-ox_year"] ?? b["0x_completed-ox_year"];
+
+          // If both values are undefined, consider them equal
+          if (startA === undefined && startB === undefined) return 0;
+
+          // If one value is undefined, treat it as larger (to push it to the end)
+          if (startA === undefined) return 1;
+          if (startB === undefined) return -1;
+
+          // Otherwise, compare the values normally
+          return startA - startB;
+        });
+
         let lastfieldKey = 0;
+
+        // return parentObjects
+        //   .map((parentObject) => {
+        //     if (!parentObject) return "";
+
+        //     const cells = [];
+        //     // if (field) {
+        //     //   const value = parentObject[field];
+        //     //   cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
+        //     // }
+        //     if (subFields) {
+        //       subFields.forEach((subField) => {
+        //         const value = parentObject[subField.key];
+        //         if (subField.clickable) {
+        //           cells.push(`
+        //             <td>
+        //               <a href="/profile/${subField.collectionName}/${
+        //             parentObject["uuid"]
+        //           }" class="clickable-row">${edges.util.escapeHtml(
+        //             value || ""
+        //           )}</a>
+        //             </td>
+        //           `);
+        //         } else {
+        //           if (
+        //             subField.key == "ox_started-ox_year" ||
+        //             subField.key == "ox_completed-ox_year"
+        //           ) {
+        //             if (lastfieldKey !== value) {
+        //               lastfieldKey = value;
+        //               cells.push(
+        //                 `<td>${edges.util.escapeHtml(value || "")}</td>`
+        //               );
+        //             } else {
+        //               cells.push(`<td></td>`);
+        //             }
+        //           }
+        //         }
+        //       });
+        //     }
+
+        //     return `<tr>${cells.join("")}</tr>`;
+        //   })
+        //   .join("");
 
         return parentObjects
           .map((parentObject) => {
             if (!parentObject) return "";
 
             const cells = [];
-            // if (field) {
-            //   const value = parentObject[field];
-            //   cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
-            // }
+            let rowStyle = ""; // Variable to hold the style for the row
+
             if (subFields) {
               subFields.forEach((subField) => {
                 const value = parentObject[subField.key];
+
                 if (subField.clickable) {
                   cells.push(`
-                    <td>
-                      <a href="/profile/${subField.collectionName}/${
+            <td>
+              <a href="/profile/${subField.collectionName}/${
                     parentObject["uuid"]
                   }" class="clickable-row">${edges.util.escapeHtml(
                     value || ""
                   )}</a>
-                    </td>
-                  `);
+            </td>
+          `);
                 } else {
                   if (
                     subField.key == "ox_started-ox_year" ||
                     subField.key == "ox_completed-ox_year"
                   ) {
+                    // Add dotted separation when current year is not the same as the last year
                     if (lastfieldKey !== value) {
                       lastfieldKey = value;
+                      // Use "????" if value is undefined
                       cells.push(
-                        `<td>${edges.util.escapeHtml(value || "")}</td>`
+                        `<td>${edges.util.escapeHtml(
+                          value !== undefined ? value : "????"
+                        )}</td>`
                       );
+                      rowStyle =
+                        "border-top: #999 dashed 1px; padding: 5px 0px 5px 10px;"; // Apply dotted separation on the top of the row
                     } else {
                       cells.push(`<td></td>`);
                     }
@@ -3040,8 +3101,8 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                 }
               });
             }
-
-            return `<tr>${cells.join("")}</tr>`;
+            // Add row style if the condition is met
+            return `<tr style="${rowStyle}">${cells.join("")}</tr>`;
           })
           .join("");
       })
@@ -3049,7 +3110,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       .join("");
 
     const table = `
-      <table class="nested-table">
+      <table class="nested-table" style="border-collapse: collapse;">
         <tbody>
           ${rows}
         </tbody>

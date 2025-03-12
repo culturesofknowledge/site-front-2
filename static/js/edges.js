@@ -256,8 +256,6 @@ emlo.HomeStatsTemplate = class extends edges.Template {
       stats += `<div id="${statsComponents[i].id}"></div>`;
     }
 
-    console.log;
-
     let frag = `
  
               ${stats}
@@ -2249,7 +2247,6 @@ emlo.MultiFields = class extends edges.Component {
           }
 
           results[0][this.primaryField] = await response.json();
-          console.log("prim", results[0]);
         } catch (err) {
           console.error("got error while fetching details ", err);
         }

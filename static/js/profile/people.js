@@ -508,6 +508,17 @@ export function getPeopleComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "letters-written-heading",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested",
+        sectionTitle: "Letters Written",
+        sectionTitleImage: "/static/img/icon-quill.png",
+        divider: true,
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "letters-written",
       category: "results",
       fetchSecondaryData: true,
@@ -515,8 +526,6 @@ export function getPeopleComponents(emlo) {
       primaryField: "frbr_creatorOf-work",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",
-        sectionTitle: "Letters Written",
-        sectionTitleImage: "/static/img/icon-quill.png",
         primaryField: "frbr_creatorOf-work",
         field: "frbr_creator-person",
         primaryResultKey: "uuid",
@@ -529,6 +538,16 @@ export function getPeopleComponents(emlo) {
             collectionName: "work",
           },
         ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "letters-recevied-heading",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested",
+        sectionTitle: "Letters Received",
+        sectionTitleImage: "/static/img/icon-quill.png",
         divider: true,
       }),
     }),
@@ -541,8 +560,6 @@ export function getPeopleComponents(emlo) {
       primaryField: "mail_recipientOf-work",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",
-        sectionTitle: "Letters Received",
-        sectionTitleImage: "/static/img/icon-quill.png",
         primaryField: "mail_recipientOf-work",
         field: "mail_recipient-person",
         primaryResultKey: "uuid",
@@ -555,6 +572,16 @@ export function getPeopleComponents(emlo) {
             collectionName: "work",
           },
         ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "letters-ment-heading",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested",
+        sectionTitle: "Letters Mentioning",
+        sectionTitleImage: "/static/img/icon-quill.png",
         divider: true,
       }),
     }),
@@ -567,8 +594,6 @@ export function getPeopleComponents(emlo) {
       primaryField: "dcterms_isReferencedBy-work",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",
-        sectionTitle: "Letters Mentioning",
-        sectionTitleImage: "/static/img/icon-quill.png",
         primaryField: "dcterms_isReferencedBy-work",
         field: "dcterms_references-person",
         primaryResultKey: "uuid",
@@ -581,7 +606,6 @@ export function getPeopleComponents(emlo) {
             collectionName: "work",
           },
         ],
-        divider: true,
       }),
     }),
 

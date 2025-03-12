@@ -159,6 +159,17 @@ export function getLocationComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "letters-sent-from-heading",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested",
+        sectionTitle: "Letters Sent From",
+        sectionTitleImage: "/static/img/icon-quill.png",
+        divider: true,
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "letters-sent-from",
       category: "results",
       fetchSecondaryData: true,
@@ -166,8 +177,6 @@ export function getLocationComponents(emlo) {
       primaryField: "mail_originOf-work",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",
-        sectionTitle: "Letters Sent From",
-        sectionTitleImage: "/static/img/icon-quill.png",
         primaryField: "mail_originOf-work",
         field: "mail_origin-location",
         primaryResultKey: "uuid",
@@ -180,6 +189,16 @@ export function getLocationComponents(emlo) {
             collectionName: "work",
           },
         ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "letters-sent-to-heading",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested",
+        sectionTitle: "Letters Sent To",
+        sectionTitleImage: "/static/img/icon-quill.png",
         divider: true,
       }),
     }),
@@ -192,8 +211,6 @@ export function getLocationComponents(emlo) {
       primaryField: "mail_destinationOf-work",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",
-        sectionTitle: "Letters Sent To",
-        sectionTitleImage: "/static/img/icon-quill.png",
         primaryField: "mail_destinationOf-work",
         field: "mail_destination-location",
         primaryResultKey: "uuid",
@@ -206,6 +223,16 @@ export function getLocationComponents(emlo) {
             collectionName: "work",
           },
         ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "letters-ment-heading",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "nested",
+        sectionTitle: "Letters Mentioning",
+        sectionTitleImage: "/static/img/icon-quill.png",
         divider: true,
       }),
     }),
@@ -219,8 +246,6 @@ export function getLocationComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",
         sectionTitle: "Letters Mentioning",
-        sectionTitleImage: "/static/img/icon-quill.png",
-        primaryField: "dcterms_isReferencedBy-work",
         field: "dcterms_references-location",
         primaryResultKey: "uuid",
         fields: [
@@ -232,7 +257,6 @@ export function getLocationComponents(emlo) {
             collectionName: "work",
           },
         ],
-        divider: true,
       }),
     }),
 

@@ -3128,7 +3128,15 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const statsHtml = this.fields
       .filter((field) => field.name !== "graph") // Exclude graph fields
       .map((field) => {
-        const value = this.component.results[0][field.key] || 0;
+        // Determine the value: if it's an array, use its length; if it's a number, use it directly; otherwise, use 0
+        let value = this.component.results[0][field.key];
+
+        if (Array.isArray(value)) {
+          value = value.length; // Use the length if it's an array
+        } else if (typeof value !== "number") {
+          value = 0; // If it's neither a number nor an array, set it to 0
+        }
+
         const escapedValue = edges.util.escapeHtml(value);
         const isClickable = value > 0;
 

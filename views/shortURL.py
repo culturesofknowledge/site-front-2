@@ -10,6 +10,7 @@ CORE_MAP = {
     "w": "works",     # Work Core
     "r": "institutions",  # Institution Core
     "l": "locations",  # Location Core
+    "i" : "images"
 }
 
 # Solr query patterns for each type
@@ -18,6 +19,7 @@ QUERY_MAP = {
     "w": lambda id: f"dcterms_identifier-editi_:editi_{id}",  # Work query pattern (can change based on actual query structure)
     "r": lambda id: f"dcterms_identifier-edit_:edit_cofk_union_institution-{id}",  # Institution query pattern (adjust as needed)
     "l": lambda id: f"dcterms_identifier-edit_:edit_cofk_union_location-{id}",  # Location query pattern (adjust as needed)
+    "i" : lambda id : f"dcterms_identifier-edit_:edit_cofk_union_image-{id}",
 }
 
 # Function to query Solr based on type and ID
@@ -42,6 +44,7 @@ REDIRECT_COLLECTION_MAP = {
     "w": "work",     # Work profile
     "r": "institution",  # Institution profile
     "l": "location",  # Location profile
+    "i" : "image"
 }
 
 @shortURL_bp.route('/<type>/<id>', methods=['GET'])

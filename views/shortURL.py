@@ -17,7 +17,7 @@ QUERY_MAP = {
     "p": lambda id: f"dcterms_identifier-editi_:editi_{id}",  # Person query pattern
     "w": lambda id: f"dcterms_identifier-editi_:editi_{id}",  # Work query pattern (can change based on actual query structure)
     "r": lambda id: f"dcterms_identifier-editi_:editi_{id}",  # Institution query pattern (adjust as needed)
-    "l": lambda id: f"dcterms_identifier-editi_:editi_{id}",  # Location query pattern (adjust as needed)
+    "l": lambda id: f"dcterms_identifier-edit_:edit_cofk_union_location-{id}",  # Location query pattern (adjust as needed)
 }
 
 # Function to query Solr based on type and ID
@@ -37,11 +37,11 @@ def query_solr(core, solr_query):
     return response.json() if response.status_code == 200 else None
 
 # URL mappings for redirection
-REDIRECT_MAP = {
-    "p": "profile.profile",  # Person profile
-    "w": "profile_work",     # Work profile
-    "r": "profile_institution",  # Institution profile
-    "l": "profile_location",  # Location profile
+REDIRECT_COLLECTION_MAP = {
+    "p": "person",  # Person profile
+    "w": "work",     # Work profile
+    "r": "",  # Institution profile
+    "l": "location",  # Location profile
 }
 
 @shortURL_bp.route('/<type>/<id>', methods=['GET'])
@@ -67,9 +67,9 @@ def redirect_function(type, id, core):
 
     uuid = solr_data['response']['docs'][0]['uuid']
 
-    # Redirect to the appropriate profile URL based on type
-    profile_url = REDIRECT_MAP.get(type)
-    if profile_url:
-        return redirect(url_for(profile_url, uuid=uuid), code=301)
+    collection = REDIRECT_COLLECTION_MAP.get(type)
+    
+    if collection:
+        return redirect(url_for("profile.profile", collection=collection, id=uuid), code=301)
     else:
         return f"Profile for type '{type}' not found", 404

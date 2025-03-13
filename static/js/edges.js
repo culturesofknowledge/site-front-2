@@ -2356,125 +2356,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     this.namespace = "edges-custom-display";
   }
 
-  // draw() {
-  //   let frag = "";
-
-  //   if (this.component.loading) {
-  //     frag = "<div class='loading-message'>Loading...</div>"; // Show loading message
-  //   } else if (this.component.errorMessage) {
-  //     frag = `<div class='error-message'>${this.component.errorMessage}</div>`; // Show error message
-  //   } else if (this.component.results && this.component.results.length > 0) {
-  //     switch (this.type) {
-  //       case "heading":
-  //         frag = this._pageHeading();
-  //         break;
-  //       case "side-title":
-  //         frag = this._sideTitle();
-  //         break;
-  //       case "links":
-  //         frag = this._renderLinks();
-  //         break;
-  //       case "nested":
-  //         frag = this._renderNestedTable();
-  //         break;
-  //       case "nested-label":
-  //         frag = this._renderNestedLabel();
-  //         break;
-  //       case "nested-list":
-  //         frag = this._renderNestedList();
-  //         break;
-  //       case "table":
-  //         frag = this._renderTable();
-  //         break;
-  //       case "bar":
-  //         frag = this._renderBarGraph();
-  //         break;
-  //       case "label":
-  //         frag = this._renderLabelValue();
-  //         break;
-  //       case "content":
-  //         frag = this._renderContent();
-  //         break;
-  //       case "dates":
-  //         frag = this._renderDates();
-  //         break;
-  //       case "date-people":
-  //         frag = this._renderDatesForPeople();
-  //         break;
-  //       case "stats":
-  //         frag = this._renderStats();
-  //         break;
-  //       case "text":
-  //         frag = this._renderText();
-  //         break;
-  //       case "plain-text":
-  //         frag = this._renderPlainText();
-  //         break;
-  //       case "location":
-  //         frag = this._renderLocation();
-  //         break;
-  //       case "side-nested-links":
-  //         frag = this._sidebarNestedLinks();
-  //         break;
-  //       case "images":
-  //         frag = this._renderImages();
-  //         break;
-  //       case "img":
-  //         frag = this._renderImage();
-  //         break;
-  //       case "dummy-message":
-  //         frag = this._renderDummyText();
-  //         break;
-  //       case "repo-version":
-  //         frag = this._renderRepoVersion();
-  //         break;
-  //       default:
-  //         frag = "<div></div>";
-  //     }
-  //   }
-
-  //   const sectionTitleFrag = this._renderSectionTitle();
-  //   const dividerFrag = this.divider ? ' <hr class="yellow-divider" />' : "";
-
-  //   const containerClasses = edges.util.styleClasses(
-  //     this.namespace,
-  //     "container",
-  //     this.component.id
-  //   );
-
-  //   let container = "";
-
-  //   if (frag) {
-  //     container = `<div class="${containerClasses}">
-  //       ${dividerFrag}
-  //       ${sectionTitleFrag}
-  //       ${frag}
-  //     </div>`;
-  //   }
-
-  //   this.component.context.html(container);
-  // }
-
   draw() {
-    // 1. Render the static elements first (immediate rendering)
-    let sectionTitleFrag = this._renderSectionTitle();
-    const dividerFrag = this.divider ? ' <hr class="yellow-divider" />' : "";
-    const containerClasses = edges.util.styleClasses(
-      this.namespace,
-      "container",
-      this.component.id
-    );
-
-    let container = `<div class="${containerClasses}">
-        ${dividerFrag}  
-        ${sectionTitleFrag}
-    </div>`;
-
-    // 2. Immediately render the basic structure (without dynamic `frag` content)
-    this.component.context.html(container);
-
-    // 3. Now process the dynamic `frag`
     let frag = "";
+
     if (this.component.loading) {
       frag = "<div class='loading-message'>Loading...</div>"; // Show loading message
     } else if (this.component.errorMessage) {
@@ -2549,14 +2433,130 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       }
     }
 
-    // 4. Once `frag` is ready, update the container with it
+    const sectionTitleFrag = this._renderSectionTitle();
+    const dividerFrag = this.divider ? ' <hr class="yellow-divider" />' : "";
+
+    const containerClasses = edges.util.styleClasses(
+      this.namespace,
+      "container",
+      this.component.id
+    );
+
+    let container = "";
+
     if (frag) {
-      // Append the `frag` to the container content
-      container += frag;
-      // Update the component context with the new content
-      this.component.context.html(container);
+      container = `<div class="${containerClasses}">
+        ${dividerFrag}
+        ${sectionTitleFrag}
+        ${frag}
+      </div>`;
     }
+
+    this.component.context.html(container);
   }
+
+  // draw() {
+  //   // 1. Render the static elements first (immediate rendering)
+  //   let sectionTitleFrag = this._renderSectionTitle();
+  //   const dividerFrag = this.divider ? ' <hr class="yellow-divider" />' : "";
+  //   const containerClasses = edges.util.styleClasses(
+  //     this.namespace,
+  //     "container",
+  //     this.component.id
+  //   );
+
+  //   let container = `<div class="${containerClasses}">
+  //       ${dividerFrag}
+  //       ${sectionTitleFrag}
+  //   </div>`;
+
+  //   // 2. Immediately render the basic structure (without dynamic `frag` content)
+  //   this.component.context.html(container);
+
+  //   // 3. Now process the dynamic `frag`
+  //   let frag = "";
+  //   if (this.component.loading) {
+  //     frag = "<div class='loading-message'>Loading...</div>"; // Show loading message
+  //   } else if (this.component.errorMessage) {
+  //     frag = `<div class='error-message'>${this.component.errorMessage}</div>`; // Show error message
+  //   } else if (this.component.results && this.component.results.length > 0) {
+  //     switch (this.type) {
+  //       case "heading":
+  //         frag = this._pageHeading();
+  //         break;
+  //       case "side-title":
+  //         frag = this._sideTitle();
+  //         break;
+  //       case "links":
+  //         frag = this._renderLinks();
+  //         break;
+  //       case "nested":
+  //         frag = this._renderNestedTable();
+  //         break;
+  //       case "nested-label":
+  //         frag = this._renderNestedLabel();
+  //         break;
+  //       case "nested-list":
+  //         frag = this._renderNestedList();
+  //         break;
+  //       case "table":
+  //         frag = this._renderTable();
+  //         break;
+  //       case "bar":
+  //         frag = this._renderBarGraph();
+  //         break;
+  //       case "label":
+  //         frag = this._renderLabelValue();
+  //         break;
+  //       case "content":
+  //         frag = this._renderContent();
+  //         break;
+  //       case "dates":
+  //         frag = this._renderDates();
+  //         break;
+  //       case "date-people":
+  //         frag = this._renderDatesForPeople();
+  //         break;
+  //       case "stats":
+  //         frag = this._renderStats();
+  //         break;
+  //       case "text":
+  //         frag = this._renderText();
+  //         break;
+  //       case "plain-text":
+  //         frag = this._renderPlainText();
+  //         break;
+  //       case "location":
+  //         frag = this._renderLocation();
+  //         break;
+  //       case "side-nested-links":
+  //         frag = this._sidebarNestedLinks();
+  //         break;
+  //       case "images":
+  //         frag = this._renderImages();
+  //         break;
+  //       case "img":
+  //         frag = this._renderImage();
+  //         break;
+  //       case "dummy-message":
+  //         frag = this._renderDummyText();
+  //         break;
+  //       case "repo-version":
+  //         frag = this._renderRepoVersion();
+  //         break;
+  //       default:
+  //         frag = "<div></div>";
+  //     }
+  //   }
+
+  //   // 4. Once `frag` is ready, update the container with it
+  //   if (frag) {
+  //     // Append the `frag` to the container content
+  //     container += frag;
+  //     // Update the component context with the new content
+  //     this.component.context.html(container);
+  //   }
+  // }
 
   _renderSectionTitle() {
     if (

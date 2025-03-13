@@ -246,6 +246,7 @@ export function getLocationComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",
         field: "dcterms_references-location",
+        primaryField: "dcterms_isReferencedBy-work",
         primaryResultKey: "uuid",
         fields: [
           { title: "", key: "ox_started-ox_year" },

@@ -16,7 +16,7 @@ CORE_MAP = {
 QUERY_MAP = {
     "p": lambda id: f"dcterms_identifier-editi_:editi_{id}",  # Person query pattern
     "w": lambda id: f"dcterms_identifier-editi_:editi_{id}",  # Work query pattern (can change based on actual query structure)
-    "r": lambda id: f"dcterms_identifier-editi_:editi_{id}",  # Institution query pattern (adjust as needed)
+    "r": lambda id: f"dcterms_identifier-edit_:edit_cofk_union_institution-{id}",  # Institution query pattern (adjust as needed)
     "l": lambda id: f"dcterms_identifier-edit_:edit_cofk_union_location-{id}",  # Location query pattern (adjust as needed)
 }
 
@@ -40,7 +40,7 @@ def query_solr(core, solr_query):
 REDIRECT_COLLECTION_MAP = {
     "p": "person",  # Person profile
     "w": "work",     # Work profile
-    "r": "",  # Institution profile
+    "r": "institution",  # Institution profile
     "l": "location",  # Location profile
 }
 
@@ -68,7 +68,7 @@ def redirect_function(type, id, core):
     uuid = solr_data['response']['docs'][0]['uuid']
 
     collection = REDIRECT_COLLECTION_MAP.get(type)
-    
+
     if collection:
         return redirect(url_for("profile.profile", collection=collection, id=uuid), code=301)
     else:

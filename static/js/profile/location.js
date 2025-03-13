@@ -245,7 +245,6 @@ export function getLocationComponents(emlo) {
       primaryField: "dcterms_isReferencedBy-work",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",
-        sectionTitle: "Letters Mentioning",
         field: "dcterms_references-location",
         primaryResultKey: "uuid",
         fields: [

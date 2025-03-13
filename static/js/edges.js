@@ -2211,7 +2211,7 @@ emlo.MultiFields = class extends edges.Component {
         console.debug("running optimized code for:", this.primaryField);
 
         const uuidArray = [];
-        let collectionName = "";
+        let collectionName = "work";
         for (const result of results) {
           const fieldData = result[this.primaryField];
           if (fieldData && Array.isArray(fieldData)) {

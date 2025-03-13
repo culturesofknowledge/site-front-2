@@ -8,6 +8,16 @@ shortURL_bp = Blueprint("shortURL", __name__)
 CORE_MAP = {
     "p": "people",  # Person Core
     "w": "works",     # Work Core
+    "r": "institutions",  # Institution Core
+    "l": "locations",  # Location Core
+}
+
+# Solr query patterns for each type
+QUERY_MAP = {
+    "p": lambda id: f"dcterms_identifier-editi_:editi_{id}",  # Person query pattern
+    "w": lambda id: f"dcterms_identifier-editi_:editi_{id}",  # Work query pattern (can change based on actual query structure)
+    "r": lambda id: f"dcterms_identifier-editi_:editi_{id}",  # Institution query pattern (adjust as needed)
+    "l": lambda id: f"dcterms_identifier-editi_:editi_{id}",  # Location query pattern (adjust as needed)
 }
 
 # Function to query Solr based on type and ID
@@ -26,33 +36,40 @@ def query_solr(core, solr_query):
     print(f"solr_url {solr_url}")
     return response.json() if response.status_code == 200 else None
 
+# URL mappings for redirection
+REDIRECT_MAP = {
+    "p": "profile.profile",  # Person profile
+    "w": "profile_work",     # Work profile
+    "r": "profile_institution",  # Institution profile
+    "l": "profile_location",  # Location profile
+}
+
 @shortURL_bp.route('/<type>/<id>', methods=['GET'])
 def index(type, id):
     # Check if the type exists in the core map
-    if type in CORE_MAP:
-        core = CORE_MAP[type]  # Get the core name based on type
-        return redirect_function(type, id, core)
-    else:
+    if type not in CORE_MAP:
         return "Invalid type", 400
     
+    core = CORE_MAP[type]  # Get the core name based on type
+    return redirect_function(type, id, core)
+
 # Modular redirect functions for each type
 def redirect_function(type, id, core):
-    solr_query = f"dcterms_identifier-editi_:editi_{id}"
+    # Generate the query based on the type
+    if type not in QUERY_MAP:
+        return "Invalid query pattern", 400
+    solr_query = QUERY_MAP[type](id)
+    
     solr_data = query_solr(core, solr_query)
 
-    if solr_data is None:
-        abort(404) 
-
-    if solr_data and solr_data['response']['numFound'] > 0:
-        uuid = solr_data['response']['docs'][0]['uuid']
-        # Redirect to the appropriate profile URL based on type
-        if type == "p":
-            return redirect(url_for('profile.profile',  collection="person", id=uuid), code=301)
-        elif type == "w":
-            return redirect(url_for('profile_work', uuid=uuid), code=301)
-        elif type == "r":
-            return redirect(url_for('profile_institution', uuid=uuid), code=301)
-        elif type == "l":
-            return redirect(url_for('profile_location', uuid=uuid), code=301)
-    else:
+    if solr_data is None or solr_data['response']['numFound'] == 0:
         return f"{type.capitalize()} not found", 404
+
+    uuid = solr_data['response']['docs'][0]['uuid']
+
+    # Redirect to the appropriate profile URL based on type
+    profile_url = REDIRECT_MAP.get(type)
+    if profile_url:
+        return redirect(url_for(profile_url, uuid=uuid), code=301)
+    else:
+        return f"Profile for type '{type}' not found", 404

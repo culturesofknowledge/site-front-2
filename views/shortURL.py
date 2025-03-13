@@ -50,7 +50,7 @@ def redirect_function(type, id, core):
         # Redirect to the appropriate profile URL based on type
         if type == "p":
             print(f"redirecting")
-            return redirect(url_for('profile.profile',  collection="people", id=uuid), code=301)
+            return redirect(url_for('profile.profile',  collection="person", id=uuid), code=301)
         elif type == "w":
             return redirect(url_for('profile_work', uuid=uuid), code=301)
         elif type == "r":

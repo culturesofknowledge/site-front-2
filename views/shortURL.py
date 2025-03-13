@@ -23,7 +23,7 @@ def query_solr(core, solr_query):
     
     # Make Solr request
     response = requests.get(solr_url, params=params)
-
+    print(f"solr_url {solr_url}")
     return response.json() if response.status_code == 200 else None
 
 @shortURL_bp.route('/<type>/<id>', methods=['GET'])
@@ -43,13 +43,10 @@ def redirect_function(type, id, core):
     if solr_data is None:
         abort(404) 
 
-    print(f"{type}")
-
     if solr_data and solr_data['response']['numFound'] > 0:
         uuid = solr_data['response']['docs'][0]['uuid']
         # Redirect to the appropriate profile URL based on type
         if type == "p":
-            print(f"redirecting")
             return redirect(url_for('profile.profile',  collection="person", id=uuid), code=301)
         elif type == "w":
             return redirect(url_for('profile_work', uuid=uuid), code=301)

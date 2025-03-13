@@ -12,7 +12,8 @@ CORE_MAP = {
     "l": "locations",  # Location Core
     "i" : "images",
     "c" : "comments",
-    "re" : "resources"
+    "re" : "resources", 
+    "m" : "manifestations"
 }
 
 # Solr query patterns for each type
@@ -23,7 +24,8 @@ QUERY_MAP = {
     "l": lambda id: f"dcterms_identifier-edit_:edit_cofk_union_location-{id}",  # Location query pattern (adjust as needed)
     "i" : lambda id : f"dcterms_identifier-edit_:edit_cofk_union_image-{id}",
     "c" : lambda id : f"dcterms_identifier-edit_:edit_cofk_union_comment-{id}",
-    "re" : lambda id : f"dcterms_identifier-edit_:edit_cofk_union_resource-{id}"
+    "re" : lambda id : f"dcterms_identifier-edit_:edit_cofk_union_resource-{id}",
+    "m": lambda id: f'dcterms_identifier-edit_:\"edit_cofk_union_manifestation-cofk_edit_interface-iwork_id:{id}\"'
 }
 
 # Function to query Solr based on type and ID
@@ -50,7 +52,8 @@ REDIRECT_COLLECTION_MAP = {
     "l": "location",  # Location profile
     "i" : "image",
     "c" : "comment",
-    "re" : "resource"
+    "re" : "resource",
+    "m" : "manifestation"
 }
 
 @shortURL_bp.route('/<type>/<id>', methods=['GET'])
@@ -59,6 +62,13 @@ def index(type, id):
     if type not in CORE_MAP:
         return "Invalid type", 400
     
+    # Special case for type 'm'
+    if type == 'm' and 2 <= len(id) <= 10:
+        # Append leading zeros to make id length 10
+        id = id.zfill(10)
+
+    print(f"Got ID as {id}")
+
     core = CORE_MAP[type]  # Get the core name based on type
     return redirect_function(type, id, core)
 

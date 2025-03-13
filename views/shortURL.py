@@ -11,7 +11,8 @@ CORE_MAP = {
     "r": "institutions",  # Institution Core
     "l": "locations",  # Location Core
     "i" : "images",
-    "c" : "comments"
+    "c" : "comments",
+    "re" : "resources"
 }
 
 # Solr query patterns for each type
@@ -21,7 +22,8 @@ QUERY_MAP = {
     "r": lambda id: f"dcterms_identifier-edit_:edit_cofk_union_institution-{id}",  # Institution query pattern (adjust as needed)
     "l": lambda id: f"dcterms_identifier-edit_:edit_cofk_union_location-{id}",  # Location query pattern (adjust as needed)
     "i" : lambda id : f"dcterms_identifier-edit_:edit_cofk_union_image-{id}",
-    "c" : lambda id : f"dcterms_identifier-edit_:edit_cofk_union_comment-{id}"
+    "c" : lambda id : f"dcterms_identifier-edit_:edit_cofk_union_comment-{id}",
+    "re" : lambda id : f"dcterms_identifier-edit_:edit_cofk_union_resource-{id}"
 }
 
 # Function to query Solr based on type and ID
@@ -47,7 +49,8 @@ REDIRECT_COLLECTION_MAP = {
     "r": "institution",  # Institution profile
     "l": "location",  # Location profile
     "i" : "image",
-    "c" : "comment"
+    "c" : "comment",
+    "re" : "resource"
 }
 
 @shortURL_bp.route('/<type>/<id>', methods=['GET'])

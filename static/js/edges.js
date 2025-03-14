@@ -196,7 +196,7 @@ emlo.ProfileTemplate = class extends edges.Template {
             <div>
               <img src="../../static/img/icon-short-url.png" alt="short-url" />
               Short URL:
-              <span id="shor-url-link">
+              <span id="short-url-link">
               </span>
             </div>
 
@@ -2372,6 +2372,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         case "side-title":
           frag = this._sideTitle();
           break;
+        case "shortUrl":
+          this._renderShortUrl();
+          break;
         case "links":
           frag = this._renderLinks();
           break;
@@ -3912,8 +3915,8 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
     const currentDomain = window.location.host;
     const result = this.component.results[0];
-    const editIdValue = this._getRecordID(this.footerType, result);
-    const shortURL = this._generateShortURL(
+    const editIdValue = GetRecordID(this.footerType, result);
+    const shortURL = GenerateShortURL(
       editIdValue,
       this.footerType,
       currentDomain
@@ -3992,6 +3995,28 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     return `${htmlContent}`;
   }
 
+  _renderShortUrl() {
+    if (this.footerType == "") {
+      return "";
+    }
+
+    const currentDomain = window.location.host;
+    const result = this.component.results[0];
+    const editIdValue = GetRecordID(this.footerType, result);
+
+    const shortURL = GenerateShortURL(
+      editIdValue,
+      this.footerType,
+      currentDomain
+    );
+
+    const doc = document.getElementById("short-url-link");
+
+    if (doc) {
+      doc.innerHTML = `<a href=${shortURL}> ${shortURL} </a>`;
+    }
+  }
+
   _getKey(type) {
     switch (type) {
       case "p":
@@ -4007,56 +4032,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     }
   }
 
-  _getRecordID(type, result) {
-    const QUERY_MAP = {
-      p: { field: "dcterms_identifier-editi_", splitValue: "editi_" }, // Person query pattern
-      w: { field: "dcterms_identifier-editi_", splitValue: "editi_" }, // Work query pattern
-      r: {
-        field: "dcterms_identifier-edit_",
-        splitValue: "edit_cofk_union_institution-",
-      }, // Institution query pattern
-      l: {
-        field: "dcterms_identifier-edit_",
-        splitValue: "edit_cofk_union_location-",
-      }, // Location query pattern
-      i: {
-        field: "dcterms_identifier-edit_",
-        splitValue: "edit_cofk_union_image-",
-      }, // Image query pattern
-      c: {
-        field: "dcterms_identifier-edit_",
-        splitValue: "edit_cofk_union_comment-",
-      }, // Comment query pattern
-      re: {
-        field: "dcterms_identifier-edit_",
-        splitValue: "edit_cofk_union_resource-",
-      }, // Resource query pattern
-      m: {
-        field: "dcterms_identifier-edit_:",
-        splitValue:
-          "edit_cofk_union_manifestation-cofk_edit_interface-iwork_id:",
-      }, // Manifestation query pattern
-    };
-
-    const queryConfig = QUERY_MAP[type];
-    if (queryConfig) {
-      // Retrieve the value from the result object for the given field
-      const fieldValue = result[queryConfig.field];
-      if (fieldValue) {
-        // Split the value using the delimiter (e.g., "editi_") and get the last part
-        const splitValue = fieldValue.split(queryConfig.splitValue).pop();
-        // Return the query by combining the split value and the id
-        return `${splitValue}`;
-      } else {
-        throw new Error(
-          `Field ${queryConfig.field} not found in result object`
-        );
-      }
-    } else {
-      throw new Error(`Unknown query type: ${type}`);
-    }
-  }
-
   _generateURL(result, type, currentDomain) {
     const map = {
       p: "person",
@@ -4069,18 +4044,8 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       c: "comment",
     };
 
-    console.log("domain", currentDomain);
-
     if (map.hasOwnProperty(type)) {
       return `${currentDomain}/${result["uuid"]}`;
-    } else {
-      return "";
-    }
-  }
-
-  _generateShortURL(id, type, currentDomain) {
-    if (id) {
-      return `${currentDomain}/${type}/${id}`;
     } else {
       return "";
     }
@@ -5778,6 +5743,61 @@ emlo.CheckboxRenderer = class extends edges.Renderer {
     window.history.replaceState({}, "", url);
   }
 };
+
+function GetRecordID(type, result) {
+  const QUERY_MAP = {
+    p: { field: "dcterms_identifier-editi_", splitValue: "editi_" }, // Person query pattern
+    w: { field: "dcterms_identifier-editi_", splitValue: "editi_" }, // Work query pattern
+    r: {
+      field: "dcterms_identifier-edit_",
+      splitValue: "edit_cofk_union_institution-",
+    }, // Institution query pattern
+    l: {
+      field: "dcterms_identifier-edit_",
+      splitValue: "edit_cofk_union_location-",
+    }, // Location query pattern
+    i: {
+      field: "dcterms_identifier-edit_",
+      splitValue: "edit_cofk_union_image-",
+    }, // Image query pattern
+    c: {
+      field: "dcterms_identifier-edit_",
+      splitValue: "edit_cofk_union_comment-",
+    }, // Comment query pattern
+    re: {
+      field: "dcterms_identifier-edit_",
+      splitValue: "edit_cofk_union_resource-",
+    }, // Resource query pattern
+    m: {
+      field: "dcterms_identifier-edit_:",
+      splitValue: "edit_cofk_union_manifestation-cofk_edit_interface-iwork_id:",
+    }, // Manifestation query pattern
+  };
+
+  const queryConfig = QUERY_MAP[type];
+  if (queryConfig) {
+    // Retrieve the value from the result object for the given field
+    const fieldValue = result[queryConfig.field];
+    if (fieldValue) {
+      // Split the value using the delimiter (e.g., "editi_") and get the last part
+      const splitValue = fieldValue.split(queryConfig.splitValue).pop();
+      // Return the query by combining the split value and the id
+      return `${splitValue}`;
+    } else {
+      throw new Error(`Field ${queryConfig.field} not found in result object`);
+    }
+  } else {
+    throw new Error(`Unknown query type: ${type}`);
+  }
+}
+
+function GenerateShortURL(id, type, currentDomain) {
+  if (id) {
+    return `${currentDomain}/${type}/${id}`;
+  } else {
+    return "";
+  }
+}
 
 function _addUrlParam(field, term) {
   let url_param_field = field;

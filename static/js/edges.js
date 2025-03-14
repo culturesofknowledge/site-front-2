@@ -3174,226 +3174,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       `;
   }
 
-  // _renderNestedTable() {
-  //   const parentField = this.primaryField;
-  //   const field = this.field;
-  //   const subFields = this.fields;
-
-  //   // Validate required fields
-  //   if (!parentField || (!field && !(subFields && subFields.length > 0))) {
-  //     return "";
-  //   }
-
-  //   // Flatten all parentObjects for row count
-  //   const allParentObjects = this.component.results.flatMap(
-  //     (result) => result[parentField] || []
-  //   );
-
-  //   // Check if total parentObject count exceeds 30
-  //   if (allParentObjects.length > 30) {
-  //     // Summarized format for large datasets
-  //     let queryVal = "";
-  //     let queryKey = this.field;
-
-  //     const decadeSummary = allParentObjects.reduce((acc, parentObject) => {
-  //       if (!parentObject) return acc;
-
-  //       const year =
-  //         parentObject["ox_started-ox_year"] ||
-  //         parentObject["ox_completed-ox_year"];
-
-  //       if (this.primaryResultKey) {
-  //         queryVal = this.component.results[0][this.primaryResultKey];
-  //       } else {
-  //         queryVal = parentObject["author_sort"];
-  //       }
-
-  //       if (year) {
-  //         const decade = Math.floor(year / 10) * 10; // Calculate decade
-
-  //         if (!acc[decade]) acc[decade] = {};
-  //         acc[decade][year] = (acc[decade][year] || 0) + 1;
-  //       } else {
-  //         if (!acc["????"]) acc["????"] = {};
-  //         acc["????"]["Unknown year"] = (acc["????"]["Unknown year"] || 0) + 1;
-  //       }
-
-  //       return acc;
-  //     }, {});
-
-  //     // Generate summarized table rows
-  //     const rows = Object.entries(decadeSummary)
-  //       .map(([decade, years]) => {
-  //         const yearCounts = Object.entries(years)
-  //           .map(
-  //             ([year, count]) =>
-  //               `<a href="/forms/advance?${queryKey}=${queryVal}&dat_sin_year=${year}"> ${year}: ${count} </a>`
-  //           )
-  //           .join(" ♦ ");
-  //         return `
-  //         <tr>
-  //           <td>
-  //             ${decade === "????" ? `????` : `${decade}s`}
-  //           </td>
-  //           <td> ${yearCounts} </td>
-  //         </tr>`;
-  //       })
-  //       .join("");
-
-  //     return `
-  //       <table class="nested-table">
-  //         <thead>
-  //           <tr>
-  //             <th>
-  //               Decade
-  //             </th>
-  //             <th>
-  //               Letters per year
-  //             </th>
-  //           </tr>
-  //         </thead>
-  //         <tbody>
-  //           ${rows}
-  //         </tbody>
-  //       </table>
-  //     `;
-  //   }
-
-  //   // Current format for datasets with parentObject count <= 30
-  //   const rows = this.component.results
-  //     .map((result) => {
-  //       let parentObjects = result[parentField];
-  //       if (!parentObjects || parentObjects.length === 0) return "";
-
-  //       parentObjects.sort((a, b) => {
-  //         const startA = a["ox_started-ox_year"] ?? a["0x_completed-ox_year"];
-  //         const startB = b["ox_started-ox_year"] ?? b["0x_completed-ox_year"];
-
-  //         // If both values are undefined, consider them equal
-  //         if (startA === undefined && startB === undefined) return 0;
-
-  //         // If one value is undefined, treat it as larger (to push it to the end)
-  //         if (startA === undefined) return 1;
-  //         if (startB === undefined) return -1;
-
-  //         // Otherwise, compare the values normally
-  //         return startA - startB;
-  //       });
-
-  //       let lastfieldKey = 0;
-
-  //       // return parentObjects
-  //       //   .map((parentObject) => {
-  //       //     if (!parentObject) return "";
-
-  //       //     const cells = [];
-  //       //     // if (field) {
-  //       //     //   const value = parentObject[field];
-  //       //     //   cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
-  //       //     // }
-  //       //     if (subFields) {
-  //       //       subFields.forEach((subField) => {
-  //       //         const value = parentObject[subField.key];
-  //       //         if (subField.clickable) {
-  //       //           cells.push(`
-  //       //             <td>
-  //       //               <a href="/profile/${subField.collectionName}/${
-  //       //             parentObject["uuid"]
-  //       //           }" class="clickable-row">${edges.util.escapeHtml(
-  //       //             value || ""
-  //       //           )}</a>
-  //       //             </td>
-  //       //           `);
-  //       //         } else {
-  //       //           if (
-  //       //             subField.key == "ox_started-ox_year" ||
-  //       //             subField.key == "ox_completed-ox_year"
-  //       //           ) {
-  //       //             if (lastfieldKey !== value) {
-  //       //               lastfieldKey = value;
-  //       //               cells.push(
-  //       //                 `<td>${edges.util.escapeHtml(value || "")}</td>`
-  //       //               );
-  //       //             } else {
-  //       //               cells.push(`<td></td>`);
-  //       //             }
-  //       //           }
-  //       //         }
-  //       //       });
-  //       //     }
-
-  //       //     return `<tr>${cells.join("")}</tr>`;
-  //       //   })
-  //       //   .join("");
-
-  //       return parentObjects
-  //         .map((parentObject) => {
-  //           if (!parentObject) return "";
-
-  //           const cells = [];
-  //           let rowStyle = ""; // Variable to hold the style for the row
-
-  //           if (subFields) {
-  //             subFields.forEach((subField) => {
-  //               const value = parentObject[subField.key];
-
-  //               if (subField.clickable) {
-  //                 cells.push(`
-  //           <td>
-  //             <a href="/profile/${subField.collectionName}/${
-  //                   parentObject["uuid"]
-  //                 }" class="clickable-row">${edges.util.escapeHtml(
-  //                   value || ""
-  //                 )}</a>
-  //           </td>
-  //         `);
-  //               } else {
-  //                 if (
-  //                   subField.key == "ox_started-ox_year" ||
-  //                   subField.key == "ox_completed-ox_year"
-  //                 ) {
-  //                   // Add dotted separation when current year is not the same as the last year
-  //                   if (lastfieldKey !== value) {
-  //                     lastfieldKey = value;
-  //                     // Use "????" if value is undefined
-  //                     cells.push(
-  //                       `<td>${edges.util.escapeHtml(
-  //                         value !== undefined ? value : "????"
-  //                       )}</td>`
-  //                     );
-  //                     rowStyle =
-  //                       "border-top: #999 dashed 1px; padding: 5px 0px 5px 10px;"; // Apply dotted separation on the top of the row
-  //                   } else {
-  //                     cells.push(`<td></td>`);
-  //                   }
-  //                 }
-  //               }
-  //             });
-  //           }
-  //           // Add row style if the condition is met
-  //           return `<tr style="${rowStyle}">${cells.join("")}</tr>`;
-  //         })
-  //         .join("");
-  //     })
-  //     .filter((row) => row)
-  //     .join("");
-
-  //   const table = `
-  //     <table class="nested-table" style="border-collapse: collapse;">
-  //       <tbody>
-  //         ${rows}
-  //       </tbody>
-  //     </table>
-  //   `;
-
-  //   return rows ? table : "";
-  // }
-
   _renderNestedTable() {
-    console.time(this.primaryField);
     const parentField = this.primaryField;
     const field = this.field;
     const subFields = this.fields;
+
     // Validate required fields
     if (!parentField || (!field && !(subFields && subFields.length > 0))) {
       return "";
@@ -3406,125 +3191,377 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
     // Check if total parentObject count exceeds 30
     if (allParentObjects.length > 30) {
-      console.timeEnd(this.primaryField);
-      return this.renderSummarizedTable(allParentObjects, field);
+      // Summarized format for large datasets
+      let queryVal = "";
+      let queryKey = this.field;
+
+      const decadeSummary = allParentObjects.reduce((acc, parentObject) => {
+        if (!parentObject) return acc;
+
+        const year =
+          parentObject["ox_started-ox_year"] ||
+          parentObject["ox_completed-ox_year"];
+
+        if (this.primaryResultKey) {
+          queryVal = this.component.results[0][this.primaryResultKey];
+        } else {
+          queryVal = parentObject["author_sort"];
+        }
+
+        if (year) {
+          const decade = Math.floor(year / 10) * 10; // Calculate decade
+
+          if (!acc[decade]) acc[decade] = {};
+          acc[decade][year] = (acc[decade][year] || 0) + 1;
+        } else {
+          if (!acc["????"]) acc["????"] = {};
+          acc["????"]["Unknown year"] = (acc["????"]["Unknown year"] || 0) + 1;
+        }
+
+        return acc;
+      }, {});
+
+      // Generate summarized table rows
+      const rows = Object.entries(decadeSummary)
+        .map(([decade, years]) => {
+          const yearCounts = Object.entries(years)
+            .map(
+              ([year, count]) =>
+                `<a href="/forms/advance?${queryKey}=${queryVal}&dat_sin_year=${year}"> ${year}: ${count} </a>`
+            )
+            .join(" ♦ ");
+          return `
+          <tr>
+            <td>
+              ${decade === "????" ? `????` : `${decade}s`}
+            </td>
+            <td> ${yearCounts} </td>
+          </tr>`;
+        })
+        .join("");
+
+      return `
+        <table class="nested-table">
+          <thead>
+            <tr>
+              <th>
+                Decade
+              </th>
+              <th>
+                Letters per year
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      `;
     }
 
     // Current format for datasets with parentObject count <= 30
-    return this.renderDetailedTable(allParentObjects, field, subFields);
-  }
+    const rows = this.component.results
+      .map((result) => {
+        let parentObjects = result[parentField];
+        if (!parentObjects || parentObjects.length === 0) return "";
 
-  renderSummarizedTable(allParentObjects, field) {
-    const decadeSummary = this.generateDecadeSummary(allParentObjects);
-    const rows = this.generateDecadeRows(decadeSummary, field);
+        parentObjects.sort((a, b) => {
+          const startA = a["ox_started-ox_year"] ?? a["0x_completed-ox_year"];
+          const startB = b["ox_started-ox_year"] ?? b["0x_completed-ox_year"];
 
-    return `
-      <table class="nested-table">
-        <thead>
-          <tr>
-            <th>Decade</th>
-            <th>Letters per year</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    `;
-  }
+          // If both values are undefined, consider them equal
+          if (startA === undefined && startB === undefined) return 0;
 
-  generateDecadeSummary(allParentObjects) {
-    return allParentObjects.reduce((acc, parentObject) => {
-      if (!parentObject) return acc;
+          // If one value is undefined, treat it as larger (to push it to the end)
+          if (startA === undefined) return 1;
+          if (startB === undefined) return -1;
 
-      const year =
-        parentObject["ox_started-ox_year"] ||
-        parentObject["ox_completed-ox_year"];
-      const queryVal = this.primaryResultKey
-        ? this.component.results[0][this.primaryResultKey]
-        : parentObject["author_sort"];
+          // Otherwise, compare the values normally
+          return startA - startB;
+        });
 
-      const decade = year ? Math.floor(year / 10) * 10 : "????";
-      if (!acc[decade]) acc[decade] = {};
-      acc[decade][year] = (acc[decade][year] || 0) + 1;
+        let lastfieldKey = 0;
 
-      return acc;
-    }, {});
-  }
+        // return parentObjects
+        //   .map((parentObject) => {
+        //     if (!parentObject) return "";
 
-  generateDecadeRows(decadeSummary, queryKey) {
-    return Object.entries(decadeSummary)
-      .map(([decade, years]) => {
-        const yearCounts = Object.entries(years)
-          .map(
-            ([year, count]) =>
-              `<a href="/forms/advance?${queryKey}=${
-                this.component.results[0][this.primaryResultKey]
-              }&dat_sin_year=${year}">${year}: ${count}</a>`
-          )
-          .join(" ♦ ");
+        //     const cells = [];
+        //     // if (field) {
+        //     //   const value = parentObject[field];
+        //     //   cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
+        //     // }
+        //     if (subFields) {
+        //       subFields.forEach((subField) => {
+        //         const value = parentObject[subField.key];
+        //         if (subField.clickable) {
+        //           cells.push(`
+        //             <td>
+        //               <a href="/profile/${subField.collectionName}/${
+        //             parentObject["uuid"]
+        //           }" class="clickable-row">${edges.util.escapeHtml(
+        //             value || ""
+        //           )}</a>
+        //             </td>
+        //           `);
+        //         } else {
+        //           if (
+        //             subField.key == "ox_started-ox_year" ||
+        //             subField.key == "ox_completed-ox_year"
+        //           ) {
+        //             if (lastfieldKey !== value) {
+        //               lastfieldKey = value;
+        //               cells.push(
+        //                 `<td>${edges.util.escapeHtml(value || "")}</td>`
+        //               );
+        //             } else {
+        //               cells.push(`<td></td>`);
+        //             }
+        //           }
+        //         }
+        //       });
+        //     }
 
-        return `
-          <tr>
-            <td>${decade === "????" ? "????" : `${decade}s`}</td>
-            <td>${yearCounts}</td>
-          </tr>
-        `;
-      })
-      .join("");
-  }
+        //     return `<tr>${cells.join("")}</tr>`;
+        //   })
+        //   .join("");
 
-  renderDetailedTable(allParentObjects, field, subFields) {
-    const rows = allParentObjects
-      .map((parentObject) => {
-        if (!parentObject) return "";
+        return parentObjects
+          .map((parentObject) => {
+            if (!parentObject) return "";
 
-        const cells = [];
-        let lastFieldKey = 0;
+            const cells = [];
+            let rowStyle = ""; // Variable to hold the style for the row
 
-        if (subFields) {
-          subFields.forEach((subField) => {
-            const value = parentObject[subField.key];
-            const rowStyle = this.getRowStyle(value, lastFieldKey);
+            if (subFields) {
+              subFields.forEach((subField) => {
+                const value = parentObject[subField.key];
 
-            if (subField.clickable) {
-              cells.push(`
-                <td>
-                  <a href="/profile/${subField.collectionName}/${
-                parentObject["uuid"]
-              }" class="clickable-row">
-                    ${edges.util.escapeHtml(value || "")}
-                  </a>
-                </td>
-              `);
-            } else {
-              cells.push(`
-                <td style="${rowStyle}">
-                  ${edges.util.escapeHtml(value !== undefined ? value : "????")}
-                </td>
-              `);
+                if (subField.clickable) {
+                  cells.push(`
+            <td>
+              <a href="/profile/${subField.collectionName}/${
+                    parentObject["uuid"]
+                  }" class="clickable-row">${edges.util.escapeHtml(
+                    value || ""
+                  )}</a>
+            </td>
+          `);
+                } else {
+                  if (
+                    subField.key == "ox_started-ox_year" ||
+                    subField.key == "ox_completed-ox_year"
+                  ) {
+                    // Add dotted separation when current year is not the same as the last year
+                    if (lastfieldKey !== value) {
+                      lastfieldKey = value;
+                      // Use "????" if value is undefined
+                      cells.push(
+                        `<td>${edges.util.escapeHtml(
+                          value !== undefined ? value : "????"
+                        )}</td>`
+                      );
+                      rowStyle =
+                        "border-top: #999 dashed 1px; padding: 5px 0px 5px 10px;"; // Apply dotted separation on the top of the row
+                    } else {
+                      cells.push(`<td></td>`);
+                    }
+                  }
+                }
+              });
             }
-          });
-        }
-
-        return `<tr>${cells.join("")}</tr>`;
+            // Add row style if the condition is met
+            return `<tr style="${rowStyle}">${cells.join("")}</tr>`;
+          })
+          .join("");
       })
       .filter((row) => row)
       .join("");
 
-    return rows
-      ? `<table class="nested-table" style="border-collapse: collapse;">
-          <tbody>${rows}</tbody>
-        </table>`
-      : "";
+    const table = `
+      <table class="nested-table" style="border-collapse: collapse;">
+        <tbody>
+          ${rows}
+        </tbody>
+      </table>
+    `;
+
+    return rows ? table : "";
   }
 
-  getRowStyle(value, lastFieldKey) {
-    if (value === lastFieldKey) {
-      return ""; // No special style
-    }
+  // _renderNestedTable() {
+  //   console.time(this.primaryField);
+  //   const parentField = this.primaryField;
+  //   const field = this.field;
+  //   const subFields = this.fields;
+  //   // Validate required fields
+  //   if (!parentField || (!field && !(subFields && subFields.length > 0))) {
+  //     return "";
+  //   }
 
-    lastFieldKey = value;
-    return "border-top: #999 dashed 1px; padding: 5px 0px 5px 10px;"; // Add dotted separation
-  }
+  //   // Flatten all parentObjects for row count
+  //   const allParentObjects = this.component.results.flatMap(
+  //     (result) => result[parentField] || []
+  //   );
+
+  //   // Check if total parentObject count exceeds 30
+  //   if (allParentObjects.length > 30) {
+  //     console.timeEnd(this.primaryField);
+  //     return this.renderSummarizedTable(allParentObjects, field);
+  //   }
+
+  //   // Current format for datasets with parentObject count <= 30
+  //   return this.renderDetailedTable(allParentObjects, field, subFields);
+  // }
+
+  // renderSummarizedTable(allParentObjects, field) {
+  //   const decadeSummary = this.generateDecadeSummary(allParentObjects);
+  //   const rows = this.generateDecadeRows(decadeSummary, field);
+
+  //   return `
+  //     <table class="nested-table">
+  //       <thead>
+  //         <tr>
+  //           <th>Decade</th>
+  //           <th>Letters per year</th>
+  //         </tr>
+  //       </thead>
+  //       <tbody>${rows}</tbody>
+  //     </table>
+  //   `;
+  // }
+
+  // generateDecadeSummary(allParentObjects) {
+  //   return allParentObjects.reduce((acc, parentObject) => {
+  //     if (!parentObject) return acc;
+
+  //     const year =
+  //       parentObject["ox_started-ox_year"] ||
+  //       parentObject["ox_completed-ox_year"];
+  //     const queryVal = this.primaryResultKey
+  //       ? this.component.results[0][this.primaryResultKey]
+  //       : parentObject["author_sort"];
+
+  //     const decade = year ? Math.floor(year / 10) * 10 : "????";
+  //     if (!acc[decade]) acc[decade] = {};
+  //     acc[decade][year] = (acc[decade][year] || 0) + 1;
+
+  //     return acc;
+  //   }, {});
+  // }
+
+  // generateDecadeRows(decadeSummary, queryKey) {
+  //   return Object.entries(decadeSummary)
+  //     .map(([decade, years]) => {
+  //       const yearCounts = Object.entries(years)
+  //         .map(
+  //           ([year, count]) =>
+  //             `<a href="/forms/advance?${queryKey}=${
+  //               this.component.results[0][this.primaryResultKey]
+  //             }&dat_sin_year=${year}">${year}: ${count}</a>`
+  //         )
+  //         .join(" ♦ ");
+
+  //       return `
+  //         <tr>
+  //           <td>${decade === "????" ? "????" : `${decade}s`}</td>
+  //           <td>${yearCounts}</td>
+  //         </tr>
+  //       `;
+  //     })
+  //     .join("");
+  // }
+
+  // renderDetailedTable(allParentObjects, field, subFields) {
+  //   const rows = allParentObjects
+  //     .map((parentObject) => {
+  //       if (!parentObject) return "";
+
+  //       const cells = [];
+  //       let lastFieldKey = "";
+
+  //       // if (subFields) {
+  //       //   subFields.forEach((subField) => {
+  //       //     const value = parentObject[subField.key];
+  //       //     const rowStyle = this.getRowStyle(value, lastFieldKey);
+
+  //       //     if (subField.clickable) {
+  //       //       cells.push(`
+  //       //         <td>
+  //       //           <a href="/profile/${subField.collectionName}/${
+  //       //         parentObject["uuid"]
+  //       //       }" class="clickable-row">
+  //       //             ${edges.util.escapeHtml(value || "")}
+  //       //           </a>
+  //       //         </td>
+  //       //       `);
+  //       //     } else {
+  //       //       cells.push(`
+  //       //         <td style="${rowStyle}">
+  //       //           ${edges.util.escapeHtml(value !== undefined ? value : "????")}
+  //       //         </td>
+  //       //       `);
+  //       //     }
+  //       //   });
+  //       // }
+
+  //       if (subFields) {
+  //         subFields.forEach((subField) => {
+  //           const value = parentObject[subField.key];
+  //           const rowStyle = this.getRowStyle(value, lastFieldKey);
+
+  //           if (subField.clickable) {
+  //             cells.push(`
+  //                   <td>
+  //                     <a href="/profile/${subField.collectionName}/${
+  //               parentObject["uuid"]
+  //             }" class="clickable-row">${edges.util.escapeHtml(value || "")}</a>
+  //                   </td>
+  //                 `);
+  //           } else {
+  //             if (
+  //               subField.key == "ox_started-ox_year" ||
+  //               subField.key == "ox_completed-ox_year"
+  //             ) {
+  //               // Add dotted separation when current year is not the same as the last year
+  //               if (lastfieldKey !== value) {
+  //                 lastfieldKey = value;
+  //                 // Use "????" if value is undefined
+  //                 cells.push(
+  //                   `<td>${edges.util.escapeHtml(
+  //                     value !== undefined ? value : "????"
+  //                   )}</td>`
+  //                 );
+  //                 rowStyle =
+  //                   "border-top: #999 dashed 1px; padding: 5px 0px 5px 10px;"; // Apply dotted separation on the top of the row
+  //               } else {
+  //                 cells.push(`<td></td>`);
+  //               }
+  //             }
+  //           }
+  //         });
+  //       }
+
+  //       return `<tr>${cells.join("")}</tr>`;
+  //     })
+  //     .filter((row) => row)
+  //     .join("");
+
+  //   return rows
+  //     ? `<table class="nested-table" style="border-collapse: collapse;">
+  //         <tbody>${rows}</tbody>
+  //       </table>`
+  //     : "";
+  // }
+
+  // getRowStyle(value, lastFieldKey) {
+  //   if (value === lastFieldKey) {
+  //     return ""; // No special style
+  //   }
+
+  //   lastFieldKey = value;
+  //   return "border-top: #999 dashed 1px; padding: 5px 0px 5px 10px;"; // Add dotted separation
+  // }
 
   _renderNestedList() {
     const parentField = this.primaryField;

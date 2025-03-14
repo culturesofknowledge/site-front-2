@@ -11,6 +11,7 @@ from views.comment import comment_bp
 from views.errors import errors_bp
 from views.solr import solr_bp
 from views.shortURL import shortURL_bp
+from views.redirectUUID import redirect_uuid_bp
 from config import Config
 import os
 
@@ -30,6 +31,7 @@ def create_app():
     app.register_blueprint(errors_bp)
     app.register_blueprint(solr_bp)
     app.register_blueprint(shortURL_bp)
+    app.register_blueprint(redirect_uuid_bp)
 
     return app
 

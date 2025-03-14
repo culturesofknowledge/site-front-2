@@ -85,13 +85,13 @@ def fetchStatsNew():
                 solr_data = response.json()
 
                 # Debugging: print the query and the response to check for issues
-                print(f"Solr Query: {solr_query}")
-                print(f"Solr Response: {solr_data}")
+                # print(f"Solr Query: {solr_query}")
+                # print(f"Solr Response: {solr_data}")
                 
                 # Append the results from the current batch
                 all_results.extend(solr_data.get('response', {}).get('docs', []))  # Assuming 'docs' contains the results
                 # Debugging: Print how many results we fetched for this batch
-                print(f"Results for batch: {len(solr_data.get('response', {}).get('docs', []))}")
+                # print(f"Results for batch: {len(solr_data.get('response', {}).get('docs', []))}")
 
             except requests.RequestException as e:
                 return jsonify({'error': 'Error fetching data from Solr', 'details': str(e)}), 500

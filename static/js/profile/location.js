@@ -11,6 +11,15 @@ export function getLocationComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "enclosed-in-side",
+      category: "sidebar",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "shortUrl",
+        footerType: "l",
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "related-resources",
       category: "sidebar",
       fetchSecondaryData: true,
@@ -112,21 +121,21 @@ export function getLocationComponents(emlo) {
           {
             name: "text",
             title: " letters sent from",
-            key: "ox_totalWorksSentFromPlace",
+            key: "mail_originOf-work",
             redirectUrl: "/forms/advance?mail_origin-location=",
             redirectQueryName: "uuid",
           },
           {
             name: "text",
             title: " letters sent to ",
-            key: "ox_totalWorksSentToPlace",
+            key: "mail_destinationOf-work",
             redirectUrl: "/forms/advance?mail_destination-location=",
             redirectQueryName: "uuid",
           },
           {
             name: "text",
             title: " letters mentioning",
-            key: "ox_totalWorksMentioningPlace",
+            key: "dcterms_isReferencedBy-work",
             redirectUrl: "/forms/advance?dcterms_references-location=",
             redirectQueryName: "uuid",
           },
@@ -159,17 +168,6 @@ export function getLocationComponents(emlo) {
     }),
 
     new emlo.MultiFields({
-      id: "letters-sent-from-heading",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested",
-        sectionTitle: "Letters Sent From",
-        sectionTitleImage: "/static/img/icon-quill.png",
-        divider: true,
-      }),
-    }),
-
-    new emlo.MultiFields({
       id: "letters-sent-from",
       category: "results",
       fetchSecondaryData: true,
@@ -179,6 +177,8 @@ export function getLocationComponents(emlo) {
         type: "nested",
         primaryField: "mail_originOf-work",
         field: "mail_origin-location",
+        sectionTitle: "Letters Sent From",
+        sectionTitleImage: "/static/img/icon-quill.png",
         primaryResultKey: "uuid",
         fields: [
           { title: "", key: "ox_started-ox_year" },
@@ -189,16 +189,6 @@ export function getLocationComponents(emlo) {
             collectionName: "work",
           },
         ],
-      }),
-    }),
-
-    new emlo.MultiFields({
-      id: "letters-sent-to-heading",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested",
-        sectionTitle: "Letters Sent To",
-        sectionTitleImage: "/static/img/icon-quill.png",
         divider: true,
       }),
     }),
@@ -213,6 +203,8 @@ export function getLocationComponents(emlo) {
         type: "nested",
         primaryField: "mail_destinationOf-work",
         field: "mail_destination-location",
+        sectionTitle: "Letters Sent To",
+        sectionTitleImage: "/static/img/icon-quill.png",
         primaryResultKey: "uuid",
         fields: [
           { title: "", key: "ox_started-ox_year" },
@@ -223,16 +215,6 @@ export function getLocationComponents(emlo) {
             collectionName: "work",
           },
         ],
-      }),
-    }),
-
-    new emlo.MultiFields({
-      id: "letters-ment-heading",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested",
-        sectionTitle: "Letters Mentioning",
-        sectionTitleImage: "/static/img/icon-quill.png",
         divider: true,
       }),
     }),
@@ -245,6 +227,8 @@ export function getLocationComponents(emlo) {
       primaryField: "dcterms_isReferencedBy-work",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",
+        sectionTitle: "Letters Mentioning",
+        sectionTitleImage: "/static/img/icon-quill.png",
         field: "dcterms_references-location",
         primaryField: "dcterms_isReferencedBy-work",
         primaryResultKey: "uuid",
@@ -257,6 +241,7 @@ export function getLocationComponents(emlo) {
             collectionName: "work",
           },
         ],
+        divider: true,
       }),
     }),
 
@@ -284,6 +269,15 @@ export function getLocationComponents(emlo) {
             key: "bibo_Note",
           },
         ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "location-footer",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "footer",
+        footerType: "l",
       }),
     }),
   ];

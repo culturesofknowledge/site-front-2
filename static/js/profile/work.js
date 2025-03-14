@@ -20,6 +20,15 @@ export function getWorkComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "enclosed-in-side",
+      category: "sidebar",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "shortUrl",
+        footerType: "w",
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "related-resources",
       category: "sidebar",
       fetchSecondaryData: true,
@@ -618,6 +627,15 @@ export function getWorkComponents(emlo) {
             key: "bibo_Note",
           },
         ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "work-footer",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "footer",
+        footerType: "w",
       }),
     }),
   ];

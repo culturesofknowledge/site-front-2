@@ -17,8 +17,6 @@ export function getPeopleComponents(emlo) {
       category: "sidebar",
       renderer: new emlo.MultiFieldsRenderer({
         type: "shortUrl",
-        sectionTitle: "Shhort URL",
-        sectionTitleImage: "/static/img/icon-quill.png",
         footerType: "p",
       }),
     }),

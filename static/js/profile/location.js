@@ -11,6 +11,15 @@ export function getLocationComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "enclosed-in-side",
+      category: "sidebar",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "shortUrl",
+        footerType: "l",
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "related-resources",
       category: "sidebar",
       fetchSecondaryData: true,
@@ -260,6 +269,15 @@ export function getLocationComponents(emlo) {
             key: "bibo_Note",
           },
         ],
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "location-footer",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "footer",
+        footerType: "l",
       }),
     }),
   ];

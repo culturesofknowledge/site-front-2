@@ -10572,3 +10572,15 @@ button.tiny {
   margin-top: 10px;
   margin-left: 10px;
 }
+
+.change {
+  background-color: #e0e0e0;
+  padding: 5px;
+  text-align: center;
+  font-size: smaller;
+}
+
+.footer-links{
+  font-size: smaller;
+  list-style: none;
+}

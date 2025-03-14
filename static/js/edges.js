@@ -196,7 +196,7 @@ emlo.ProfileTemplate = class extends edges.Template {
             <div>
               <img src="../../static/img/icon-short-url.png" alt="short-url" />
               Short URL:
-              <span id="shor-url-link">
+              <span id="short-url-link">
               </span>
             </div>
 
@@ -255,8 +255,6 @@ emlo.HomeStatsTemplate = class extends edges.Template {
     for (let i = 0; i < statsComponents.length; i++) {
       stats += `<div id="${statsComponents[i].id}"></div>`;
     }
-
-    console.log;
 
     let frag = `
  
@@ -2226,7 +2224,7 @@ emlo.MultiFields = class extends edges.Component {
         console.debug("running optimized code for:", this.primaryField);
 
         const uuidArray = [];
-        let collectionName = "";
+        let collectionName = "work";
         for (const result of results) {
           const fieldData = result[this.primaryField];
           if (fieldData && Array.isArray(fieldData)) {
@@ -2262,7 +2260,6 @@ emlo.MultiFields = class extends edges.Component {
           }
 
           results[0][this.primaryField] = await response.json();
-          console.log("prim", results[0]);
         } catch (err) {
           console.error("got error while fetching details ", err);
         }
@@ -2369,12 +2366,135 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     this.long_field = edges.util.getParam(params, "long_field", "");
     this.divider = edges.util.getParam(params, "divider", false); // Whether to include a divider
     this.message = edges.util.getParam(params, "message", "");
+    this.footerType = edges.util.getParam(params, "footerType", "");
     this.namespace = "edges-custom-display";
   }
 
-  // draw() {
-  //   let frag = "";
+  draw() {
+    let frag = "";
 
+    if (this.component.loading) {
+      frag = "<div class='loading-message'>Loading...</div>"; // Show loading message
+    } else if (this.component.errorMessage) {
+      frag = `<div class='error-message'>${this.component.errorMessage}</div>`; // Show error message
+    } else if (this.component.results && this.component.results.length > 0) {
+      switch (this.type) {
+        case "heading":
+          frag = this._pageHeading();
+          break;
+        case "side-title":
+          frag = this._sideTitle();
+          break;
+        case "shortUrl":
+          this._renderShortUrl();
+          break;
+        case "links":
+          frag = this._renderLinks();
+          break;
+        case "nested":
+          frag = this._renderNestedTable();
+          break;
+        case "nested-label":
+          frag = this._renderNestedLabel();
+          break;
+        case "nested-list":
+          frag = this._renderNestedList();
+          break;
+        case "table":
+          frag = this._renderTable();
+          break;
+        case "bar":
+          frag = this._renderBarGraph();
+          break;
+        case "label":
+          frag = this._renderLabelValue();
+          break;
+        case "content":
+          frag = this._renderContent();
+          break;
+        case "dates":
+          frag = this._renderDates();
+          break;
+        case "date-people":
+          frag = this._renderDatesForPeople();
+          break;
+        case "stats":
+          frag = this._renderStats();
+          break;
+        case "text":
+          frag = this._renderText();
+          break;
+        case "plain-text":
+          frag = this._renderPlainText();
+          break;
+        case "location":
+          frag = this._renderLocation();
+          break;
+        case "side-nested-links":
+          frag = this._sidebarNestedLinks();
+          break;
+        case "images":
+          frag = this._renderImages();
+          break;
+        case "img":
+          frag = this._renderImage();
+          break;
+        case "dummy-message":
+          frag = this._renderDummyText();
+          break;
+        case "repo-version":
+          frag = this._renderRepoVersion();
+          break;
+        case "footer":
+          frag = this._renderFooter();
+          break;
+        default:
+          frag = "<div></div>";
+      }
+    }
+
+    const sectionTitleFrag = this._renderSectionTitle();
+    const dividerFrag = this.divider ? ' <hr class="yellow-divider" />' : "";
+
+    const containerClasses = edges.util.styleClasses(
+      this.namespace,
+      "container",
+      this.component.id
+    );
+
+    let container = "";
+
+    if (frag) {
+      container = `<div class="${containerClasses}">
+        ${dividerFrag}
+        ${sectionTitleFrag}
+        ${frag}
+      </div>`;
+    }
+
+    this.component.context.html(container);
+  }
+
+  // draw() {
+  //   // 1. Render the static elements first (immediate rendering)
+  //   let sectionTitleFrag = this._renderSectionTitle();
+  //   const dividerFrag = this.divider ? ' <hr class="yellow-divider" />' : "";
+  //   const containerClasses = edges.util.styleClasses(
+  //     this.namespace,
+  //     "container",
+  //     this.component.id
+  //   );
+
+  //   let container = `<div class="${containerClasses}">
+  //       ${dividerFrag}
+  //       ${sectionTitleFrag}
+  //   </div>`;
+
+  //   // 2. Immediately render the basic structure (without dynamic `frag` content)
+  //   this.component.context.html(container);
+
+  //   // 3. Now process the dynamic `frag`
+  //   let frag = "";
   //   if (this.component.loading) {
   //     frag = "<div class='loading-message'>Loading...</div>"; // Show loading message
   //   } else if (this.component.errorMessage) {
@@ -2449,130 +2569,14 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   //     }
   //   }
 
-  //   const sectionTitleFrag = this._renderSectionTitle();
-  //   const dividerFrag = this.divider ? ' <hr class="yellow-divider" />' : "";
-
-  //   const containerClasses = edges.util.styleClasses(
-  //     this.namespace,
-  //     "container",
-  //     this.component.id
-  //   );
-
-  //   let container = "";
-
+  //   // 4. Once `frag` is ready, update the container with it
   //   if (frag) {
-  //     container = `<div class="${containerClasses}">
-  //       ${dividerFrag}
-  //       ${sectionTitleFrag}
-  //       ${frag}
-  //     </div>`;
+  //     // Append the `frag` to the container content
+  //     container += frag;
+  //     // Update the component context with the new content
+  //     this.component.context.html(container);
   //   }
-
-  //   this.component.context.html(container);
   // }
-
-  draw() {
-    // 1. Render the static elements first (immediate rendering)
-    let sectionTitleFrag = this._renderSectionTitle();
-    const dividerFrag = this.divider ? ' <hr class="yellow-divider" />' : "";
-    const containerClasses = edges.util.styleClasses(
-      this.namespace,
-      "container",
-      this.component.id
-    );
-
-    let container = `<div class="${containerClasses}">
-        ${dividerFrag}  
-        ${sectionTitleFrag}
-    </div>`;
-
-    // 2. Immediately render the basic structure (without dynamic `frag` content)
-    this.component.context.html(container);
-
-    // 3. Now process the dynamic `frag`
-    let frag = "";
-    if (this.component.loading) {
-      frag = "<div class='loading-message'>Loading...</div>"; // Show loading message
-    } else if (this.component.errorMessage) {
-      frag = `<div class='error-message'>${this.component.errorMessage}</div>`; // Show error message
-    } else if (this.component.results && this.component.results.length > 0) {
-      switch (this.type) {
-        case "heading":
-          frag = this._pageHeading();
-          break;
-        case "side-title":
-          frag = this._sideTitle();
-          break;
-        case "links":
-          frag = this._renderLinks();
-          break;
-        case "nested":
-          frag = this._renderNestedTable();
-          break;
-        case "nested-label":
-          frag = this._renderNestedLabel();
-          break;
-        case "nested-list":
-          frag = this._renderNestedList();
-          break;
-        case "table":
-          frag = this._renderTable();
-          break;
-        case "bar":
-          frag = this._renderBarGraph();
-          break;
-        case "label":
-          frag = this._renderLabelValue();
-          break;
-        case "content":
-          frag = this._renderContent();
-          break;
-        case "dates":
-          frag = this._renderDates();
-          break;
-        case "date-people":
-          frag = this._renderDatesForPeople();
-          break;
-        case "stats":
-          frag = this._renderStats();
-          break;
-        case "text":
-          frag = this._renderText();
-          break;
-        case "plain-text":
-          frag = this._renderPlainText();
-          break;
-        case "location":
-          frag = this._renderLocation();
-          break;
-        case "side-nested-links":
-          frag = this._sidebarNestedLinks();
-          break;
-        case "images":
-          frag = this._renderImages();
-          break;
-        case "img":
-          frag = this._renderImage();
-          break;
-        case "dummy-message":
-          frag = this._renderDummyText();
-          break;
-        case "repo-version":
-          frag = this._renderRepoVersion();
-          break;
-        default:
-          frag = "<div></div>";
-      }
-    }
-
-    // 4. Once `frag` is ready, update the container with it
-    if (frag) {
-      // Append the `frag` to the container content
-      container += frag;
-      // Update the component context with the new content
-      this.component.context.html(container);
-    }
-  }
 
   _renderSectionTitle() {
     if (
@@ -3141,7 +3145,15 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const statsHtml = this.fields
       .filter((field) => field.name !== "graph") // Exclude graph fields
       .map((field) => {
-        const value = this.component.results[0][field.key] || 0;
+        // Determine the value: if it's an array, use its length; if it's a number, use it directly; otherwise, use 0
+        let value = this.component.results[0][field.key];
+
+        if (Array.isArray(value)) {
+          value = value.length; // Use the length if it's an array
+        } else if (typeof value !== "number") {
+          value = 0; // If it's neither a number nor an array, set it to 0
+        }
+
         const escapedValue = edges.util.escapeHtml(value);
         const isClickable = value > 0;
 
@@ -3182,226 +3194,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       `;
   }
 
-  // _renderNestedTable() {
-  //   const parentField = this.primaryField;
-  //   const field = this.field;
-  //   const subFields = this.fields;
-
-  //   // Validate required fields
-  //   if (!parentField || (!field && !(subFields && subFields.length > 0))) {
-  //     return "";
-  //   }
-
-  //   // Flatten all parentObjects for row count
-  //   const allParentObjects = this.component.results.flatMap(
-  //     (result) => result[parentField] || []
-  //   );
-
-  //   // Check if total parentObject count exceeds 30
-  //   if (allParentObjects.length > 30) {
-  //     // Summarized format for large datasets
-  //     let queryVal = "";
-  //     let queryKey = this.field;
-
-  //     const decadeSummary = allParentObjects.reduce((acc, parentObject) => {
-  //       if (!parentObject) return acc;
-
-  //       const year =
-  //         parentObject["ox_started-ox_year"] ||
-  //         parentObject["ox_completed-ox_year"];
-
-  //       if (this.primaryResultKey) {
-  //         queryVal = this.component.results[0][this.primaryResultKey];
-  //       } else {
-  //         queryVal = parentObject["author_sort"];
-  //       }
-
-  //       if (year) {
-  //         const decade = Math.floor(year / 10) * 10; // Calculate decade
-
-  //         if (!acc[decade]) acc[decade] = {};
-  //         acc[decade][year] = (acc[decade][year] || 0) + 1;
-  //       } else {
-  //         if (!acc["????"]) acc["????"] = {};
-  //         acc["????"]["Unknown year"] = (acc["????"]["Unknown year"] || 0) + 1;
-  //       }
-
-  //       return acc;
-  //     }, {});
-
-  //     // Generate summarized table rows
-  //     const rows = Object.entries(decadeSummary)
-  //       .map(([decade, years]) => {
-  //         const yearCounts = Object.entries(years)
-  //           .map(
-  //             ([year, count]) =>
-  //               `<a href="/forms/advance?${queryKey}=${queryVal}&dat_sin_year=${year}"> ${year}: ${count} </a>`
-  //           )
-  //           .join(" ♦ ");
-  //         return `
-  //         <tr>
-  //           <td>
-  //             ${decade === "????" ? `????` : `${decade}s`}
-  //           </td>
-  //           <td> ${yearCounts} </td>
-  //         </tr>`;
-  //       })
-  //       .join("");
-
-  //     return `
-  //       <table class="nested-table">
-  //         <thead>
-  //           <tr>
-  //             <th>
-  //               Decade
-  //             </th>
-  //             <th>
-  //               Letters per year
-  //             </th>
-  //           </tr>
-  //         </thead>
-  //         <tbody>
-  //           ${rows}
-  //         </tbody>
-  //       </table>
-  //     `;
-  //   }
-
-  //   // Current format for datasets with parentObject count <= 30
-  //   const rows = this.component.results
-  //     .map((result) => {
-  //       let parentObjects = result[parentField];
-  //       if (!parentObjects || parentObjects.length === 0) return "";
-
-  //       parentObjects.sort((a, b) => {
-  //         const startA = a["ox_started-ox_year"] ?? a["0x_completed-ox_year"];
-  //         const startB = b["ox_started-ox_year"] ?? b["0x_completed-ox_year"];
-
-  //         // If both values are undefined, consider them equal
-  //         if (startA === undefined && startB === undefined) return 0;
-
-  //         // If one value is undefined, treat it as larger (to push it to the end)
-  //         if (startA === undefined) return 1;
-  //         if (startB === undefined) return -1;
-
-  //         // Otherwise, compare the values normally
-  //         return startA - startB;
-  //       });
-
-  //       let lastfieldKey = 0;
-
-  //       // return parentObjects
-  //       //   .map((parentObject) => {
-  //       //     if (!parentObject) return "";
-
-  //       //     const cells = [];
-  //       //     // if (field) {
-  //       //     //   const value = parentObject[field];
-  //       //     //   cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
-  //       //     // }
-  //       //     if (subFields) {
-  //       //       subFields.forEach((subField) => {
-  //       //         const value = parentObject[subField.key];
-  //       //         if (subField.clickable) {
-  //       //           cells.push(`
-  //       //             <td>
-  //       //               <a href="/profile/${subField.collectionName}/${
-  //       //             parentObject["uuid"]
-  //       //           }" class="clickable-row">${edges.util.escapeHtml(
-  //       //             value || ""
-  //       //           )}</a>
-  //       //             </td>
-  //       //           `);
-  //       //         } else {
-  //       //           if (
-  //       //             subField.key == "ox_started-ox_year" ||
-  //       //             subField.key == "ox_completed-ox_year"
-  //       //           ) {
-  //       //             if (lastfieldKey !== value) {
-  //       //               lastfieldKey = value;
-  //       //               cells.push(
-  //       //                 `<td>${edges.util.escapeHtml(value || "")}</td>`
-  //       //               );
-  //       //             } else {
-  //       //               cells.push(`<td></td>`);
-  //       //             }
-  //       //           }
-  //       //         }
-  //       //       });
-  //       //     }
-
-  //       //     return `<tr>${cells.join("")}</tr>`;
-  //       //   })
-  //       //   .join("");
-
-  //       return parentObjects
-  //         .map((parentObject) => {
-  //           if (!parentObject) return "";
-
-  //           const cells = [];
-  //           let rowStyle = ""; // Variable to hold the style for the row
-
-  //           if (subFields) {
-  //             subFields.forEach((subField) => {
-  //               const value = parentObject[subField.key];
-
-  //               if (subField.clickable) {
-  //                 cells.push(`
-  //           <td>
-  //             <a href="/profile/${subField.collectionName}/${
-  //                   parentObject["uuid"]
-  //                 }" class="clickable-row">${edges.util.escapeHtml(
-  //                   value || ""
-  //                 )}</a>
-  //           </td>
-  //         `);
-  //               } else {
-  //                 if (
-  //                   subField.key == "ox_started-ox_year" ||
-  //                   subField.key == "ox_completed-ox_year"
-  //                 ) {
-  //                   // Add dotted separation when current year is not the same as the last year
-  //                   if (lastfieldKey !== value) {
-  //                     lastfieldKey = value;
-  //                     // Use "????" if value is undefined
-  //                     cells.push(
-  //                       `<td>${edges.util.escapeHtml(
-  //                         value !== undefined ? value : "????"
-  //                       )}</td>`
-  //                     );
-  //                     rowStyle =
-  //                       "border-top: #999 dashed 1px; padding: 5px 0px 5px 10px;"; // Apply dotted separation on the top of the row
-  //                   } else {
-  //                     cells.push(`<td></td>`);
-  //                   }
-  //                 }
-  //               }
-  //             });
-  //           }
-  //           // Add row style if the condition is met
-  //           return `<tr style="${rowStyle}">${cells.join("")}</tr>`;
-  //         })
-  //         .join("");
-  //     })
-  //     .filter((row) => row)
-  //     .join("");
-
-  //   const table = `
-  //     <table class="nested-table" style="border-collapse: collapse;">
-  //       <tbody>
-  //         ${rows}
-  //       </tbody>
-  //     </table>
-  //   `;
-
-  //   return rows ? table : "";
-  // }
-
   _renderNestedTable() {
-    console.time(this.primaryField);
     const parentField = this.primaryField;
     const field = this.field;
     const subFields = this.fields;
+
     // Validate required fields
     if (!parentField || (!field && !(subFields && subFields.length > 0))) {
       return "";
@@ -3414,124 +3211,202 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
     // Check if total parentObject count exceeds 30
     if (allParentObjects.length > 30) {
-      console.timeEnd(this.primaryField);
-      return this.renderSummarizedTable(allParentObjects, field);
+      // Summarized format for large datasets
+      let queryVal = "";
+      let queryKey = this.field;
+
+      const decadeSummary = allParentObjects.reduce((acc, parentObject) => {
+        if (!parentObject) return acc;
+
+        const year =
+          parentObject["ox_started-ox_year"] ||
+          parentObject["ox_completed-ox_year"];
+
+        if (this.primaryResultKey) {
+          queryVal = this.component.results[0][this.primaryResultKey];
+        } else {
+          queryVal = parentObject["author_sort"];
+        }
+
+        if (year) {
+          const decade = Math.floor(year / 10) * 10; // Calculate decade
+
+          if (!acc[decade]) acc[decade] = {};
+          acc[decade][year] = (acc[decade][year] || 0) + 1;
+        } else {
+          if (!acc["????"]) acc["????"] = {};
+          acc["????"]["Unknown year"] = (acc["????"]["Unknown year"] || 0) + 1;
+        }
+
+        return acc;
+      }, {});
+
+      // Generate summarized table rows
+      const rows = Object.entries(decadeSummary)
+        .map(([decade, years]) => {
+          const yearCounts = Object.entries(years)
+            .map(
+              ([year, count]) =>
+                `<a href="/forms/advance?${queryKey}=${queryVal}&dat_sin_year=${year}"> ${year}: ${count} </a>`
+            )
+            .join(" ♦ ");
+          return `
+          <tr>
+            <td>
+              ${decade === "????" ? `????` : `${decade}s`}
+            </td>
+            <td> ${yearCounts} </td>
+          </tr>`;
+        })
+        .join("");
+
+      return `
+        <table class="nested-table">
+          <thead>
+            <tr>
+              <th>
+                Decade
+              </th>
+              <th>
+                Letters per year
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      `;
     }
 
     // Current format for datasets with parentObject count <= 30
-    return this.renderDetailedTable(allParentObjects, field, subFields);
-  }
+    const rows = this.component.results
+      .map((result) => {
+        let parentObjects = result[parentField];
+        if (!parentObjects || parentObjects.length === 0) return "";
 
-  renderSummarizedTable(allParentObjects, field) {
-    const decadeSummary = this.generateDecadeSummary(allParentObjects);
-    const rows = this.generateDecadeRows(decadeSummary, field);
+        parentObjects.sort((a, b) => {
+          const startA = a["ox_started-ox_year"] ?? a["0x_completed-ox_year"];
+          const startB = b["ox_started-ox_year"] ?? b["0x_completed-ox_year"];
 
-    return `
-      <table class="nested-table">
-        <thead>
-          <tr>
-            <th>Decade</th>
-            <th>Letters per year</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    `;
-  }
+          // If both values are undefined, consider them equal
+          if (startA === undefined && startB === undefined) return 0;
 
-  generateDecadeSummary(allParentObjects) {
-    return allParentObjects.reduce((acc, parentObject) => {
-      if (!parentObject) return acc;
+          // If one value is undefined, treat it as larger (to push it to the end)
+          if (startA === undefined) return 1;
+          if (startB === undefined) return -1;
 
-      const year =
-        parentObject["ox_started-ox_year"] ||
-        parentObject["ox_completed-ox_year"];
-      const queryVal = this.primaryResultKey
-        ? this.component.results[0][this.primaryResultKey]
-        : parentObject["author_sort"];
+          // Otherwise, compare the values normally
+          return startA - startB;
+        });
 
-      const decade = year ? Math.floor(year / 10) * 10 : "????";
-      if (!acc[decade]) acc[decade] = {};
-      acc[decade][year] = (acc[decade][year] || 0) + 1;
+        let lastfieldKey = 0;
 
-      return acc;
-    }, {});
-  }
+        // return parentObjects
+        //   .map((parentObject) => {
+        //     if (!parentObject) return "";
 
-  generateDecadeRows(decadeSummary, queryKey) {
-    return Object.entries(decadeSummary)
-      .map(([decade, years]) => {
-        const yearCounts = Object.entries(years)
-          .map(
-            ([year, count]) =>
-              `<a href="/forms/advance?${queryKey}=${
-                this.component.results[0][this.primaryResultKey]
-              }&dat_sin_year=${year}">${year}: ${count}</a>`
-          )
-          .join(" ♦ ");
+        //     const cells = [];
+        //     // if (field) {
+        //     //   const value = parentObject[field];
+        //     //   cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
+        //     // }
+        //     if (subFields) {
+        //       subFields.forEach((subField) => {
+        //         const value = parentObject[subField.key];
+        //         if (subField.clickable) {
+        //           cells.push(`
+        //             <td>
+        //               <a href="/profile/${subField.collectionName}/${
+        //             parentObject["uuid"]
+        //           }" class="clickable-row">${edges.util.escapeHtml(
+        //             value || ""
+        //           )}</a>
+        //             </td>
+        //           `);
+        //         } else {
+        //           if (
+        //             subField.key == "ox_started-ox_year" ||
+        //             subField.key == "ox_completed-ox_year"
+        //           ) {
+        //             if (lastfieldKey !== value) {
+        //               lastfieldKey = value;
+        //               cells.push(
+        //                 `<td>${edges.util.escapeHtml(value || "")}</td>`
+        //               );
+        //             } else {
+        //               cells.push(`<td></td>`);
+        //             }
+        //           }
+        //         }
+        //       });
+        //     }
 
-        return `
-          <tr>
-            <td>${decade === "????" ? "????" : `${decade}s`}</td>
-            <td>${yearCounts}</td>
-          </tr>
-        `;
-      })
-      .join("");
-  }
+        //     return `<tr>${cells.join("")}</tr>`;
+        //   })
+        //   .join("");
 
-  renderDetailedTable(allParentObjects, field, subFields) {
-    const rows = allParentObjects
-      .map((parentObject) => {
-        if (!parentObject) return "";
+        return parentObjects
+          .map((parentObject) => {
+            if (!parentObject) return "";
 
-        const cells = [];
-        let lastFieldKey = 0;
+            const cells = [];
+            let rowStyle = ""; // Variable to hold the style for the row
 
-        if (subFields) {
-          subFields.forEach((subField) => {
-            const value = parentObject[subField.key];
-            const rowStyle = this.getRowStyle(value, lastFieldKey);
+            if (subFields) {
+              subFields.forEach((subField) => {
+                const value = parentObject[subField.key];
 
-            if (subField.clickable) {
-              cells.push(`
-                <td>
-                  <a href="/profile/${subField.collectionName}/${
-                parentObject["uuid"]
-              }" class="clickable-row">
-                    ${edges.util.escapeHtml(value || "")}
-                  </a>
-                </td>
-              `);
-            } else {
-              cells.push(`
-                <td style="${rowStyle}">
-                  ${edges.util.escapeHtml(value !== undefined ? value : "????")}
-                </td>
-              `);
+                if (subField.clickable) {
+                  cells.push(`
+            <td>
+              <a href="/profile/${subField.collectionName}/${
+                    parentObject["uuid"]
+                  }" class="clickable-row">${edges.util.escapeHtml(
+                    value || ""
+                  )}</a>
+            </td>
+          `);
+                } else {
+                  if (
+                    subField.key == "ox_started-ox_year" ||
+                    subField.key == "ox_completed-ox_year"
+                  ) {
+                    // Add dotted separation when current year is not the same as the last year
+                    if (lastfieldKey !== value) {
+                      lastfieldKey = value;
+                      // Use "????" if value is undefined
+                      cells.push(
+                        `<td>${edges.util.escapeHtml(
+                          value !== undefined ? value : "????"
+                        )}</td>`
+                      );
+                      rowStyle =
+                        "border-top: #999 dashed 1px; padding: 5px 0px 5px 10px;"; // Apply dotted separation on the top of the row
+                    } else {
+                      cells.push(`<td></td>`);
+                    }
+                  }
+                }
+              });
             }
-          });
-        }
-
-        return `<tr>${cells.join("")}</tr>`;
+            // Add row style if the condition is met
+            return `<tr style="${rowStyle}">${cells.join("")}</tr>`;
+          })
+          .join("");
       })
       .filter((row) => row)
       .join("");
 
-    return rows
-      ? `<table class="nested-table" style="border-collapse: collapse;">
-          <tbody>${rows}</tbody>
-        </table>`
-      : "";
-  }
+    const table = `
+      <table class="nested-table" style="border-collapse: collapse;">
+        <tbody>
+          ${rows}
+        </tbody>
+      </table>
+    `;
 
-  getRowStyle(value, lastFieldKey) {
-    if (value === lastFieldKey) {
-      return ""; // No special style
-    }
-
-    lastFieldKey = value;
-    return "border-top: #999 dashed 1px; padding: 5px 0px 5px 10px;"; // Add dotted separation
+    return rows ? table : "";
   }
 
   _renderNestedList() {
@@ -4045,89 +3920,150 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   _renderDummyText() {
     return `${this.message}`;
   }
+
+  _renderFooter() {
+    if (this.footerType == "") {
+      return;
+    }
+
+    const currentDomain = window.location.host;
+    const result = this.component.results[0];
+    const editIdValue = GetRecordID(this.footerType, result);
+    const shortURL = GenerateShortURL(
+      editIdValue,
+      this.footerType,
+      currentDomain
+    );
+    const url = this._generateURL(result, this.footerType, currentDomain);
+
+    let htmlContent = `<div class="column"><br/><br/><br/><br/><div class="change">`;
+
+    // Check for Source of Data
+    if (
+      result &&
+      result.hasOwnProperty("ox_sourceOfData") &&
+      result["ox_sourceOfData"]
+    ) {
+      htmlContent += `<span class="provenance">Source of data: ${result["ox_sourceOfData"]}</span><br/>`;
+    }
+
+    // Check for Changed By User
+    if (
+      result &&
+      result.hasOwnProperty("ox_internalModifiedByUser") &&
+      result["ox_internalModifiedByUser"]
+    ) {
+      let changeUser =
+        result["ox_internalModifiedByUser"] === "Initial import"
+          ? "initial import"
+          : result["ox_internalModifiedByUser"];
+
+      // Check if there's an edit ID value
+      if (editIdValue) {
+        htmlContent += `Record ID ${editIdValue}, last altered <!-- not changed --> by ${changeUser}`;
+      } else {
+        htmlContent += `Record last altered <!-- not changed --> by ${changeUser}`;
+      }
+
+      // Check for Date Changed
+      if (
+        result &&
+        result.hasOwnProperty("ox_internalModified") &&
+        result["ox_internalModified"]
+      ) {
+        let changeTimestamp = result["ox_internalModified"];
+        let changeYear = changeTimestamp.substring(0, 4);
+        let changeMonth = changeTimestamp.substring(5, 7);
+        let changeDay = changeTimestamp.substring(8, 10);
+        htmlContent += ` on ${changeDay}/${changeMonth}/${changeYear}.`;
+      }
+
+      htmlContent += `<br/><br/>Alternative urls for this record:<ul>`;
+
+      if (url) {
+        htmlContent += `<li class="footer-links"><a href="${url}">${url}</a></li>`;
+      }
+
+      if (shortURL) {
+        htmlContent += `<li class="footer-links"><a href="${shortURL}">${shortURL}</a></li>`;
+      }
+
+      htmlContent += `</ul>`;
+
+      // If there's an editing URL, show the link
+      const key = this._getKey(this.footerType);
+
+      if (key) {
+        htmlContent += `
+      <span style="font-size:smaller">
+        <a href="https://emlo-edit.bodleian.ox.ac.uk/interface/union.php?${key}=${editIdValue}" target="_blank" rel="nofollow">
+          Editing interface
+        </a> (requires login)
+      </span>`;
+      }
+    }
+
+    htmlContent += `</div><br/></div>`;
+
+    return `${htmlContent}`;
+  }
+
+  _renderShortUrl() {
+    if (this.footerType == "") {
+      return "";
+    }
+
+    const currentDomain = window.location.host;
+    const result = this.component.results[0];
+    const editIdValue = GetRecordID(this.footerType, result);
+
+    const shortURL = GenerateShortURL(
+      editIdValue,
+      this.footerType,
+      currentDomain
+    );
+
+    const doc = document.getElementById("short-url-link");
+
+    if (doc) {
+      doc.innerHTML = `<a href=${shortURL}> ${shortURL} </a>`;
+    }
+  }
+
+  _getKey(type) {
+    switch (type) {
+      case "p":
+        return "iperson_id";
+      case "l":
+        return "location_id";
+      case "r":
+        return "institution_id";
+      case "w":
+        return "iwork_id";
+      default:
+        return "";
+    }
+  }
+
+  _generateURL(result, type, currentDomain) {
+    const map = {
+      p: "person",
+      m: "manifestation",
+      w: "work",
+      r: "institution",
+      l: "location",
+      i: "image",
+      re: "resource",
+      c: "comment",
+    };
+
+    if (map.hasOwnProperty(type)) {
+      return `${currentDomain}/${result["uuid"]}`;
+    } else {
+      return "";
+    }
+  }
 };
-// emlo.Stats = class extends edges.Component {
-//   constructor(params) {
-//     super(params);
-//     this.hitCount = 0;
-//     this.solrCore = edges.util.getParam(params, "solrCore", "");
-//     this.facetFields = edges.util.getParam(params, "facetFields", []);
-//     this.facetField = edges.util.getParam(params, "facetField", "");
-//   }
-
-//   async synchronise() {
-//     this.hitCount = 0;
-
-//     // Fetch data from Solr and update the hit count
-//     const hitCount = await this._fetchHitCount(this.solrCore);
-//     if (hitCount !== null) {
-//       this.hitCount = hitCount;
-//     }
-
-//     this.renderer.draw();
-//   }
-
-//   async _fetchHitCount(collectionName) {
-//     // Base Solr query
-//     let url = `/solr/${collectionName}/select?q=*:*&rows=0&wt=json`;
-
-//     // Add facet fields to the query if they exist, in case multiple facet field support is needed
-//     // if (this.facetFields.length > 0) {
-//     //   const facetQuery = this.facetFields
-//     //     .map((field) => ``)
-//     //     .join("&");
-//     //   url += `&facet=true&${facetQuery}`;
-//     // }
-
-//     if (this.facetField) {
-//       url += `&facet=true&facet.field=${encodeURIComponent(this.facetField)}`;
-//     }
-
-//     try {
-//       const response = await fetch(url);
-//       if (!response.ok) {
-//         console.error(
-//           `Error fetching data from ${url}: ${response.statusText}`
-//         );
-//         return null;
-//       }
-
-//       const data = await response.json();
-
-//       // Log facet counts if available
-//       if (data.facet_counts && data.facet_counts.facet_fields) {
-//         if (
-//           this.facetField &&
-//           data.facet_counts.facet_fields[this.facetField]
-//         ) {
-//           if (this.facetField == "cito_Catalog") {
-//             return data.facet_counts.facet_fields["cito_Catalog"].length / 2;
-//           } else if (this.facetField == "ox_isOrganisation") {
-//             for (
-//               let i = 0;
-//               i < data.facet_counts.facet_fields["ox_isOrganisation"].length;
-//               i += 2
-//             ) {
-//               if (
-//                 data.facet_counts.facet_fields["ox_isOrganisation"][i] ===
-//                 "true"
-//               ) {
-//                 return data.facet_counts.facet_fields["ox_isOrganisation"][
-//                   i + 1
-//                 ];
-//               }
-//             }
-//           }
-//         }
-//       }
-
-//       return data.response.numFound || 0; // Return hit count
-//     } catch (error) {
-//       console.error(`Error fetching data from ${url}: ${error}`);
-//       return null;
-//     }
-//   }
-// };
 
 emlo.Stats = class extends edges.Component {
   constructor(params) {
@@ -5820,6 +5756,61 @@ emlo.CheckboxRenderer = class extends edges.Renderer {
     window.history.replaceState({}, "", url);
   }
 };
+
+function GetRecordID(type, result) {
+  const QUERY_MAP = {
+    p: { field: "dcterms_identifier-editi_", splitValue: "editi_" }, // Person query pattern
+    w: { field: "dcterms_identifier-editi_", splitValue: "editi_" }, // Work query pattern
+    r: {
+      field: "dcterms_identifier-edit_",
+      splitValue: "edit_cofk_union_institution-",
+    }, // Institution query pattern
+    l: {
+      field: "dcterms_identifier-edit_",
+      splitValue: "edit_cofk_union_location-",
+    }, // Location query pattern
+    i: {
+      field: "dcterms_identifier-edit_",
+      splitValue: "edit_cofk_union_image-",
+    }, // Image query pattern
+    c: {
+      field: "dcterms_identifier-edit_",
+      splitValue: "edit_cofk_union_comment-",
+    }, // Comment query pattern
+    re: {
+      field: "dcterms_identifier-edit_",
+      splitValue: "edit_cofk_union_resource-",
+    }, // Resource query pattern
+    m: {
+      field: "dcterms_identifier-edit_:",
+      splitValue: "edit_cofk_union_manifestation-cofk_edit_interface-iwork_id:",
+    }, // Manifestation query pattern
+  };
+
+  const queryConfig = QUERY_MAP[type];
+  if (queryConfig) {
+    // Retrieve the value from the result object for the given field
+    const fieldValue = result[queryConfig.field];
+    if (fieldValue) {
+      // Split the value using the delimiter (e.g., "editi_") and get the last part
+      const splitValue = fieldValue.split(queryConfig.splitValue).pop();
+      // Return the query by combining the split value and the id
+      return `${splitValue}`;
+    } else {
+      throw new Error(`Field ${queryConfig.field} not found in result object`);
+    }
+  } else {
+    throw new Error(`Unknown query type: ${type}`);
+  }
+}
+
+function GenerateShortURL(id, type, currentDomain) {
+  if (id) {
+    return `${currentDomain}/${type}/${id}`;
+  } else {
+    return "";
+  }
+}
 
 function _addUrlParam(field, term) {
   let url_param_field = field;

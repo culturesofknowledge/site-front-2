@@ -74,6 +74,15 @@ function _getInstitutionComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "enclosed-in-side",
+      category: "sidebar",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "shortUrl",
+        footerType: "r",
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "related-resources",
       category: "sidebar",
       fetchSecondaryData: true,
@@ -138,6 +147,15 @@ function _getInstitutionComponents(emlo) {
         divider: true,
       }),
     }),
+
+    new emlo.MultiFields({
+      id: "inst-footer",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "footer",
+        footerType: "r",
+      }),
+    }),
   ];
 }
 
@@ -150,6 +168,15 @@ function _getManifestation(emlo) {
         type: "side-title",
         contentTitle: "Document",
         contentTitleImage: "/static/img/person-icon.png",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "enclosed-in-side",
+      category: "sidebar",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "shortUrl",
+        footerType: "m",
       }),
     }),
 
@@ -382,6 +409,15 @@ function _getManifestation(emlo) {
         field: "ox_excipit",
       }),
     }),
+
+    new emlo.MultiFields({
+      id: "mani-footer",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "footer",
+        footerType: "m",
+      }),
+    }),
   ];
 }
 
@@ -394,6 +430,15 @@ function _getImageComponents(emlo) {
         type: "side-title",
         contentTitle: "Image",
         contentTitleImage: "/static/img/images-icon.png",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "enclosed-in-side",
+      category: "sidebar",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "shortUrl",
+        footerType: "i",
       }),
     }),
 
@@ -437,6 +482,15 @@ function _getImageComponents(emlo) {
         field: "",
       }),
     }),
+
+    new emlo.MultiFields({
+      id: "image-footer",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "footer",
+        footerType: "i",
+      }),
+    }),
   ];
 }
 
@@ -462,6 +516,15 @@ function _getCommentsComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "enclosed-in-side",
+      category: "sidebar",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "shortUrl",
+        footerType: "c",
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "para",
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
@@ -469,6 +532,15 @@ function _getCommentsComponents(emlo) {
         divider: true,
         message:
           "Sorry, this record has not been found. It may have been deleted as a duplicate. ",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "comment-footer",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "footer",
+        footerType: "c",
       }),
     }),
   ];
@@ -496,6 +568,15 @@ function _getResourcesComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "enclosed-in-side",
+      category: "sidebar",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "shortUrl",
+        footerType: "re",
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "para",
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
@@ -503,6 +584,15 @@ function _getResourcesComponents(emlo) {
         divider: true,
         message:
           "Sorry, this record has not been found. It may have been deleted as a duplicate. ",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "resource-footer",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "footer",
+        footerType: "re",
       }),
     }),
   ];

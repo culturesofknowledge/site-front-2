@@ -13,6 +13,17 @@ export function getPeopleComponents(emlo) {
     }),
 
     new emlo.MultiFields({
+      id: "enclosed-in-side",
+      category: "sidebar",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "shortUrl",
+        sectionTitle: "Shhort URL",
+        sectionTitleImage: "/static/img/icon-quill.png",
+        footerType: "p",
+      }),
+    }),
+
+    new emlo.MultiFields({
       id: "related-resources",
       category: "sidebar",
       fetchSecondaryData: true,

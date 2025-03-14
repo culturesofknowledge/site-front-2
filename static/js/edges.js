@@ -2353,6 +2353,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     this.long_field = edges.util.getParam(params, "long_field", "");
     this.divider = edges.util.getParam(params, "divider", false); // Whether to include a divider
     this.message = edges.util.getParam(params, "message", "");
+    this.footerType = edges.util.getParam(params, "footerType", "");
     this.namespace = "edges-custom-display";
   }
 
@@ -2427,6 +2428,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
           break;
         case "repo-version":
           frag = this._renderRepoVersion();
+          break;
+        case "footer":
+          frag = this._renderFooter();
           break;
         default:
           frag = "<div></div>";
@@ -3389,180 +3393,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     return rows ? table : "";
   }
 
-  // _renderNestedTable() {
-  //   console.time(this.primaryField);
-  //   const parentField = this.primaryField;
-  //   const field = this.field;
-  //   const subFields = this.fields;
-  //   // Validate required fields
-  //   if (!parentField || (!field && !(subFields && subFields.length > 0))) {
-  //     return "";
-  //   }
-
-  //   // Flatten all parentObjects for row count
-  //   const allParentObjects = this.component.results.flatMap(
-  //     (result) => result[parentField] || []
-  //   );
-
-  //   // Check if total parentObject count exceeds 30
-  //   if (allParentObjects.length > 30) {
-  //     console.timeEnd(this.primaryField);
-  //     return this.renderSummarizedTable(allParentObjects, field);
-  //   }
-
-  //   // Current format for datasets with parentObject count <= 30
-  //   return this.renderDetailedTable(allParentObjects, field, subFields);
-  // }
-
-  // renderSummarizedTable(allParentObjects, field) {
-  //   const decadeSummary = this.generateDecadeSummary(allParentObjects);
-  //   const rows = this.generateDecadeRows(decadeSummary, field);
-
-  //   return `
-  //     <table class="nested-table">
-  //       <thead>
-  //         <tr>
-  //           <th>Decade</th>
-  //           <th>Letters per year</th>
-  //         </tr>
-  //       </thead>
-  //       <tbody>${rows}</tbody>
-  //     </table>
-  //   `;
-  // }
-
-  // generateDecadeSummary(allParentObjects) {
-  //   return allParentObjects.reduce((acc, parentObject) => {
-  //     if (!parentObject) return acc;
-
-  //     const year =
-  //       parentObject["ox_started-ox_year"] ||
-  //       parentObject["ox_completed-ox_year"];
-  //     const queryVal = this.primaryResultKey
-  //       ? this.component.results[0][this.primaryResultKey]
-  //       : parentObject["author_sort"];
-
-  //     const decade = year ? Math.floor(year / 10) * 10 : "????";
-  //     if (!acc[decade]) acc[decade] = {};
-  //     acc[decade][year] = (acc[decade][year] || 0) + 1;
-
-  //     return acc;
-  //   }, {});
-  // }
-
-  // generateDecadeRows(decadeSummary, queryKey) {
-  //   return Object.entries(decadeSummary)
-  //     .map(([decade, years]) => {
-  //       const yearCounts = Object.entries(years)
-  //         .map(
-  //           ([year, count]) =>
-  //             `<a href="/forms/advance?${queryKey}=${
-  //               this.component.results[0][this.primaryResultKey]
-  //             }&dat_sin_year=${year}">${year}: ${count}</a>`
-  //         )
-  //         .join(" ♦ ");
-
-  //       return `
-  //         <tr>
-  //           <td>${decade === "????" ? "????" : `${decade}s`}</td>
-  //           <td>${yearCounts}</td>
-  //         </tr>
-  //       `;
-  //     })
-  //     .join("");
-  // }
-
-  // renderDetailedTable(allParentObjects, field, subFields) {
-  //   const rows = allParentObjects
-  //     .map((parentObject) => {
-  //       if (!parentObject) return "";
-
-  //       const cells = [];
-  //       let lastFieldKey = "";
-
-  //       // if (subFields) {
-  //       //   subFields.forEach((subField) => {
-  //       //     const value = parentObject[subField.key];
-  //       //     const rowStyle = this.getRowStyle(value, lastFieldKey);
-
-  //       //     if (subField.clickable) {
-  //       //       cells.push(`
-  //       //         <td>
-  //       //           <a href="/profile/${subField.collectionName}/${
-  //       //         parentObject["uuid"]
-  //       //       }" class="clickable-row">
-  //       //             ${edges.util.escapeHtml(value || "")}
-  //       //           </a>
-  //       //         </td>
-  //       //       `);
-  //       //     } else {
-  //       //       cells.push(`
-  //       //         <td style="${rowStyle}">
-  //       //           ${edges.util.escapeHtml(value !== undefined ? value : "????")}
-  //       //         </td>
-  //       //       `);
-  //       //     }
-  //       //   });
-  //       // }
-
-  //       if (subFields) {
-  //         subFields.forEach((subField) => {
-  //           const value = parentObject[subField.key];
-  //           const rowStyle = this.getRowStyle(value, lastFieldKey);
-
-  //           if (subField.clickable) {
-  //             cells.push(`
-  //                   <td>
-  //                     <a href="/profile/${subField.collectionName}/${
-  //               parentObject["uuid"]
-  //             }" class="clickable-row">${edges.util.escapeHtml(value || "")}</a>
-  //                   </td>
-  //                 `);
-  //           } else {
-  //             if (
-  //               subField.key == "ox_started-ox_year" ||
-  //               subField.key == "ox_completed-ox_year"
-  //             ) {
-  //               // Add dotted separation when current year is not the same as the last year
-  //               if (lastfieldKey !== value) {
-  //                 lastfieldKey = value;
-  //                 // Use "????" if value is undefined
-  //                 cells.push(
-  //                   `<td>${edges.util.escapeHtml(
-  //                     value !== undefined ? value : "????"
-  //                   )}</td>`
-  //                 );
-  //                 rowStyle =
-  //                   "border-top: #999 dashed 1px; padding: 5px 0px 5px 10px;"; // Apply dotted separation on the top of the row
-  //               } else {
-  //                 cells.push(`<td></td>`);
-  //               }
-  //             }
-  //           }
-  //         });
-  //       }
-
-  //       return `<tr>${cells.join("")}</tr>`;
-  //     })
-  //     .filter((row) => row)
-  //     .join("");
-
-  //   return rows
-  //     ? `<table class="nested-table" style="border-collapse: collapse;">
-  //         <tbody>${rows}</tbody>
-  //       </table>`
-  //     : "";
-  // }
-
-  // getRowStyle(value, lastFieldKey) {
-  //   if (value === lastFieldKey) {
-  //     return ""; // No special style
-  //   }
-
-  //   lastFieldKey = value;
-  //   return "border-top: #999 dashed 1px; padding: 5px 0px 5px 10px;"; // Add dotted separation
-  // }
-
   _renderNestedList() {
     const parentField = this.primaryField;
     const field = this.field;
@@ -4074,89 +3904,188 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   _renderDummyText() {
     return `${this.message}`;
   }
+
+  _renderFooter() {
+    if (this.footerType == "") {
+      return;
+    }
+
+    const currentDomain = window.location.host;
+    const result = this.component.results[0];
+    const editIdValue = this._getRecordID(this.footerType, result);
+    const shortURL = this._generateShortURL(
+      editIdValue,
+      this.footerType,
+      currentDomain
+    );
+    const url = this._generateURL(result, this.footerType, currentDomain);
+
+    let htmlContent = `<div class="column"><br/><br/><br/><br/><div class="change">`;
+
+    // Check for Source of Data
+    if (
+      result &&
+      result.hasOwnProperty("ox_sourceOfData") &&
+      result["ox_sourceOfData"]
+    ) {
+      htmlContent += `<span class="provenance">Source of data: ${result["ox_sourceOfData"]}</span><br/>`;
+    }
+
+    // Check for Changed By User
+    if (
+      result &&
+      result.hasOwnProperty("ox_internalModifiedByUser") &&
+      result["ox_internalModifiedByUser"]
+    ) {
+      let changeUser =
+        result["ox_internalModifiedByUser"] === "Initial import"
+          ? "initial import"
+          : result["ox_internalModifiedByUser"];
+
+      // Check if there's an edit ID value
+      if (editIdValue) {
+        htmlContent += `Record ID ${editIdValue}, last altered <!-- not changed --> by ${changeUser}`;
+      } else {
+        htmlContent += `Record last altered <!-- not changed --> by ${changeUser}`;
+      }
+
+      // Check for Date Changed
+      if (
+        result &&
+        result.hasOwnProperty("ox_internalModified") &&
+        result["ox_internalModified"]
+      ) {
+        let changeTimestamp = result["ox_internalModified"];
+        let changeYear = changeTimestamp.substring(0, 4);
+        let changeMonth = changeTimestamp.substring(5, 7);
+        let changeDay = changeTimestamp.substring(8, 10);
+        htmlContent += ` on ${changeDay}/${changeMonth}/${changeYear}.`;
+      }
+
+      htmlContent += `<br/><br/>Alternative urls for this record:<ul>`;
+
+      if (url) {
+        htmlContent += `<li class="footer-links"><a href="${url}">${url}</a></li>`;
+      }
+
+      if (shortURL) {
+        htmlContent += `<li class="footer-links"><a href="${shortURL}">${shortURL}</a></li>`;
+      }
+
+      htmlContent += `</ul>`;
+
+      // If there's an editing URL, show the link
+      const key = this._getKey(this.footerType);
+
+      if (key) {
+        htmlContent += `
+      <span style="font-size:smaller">
+        <a href="https://emlo-edit.bodleian.ox.ac.uk/interface/union.php?${key}=${editIdValue}" target="_blank" rel="nofollow">
+          Editing interface
+        </a> (requires login)
+      </span>`;
+      }
+    }
+
+    htmlContent += `</div><br/></div>`;
+
+    return `${htmlContent}`;
+  }
+
+  _getKey(type) {
+    switch (type) {
+      case "p":
+        return "iperson_id";
+      case "l":
+        return "location_id";
+      case "r":
+        return "institution_id";
+      case "w":
+        return "iwork_id";
+      default:
+        return "";
+    }
+  }
+
+  _getRecordID(type, result) {
+    const QUERY_MAP = {
+      p: { field: "dcterms_identifier-editi_", splitValue: "editi_" }, // Person query pattern
+      w: { field: "dcterms_identifier-editi_", splitValue: "editi_" }, // Work query pattern
+      r: {
+        field: "dcterms_identifier-edit_",
+        splitValue: "edit_cofk_union_institution-",
+      }, // Institution query pattern
+      l: {
+        field: "dcterms_identifier-edit_",
+        splitValue: "edit_cofk_union_location-",
+      }, // Location query pattern
+      i: {
+        field: "dcterms_identifier-edit_",
+        splitValue: "edit_cofk_union_image-",
+      }, // Image query pattern
+      c: {
+        field: "dcterms_identifier-edit_",
+        splitValue: "edit_cofk_union_comment-",
+      }, // Comment query pattern
+      re: {
+        field: "dcterms_identifier-edit_",
+        splitValue: "edit_cofk_union_resource-",
+      }, // Resource query pattern
+      m: {
+        field: "dcterms_identifier-edit_:",
+        splitValue:
+          "edit_cofk_union_manifestation-cofk_edit_interface-iwork_id:",
+      }, // Manifestation query pattern
+    };
+
+    const queryConfig = QUERY_MAP[type];
+    if (queryConfig) {
+      // Retrieve the value from the result object for the given field
+      const fieldValue = result[queryConfig.field];
+      if (fieldValue) {
+        // Split the value using the delimiter (e.g., "editi_") and get the last part
+        const splitValue = fieldValue.split(queryConfig.splitValue).pop();
+        // Return the query by combining the split value and the id
+        return `${splitValue}`;
+      } else {
+        throw new Error(
+          `Field ${queryConfig.field} not found in result object`
+        );
+      }
+    } else {
+      throw new Error(`Unknown query type: ${type}`);
+    }
+  }
+
+  _generateURL(result, type, currentDomain) {
+    const map = {
+      p: "person",
+      m: "manifestation",
+      w: "work",
+      r: "institution",
+      l: "location",
+      i: "image",
+      re: "resource",
+      c: "comment",
+    };
+
+    console.log("domain", currentDomain);
+
+    if (map.hasOwnProperty(type)) {
+      return `${currentDomain}/${result["uuid"]}`;
+    } else {
+      return "";
+    }
+  }
+
+  _generateShortURL(id, type, currentDomain) {
+    if (id) {
+      return `${currentDomain}/${type}/${id}`;
+    } else {
+      return "";
+    }
+  }
 };
-// emlo.Stats = class extends edges.Component {
-//   constructor(params) {
-//     super(params);
-//     this.hitCount = 0;
-//     this.solrCore = edges.util.getParam(params, "solrCore", "");
-//     this.facetFields = edges.util.getParam(params, "facetFields", []);
-//     this.facetField = edges.util.getParam(params, "facetField", "");
-//   }
-
-//   async synchronise() {
-//     this.hitCount = 0;
-
-//     // Fetch data from Solr and update the hit count
-//     const hitCount = await this._fetchHitCount(this.solrCore);
-//     if (hitCount !== null) {
-//       this.hitCount = hitCount;
-//     }
-
-//     this.renderer.draw();
-//   }
-
-//   async _fetchHitCount(collectionName) {
-//     // Base Solr query
-//     let url = `/solr/${collectionName}/select?q=*:*&rows=0&wt=json`;
-
-//     // Add facet fields to the query if they exist, in case multiple facet field support is needed
-//     // if (this.facetFields.length > 0) {
-//     //   const facetQuery = this.facetFields
-//     //     .map((field) => ``)
-//     //     .join("&");
-//     //   url += `&facet=true&${facetQuery}`;
-//     // }
-
-//     if (this.facetField) {
-//       url += `&facet=true&facet.field=${encodeURIComponent(this.facetField)}`;
-//     }
-
-//     try {
-//       const response = await fetch(url);
-//       if (!response.ok) {
-//         console.error(
-//           `Error fetching data from ${url}: ${response.statusText}`
-//         );
-//         return null;
-//       }
-
-//       const data = await response.json();
-
-//       // Log facet counts if available
-//       if (data.facet_counts && data.facet_counts.facet_fields) {
-//         if (
-//           this.facetField &&
-//           data.facet_counts.facet_fields[this.facetField]
-//         ) {
-//           if (this.facetField == "cito_Catalog") {
-//             return data.facet_counts.facet_fields["cito_Catalog"].length / 2;
-//           } else if (this.facetField == "ox_isOrganisation") {
-//             for (
-//               let i = 0;
-//               i < data.facet_counts.facet_fields["ox_isOrganisation"].length;
-//               i += 2
-//             ) {
-//               if (
-//                 data.facet_counts.facet_fields["ox_isOrganisation"][i] ===
-//                 "true"
-//               ) {
-//                 return data.facet_counts.facet_fields["ox_isOrganisation"][
-//                   i + 1
-//                 ];
-//               }
-//             }
-//           }
-//         }
-//       }
-
-//       return data.response.numFound || 0; // Return hit count
-//     } catch (error) {
-//       console.error(`Error fetching data from ${url}: ${error}`);
-//       return null;
-//     }
-//   }
-// };
 
 emlo.Stats = class extends edges.Component {
   constructor(params) {

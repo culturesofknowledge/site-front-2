@@ -598,5 +598,14 @@ export function getPeopleComponents(emlo) {
         divider: true,
       }),
     }),
+
+    new emlo.MultiFields({
+      id: "people-footer",
+      category: "results",
+      renderer: new emlo.MultiFieldsRenderer({
+        type: "footer",
+        footerType: "p",
+      }),
+    }),
   ];
 }

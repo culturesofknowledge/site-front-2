@@ -166,6 +166,28 @@ class PersonChart {
 
         const y_ticks = this.getYAxisTickNumber(max_value, this.bars_are);
 
+        const yTickMarks = yScale.ticks(y_ticks);
+
+        this.svgChart
+          .append("svg:g")
+          .classed("guidelines", 1)
+          .selectAll("line.guideline." + chart)
+          .data(yTickMarks, function (d, j) {
+            return d == 0 ? 0 : j + "-" + chart;
+          })
+          .enter()
+          .append("line")
+          .classed("guideline", 1)
+          .classed(chart, 1)
+          .attr("x1", chart_x)
+          .attr("x2", chart_x + this.chart_width)
+          .attr("y1", function (d) {
+            return chart_y + yScale(d);
+          })
+          .attr("y2", function (d) {
+            return chart_y + yScale(d);
+          });
+
         // Draw Axes
         const xAxis = d3.svg
           .axis()
@@ -205,138 +227,6 @@ class PersonChart {
         this.renderBars(chart, xScale, yScale, chart_x, chart_y, chart_height);
       }
     }
-
-    // for (i = 0; i < this.charts.length; i++) {
-    //   let chart = this.charts[i];
-    //   if (this.have[chart]) {
-    //     var chart_height =
-    //         this.svg_height_base -
-    //         this.label_space_top -
-    //         this.label_space_bottom,
-    //       chart_x = this.label_space_left,
-    //       chart_y =
-    //         i * (this.svg_height_base + this.svg_chart_gap) +
-    //         this.label_space_top;
-
-    //     // Draw title
-    //     this.svgChart
-    //       .append("text")
-    //       .classed("chart-title", 1)
-    //       .classed(chart, 1)
-    //       .attr("x", chart_x - 10)
-    //       .attr("y", chart_y - 10)
-    //       .text(this.chart_titles[i]);
-
-    //     //
-    //     // Create Y scale
-    //     //
-    //     const yScale = d3.scale.linear();
-
-    //     //var stretchLowerYScale = false;
-    //     //stretchLowerYScale = ( (max_value / 4) > 10 );
-    //     //if( stretchLowerYScale )
-    //     //	yScale.domain( [0,10,max_value] ).range( [chart_height,chart_height - chart_height/4,0] ); // enhance values between 1 and 10 so we can see them easier.
-    //     //else
-    //     yScale.domain([0, this.max_value]).rangeRound([this.chart_height, 0]);
-
-    //     //
-    //     // Create Xscale
-    //     //
-    //     const xScaleDomain = this.getXScaleDomain(
-    //       this.person_data,
-    //       this.showUnknown
-    //     );
-
-    //     const xScale = d3.scale
-    //       .ordinal()
-    //       .domain(xScaleDomain)
-    //       .rangeRoundBands([0, this.chart_width], 0.2);
-
-    //     var y_ticks = this.getYAxisTickNumber(this.max_value, this.bars_are);
-
-    //     var yTickMarks = yScale.ticks(y_ticks);
-    //     //if( stretchLowerYScale ) {
-    //     //	yTickMarks.push(10);
-    //     //}
-
-    //     this.svgChart
-    //       .append("svg:g")
-    //       .classed("guidelines", 1)
-    //       .selectAll("line.guideline." + chart)
-    //       .data(yTickMarks, function (d, j) {
-    //         return d == 0 ? 0 : j + "-" + chart;
-    //       })
-    //       .enter()
-    //       .append("line")
-    //       .classed("guideline", 1)
-    //       .classed(chart, 1)
-    //       .attr("x1", chart_x)
-    //       .attr("x2", chart_x + this.chart_width)
-    //       .attr("y1", function (d) {
-    //         return chart_y + yScale(d);
-    //       })
-    //       .attr("y2", function (d) {
-    //         return chart_y + yScale(d);
-    //       });
-
-    //     //
-    //     // Axes
-    //     //
-    //     const xAxisTicks = this.getXAxisTicks(
-    //       xScale.domain(),
-    //       this.chart_width
-    //     );
-
-    //     const xAxis = d3.svg
-    //       .axis()
-    //       .scale(xScale)
-    //       .orient("bottom")
-    //       .tickValues(xAxisTicks);
-
-    //     const yAxis = d3.svg
-    //       .axis()
-    //       .scale(yScale)
-    //       .orient("left")
-    //       .tickFormat(d3.format("f"))
-    //       .ticks(y_ticks)
-    //       .tickSize(4, 2, 0);
-
-    //     yAxis.tickSubdivide(
-    //       this.getYAxisSubTickNumber(yScale.ticks(y_ticks), this.bars_are)
-    //     );
-
-    //     console.log("chart", xAxis, yAxis);
-
-    //     this.axes[chart] = {
-    //       x: xAxis,
-    //       y: yAxis,
-    //     };
-
-    //     this.svgChart
-    //       .append("svg:g")
-    //       .classed("xaxis", 1)
-    //       .classed("axis", 1)
-    //       .classed("label", 1)
-    //       .classed(chart, 1)
-    //       .attr(
-    //         "transform",
-    //         "translate(" + chart_x + "," + (chart_y + this.chart_height) + ")"
-    //       )
-    //       .call(xAxis);
-
-    //     console.log("rendering", chart_x, chart_y);
-    //     this.svgChart
-    //       .append("svg:g")
-    //       .classed("yaxis", 1)
-    //       .classed("axis", 1)
-    //       .classed("label", 1)
-    //       .classed(chart, 1)
-    //       .attr("transform", "translate(" + chart_x + "," + chart_y + ")")
-    //       .call(yAxis);
-    //   }
-    // }
-
-    // this.updateCharts(1000, 0);
   }
 
   renderBars(chart, xScale, yScale, chart_x, chart_y, chart_height) {
@@ -535,6 +425,7 @@ class PersonChart {
     //	yTickMarks.push(10);
     //}
     let self = this;
+
     var guidelines = this.svgChart
       .select("g.guidelines")
       .selectAll("line.guideline." + this.getChart(0))
@@ -558,10 +449,10 @@ class PersonChart {
       .transition()
       .duration(duration)
       .attr("y1", function (d) {
-        return this.label_space_top + yScale(d);
+        return self.label_space_top + yScale(d);
       })
       .attr("y2", function (d) {
-        return this.label_space_top + yScale(d);
+        return self.label_space_top + yScale(d);
       });
 
     if (this.bars_are == this.stacked || this.bars_are == this.split) {

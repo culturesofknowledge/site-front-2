@@ -346,8 +346,6 @@ class PersonChart {
       ? this.person_data_with_unknown
       : this.person_data_without_unknown;
 
-    console.log("person_data", this.person_data);
-
     this.person_data_length = this.person_data.length;
 
     this.max_value = this.getMax(this.person_data, this.showUnknown, chart);

@@ -4195,6 +4195,7 @@ emlo.BarGraph = class extends edges.Component {
     this.graphData = {};
     this.cache = {};
     this.loading = false; // To track loading state
+    this.showUnkown = false;
   }
 
   async synchronise() {
@@ -4367,6 +4368,7 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       "separate",
       this
     );
+    const unkownClass = edges.util.allClasses(this.namespace, "unkown", this);
 
     if (graphDataKeys.length <= 1)
       return `
@@ -4380,8 +4382,8 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
 
     return `
     <div class="button-bar">
-					<ul class="button-group unknown" style="display:none">
-						<li><button id="show_unknown" class="button tiny">Show unknown years</button></li>
+					<ul class="button-group unknown">
+						<li><button id="show_unknown" class="${unkownClass} button tiny">Show unknown</button></li>
 					</ul>
 
 
@@ -4463,7 +4465,12 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
     // Iterate through the keys of the counts object
     for (let year in counts) {
       if (counts.hasOwnProperty(year)) {
-        year = parseInt(year); // Convert the year to an integer (since the keys are strings)
+        if (year === "?") {
+          year = 9999;
+        } else {
+          year = parseInt(year); // Convert the year to an integer (since the keys are strings)
+        }
+
         if (year !== "?" && year !== 9999) {
           if (year > maxYear) {
             maxYear = year;
@@ -4512,7 +4519,7 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
     let person_data = this._toLongFormat(
       sortedYears.map(function (year) {
         return [
-          parseInt(year),
+          year === "?" ? 9999 : parseInt(year, 10),
           counts[year].mentioned,
           counts[year].recipient,
           counts[year].creator,
@@ -5075,14 +5082,29 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       "stackBar",
       this
     );
+
+    const unknownSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "unkown",
+      this
+    );
+
     edges.on(fullscreenSelector, "click", this, "toggleFullscreen");
     edges.on(stackedBarSelector, "click", this, "stackedView");
     edges.on(separateSelector, "click", this, "separateView");
     edges.on(splitBarSelector, "click", this, "splitView");
+    edges.on(unknownSelector, "click", this, "toggleUnknown");
   }
 
   separateView() {
     this.personChart.switchBars(3);
+  }
+
+  toggleUnknown() {
+    console.log("toggle unknown");
+
+    this.personChart.unknownShow(this.showUnkown);
+    this.showUnkown = !this.showUnkown;
   }
 
   stackedView() {

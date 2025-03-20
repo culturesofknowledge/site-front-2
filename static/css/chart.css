@@ -1,0 +1,88 @@
+#chart {
+  z-index: 100;
+  background-color: white;
+  position: relative;
+  -webkit-transition: 1s ease-in-out;
+  -moz-transition: 1s ease-in-out;
+  -o-transition: 1s ease-in-out;
+  transition: 1s ease-in-out;
+  padding: 5px;
+}
+
+.chart {
+  margin-left: 2px;
+  margin-bottom: 10px;
+}
+.label {
+  font-size: 10px;
+  font-family: "Times New Roman", serif;
+}
+.chart-title {
+  margin-left: 0;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  font-size: 14px;
+  -font-weight: bold;
+  color: #172854;
+}
+.chart rect {
+  stroke-width: 0;
+  stroke: white;
+}
+
+.bar.creator {
+  fill: #2e527e;
+}
+.bar.recipient {
+  fill: #5a7ca5;
+}
+.bar.mentioned {
+  fill: #a7bfd6;
+}
+
+.bar.creator.unknown {
+  fill: #7e7e7e;
+}
+.bar.recipient.unknown {
+  fill: #a5a5a5;
+}
+.bar.mentioned.unknown {
+  fill: #d6d6d6;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #b3b3b3;
+  stroke-width: 0.5;
+  shape-rendering: crispEdges;
+}
+.axis text {
+  font-family: sans-serif;
+  font-size: 11px;
+}
+.guideline {
+  stroke: #efc319;
+  stroke-width: 0.3;
+}
+
+.bar:hover {
+  fill: #efc319;
+}
+.bar.creator.unknown:hover {
+  fill: #8e8e8e;
+}
+.bar.recipient.unknown:hover {
+  fill: #b5b5b5;
+}
+.bar.mentioned.unknown:hover {
+  fill: #e6e6e6;
+}
+
+#chart .button-bar {
+  margin-left: 9px;
+}
+#chart .button.highlight {
+  background-color: #efc319;
+  color: black;
+}

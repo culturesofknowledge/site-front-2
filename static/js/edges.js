@@ -1,4 +1,5 @@
 import { getCollectionTitle } from "../js/profile/collectionDetails.js";
+import PersonChart from "./chart.js";
 
 const emlo = {
   active: {},
@@ -4312,6 +4313,7 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
     this.marginAbove = 10; // Margin above the max value
     this.margin = { top: 50, right: 20, bottom: 40, left: 40 }; // Margins for the chart
     this.graphConfig = edges.util.getParam(params, "graphConfig", {});
+    this.personChart;
   }
 
   // You can set this graphConfig object externally
@@ -4327,6 +4329,7 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
         <div id="${
           this.namespace
         }-container" class="custom-bar-graph-container">
+          <div id="chart"></div>
           <div id="${this.namespace}-chart" style="display:grid"></div>
         </div>
       `;
@@ -4376,64 +4379,125 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
     `;
   }
 
+  setYearCountsForGraphs(relevantWorksFieldname, data, counts) {
+    // Check if relevantWorksFieldname exists in profile
+    // if (profile.hasOwnProperty(relevantWorksFieldname)) {
+    let relationshipType;
+
+    // Determine relationship type based on the fieldname
+    if (relevantWorksFieldname === "frbr_creatorOf-work") {
+      relationshipType = "creator";
+    } else if (relevantWorksFieldname === "mail_recipientOf-work") {
+      relationshipType = "recipient";
+    } else if (relevantWorksFieldname === "dcterms_isReferencedBy-work") {
+      relationshipType = "mentioned";
+    } else {
+      // Invalid input
+      return;
+    }
+
+    const yearOfWorkFieldname = "ox_started-ox_year";
+
+    // Iterate through the data array
+    data.forEach((item) => {
+      const obj = item;
+
+      let year = "?";
+      if (obj.hasOwnProperty(yearOfWorkFieldname)) {
+        year = obj[yearOfWorkFieldname];
+      }
+
+      // Initialize year in counts if not already present
+      if (!counts.hasOwnProperty(year)) {
+        counts[year] = { creator: 0, recipient: 0, mentioned: 0 };
+      }
+
+      // Increment the value for the current type of work
+      counts[year][relationshipType] += 1;
+    });
+  }
+
+  _toLongFormat(d, p, i, z) {
+    for (i = 0, z = d.length; i < z; i++) {
+      p.push({
+        year: d[i][0],
+        mentioned: d[i][1],
+        recipient: d[i][2],
+        creator: d[i][3],
+      });
+    }
+    return p;
+  }
+
+  setFirstAndLastYearsForGraphs(counts) {
+    let maxYear = 1;
+    let minYear = 9999;
+
+    // Iterate through the keys of the counts object
+    for (let year in counts) {
+      if (counts.hasOwnProperty(year)) {
+        year = parseInt(year); // Convert the year to an integer (since the keys are strings)
+        if (year !== "?" && year !== 9999) {
+          if (year > maxYear) {
+            maxYear = year;
+          }
+          if (year < minYear) {
+            minYear = year;
+          }
+        }
+      }
+    }
+
+    return { minYear, maxYear };
+  }
+
+  setYearsWithZeroForGraphs(minYear, maxYear, counts) {
+    let year = minYear;
+
+    while (year < maxYear) {
+      if (!counts.hasOwnProperty(year)) {
+        counts[year] = { creator: 0, recipient: 0, mentioned: 0 };
+      }
+      year++;
+    }
+  }
+
   _renderGraphs() {
     const graphContainer = document.getElementById(`${this.namespace}-chart`);
     graphContainer.innerHTML = ""; // Clear existing graphs
 
-    const datasets = [];
-    const labels = []; // Unified x-axis labels
-    let maxYValue = 0; // Unified y-axis max value
-
-    for (const [fieldKey, fieldData] of Object.entries(
-      this.component.graphData
-    )) {
-      // const reducedData = this._reduceData(fieldData);
-      const reducedData = fieldData;
-      const valueCounts = this._countOccurrences(
-        reducedData,
-        this.component.xAxisField
-      );
-
-      // Get the configuration for this fieldKey, or use defaults if not found
-      const config = this.graphConfig[fieldKey] || {
-        barColor: this.barColor,
-        graphTitle: fieldKey,
-      }; // Default to fieldKey as title and default bar color
-
-      // Update x-axis labels to ensure they are uniform and sorted
-      for (const label in valueCounts) {
-        if (!labels.includes(label)) {
-          let i = 0;
-          while (i < labels.length && labels[i] < label) {
-            i++;
-          }
-          labels.splice(i, 0, label); // Insert at position i
-        }
-      }
-
-      const localMax = Math.max(...Object.values(valueCounts));
-      maxYValue = Math.max(maxYValue, localMax);
-
-      datasets.push({
-        label: fieldKey,
-        data: valueCounts,
-        config: config, // Include the config for this dataset
-      });
-
-      if (this.currentView === "separate") {
-        this._drawGraph(
-          valueCounts,
-          labels,
-          maxYValue,
-          fieldKey,
-          graphContainer,
-          config
-        );
-      }
+    const counts = {};
+    for (const key in this.component.graphData) {
+      this.setYearCountsForGraphs(key, this.component.graphData[key], counts);
     }
 
-    if (this.currentView !== "separate") {
-      this._drawCombinedGraph(datasets, labels, maxYValue, graphContainer);
+    let first_and_last = this.setFirstAndLastYearsForGraphs(counts);
+
+    this.setYearsWithZeroForGraphs(
+      first_and_last.minYear,
+      first_and_last.maxYear,
+      counts
+    );
+
+    // Sort the years numerically
+    let sortedYears = Object.keys(counts).sort((yearA, yearB) => yearA - yearB);
+
+    let person_data = this._toLongFormat(
+      sortedYears.map(function (year) {
+        return [
+          parseInt(year),
+          counts[year].mentioned,
+          counts[year].recipient,
+          counts[year].creator,
+        ];
+      }),
+      []
+    );
+
+    if (person_data.length > 0) {
+      // const person_chart = new PersonChart(person_data);
+      this.personChart = new PersonChart(person_data);
+      // person_chart.updateCharts(500, 0);
     }
   }
 
@@ -4991,18 +5055,17 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
   }
 
   separateView() {
-    this.currentView = "separate";
-    this.draw();
+    this.personChart.switchBars(3);
   }
 
   stackedView() {
-    this.currentView = "stacked";
-    this.draw();
+    // this.currentView = "stacked";
+    console.log("switch");
+    this.personChart.switchBars(1);
   }
 
   splitView() {
-    this.currentView = "split";
-    this.draw();
+    this.personChart.switchBars(2);
   }
 
   // toggleFullscreen(containerId) {

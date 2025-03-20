@@ -48,14 +48,13 @@ class PersonChart {
   }
 
   setupData() {
-    console.log("peron_dat", this.person_data, this.person_data.length);
     if (
       this.person_data[this.person_data.length - 1].year ===
       this.unknownYear * 1
     ) {
       this.have.unknown = true;
-      this.person_data_with_unknown = person_data;
-      this.person_data_without_unknown = person_data.slice(0, -1); // Shallow clone!
+      this.person_data_with_unknown = this.person_data;
+      this.person_data_without_unknown = this.person_data.slice(0, -1); // Shallow clone!
     } else {
       this.person_data_without_unknown = this.person_data_with_unknown =
         this.person_data;
@@ -347,6 +346,8 @@ class PersonChart {
       ? this.person_data_with_unknown
       : this.person_data_without_unknown;
 
+    console.log("person_data", this.person_data);
+
     this.person_data_length = this.person_data.length;
 
     this.max_value = this.getMax(this.person_data, this.showUnknown, chart);
@@ -630,20 +631,6 @@ class PersonChart {
     });
   }
 
-  unknownShow(show) {
-    if (show) {
-      this.highlight(["#show_unknown"], true);
-      d3.select("#show_unknown").text("Hide unknown");
-      this.show_unknown = true;
-    } else {
-      this.highlight(["#show_unknown"], false);
-      d3.select("#show_unknown").text("Show unknown");
-      this.show_unknown = false;
-    }
-
-    this.updateCharts(1000, 0);
-  }
-
   launchFullScreen() {
     var d3FullscreenButton = d3.select("#fullscreen"); // assuming modernizr
 
@@ -696,6 +683,41 @@ class PersonChart {
       fullscreen = !fullscreen;
       this.highlight(["#fullscreen"], fullscreen);
     }
+  }
+
+  unknownShow(show) {
+    if (show) {
+      this.highlight(["#show_unknown"], true);
+      //highlight(["#hide_unknown"], false);
+      d3.select("#show_unknown").text("Hide unknown");
+      this.showUnknown = true;
+    } else {
+      //highlight(["#hide_unknown"], true);
+      this.highlight(["#show_unknown"], false);
+      d3.select("#show_unknown").text("Show unknown");
+
+      this.showUnknown = false;
+    }
+    const self = this;
+    this.updateCharts(1000, function (d, i) {
+      if (d.creator === 0 && d.recipient === 0 && d.mentioned === 0) {
+        return 0;
+      }
+
+      // Work out how many bars we've already moved, skip over empty ones.
+      for (var j = 0, count = 0; j < i; j++) {
+        if (
+          self.person_data[j].creator !== 0 ||
+          self.person_data[j].recipient !== 0 ||
+          self.person_data[j].mentioned !== 0
+        ) {
+          count += 1;
+        }
+      }
+      return (
+        (self.person_data_length - count - 1) * (1200 / self.person_data_length)
+      );
+    });
   }
 }
 

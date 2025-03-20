@@ -643,6 +643,60 @@ class PersonChart {
 
     this.updateCharts(1000, 0);
   }
+
+  launchFullScreen() {
+    var d3FullscreenButton = d3.select("#fullscreen"); // assuming modernizr
+
+    if (d3FullscreenButton) {
+      this.hide(["#fullscreen"], false);
+
+      var fullscreen = false;
+
+      var d3Chart = d3.select("#chart");
+      if (fullscreen) {
+        d3Chart.style("-ms-transform", "");
+        d3Chart.style("-webkit-transform", "");
+        d3Chart.style("transform", "");
+        d3FullscreenButton.text("Fullscreen");
+      } else {
+        d3FullscreenButton.text("Close");
+
+        var gapWidth = window.innerWidth * 0.02,
+          gapHeight = window.innerHeight * 0.02,
+          winWidth = window.innerWidth - gapWidth * 2,
+          winHeight = window.innerHeight - gapHeight * 2,
+          chartBox = d3Chart.node().getBoundingClientRect(),
+          scaleWidth = winWidth / chartBox.width,
+          scaleHeight = winHeight / chartBox.height,
+          scale = 1;
+
+        scale = scaleHeight;
+        if (scale * chartBox.width > winWidth) {
+          scale = scaleWidth;
+        }
+
+        var centredX = (window.innerWidth - chartBox.width) / 2,
+          centredY = (window.innerHeight - chartBox.height) / 2;
+
+        var transform = "";
+        transform += "scale(" + scale + ")";
+        transform +=
+          " translate(" +
+          (centredX - chartBox.left) / scale +
+          "px," +
+          (centredY - chartBox.top) / scale +
+          "px)";
+        // !! transform += " rotate(180deg)";
+
+        d3Chart.style("-ms-transform", transform);
+        d3Chart.style("-webkit-transform", transform);
+        d3Chart.style("transform", transform);
+      }
+
+      fullscreen = !fullscreen;
+      this.highlight(["#fullscreen"], fullscreen);
+    }
+  }
 }
 
 // Initialize the PersonChart

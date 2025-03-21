@@ -3725,16 +3725,27 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                       </p></dd>
                     `);
                   } else {
-                    cells.push(`
-                      <dd><p>
-                        <a target="_blank" href="${edges.util.escapeHtml(
-                          parentObject[subField.linkKey]
-                        )}" class="clickable-row">${edges.util.escapeHtml(
-                      value || ""
-                    )}</a>
-                      ${otherInfoDiv}
-                      </p></dd>
-                    `);
+                    if(parentObject[subField.linkKey]){
+                      cells.push(`
+                        <dd><p>
+                          <a target="_blank" href="${edges.util.escapeHtml(
+                            parentObject[subField.linkKey]
+                          )}" class="clickable-row">${edges.util.escapeHtml(
+                        value || ""
+                      )}</a>
+                        ${otherInfoDiv}
+                        </p></dd>
+                      `);
+                    } else {
+                      cells.push(
+                        `
+                        <dd><p>
+                        <div>${edges.util.escapeHtml(
+                          value || ""
+                        )}</div> ${otherInfoDiv} </p> </dd>`
+                      );
+                    }
+                   
                   }
                 } else {
                   // Create non-clickable cell

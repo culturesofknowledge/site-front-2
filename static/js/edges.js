@@ -3514,11 +3514,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                           parentObject.dcterms_relation
                         }" class="clickable-row">${edges.util.escapeHtml(
                         value || ""
-                      )}</a> - 
+                      )}</a>
   
                       ${
                         additionalInfoVal
-                          ? edges.util.escapeHtml(additionalInfoVal)
+                          ? `- ${edges.util.escapeHtml(additionalInfoVal)}`
                           : edges.util.escapeHtml(additionalInfo || "")
                       }
                       </span>
@@ -3529,7 +3529,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     
                         ${
                           additionalInfoVal
-                            ? edges.util.escapeHtml(additionalInfoVal)
+                            ? `- ${edges.util.escapeHtml(additionalInfoVal)}`
                             : edges.util.escapeHtml(additionalInfo || "")
                         }
                         </span>
@@ -3542,11 +3542,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                       parentObject["uuid"]
                     }" class="clickable-row">${edges.util.escapeHtml(
                       value || ""
-                    )}</a> - 
+                    )}</a>
   
                       ${
                         additionalInfoVal
-                          ? edges.util.escapeHtml(additionalInfoVal)
+                          ? `- ${edges.util.escapeHtml(additionalInfoVal)}`
                           : edges.util.escapeHtml(additionalInfo || "")
                       }
                       </span>

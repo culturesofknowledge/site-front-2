@@ -2819,17 +2819,19 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     if (this.fields.length > 0) {
       return `<div class="content">
       ${this.fields
-        .map(
-          (field) =>
-            ` 
+        .map((field) => {
+          const value = this.component.results[0][field.key] || "";
+          if (!value.trim()) return "";
+
+          return ` 
             <dl>
                <dt><strong> ${field.title} </strong></dt>
                <dd> ${edges.util.escapeHtml(
                  this.component.results[0][field.key] || ""
                )} </dd>
             </dl>
-            `
-        )
+            `;
+        })
         .join("")}</div>
       `;
     }

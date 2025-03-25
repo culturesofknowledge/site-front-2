@@ -773,7 +773,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
               return `<td><a href="${prefix}/${subPagen}/${href}">${linkText}</a></td>`;
             }
 
-            return `<td><a href="${prefix}/${href}">${linkText}</a></td>`;
+            return `<td><a href="${href}">${linkText}</a></td>`;
           }
 
           if (field.type === "multiple" && field.multipleFields) {

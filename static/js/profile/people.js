@@ -8,6 +8,7 @@ export function getPeopleComponents(emlo) {
         contentTitle: "Person",
         dynamicTitle: "Organization",
         dynamicTitleField: "ox_isOrganisation",
+        dynamicImage: "/static/img/people_icon.png",
         contentTitleImage: "/static/img/person-icon.png",
       }),
     }),

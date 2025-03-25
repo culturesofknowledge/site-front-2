@@ -307,10 +307,15 @@ export function getWorkComponents(emlo) {
         primaryField: "mail_origin-location",
         fields: [
           {
-            title: "",
+            title: "Marked as",
             key: "geonames_name",
             clickable: true,
             collectionName: "location",
+            additonalInfo: [],
+          },
+          {
+            title: "Marked as",
+            key: "",
             additonalInfo: [
               {
                 mainKey: "mail_origin-indef_inferred",
@@ -367,6 +372,11 @@ export function getWorkComponents(emlo) {
             key: "geonames_name",
             clickable: true,
             collectionName: "location",
+            additonalInfo: [],
+          },
+          {
+            title: "Marked as",
+            key: "",
             additonalInfo: [
               {
                 mainKey: "mail_destination-indef_inferred",

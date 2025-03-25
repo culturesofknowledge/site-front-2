@@ -2736,6 +2736,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
               value = this.component.results[0][field.key];
             }
 
+            // Hide class is a patch code for institution location section.
             return additionalInfo || value
               ? `<div class="content">
               ${
@@ -2743,9 +2744,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                   ? `
                   ${
                     field.title
-                      ? `<span class="fieldlabel">${edges.util.escapeHtml(
-                          field.title
-                        )}: </span>`
+                      ? `<span class="${
+                          field.hideClass ? "" : "fieldlabel"
+                        }">${edges.util.escapeHtml(field.title)}: </span>`
                       : ""
                   }
                   <span>${edges.util.escapeHtml(value)}</span>`

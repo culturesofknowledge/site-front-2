@@ -762,6 +762,17 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
               : val;
             let linkText = field.linkText || val;
             let prefix = field.linkHrefPrefix || "";
+
+            if (prefix) {
+              let subPagen =
+                res.hasOwnProperty("object_type") &&
+                res["object_type"] === "person"
+                  ? "people"
+                  : res["object_type"];
+
+              return `<td><a href="${prefix}/${subPagen}/${href}">${linkText}</a></td>`;
+            }
+
             return `<td><a href="${prefix}/${href}">${linkText}</a></td>`;
           }
 

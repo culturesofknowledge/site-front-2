@@ -167,17 +167,17 @@ export function getWorkComponents(emlo) {
               {
                 mainKey: "mail_authors-indef_inferred",
                 secondaryKey: "mail_authors-rdf_value",
-                text: "(Authors is inferred)",
+                text: "(Author is inferred)",
               },
               {
                 mainKey: "mail_authors-indef_uncertain",
                 secondaryKey: "mail_authors-rdf_value",
-                text: "(Authors is uncertain)",
+                text: "(Author is uncertain)",
               },
               {
                 mainKey: "mail_authors-indef_approximate",
                 secondaryKey: "mail_authors-rdf_value",
-                text: "(Authors is approximate)",
+                text: "(Author is approximate)",
               },
             ],
           },

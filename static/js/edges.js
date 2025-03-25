@@ -2770,18 +2770,18 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                   ? `
                   ${
                     field.title
-                      ? `<span class="${
+                      ? `<p class="${
                           field.hideClass ? "" : "fieldlabel"
-                        }">${edges.util.escapeHtml(field.title)}: </span>`
+                        }">${edges.util.escapeHtml(field.title)}: </p>`
                       : ""
                   }
-                  <span>${edges.util.escapeHtml(value)}</span>`
+                  <p>${edges.util.escapeHtml(value)}</p>`
                   : ""
               }
               
                  ${
                    additionalInfo
-                     ? `<span style="font-size:smaller">${additionalInfo}</span>`
+                     ? `<p style="font-size:smaller">${additionalInfo}</p>`
                      : ""
                  }
                </div>`

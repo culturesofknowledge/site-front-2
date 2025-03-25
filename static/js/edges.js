@@ -764,13 +764,15 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
             let prefix = field.linkHrefPrefix || "";
 
             if (prefix) {
-              let subPagen =
-                res.hasOwnProperty("object_type") &&
-                res["object_type"] === "person"
-                  ? "people"
-                  : res["object_type"];
+              let subPagen = res.hasOwnProperty("object_type")
+                ? res["object_type"]
+                : "";
 
-              return `<td><a href="${prefix}/${subPagen}/${href}">${linkText}</a></td>`;
+              if (subPagen != "") {
+                return `<td><a href="${prefix}/${subPagen}/${href}">${linkText}</a></td>`;
+              }
+
+              return `<td><a href="${prefix}/${href}">${linkText}</a></td>`;
             }
 
             return `<td><a href="${href}">${linkText}</a></td>`;
@@ -2967,6 +2969,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
     this.fields.map((field) => {
       let displayValue = "";
+      let title = "";
 
       if (field.keys.date) {
         let day = field.keys.date.day
@@ -2997,10 +3000,21 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         });
       }
 
+      if (
+        resultObj.hasOwnProperty("ox_isOrganisation") &&
+        resultObj["ox_isOrganisation"]
+      ) {
+        if (field.core == "birth") {
+          title = "Date of formation";
+        } else {
+          title = "Date of disbandment";
+        }
+      }
+
       if (displayValue) {
         content += `
       <dt>
-        <strong> ${field.title || ""} </strong>
+        <strong> ${title || field.title} </strong>
       </dt>
       <dd> 
         ${displayValue}

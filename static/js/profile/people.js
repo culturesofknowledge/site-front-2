@@ -405,7 +405,7 @@ export function getPeopleComponents(emlo) {
         contentTitle: "",
         divider: true,
         fields: [
-          { title: "Alternative name", key: "skos_altLabel" },
+          { title: "Alternative names", key: "skos_altLabel" },
           { title: "Titles or roles", key: "ox_titlesRolesOccupations" },
         ],
       }),
@@ -421,7 +421,8 @@ export function getPeopleComponents(emlo) {
         divider: true,
         fields: [
           {
-            title: "Date of formation",
+            title: "Date of birth",
+            core: "birth",
             keys: {
               date: {
                 day: "bio_Birth-ox_day",
@@ -436,7 +437,8 @@ export function getPeopleComponents(emlo) {
             },
           },
           {
-            title: "Date of disbandment",
+            title: "Date of death",
+            core: "death",
             keys: {
               date: {
                 day: "bio_Death-ox_day",

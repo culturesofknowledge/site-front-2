@@ -3719,16 +3719,17 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const value = this.component.results[0][this.field];
 
     if (this.field == "cito_Catalog") {
-      return value
-        ? `
-        <p style="margin-top: 10px;font-style: oblique;">
-          Collection details: 
-          <a href="http://emlo-portal.bodleian.ox.ac.uk/collections/?catalogue=${
-            getCollectionTitle(value).href
-          }"> ${getCollectionTitle(value).title} </a>
-        <p>
-      `
-        : "";
+      return "";
+      // return value
+      //   ? `
+      //   <p style="margin-top: 10px;font-style: oblique;">
+      //     Collection details:
+      //     <a href="http://emlo-portal.bodleian.ox.ac.uk/collections/?catalogue=${
+      //       getCollectionTitle(value).href
+      //     }"> ${getCollectionTitle(value).title} </a>
+      //   <p>
+      // `
+      //   : "";
     }
 
     return value

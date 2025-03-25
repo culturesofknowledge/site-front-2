@@ -434,7 +434,7 @@ export function getWorkComponents(emlo) {
       primaryField: "dcterms_references-location",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested-label",
-        sectionTitle: "Places mentioned",
+        sectionTitle: "Mentions",
         primaryField: "dcterms_references-location",
         fields: [
           {

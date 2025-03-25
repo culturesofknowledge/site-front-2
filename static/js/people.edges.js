@@ -161,7 +161,7 @@ try {
             post: "",
             type: "link",
             linkHref: "uuid",
-            linkHrefPrefix: "/profile/person",
+            linkHrefPrefix: "/profile",
             valueFunction: null,
           },
           {

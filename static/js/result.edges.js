@@ -435,6 +435,7 @@ function _getTypeOfRecord(val, res, fieldName) {
     person: " Person or organisation ",
     location: "Location",
     work: "Letter",
+    institution: "Institution",
   };
 
   if (objectMap[val]) {

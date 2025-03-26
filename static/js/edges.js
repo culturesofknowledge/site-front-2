@@ -2774,10 +2774,10 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                     field.title
                       ? `<p class="${
                           field.hideClass ? "" : "fieldlabel"
-                        }">${edges.util.escapeHtml(field.title)}: </p>`
+                        }">${edges.util.escapeHtml(field.title)}: `
                       : ""
                   }
-                  <p>${edges.util.escapeHtml(value)}</p>`
+                    ${edges.util.escapeHtml(value)}</p>`
                   : ""
               }
               

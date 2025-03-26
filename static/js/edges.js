@@ -2236,7 +2236,7 @@ emlo.MultiFields = class extends edges.Component {
     if (this.fetchSecondaryData) {
       if (this.optimizedCode) {
         console.debug("running optimized code for:", this.primaryField);
-
+        let objectKey = "uuid";
         const uuidArray = [];
         let collectionName = "work";
         for (const result of results) {
@@ -2251,9 +2251,16 @@ emlo.MultiFields = class extends edges.Component {
           }
         }
 
+        // Patch changing the collection name for specific primary key
+        if (this.primaryField === "ox_hasResource-manifestation") {
+          collectionName = "work";
+          objectKey = "uuid_related";
+        }
+
         const payload = {
           solrCore: collectionName,
           uuids: uuidArray,
+          objectKey: objectKey,
           filter: "", // Adjust if a filter is required
         };
 
@@ -2762,8 +2769,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                 })
                 .join("");
             }
-
-            console.log("field.key", field.key);
 
             if (field.type == "date") {
               value = this._formatDate(this.component.results[0][field.key]);

@@ -145,10 +145,11 @@ function _getInstitutionComponents(emlo) {
       id: "contents",
       category: "results",
       fetchSecondaryData: true,
+      optimizedCode: true,
       primaryField: "ox_hasResource-manifestation",
       renderer: new emlo.MultiFieldsRenderer({
         type: "nested",
-        sectionTitle: "Content",
+        sectionTitle: "Collection overview",
         sectionTitleImage: "/static/img/icon-quill.png",
         primaryField: "ox_hasResource-manifestation",
         fields: [

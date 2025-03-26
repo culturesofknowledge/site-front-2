@@ -2727,25 +2727,34 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
               additionalInfo = field.additonalInfo
                 .map((info) => {
                   let displayValue = "";
-                  if (info.mainKey in this.component.results[0]) {
-                    const mainValue = this.component.results[0][info.mainKey];
-                    if (typeof mainValue === "boolean") {
-                      displayValue = mainValue ? info.text : "";
-                    } else if (mainValue) {
-                      displayValue = `Marked as:   ${mainValue}`;
-                    }
-                  }
 
-                  if (
-                    !displayValue &&
-                    info.secondaryKey in this.component.results[0]
-                  ) {
-                    const secondaryValue =
-                      this.component.results[0][info.secondaryKey];
-                    if (typeof secondaryValue === "boolean") {
-                      displayValue = secondaryValue ? info.text : "";
-                    } else if (secondaryValue) {
-                      displayValue = `Marked as:   ${secondaryValue}`;
+                  if (info.mainKey == "ox_locatedInAlternate") {
+                    if (
+                      this.component.results[0].hasOwnProperty(info.mainKey)
+                    ) {
+                      displayValue = this.component.results[0][info.mainKey];
+                    }
+                  } else {
+                    if (info.mainKey in this.component.results[0]) {
+                      const mainValue = this.component.results[0][info.mainKey];
+                      if (typeof mainValue === "boolean") {
+                        displayValue = mainValue ? info.text : "";
+                      } else if (mainValue) {
+                        displayValue = `Marked as:   ${mainValue}`;
+                      }
+                    }
+
+                    if (
+                      !displayValue &&
+                      info.secondaryKey in this.component.results[0]
+                    ) {
+                      const secondaryValue =
+                        this.component.results[0][info.secondaryKey];
+                      if (typeof secondaryValue === "boolean") {
+                        displayValue = secondaryValue ? info.text : "";
+                      } else if (secondaryValue) {
+                        displayValue = `Marked as:   ${secondaryValue}`;
+                      }
                     }
                   }
 
@@ -2754,10 +2763,31 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                 .join("");
             }
 
+            console.log("field.key", field.key);
+
             if (field.type == "date") {
               value = this._formatDate(this.component.results[0][field.key]);
             } else if (field.type == "work-date") {
               value = this._getWorkDate();
+            } else if (field.key == "geonames_locatedIn") {
+              value = this.component.results[0][field.key];
+
+              let html = `<div class="content">`;
+
+              if (value) {
+                html += `<p class="${field.hideClass ? "" : "fieldlabel"}">${
+                  field.title
+                }: ${value}`;
+
+                if (additionalInfo) {
+                  html += ` (${additionalInfo})</p>`;
+                } else {
+                  html += `</p>`;
+                }
+              }
+              html += `</div>`;
+
+              return html;
             } else {
               value = this.component.results[0][field.key];
             }

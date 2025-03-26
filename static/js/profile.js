@@ -124,7 +124,18 @@ function _getInstitutionComponents(emlo) {
         sectionTitleImage: "/static/img/icon-globe.png",
         divider: true,
         fields: [
-          { title: "City", key: "geonames_locatedIn", hideClass: true },
+          {
+            title: "City",
+            key: "geonames_locatedIn",
+            additonalInfo: [
+              {
+                mainKey: "ox_locatedInAlternate",
+                secondaryKey: "",
+                text: "",
+              },
+            ],
+            hideClass: true,
+          },
           { title: "Country", key: "geonames_inCountry", hideClass: true },
         ],
       }),

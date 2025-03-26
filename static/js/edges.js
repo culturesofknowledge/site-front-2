@@ -3234,7 +3234,13 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         })
         .join("");
 
+      let countFrag = "";
+      if (this.primaryField == "ox_hasResource-manifestation") {
+        countFrag += `${allParentObjects.length} records`;
+      }
+
       return `
+        ${countFrag}
         <table class="nested-table">
           <thead>
             <tr>
@@ -3372,7 +3378,18 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       .filter((row) => row)
       .join("");
 
+    let countFrag = "";
+    if (
+      this.primaryField == "ox_hasResource-manifestation" &&
+      allParentObjects.length > 0
+    ) {
+      countFrag += `${allParentObjects.length} ${
+        allParentObjects.length > 1 ? "records" : "record"
+      }`;
+    }
+
     const table = `
+      ${countFrag}
       <table class="nested-table" style="border-collapse: collapse;">
         <tbody>
           ${rows}

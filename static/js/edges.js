@@ -2483,7 +2483,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       container = `<div class="${containerClasses}">
         ${dividerFrag}
         ${sectionTitleFrag}
-        ${frag}
+        <div style="margin-left:25px">
+          ${frag}
+        </div>
       </div>`;
     }
 
@@ -3730,6 +3732,16 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       //   <p>
       // `
       //   : "";
+    }
+
+    if (this.field == "geonames_alternateName") {
+      return value
+        ? `
+        <p style="white-space:pre-line">
+           ${edges.util.escapeHtml(value)}
+        <p>
+      `
+        : "";
     }
 
     return value

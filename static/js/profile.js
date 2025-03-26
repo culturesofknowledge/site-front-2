@@ -108,7 +108,7 @@ function _getInstitutionComponents(emlo) {
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
         type: "text",
-        sectionTitle: "Alternative name",
+        sectionTitle: "Alternative names",
         sectionTitleImage: "/static/img/icon-repository.png",
         field: "geonames_alternateName",
         divider: true,

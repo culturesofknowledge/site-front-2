@@ -48,6 +48,7 @@ def fetchStatsNew():
         data = request.json
         solr_core = data.get('solrCore')
         uuids = data.get('uuids', [])
+        objectKey = data.get('objectKey', 'uuid')
         filter_query = data.get('filter', '')
 
         # Validate input
@@ -65,8 +66,8 @@ def fetchStatsNew():
         for batch in batches:
             # Construct the Solr query for the current batch
             uuid_query = ' OR '.join([f'"{uuid}"' for uuid in batch])  # Ensure UUIDs are quoted correctly
-            solr_query = f'uuid:({uuid_query})'
-
+            solr_query = f'{objectKey}:({uuid_query})'
+            print(f"Got query: {solr_query}")
             if filter_query:
                 solr_query += f' AND ({filter_query})'
 

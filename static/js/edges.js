@@ -2483,9 +2483,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       container = `<div class="${containerClasses}">
         ${dividerFrag}
         ${sectionTitleFrag}
-        <div style="margin-left:25px">
           ${frag}
-        </div>
       </div>`;
     }
 

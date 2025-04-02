@@ -212,7 +212,7 @@ emlo.ProfileTemplate = class extends edges.Template {
         </div>
       </div>
 
-      <div class="row row-with-side">
+      <div class="columns large-12">
         <div class="large-12 columns" style="padding-left:0px">
             <div id="profile">
                 <h2 class="main" style="margin-top:0px">
@@ -2570,7 +2570,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     return `
     <h4 class="main">
       ${imageTag}
-      <strong>${edges.util.escapeHtml(title)}</strong>
+      <strong style="font-family: Helvetica Neue,Helvetica,Roboto,Arial,sans-serif;cursor: auto;">${edges.util.escapeHtml(title)}</strong>
     </h4>
     <hr class="yellow-divider" />`;
   }
@@ -3240,22 +3240,24 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       }
 
       return `
-        ${countFrag}
-        <table class="nested-table">
-          <thead>
-            <tr>
-              <th>
-                Decade
-              </th>
-              <th>
-                Letters per year
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows}
-          </tbody>
-        </table>
+        <div style="margin-left:35px">
+          ${countFrag}
+          <table class="nested-table">
+            <thead>
+              <tr>
+                <th>
+                  Decade
+                </th>
+                <th>
+                  Letters per year
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows}
+            </tbody>
+          </table>
+        </div>
       `;
     }
 
@@ -3389,12 +3391,14 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     }
 
     const table = `
-      ${countFrag}
-      <table class="nested-table" style="border-collapse: collapse;">
-        <tbody>
-          ${rows}
-        </tbody>
-      </table>
+      <div style="margin-left:35px">
+        ${countFrag}
+        <table class="nested-table" style="border-collapse: collapse;">
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      </div>
     `;
 
     return rows ? table : "";

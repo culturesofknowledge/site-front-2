@@ -100,7 +100,7 @@ emlo.ResultTemplate = class extends edges.Template {
           </div>
        
           <div id="modify_search" style="display:none;">
-              <button onclick="modifyCurrentSearch()">Modify search</button>
+              <button class="small button modifysearchbtn" onclick="modifyCurrentSearch()">Modify your search</button>
           </div>
 
          <div id="current_search">

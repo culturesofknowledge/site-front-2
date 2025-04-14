@@ -108,7 +108,7 @@ emlo.ResultTemplate = class extends edges.Template {
             ${selected_facets}
         </div>
 
-        <div id="refine_search">
+        <div id="refine_search" style="display:none;">
             <h3 class="main">Refine your results</h3>
             ${refine_search}
         </div>
@@ -517,6 +517,11 @@ emlo.ResultTable = class extends edges.Component {
       if (this.results === false) {
         currentDoc.innerHTML = "Loading results...";
         return;
+      }
+
+      if(this.hitCount > 0)  {
+        let refineSearch = document.getElementById("refine_search");
+        refineSearch.style.display = "inline";
       }
 
       // Check if results are fetched correctly

@@ -3224,7 +3224,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         return acc;
       }, {});
 
-      console.log("queryKey" , queryVal , this.primaryResultKey)
 
       // Generate summarized table rows
       const rows = Object.entries(decadeSummary)

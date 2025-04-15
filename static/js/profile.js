@@ -152,6 +152,7 @@ function _getInstitutionComponents(emlo) {
         sectionTitle: "Collection overview",
         sectionTitleImage: "/static/img/icon-quill.png",
         primaryField: "ox_hasResource-manifestation",
+        field:"repository",
         fields: [
           { title: "", key: "ox_started-ox_year" },
           { title: "", key: "dcterms_description", clickable: true },

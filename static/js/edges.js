@@ -3204,7 +3204,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         if (this.primaryResultKey) {
           queryVal = this.component.results[0][this.primaryResultKey];
         } else {
-          queryVal = parentObject["author_sort"];
+          if(this.field == "repository") {
+            queryVal = this.component.results[0]["browse"];
+          } else {  
+            queryVal = parentObject["author_sort"];
+          }
         }
 
         if (year) {
@@ -3219,6 +3223,8 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
         return acc;
       }, {});
+
+      console.log("queryKey" , queryVal , this.primaryResultKey)
 
       // Generate summarized table rows
       const rows = Object.entries(decadeSummary)

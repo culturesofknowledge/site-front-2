@@ -519,7 +519,7 @@ emlo.ResultTable = class extends edges.Component {
         return;
       }
 
-      if(this.hitCount > 0)  {
+      if (this.hitCount > 0) {
         let refineSearch = document.getElementById("refine_search");
         refineSearch.style.display = "inline";
       }
@@ -2153,38 +2153,339 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
     return browseNamesString;
   }
 
+  // _getSelectedFieldLabel(field) {
+  //   switch (field) {
+  //     case "author_sort":
+  //     case "frbr_creator-person":
+  //       return "Author";
+  //     case "recipient_sort":
+  //     case "mail_recipient-person":
+  //       return "Recipient";
+  //     case "dcterms_references-person":
+  //       return "Mentions";
+  //     case "origin_sort":
+  //       return "Origin of letter";
+  //     case "destination_sort":
+  //       return "Destination of letter";
+  //     case "cito_Catalog":
+  //       return "Catalogue";
+  //     case "ox_started-ox_year":
+  //       return "Year";
+  //     case "mail_origin-location":
+  //     case "pla_ori_name":
+  //       return " Origin of letter";
+  //     case "mail_destination-location":
+  //     case "pla_des_name":
+  //       return " Origin of letter";
+  //     case "dcterms_references-location":
+  //     case "pla_ment_name":
+  //       return " Places mentioned";
+  //     case "uuid_related":
+  //       return "Any from list";
+  //     default:
+  //       return field;
+  //   }
+  // }
+
   _getSelectedFieldLabel(field) {
-    switch (field) {
-      case "author_sort":
-      case "frbr_creator-person":
-        return "Author";
-      case "recipient_sort":
-      case "mail_recipient-person":
-        return "Recipient";
-      case "dcterms_references-person":
-        return "Mentions";
-      case "origin_sort":
-        return "Origin of letter";
-      case "destination_sort":
-        return "Destination of letter";
-      case "cito_Catalog":
-        return "Catalogue";
-      case "ox_started-ox_year":
-        return "Year";
-      case "mail_origin-location":
-      case "pla_ori_name":
-        return " Origin of letter";
-      case "mail_destination-location":
-      case "pla_des_name":
-        return " Origin of letter";
-      case "dcterms_references-location":
-      case "pla_ment_name":
-        return " Places mentioned";
-      case "uuid_related":
-        return "Any from list";
-      default:
-        return field;
-    }
+    const fieldLabels = {
+      aut: "Author",
+      author_sort: "Author",
+      aut_mark: "Author as marked",
+      aut_org: "Author is organisation",
+      agent_org: "Author, recipient etc is organisation",
+      aut_gend: "Author Gender",
+      aut_roles: "Roles or titles of author",
+      rec: "Recipient",
+      rec_roles: "Roles or titles of recipient",
+      rec_mark: "Recipient as marked",
+      rec_org: "Recipient is organisation",
+      rec_gend: "Recipient Gender",
+      ment: "Person or organisation mentioned",
+      ment_gend: "Gender of person mentioned",
+      ment_roles: "Roles or titles of person mentioned",
+      ment_org: "Organisation is mentioned",
+      recipient_sort: "Addressee",
+      origin_sort: "Origin",
+      pla_ori_name: "Origin",
+      pla_ori_mark: "Origin as marked",
+      pla_des_name: "Destination",
+      pla_des_mark: "Destination as marked",
+      pla_ment_name: "Place mentioned",
+      let_ima: "Has images",
+      let_trans: "Has transcription",
+      let_abst: "Has abstract",
+      let_shel: "Shelfmark",
+      let_pe: "Has printed editions",
+      let_pe_tex: "Printed editions",
+      let_with_en: "Enclosed",
+      let_en: "Encloses",
+      let_pap_siz: "Has paper size",
+      let_pap_siz_tex: "Paper size",
+      let_pap_typ: "Has paper type",
+      let_pap_typ_tex: "Paper type",
+      let_page: "Has page count",
+      let_page_min: "Minimum page count",
+      let_seal: "Has seal",
+      let_seal_tex: "Seal",
+      let_pmark: "Has postmark",
+      let_pmark_tex: "Postmark",
+      let_end: "Has endorsement",
+      let_end_tex: "Endorsement",
+      let_con: "Contents",
+      let_lang: "Language",
+      destination_sort: "Destination",
+      col_cat: "Catalogue",
+      cat_group: "Catalogues",
+      let_type: "Document type",
+      started_date_sort: "Date",
+      dat_sin_year: "Year",
+      dat_sin_month: "Month",
+      dat_sin_day: "Day",
+      dat_from_year: "From year",
+      dat_from_month: "From month",
+      dat_from_day: "From day",
+      dat_to_year: "To year",
+      dat_to_month: "To month",
+      dat_to_day: "To day",
+      "dcterms_references-person": "Mentions",
+      "mail_origin-location": "Origin",
+      "mail_destination-location": "Destination",
+      "dcterms_references-location": "Place mentioned",
+      uuid_related: "Any from list",
+      "frbr_creator-person": "Author",
+      "ox_started-ox_year": "Year",
+      cito_Catalog: "Catalogue",
+      object_type: "Record Type",
+      "object type": "Record Type",
+      collection: "Collections",
+      locations: "Locations",
+      work: "Letter",
+      person: "Person or organisation",
+      manifestation: "Document",
+      resource: "Related resource",
+      cito_Catalog: "Catalogue",
+      ox_keywords: "Keywords",
+      dcterms_language: "Language",
+      dcterms_abstract: "Abstract",
+      ox_editStatus: "Edit Status",
+      ox_incipit: "Incipit",
+      ox_excipit: "Explicit",
+      mail_postScript: "Postscript",
+      ox_editorNotes: "Editors' Notes",
+      "frbr_Manifestation-manifestation":
+        "Versions (originals, copies, digital, etc.)",
+      "rdfs_seeAlso-resource": "Related Resources",
+      "ox_isAnnotatedBy-comment": "Comments",
+      "ox_started-ox_year": "Year",
+      "frbr_creator-person": "Author",
+      "mail_recipient-person": "Recipient",
+      "mail_authors-rdf_value": "Author (as marked)",
+      "mail_addressees-rdf_value": "Recipient (as marked)",
+      "dcterms_references-person": "Mentions",
+      dcterms_relation: "Link",
+      skos_altLabel: "Alternative names",
+      foaf_name: "Name",
+      "dcterms_identifier-shelf_": "Shelfmark",
+      mail_destination: "Address",
+      "frbr_Work-work": "Details of letter",
+      "frbr_Image-image": "Image",
+      "ox_resourceAt-institution": "Repository",
+      geonames_officialName: "Repository",
+      bibo_Note: "Comment",
+      "bibo_annotates-work": "Comment on letter",
+      "bibo_annotates-person": "Comment on person or organisation",
+      "ox_annotatesAddressee-work": "Comment on addressee",
+      "ox_annotatesAuthor-work": "Comment on author",
+      "ox_annotatesDate-work": "Comment on date",
+      ox_titleOfResource: "Resource title",
+      dcterms_description: "Description of letter",
+      "mail_origin-location": "Origin of letter",
+      "mail_destination-location": "Destination of letter",
+      "mail_destination-rdf_value": "Destination (as marked)",
+      "mail_origin-rdf_value": "Origin (as marked)",
+      "frbr_creatorOf-work": "Letters Written",
+      "mail_recipientOf-work": "Letters Received",
+      "ox_memberOf-person": "Member of",
+      "foaf_member-person": "Members",
+      "dcterms_isReferencedBy-work": "Letters Mentioning",
+      foaf_gender: "Gender",
+      mail_paperSize: "Paper size",
+      mail_paper: "Paper type or watermark",
+      ox_numPageText: "Number of pages of text",
+      mail_seal: "Seal",
+      ox_endorsements: "Endorsements",
+      ox_nonLetterEnclosures: "Non-letter enclosures",
+      mail_postageMark: "Postage mark",
+      ox_printedEditionDetails: "",
+      "mail_enclosedBy-manifestation": "Was enclosed in",
+      "mail_enclosureOf-manifestation": "Had enclosure",
+      "mail_originOf-work": "Letters Sent From",
+      "mail_destinationOf-work": "Letters Sent To",
+      "rdfs_seeAlso-work": "Resource related to letter",
+      "rdfs_seeAlso-person": "Resource related to person or organisation",
+      ox_titlesRolesOccupations: "Titles or roles",
+      "rel_childOf-person": "Child of",
+      "rel_parentOf-person": "Parent of",
+      "rel_siblingOf-person": "Sibling of",
+      "rel_spouseOf-person  ": "Spouse of",
+      "rel_relativeOf-person": "Relative of",
+      "ox_unspecifiedRelationshipWith-person": "Unspecified relationship with",
+      "dcterms_identifier-editi_": "ID",
+      "dcterms_identifier-uri_": "URI",
+      "rdfs_seeAlso-work": "Letter with related resource",
+      "rdfs_seeAlso-person": "Person with related resource",
+      "dcterms_references-location": "Places mentioned",
+      "dcterms_references-work": "Letters mentioned",
+      "ox_authorAnnotate-comment": "Comments on author",
+      "ox_addresseeAnnotate-comment": "Comments on addressee",
+      "ox_dateAnnotate-comment": "Comments on creation date",
+      "ox_dateReceiptAnnotate-comment": "Comments on receipt date",
+      "ox_originAnnotate-comment": "Comments on origin",
+      "ox_destinationAnnotate-comment": "Comments on destination",
+      "person-author": "Author",
+      "person-author-organisation": "Author is organisation",
+      "person-author-gender": "Gender is author",
+      "person-recipient": "Addressee",
+      "person-recipient-organisation": "Addressee is organisation",
+      "person-recipient-gender": "Gender is addressee",
+      "location-origin": "Origin",
+      "location-destination": "Destination",
+      ox_day: "Day",
+      ox_month: "Month",
+      ox_year: "Year",
+      ox_started: "Period start",
+      ox_completed: "Period end",
+      "ox_started-ox_day": "Start day",
+      "ox_started-ox_month": "Start month",
+      "ox_completed-ox_day": "End day",
+      "ox_completed-ox_month": "End month",
+      "ox_completed-ox_year": "End year",
+      ox_dateIsRange: "Date range",
+      ox_originalCalendar: "Original calendar",
+      ox_dateMarked: "Date as marked",
+      ox_internalAdded: "Date added",
+      ox_internalCreated: "Date created",
+      ox_internalModified: "Date changed",
+      indef_uncertainDate: "Uncertainty flag",
+      indef_uncertain: "Uncertain",
+      indef_inferred: "Inferred",
+      indef_approximate: "Approximate",
+      mail_authors_uncertain: "Author uncertain",
+      mail_authors_inferred: "Author inferred",
+      mail_addressees_uncertain: "Addressee uncertain",
+      mail_addressees_inferred: "Addressee inferred",
+      mail_origin_uncertain: "Origin uncertain",
+      mail_origin_inferred: "Origin inferred",
+      mail_destination_uncertain: "Destination uncertain",
+      mail_destination_inferred: "Destination inferred",
+      ox_started_uncertain: "Date uncertain",
+      ox_started_inferred: "Date inferred",
+      ox_started_approximate: "Date approximate",
+      dcterms_created: "Creation date",
+      "dcterms_created-ox_year": "Creation date year",
+      "dcterms_created-ox_month": "Creation date month",
+      "dcterms_created-ox_day": "Creation date day",
+      "dcterms_created-uncertain": "Creation date uncertain",
+      "dcterms_created-inferred": "Creation date inferred",
+      "dcterms_created-approximate": "Creation date approximate",
+      dcterms_source: "Image source file",
+      foaf_thumbnail: "Thumbnail file",
+      "bibo_annotates-manifestation": "Document commented on",
+      "bibo_annotates-location": "Place commented on",
+      "foaf_name-firstletter": "First letter of name",
+      geonames_name: "Location name",
+      ox_locationAlternateName: "Alternative names",
+      "ox_hasResource-manifestation": "Repository contents",
+      geonames_alternateName: "Alternative names for repository",
+      geonames_locatedIn: "City",
+      ox_locatedInAlternate: "Alternative names for city",
+      geonames_inCountry: "Country",
+      ox_inCountryAlternate: "Alternative names for country",
+      dcterms_type: "Document type",
+      ox_detailsOfResource: "Resource details",
+      bio_Birth: "Birth",
+      "bio_Birth-ox_year": "Birth year",
+      "bio_Birth-ox_month": "Birth month",
+      "bio_Birth-ox_day": "Birth day",
+      "bio_Birth-uncertain": "Birth date uncertain",
+      "bio_Birth-inferred": "Birth date inferred",
+      "bio_Birth-approximate": "Birth date approximate",
+      bio_Death: "Death",
+      "bio_Death-ox_year": "Death year",
+      "bio_Death-ox_month": "Death month",
+      "bio_Death-ox_day": "Death day",
+      "bio_Death-uncertain": "Death date uncertain",
+      "bio_Death-inferred": "Death date inferred",
+      "bio_Death-approximate": "Death date approximate",
+      ox_furtherReading: "Further reading",
+      geo_lat: "Latitude",
+      geo_long: "Longitude",
+      ox_isOrganisation: "Is organisation",
+      "manifestation-paper_size": "Paper size",
+      "manifestation-paper_type": "paper type",
+      bibo_numPages: "Number of pages of document",
+      "manifestation-pages_number": "Number of pages",
+      "manifestation-seal": "Seal",
+      "manifestation-endorsements": "Endorsements",
+      "manifestation-non_letter_enclosures": "Non-letter enclosures",
+      "manifestation-postage_mark": "Postage mark",
+      "manifestation-enclosed": "Enclosed",
+      "manifestation-enclosure": "Document with enclosure",
+      "mail_replyTo-work": "Reply to",
+      "mail_hasReply-work": "Answered by",
+      "owl_sameAs-work": "Matches",
+      "manifestation-has_image": "Has image",
+      get_manif_repository_fieldname: "Repository",
+      "manifestation-doc_type": "Document type",
+      "manifestation-shelfmark": "Shelfmark",
+      "manifestation-printed_edition": "Printed edition",
+      ox_isTranslation: "Is translation",
+      "ox_previouslyOwned-manifestation": "Documents owned",
+      "ox_previouslyOwnedBy-person": "Former owner",
+      "mail_handwrote-manifestation": "Handwrote",
+      "mail_handwroteBy-person": "Handwritten by",
+      "ox_wasBornIn-location": "Place where born",
+      "rel_wasBirthplaceOf-person": "People born at place",
+      "ox_diedAt-location": "Place where died",
+      "rel_wasPlaceOfDeathOf-person": "People who died at place",
+      "ox_wasAt-location": "Places visited",
+      "rel_wasVisitedBy-person": "People who visited place",
+      "ox_annotatesAgentsReferenced-work":
+        "Letters with comments on people mentioned",
+      "ox_agentsReferencedAnnotatedBy-comment":
+        "Comments on people mentioned in work",
+      ox_totalWorksByAgent: "Letters Written",
+      ox_totalWorksAddressedToAgent: "Letters Received",
+      ox_totalWorksMentioningAgent: "Letters Mentioning",
+      ox_totalWorksSentFromPlace: "Letters Sent From",
+      ox_totalWorksSentToPlace: "Letters Sent To",
+      ox_totalWorksMentioningPlace: "Letters Mentioning",
+      ox_totalDocsInRepository: "Number of documents",
+      ox_opened: "Opened",
+      ox_routing_mark_ms: "Routing mark (MS)",
+      ox_routing_mark_stamp: "Routing mark (stamp)",
+      ox_handling_instructions: "Handling instructions",
+      ox_stored_folded: "Stored folded",
+      ox_postage_costs_as_marked: "Postage cost as marked",
+      ox_postage_costs: "Postage cost",
+      ox_non_delivery_reason: "Non-delivery reason",
+      ox_date_of_receipt_as_marked: "Date of receipt as marked",
+      ox_manifestation_receipt_calendar: "Date of receipt calendar",
+      ox_manifestation_receipt_date: "Date of receipt",
+      ox_manifestation_receipt_date_gregorian: "Date of receipt gregorian",
+      ox_manifestation_receipt_date_inferred: "Date of receipt inferred",
+      ox_manifestation_receipt_date_uncertain: "Date of receipt uncertain",
+      ox_manifestation_receipt_date_approx: "Date of receipt approx",
+      ox_accompaniments: "Accompaniments",
+      "taught-person": "Taught",
+      "was_taught_by-person": "Was taught by",
+      "employed-person": "Employed",
+      "was_employed_by-person": "Was employed by",
+      "friend-person": "Friend of",
+    };
+
+    return fieldLabels[field] || field;
   }
 };
 
@@ -2575,7 +2876,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     return `
     <h4 class="main">
       ${imageTag}
-      <strong style="font-family: Helvetica Neue,Helvetica,Roboto,Arial,sans-serif;cursor: auto;">${edges.util.escapeHtml(title)}</strong>
+      <strong style="font-family: Helvetica Neue,Helvetica,Roboto,Arial,sans-serif;cursor: auto;">${edges.util.escapeHtml(
+        title
+      )}</strong>
     </h4>
     <hr class="yellow-divider" />`;
   }
@@ -3204,9 +3507,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         if (this.primaryResultKey) {
           queryVal = this.component.results[0][this.primaryResultKey];
         } else {
-          if(this.field == "repository") {
+          if (this.field == "repository") {
             queryVal = this.component.results[0]["browse"];
-          } else {  
+          } else {
             queryVal = parentObject["author_sort"];
           }
         }
@@ -3223,7 +3526,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
         return acc;
       }, {});
-
 
       // Generate summarized table rows
       const rows = Object.entries(decadeSummary)

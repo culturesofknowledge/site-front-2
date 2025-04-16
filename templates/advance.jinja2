@@ -407,33 +407,44 @@ function sticky_relocate() {
     }
 }
 
-function checkIfBooleanFieldIsPresent(){
+function updateInputValue(){
    const urlParams = new URLSearchParams(window.location.search);
 
     inputs.forEach(input => {
-    const { id, defaultValue, paramName } = input;
+        const { id, defaultValue, paramName } = input;
 
-    // Only check boolean fields (i.e., those with defaultValue === "false")
-    if (defaultValue === "false") {
-        const paramValue = urlParams.get(paramName);
+        // Only check boolean fields (i.e., those with defaultValue === "false")
+        if (defaultValue === "false") {
+            const paramValue = urlParams.get(paramName);
 
-        // If param exists and is "true", update the input element
-        if (paramValue === "true") {
-        const element = document.getElementById(id);
-        if (element) {
-            // If it's a checkbox or similar, mark it as checked
-            element.checked = true;
-            element.value = "true";
+            // If param exists and is "true", update the input element
+            if (paramValue === "true") {
+                const element = document.getElementById(id);
+                if (element) {
+                    // If it's a checkbox or similar, mark it as checked
+                    element.checked = true;
+                    element.value = "true";
+                } else {
+                    console.warn(`Element with ID "${id}" not found.`);
+                }
+            }
         } else {
-            console.warn(`Element with ID "${id}" not found.`);
+            const paramValue = urlParams.get(paramName);
+
+            if(paramValue && paramValue != defaultValue) {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.value = paramValue
+                } else {
+                    console.warn(`Element with ID "${id}" not found.`);
+                }
+            }
         }
-        }
-    }
     });
 }
 
 $(function() {
-    checkIfBooleanFieldIsPresent()
+    updateInputValue()
     const maxWidthForScrollEffect = 1024;
     $(window).scroll(sticky_relocate);
     $('.side').css("position", "initial");

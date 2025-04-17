@@ -3991,8 +3991,15 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     // Iterate through results and build rows
     const rows = this.component.results
       .map((result) => {
-        const parentObjects = result[parentField]; // Get all objects in the primary field array
+        let parentObjects = result[parentField]; // Get all objects in the primary field array
         if (!parentObjects || parentObjects.length === 0) return ""; // Skip if no data in primary field
+
+        // Sorting list on the basis of field name
+        parentObjects = parentObjects.sort((a, b) => {
+          const nameA = a["browse"] || "";
+          const nameB = b["browse"] || "";
+          return nameA.localeCompare(nameB);
+        });
 
         // Iterate over each object in the parent field array
         return parentObjects

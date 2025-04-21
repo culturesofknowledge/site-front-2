@@ -212,7 +212,7 @@ emlo.ProfileTemplate = class extends edges.Template {
         </div>
       </div>
 
-      <div id="main" class="">
+      <div id="main" class="" style="margin-left:5px;">
         <div class="large-12 columns">
           ${results}
         </div>

@@ -198,36 +198,94 @@ try {
   console.error(error.message);
 }
 
-function _redirectToSearch(val, res, fieldName) {
+// function _redirectToSearch(val, res, fieldName) {
+//   if (typeof res !== "object" || res === null) {
+//     console.log("Invalid input: res is not an object");
+//     return "<div>Invalid input</div>";
+//   }
+
+//   // console.log("finalURL", finalUrl);
+//   if (val > 0) {
+//     const baseURL = `/forms/advance`;
+//     let query = "";
+
+//     const user = res["foaf_name"];
+//     const currentPageQ = `browsing=organisations&letter=${current_search_letter}`;
+
+//     switch (fieldName) {
+//       case "ox_totalWorksByAgent":
+//         let aut = res["frbr_creatorOf-work"];
+//         aut = aut.join(",");
+
+//         query = `frbr_creator-person=${aut}`;
+
+//         break;
+//       case "ox_totalWorksAddressedToAgent":
+//         let rec = res["mail_recipientOf-work"];
+//         if (rec.length > 0) {
+//           query = `mail_recipient-person=${rec.join(",")}`;
+//         }
+//         break;
+//       case "ox_totalWorksMentioningAgent":
+//         let ment = res["dcterms_isReferencedBy-work"];
+//         if (ment.length > 0) {
+//           query = `dcterms_references-person=${ment.join(",")}`;
+//         }
+//         break;
+//     }
+
+//     query += query ? `&${currentPageQ}` : `${currentPageQ}`;
+//     const finalUrl = query ? `${baseURL}?${query}` : `${baseURL}`;
+
+//     return `<a href="${finalUrl}"> ${val} </a>`;
+//   } else {
+//     return `-`;
+//   }
+// }
+
+function _redirectToSearch(val, res, fieldName, current_search_letter = "A") {
   if (typeof res !== "object" || res === null) {
     console.log("Invalid input: res is not an object");
     return "<div>Invalid input</div>";
   }
 
-  // console.log("finalURL", finalUrl);
   if (val > 0) {
     const baseURL = `/forms/advance`;
-    let query = "";
-    const user = res["foaf_name"];
     const currentPageQ = `browsing=organisations&letter=${current_search_letter}`;
 
-    switch (fieldName) {
-      case "ox_totalWorksByAgent":
-        query = `aut=${user}`;
-        break;
-      case "ox_totalWorksAddressedToAgent":
-        query = `rec=${user}`;
-        break;
-      case "ox_totalWorksMentioningAgent":
-        query = `ment=${user}`;
-        break;
+    const queryFields = {
+      ox_totalWorksByAgent: {
+        resKey: "frbr_creatorOf-work",
+        queryKey: "frbr_creator-person",
+      },
+      ox_totalWorksAddressedToAgent: {
+        resKey: "mail_recipientOf-work",
+        queryKey: "mail_recipient-person",
+      },
+      ox_totalWorksMentioningAgent: {
+        resKey: "dcterms_isReferencedBy-work",
+        queryKey: "dcterms_references-person",
+      },
+    };
+
+    const mapping = queryFields[fieldName];
+    let query = "";
+
+    if (mapping) {
+      const values = res[mapping.resKey];
+      const newVal = `http://localhost/person/${res.uuid}`;
+      if (Array.isArray(values) && values.length > 0) {
+        query = `${mapping.queryKey}=${newVal}`;
+      }
     }
 
-    query += query ? `&${currentPageQ}` : `${currentPageQ}`;
-    const finalUrl = query ? `${baseURL}?${query}` : `${baseURL}`;
+    console.log("query", query);
 
-    return `<a href="${finalUrl}"> ${val} </a>`;
-  } else {
-    return `-`;
+    query += query ? `&${currentPageQ}` : currentPageQ;
+    const finalUrl = `${baseURL}?${query}`;
+
+    return `<a href="${finalUrl}">${val}</a>`;
   }
+
+  return `-`;
 }

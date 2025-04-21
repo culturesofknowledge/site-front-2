@@ -2686,6 +2686,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     this.divider = edges.util.getParam(params, "divider", false); // Whether to include a divider
     this.message = edges.util.getParam(params, "message", "");
     this.footerType = edges.util.getParam(params, "footerType", "");
+    this.isSide = edges.util.getParam(params, "isSide", false); // Whether to render in a sidebar
     this.namespace = "edges-custom-display";
   }
 
@@ -2773,7 +2774,13 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     }
 
     const sectionTitleFrag = this._renderSectionTitle();
-    const dividerFrag = this.divider ? ' <hr class="yellow-divider" />' : "";
+    const dividerFrag = this.divider
+      ? this.isSide
+        ? '<hr class="yellow-divider"/>'
+        : '<div class="yellow-divider"></div>'
+      : "";
+
+    console.log("frag", dividerFrag);
 
     const containerClasses = edges.util.styleClasses(
       this.namespace,
@@ -2784,10 +2791,16 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     let container = "";
 
     if (frag) {
+      const content = this.isSide
+        ? `${sectionTitleFrag}${frag}`
+        : `<div class="content">
+             ${sectionTitleFrag}
+             ${frag}
+           </div>`;
+
       container = `<div class="${containerClasses}">
         ${dividerFrag}
-        ${sectionTitleFrag}
-          ${frag}
+        ${content}
       </div>`;
     }
 

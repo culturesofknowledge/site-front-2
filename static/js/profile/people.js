@@ -10,6 +10,7 @@ export function getPeopleComponents(emlo) {
         dynamicTitleField: "ox_isOrganisation",
         dynamicImage: "/static/img/people_icon.png",
         contentTitleImage: "/static/img/person-icon.png",
+        isSide: true,
       }),
     }),
 
@@ -19,6 +20,7 @@ export function getPeopleComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "shortUrl",
         footerType: "p",
+        isSide: true,
       }),
     }),
 
@@ -32,6 +34,7 @@ export function getPeopleComponents(emlo) {
         divider: true,
         contentTitle: "Related resources ",
         primaryField: "rdfs_seeAlso-resource",
+        isSide: true,
         fields: [
           {
             title: "",
@@ -53,6 +56,7 @@ export function getPeopleComponents(emlo) {
         divider: true,
         contentTitle: "Place where born",
         primaryField: "ox_wasBornIn-location",
+        isSide: true,
         fields: [
           {
             title: "",
@@ -74,6 +78,7 @@ export function getPeopleComponents(emlo) {
         divider: true,
         contentTitle: "Place where died",
         primaryField: "ox_diedAt-location",
+        isSide: true,
         fields: [
           {
             title: "",
@@ -95,6 +100,7 @@ export function getPeopleComponents(emlo) {
         divider: true,
         contentTitle: "Places visited",
         primaryField: "ox_wasAt-location",
+        isSide: true,
         fields: [
           {
             title: "",
@@ -115,6 +121,7 @@ export function getPeopleComponents(emlo) {
         type: "side-nested-links",
         contentTitle: "Child of ",
         primaryField: "rel_childOf-person",
+        isSide: true,
         fields: [
           {
             title: "",
@@ -135,6 +142,7 @@ export function getPeopleComponents(emlo) {
         type: "side-nested-links",
         contentTitle: "Parent of ",
         primaryField: "rel_parentOf-person",
+        isSide: true,
         fields: [
           {
             title: "",
@@ -155,6 +163,7 @@ export function getPeopleComponents(emlo) {
         type: "side-nested-links",
         contentTitle: "Sibling of ",
         primaryField: "rel_siblingOf-person",
+        isSide: true,
         fields: [
           {
             title: "",
@@ -175,6 +184,7 @@ export function getPeopleComponents(emlo) {
         type: "side-nested-links",
         contentTitle: "Spouse of ",
         primaryField: "rel_spouseOf-person",
+        isSide: true,
         fields: [
           {
             title: "",
@@ -195,6 +205,7 @@ export function getPeopleComponents(emlo) {
         type: "side-nested-links",
         contentTitle: "Relative of ",
         primaryField: "rel_relativeOf-person",
+        isSide: true,
         fields: [
           {
             title: "",
@@ -215,6 +226,7 @@ export function getPeopleComponents(emlo) {
         type: "side-nested-links",
         contentTitle: "Unspecified relationship with ",
         primaryField: "ox_unspecifiedRelationshipWith-person",
+        isSide: true,
         fields: [
           {
             title: "",
@@ -235,6 +247,7 @@ export function getPeopleComponents(emlo) {
         type: "side-nested-links",
         contentTitle: "Was taught by",
         primaryField: "taught-person",
+        isSide: true,
         fields: [
           {
             title: "",
@@ -255,6 +268,7 @@ export function getPeopleComponents(emlo) {
         type: "side-nested-links",
         contentTitle: "Taught",
         primaryField: "was_taught_by-person",
+        isSide: true,
         fields: [
           {
             title: "",
@@ -275,6 +289,7 @@ export function getPeopleComponents(emlo) {
         type: "side-nested-links",
         contentTitle: "Was employed by",
         primaryField: "employed-person",
+        isSide: true,
         fields: [
           {
             title: "",
@@ -295,6 +310,7 @@ export function getPeopleComponents(emlo) {
         type: "side-nested-links",
         contentTitle: "Employed",
         primaryField: "was_employed_by-person",
+        isSide: true,
         fields: [
           {
             title: "",
@@ -315,6 +331,7 @@ export function getPeopleComponents(emlo) {
         type: "side-nested-links",
         contentTitle: "Friend of",
         primaryField: "friend-person",
+        isSide: true,
         fields: [
           {
             title: "",
@@ -335,6 +352,7 @@ export function getPeopleComponents(emlo) {
         type: "side-nested-links",
         contentTitle: "Member of ",
         primaryField: "ox_memberOf-person",
+        isSide: true,
         fields: [
           {
             title: "",
@@ -355,6 +373,7 @@ export function getPeopleComponents(emlo) {
         type: "side-nested-links",
         contentTitle: "Members",
         primaryField: "foaf_member-person",
+        isSide: true,
         fields: [
           {
             title: "",
@@ -375,6 +394,7 @@ export function getPeopleComponents(emlo) {
         type: "side-nested-links",
         contentTitle: "Further reading",
         primaryField: "ox_furtherReading",
+        isSide: true,
         fields: [
           {
             title: "",

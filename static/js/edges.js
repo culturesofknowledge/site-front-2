@@ -2088,6 +2088,15 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
         value = value.slice(1, -1);
       }
 
+      if (
+        typeof value === "string" &&
+        value.startsWith('"http') &&
+        value.endsWith('"')
+      ) {
+        value = value.split("/").filter(Boolean).pop();
+        value = value.slice(0, -1);
+      }
+
       let collectionName = "";
 
       if (colMap.hasOwnProperty(field)) {

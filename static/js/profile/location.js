@@ -7,6 +7,7 @@ export function getLocationComponents(emlo) {
         type: "side-title",
         contentTitle: "Location",
         contentTitleImage: "/static/img/places-icon.png",
+        isSide: true,
       }),
     }),
 
@@ -16,6 +17,7 @@ export function getLocationComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "shortUrl",
         footerType: "l",
+        isSide: true,
       }),
     }),
 
@@ -29,6 +31,7 @@ export function getLocationComponents(emlo) {
         divider: true,
         contentTitle: "Related Resources ",
         primaryField: "rdfs_seeAlso-resource",
+        isSide: true,
         fields: [
           {
             title: "",
@@ -49,6 +52,7 @@ export function getLocationComponents(emlo) {
         type: "side-nested-links",
         contentTitle: "People born at place ",
         primaryField: "rel_wasBirthplaceOf-person",
+        isSide: true,
         fields: [
           {
             title: "",
@@ -69,6 +73,7 @@ export function getLocationComponents(emlo) {
         type: "side-nested-links",
         contentTitle: "People who died at place",
         primaryField: "rel_wasPlaceOfDeathOf-person",
+        isSide: true,
         fields: [
           {
             title: "",
@@ -89,6 +94,7 @@ export function getLocationComponents(emlo) {
         type: "side-nested-links",
         contentTitle: "People who visited place ",
         primaryField: "rel_wasVisitedBy-person",
+        isSide: true,
         fields: [
           {
             title: "",
@@ -105,6 +111,7 @@ export function getLocationComponents(emlo) {
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
         type: "heading",
+        isSide: true,
         field: "browse",
       }),
     }),

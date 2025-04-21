@@ -6,6 +6,7 @@ export function getWorkComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-title",
         contentTitle: "Letter",
+        isSide: true,
         contentTitleImage: "/static/img/letter_icon.png",
       }),
     }),
@@ -15,6 +16,7 @@ export function getWorkComponents(emlo) {
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
         type: "heading",
+        isSide: true,
         field: "dcterms_description",
       }),
     }),
@@ -24,6 +26,7 @@ export function getWorkComponents(emlo) {
       category: "sidebar",
       renderer: new emlo.MultiFieldsRenderer({
         type: "shortUrl",
+        isSide: true,
         footerType: "w",
       }),
     }),
@@ -37,6 +40,7 @@ export function getWorkComponents(emlo) {
         type: "side-nested-links",
         divider: true,
         contentTitle: "Related Resources ",
+        isSide: true,
         primaryField: "rdfs_seeAlso-resource",
         fields: [
           {
@@ -56,6 +60,7 @@ export function getWorkComponents(emlo) {
         type: "plain-text",
         divider: true,
         contentTitle: "Source of record",
+        isSide: true,
         field: "ox_sourceOfData",
       }),
     }),
@@ -66,6 +71,7 @@ export function getWorkComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "text",
         sectionTitle: "",
+        isSide: true,
         field: "cito_Catalog",
       }),
     }),

@@ -511,21 +511,21 @@ function advanceSearch(params) {
     if (params.get("frbr_creator-person")) {
       openingQuery.must.push({
         field: "frbr_creator-person",
-        value: `*${params.get("frbr_creator-person")}*`,
+        value: `"${params.get("frbr_creator-person")}"`,
       });
     }
 
     if (params.get("dcterms_references-person")) {
       openingQuery.must.push({
         field: "dcterms_references-person",
-        value: `*${params.get("dcterms_references-person")}*`,
+        value: `"${params.get("dcterms_references-person")}"`,
       });
     }
 
     if (params.get("mail_recipient-person")) {
       openingQuery.must.push({
         field: "mail_recipient-person",
-        value: `*${params.get("mail_recipient-person")}*`,
+        value: `"${params.get("mail_recipient-person")}"`,
       });
     }
 

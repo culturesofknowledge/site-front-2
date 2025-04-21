@@ -736,9 +736,12 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
         if (val) {
           val = edges.util.escapeHtml(val);
         }
+
         if (field.valueFunction) {
           val = field.valueFunction(val, res, field.field, this, index);
+          return `<td>${val}</td>`;
         }
+
         if (!val && this.omitFieldIfEmpty) {
           return "<td></td>";
         }

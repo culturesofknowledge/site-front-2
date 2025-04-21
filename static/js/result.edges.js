@@ -361,7 +361,7 @@ try {
               pre: "",
               post: "",
               type: "date",
-              valueFunction: null,
+              valueFunction: _displayDate,
             },
             {
               header: "Author",
@@ -530,4 +530,46 @@ function _redirectToProfile(val, res, fieldName, edge, currentIndex) {
 
   // Return the anchor tag with the correct URL
   return `<a href='${finalUrl}'> Letter </a>`;
+}
+
+function _displayDate(val, res) {
+  const day = res["ox_started-ox_day"];
+  const month = res["ox_started-ox_month"];
+  const year = res["ox_started-ox_year"];
+
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  let parts = [];
+
+  if (day !== undefined && day !== null) {
+    parts.push(day);
+  }
+
+  if (month !== undefined && month !== null) {
+    // Convert month (1–12 or 0–11) to name
+    let monthIndex = Number(month) - 1;
+    if (monthIndex >= 0 && monthIndex < 12) {
+      parts.push(monthNames[monthIndex]);
+    }
+  }
+
+  if (year !== undefined && year !== null) {
+    parts.push(year);
+  }
+
+  return parts.join(" ");
+  return "<p>Babu ji</p>";
 }

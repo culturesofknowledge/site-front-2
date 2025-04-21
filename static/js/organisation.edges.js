@@ -279,8 +279,6 @@ function _redirectToSearch(val, res, fieldName, current_search_letter = "A") {
       }
     }
 
-    console.log("query", query);
-
     query += query ? `&${currentPageQ}` : currentPageQ;
     const finalUrl = `${baseURL}?${query}`;
 

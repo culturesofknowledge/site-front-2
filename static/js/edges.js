@@ -2780,8 +2780,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         : '<div class="yellow-divider"></div>'
       : "";
 
-    console.log("frag", dividerFrag);
-
     const containerClasses = edges.util.styleClasses(
       this.namespace,
       "container",
@@ -2798,8 +2796,8 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
              ${frag}
            </div>`;
 
-      container = `<div class="${containerClasses}">
-        ${dividerFrag}
+      container = `<div class="${containerClasses}" style="margin-bottom: 30px;">
+        ${dividerFrag} 
         ${content}
       </div>`;
     }

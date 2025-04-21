@@ -60,6 +60,7 @@ function _getInstitutionComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-title",
         contentTitle: "Institution",
+        isSide: true,
         contentTitleImage: "/static/img/repository-icon.png",
       }),
     }),
@@ -69,6 +70,7 @@ function _getInstitutionComponents(emlo) {
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
         type: "heading",
+        isSide: true,
         field: "browse",
       }),
     }),
@@ -78,6 +80,7 @@ function _getInstitutionComponents(emlo) {
       category: "sidebar",
       renderer: new emlo.MultiFieldsRenderer({
         type: "shortUrl",
+        isSide: true,
         footerType: "r",
       }),
     }),
@@ -90,6 +93,7 @@ function _getInstitutionComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-nested-links",
         divider: true,
+        isSide: true,
         contentTitle: "Related Resources ",
         primaryField: "rdfs_seeAlso-resource",
         fields: [
@@ -152,7 +156,7 @@ function _getInstitutionComponents(emlo) {
         sectionTitle: "Collection overview",
         sectionTitleImage: "/static/img/icon-quill.png",
         primaryField: "ox_hasResource-manifestation",
-        field:"repository",
+        field: "repository",
         fields: [
           { title: "", key: "ox_started-ox_year" },
           { title: "", key: "dcterms_description", clickable: true },
@@ -180,6 +184,7 @@ function _getManifestation(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-title",
         contentTitle: "Document",
+        isSide: true,
         contentTitleImage: "/static/img/person-icon.png",
       }),
     }),
@@ -189,6 +194,7 @@ function _getManifestation(emlo) {
       category: "sidebar",
       renderer: new emlo.MultiFieldsRenderer({
         type: "shortUrl",
+        isSide: true,
         footerType: "m",
       }),
     }),
@@ -198,6 +204,7 @@ function _getManifestation(emlo) {
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
         type: "heading",
+        isSide: true,
         field: "frbr_Work-work",
       }),
     }),
@@ -442,6 +449,7 @@ function _getImageComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-title",
         contentTitle: "Image",
+        isSide: true,
         contentTitleImage: "/static/img/images-icon.png",
       }),
     }),
@@ -451,6 +459,7 @@ function _getImageComponents(emlo) {
       category: "sidebar",
       renderer: new emlo.MultiFieldsRenderer({
         type: "shortUrl",
+        isSide: true,
         footerType: "i",
       }),
     }),
@@ -460,6 +469,7 @@ function _getImageComponents(emlo) {
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
         type: "heading",
+        isSide: true,
         field: "frbr_Work-work",
       }),
     }),
@@ -515,6 +525,7 @@ function _getCommentsComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-title",
         contentTitle: "Comment",
+        isSide: true,
         contentTitleImage: "/static/img/resources-icon.png",
       }),
     }),
@@ -524,6 +535,7 @@ function _getCommentsComponents(emlo) {
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
         type: "heading",
+        isSide: true,
         field: "bibo_Note",
       }),
     }),
@@ -533,6 +545,7 @@ function _getCommentsComponents(emlo) {
       category: "sidebar",
       renderer: new emlo.MultiFieldsRenderer({
         type: "shortUrl",
+        isSide: true,
         footerType: "c",
       }),
     }),
@@ -567,6 +580,7 @@ function _getResourcesComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "side-title",
         contentTitle: "Related resource",
+        isSide: true,
         contentTitleImage: "/static/img/resources-icon.png",
       }),
     }),
@@ -576,6 +590,7 @@ function _getResourcesComponents(emlo) {
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
         type: "heading",
+        isSide: true,
         field: "ox_titleOfResource",
       }),
     }),
@@ -585,6 +600,7 @@ function _getResourcesComponents(emlo) {
       category: "sidebar",
       renderer: new emlo.MultiFieldsRenderer({
         type: "shortUrl",
+        isSide: true,
         footerType: "re",
       }),
     }),

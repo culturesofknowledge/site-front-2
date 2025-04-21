@@ -212,18 +212,9 @@ emlo.ProfileTemplate = class extends edges.Template {
         </div>
       </div>
 
-      <div class="columns large-12">
-        <div class="large-12 columns" style="padding-left:0px">
-            <div id="profile">
-                <h2 class="main" style="margin-top:0px">
-                    <span id="profile-header" class="font-18">
-                    </span>
-                </h2>
-            </div>
-   
-             <div id="" class="large-12 columns">
-              ${results}
-            </div>
+      <div id="main" class="">
+        <div class="large-12 columns">
+          ${results}
         </div>
       </div>
     </div>`;
@@ -2828,11 +2819,10 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
   _pageHeading() {
     return `
-      <h2 class="main">
-        <span id="result-header" class="font-18">
-          ${edges.util.escapeHtml(this.component.results[0][this.field] || "")}
-        </span>
-      </h2>`;
+      <h2 style="margin:27.2px 0px">
+        ${edges.util.escapeHtml(this.component.results[0][this.field] || "")}
+      </h2> 
+      `;
   }
 
   _sideTitle() {

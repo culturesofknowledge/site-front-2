@@ -9986,7 +9986,7 @@ form .button:hover {
 }
 
 .yellow-divider {
-  border: 1px solid #efc319;
+  border-top: 1px solid #efc319;
 }
 
 h1,
@@ -10580,7 +10580,7 @@ button.tiny {
   font-size: smaller;
 }
 
-.footer-links{
+.footer-links {
   font-size: smaller;
   list-style: none;
 }

@@ -411,6 +411,7 @@ export function getPeopleComponents(emlo) {
       category: "results",
       renderer: new emlo.MultiFieldsRenderer({
         type: "heading",
+        isSide: true, // This is a temporary fix to handle margin for heading
         field: "browse",
       }),
     }),

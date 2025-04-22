@@ -187,37 +187,66 @@ emlo.ProfileTemplate = class extends edges.Template {
       sidebarTitle += `<div id="${sidebarTitleComponents[i].id}"></div>`;
     }
 
-    let frag = `<div class="row row-with-side">
-      <div class="side-nav"> 
-        <div id="sidebar-title">
-          ${sidebarTitle}
-        </div>
-        
-        <div id="sidebar-actions">
-            <div>
-              <img src="../../static/img/icon-short-url.png" alt="short-url" />
-              Short URL:
-              <span id="short-url-link">
-              </span>
-            </div>
+    // let frag = `<div class="row row-with-side">
+    //   <div class="side-nav">
+    //     <div id="sidebar-title">
+    //       ${sidebarTitle}
+    //     </div>
 
-            <div id="send-comment">
-              <img src="../../static/img/icon-send-comment.png" alt="short-url" />
-              <a> Send Comment </a>
-            </div>
-        </div>
-        
-        <div id="more-options">
-            ${sidebar}
-        </div>
-      </div>
+    //     <div id="sidebar-actions">
+    //         <div>
+    //           <img src="../../static/img/icon-short-url.png" alt="short-url" />
+    //           Short URL:
+    //           <span id="short-url-link">
+    //           </span>
+    //         </div>
 
-      <div id="main" class="" style="margin-left:5px;">
-        <div class="large-12 columns">
+    //         <div id="send-comment">
+    //           <img src="../../static/img/icon-send-comment.png" alt="short-url" />
+    //           <a> Send Comment </a>
+    //         </div>
+    //     </div>
+
+    //     <div id="more-options">
+    //         ${sidebar}
+    //     </div>
+    //   </div>
+
+    //   <div id="main" class="" style="margin-left:5px;">
+    //     <div class="large-12 columns">
+    //       ${results}
+    //     </div>
+    //   </div>
+    // </div>`;
+
+    let frag = `
+      <div id="main" class="row">
+        <div class="columns large-9 large-push-3">
           ${results}
         </div>
+
+        <div class="columns large-3 large-pull-9 side">
+          <div id="sidebar-title">
+            ${sidebarTitle}
+          </div>
+
+          <div id="sidebar-actions" style="font-family:sans-serif;cursor: auto;">
+            <p style="margin-bottom: 1.25rem">
+              <img src="../../static/img/icon-short-url.png" alt="short-url" />
+              Short URL: <span id="short-url-link"></span>
+            <p>
+
+            <p style="padding-bottom: 10px; padding-top:5px">
+              <img class="opacity50 icon-tweak" src="../../static/img/icon-send-comment.png" alt="short-url" />
+              <a> Send Comment </a>
+            </p>
+          </div>
+          <div id="more-options">
+            ${sidebar}
+          </div>
+        </div>
       </div>
-    </div>`;
+    `;
 
     this.edge.context.html(frag);
   }
@@ -2803,12 +2832,12 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     if (frag) {
       const content = this.isSide
         ? `${sectionTitleFrag}${frag}`
-        : `<div class="content">
+        : `<div class="" style="padding-bottom:20px;padding-left: 0.9375rem;padding-right: 0.9375rem">
              ${sectionTitleFrag}
              ${frag}
            </div>`;
 
-      container = `<div class="${containerClasses}" style="margin-bottom: 30px;">
+      container = `<div class="${containerClasses}">
         ${dividerFrag} 
         ${content}
       </div>`;
@@ -2828,13 +2857,10 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
             this.sectionTitleImage
           )}" alt="${edges.util.escapeHtml(
             this.sectionTitle
-          )}" class="title-image">`
+          )}" class="title-image" />`
         : "";
 
-      return `
-      <${this.sectionTitleStyle}>
-      ${imageTag} ${edges.util.escapeHtml(this.sectionTitle)}
-    </${this.sectionTitleStyle}>`;
+      return `<${this.sectionTitleStyle}>${imageTag}${this.sectionTitle}</${this.sectionTitleStyle}>`;
     } else {
       return "";
     }
@@ -2842,9 +2868,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
   _pageHeading() {
     return `
-      <h2 style="margin:27.2px 0px">
+      <br/>
+      <h2>
         ${edges.util.escapeHtml(this.component.results[0][this.field] || "")}
       </h2> 
+      <br/>
       `;
   }
 
@@ -2887,13 +2915,13 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     }
 
     return `
-    <h4 class="main">
+    <div style="padding-bottom: 21px; padding-top:5px">
       ${imageTag}
       <strong style="font-family: Helvetica Neue,Helvetica,Roboto,Arial,sans-serif;cursor: auto;">${edges.util.escapeHtml(
         title
       )}</strong>
-    </h4>
-    <hr class="yellow-divider" />`;
+    </div>
+    <div class="yellow-divider"></div><br>`;
   }
 
   _renderRepoVersion() {
@@ -3173,22 +3201,20 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     }
 
     if (this.fields.length > 0) {
-      return `<div class="content">
+      return `<div class="content"><dl>
       ${this.fields
         .map((field) => {
           const value = this.component.results[0][field.key] || "";
           if (!value.trim()) return "";
 
           return ` 
-            <dl>
                <dt><strong> ${field.title} </strong></dt>
                <dd> ${edges.util.escapeHtml(
                  this.component.results[0][field.key] || ""
                )} </dd>
-            </dl>
             `;
         })
-        .join("")}</div>
+        .join("")}</dl></div>
       `;
     }
   }
@@ -3382,7 +3408,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     });
 
     if (content) {
-      return `<div class="content"><dl> ${content} </dl></div>`;
+      return `<div class="content"><dl> ${content} </dl></div><br/>`;
     } else {
       return "";
     }
@@ -3453,7 +3479,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         const isClickable = value > 0;
 
         return `
-            <span class="stat-item">
               ${
                 isClickable
                   ? `<a href='${
@@ -3467,7 +3492,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                     } </a>`
                   : `${escapedValue} ${field.title}`
               }
-            </span>
           `;
       })
       .join(" ♦ ");
@@ -3483,7 +3507,10 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
     return `
         <div class="content">
-          ${statsHtml}
+          <p class="highlight-box" style="font-family:sans-serif;">
+            ${statsHtml}
+            </span>
+          </p>
         </div>
         ${graphHtml ? `<div class="graph-section">${graphHtml}</div>` : ""}
       `;
@@ -4676,10 +4703,11 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       
         <div id="${
           this.namespace
-        }-container" class="custom-bar-graph-container">
+        }-container" class="custom-bar-graph-container content" style="padding-bottom:20px">
           <div id="chart">
             ${this._renderControls()}
           </div>
+          <br/>
           <div id="${this.namespace}-chart" style="display:grid"></div>
         </div>
       `;

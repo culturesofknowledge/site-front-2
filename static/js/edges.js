@@ -2847,13 +2847,10 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
             this.sectionTitleImage
           )}" alt="${edges.util.escapeHtml(
             this.sectionTitle
-          )}" class="title-image">`
+          )}" class="title-image" />`
         : "";
 
-      return `
-      <${this.sectionTitleStyle}>
-        ${imageTag} ${this.sectionTitle}
-      </${this.sectionTitleStyle}>`;
+      return `<${this.sectionTitleStyle}>${imageTag}${this.sectionTitle}</${this.sectionTitleStyle}>`;
     } else {
       return "";
     }

@@ -3472,7 +3472,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         const isClickable = value > 0;
 
         return `
-            <span class="stat-item">
               ${
                 isClickable
                   ? `<a href='${
@@ -3486,7 +3485,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                     } </a>`
                   : `${escapedValue} ${field.title}`
               }
-            </span>
           `;
       })
       .join(" ♦ ");
@@ -3502,7 +3500,10 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
     return `
         <div class="content">
-          ${statsHtml}
+          <p class="highlight-box">
+            ${statsHtml}
+            </span>
+          </p>
         </div>
         ${graphHtml ? `<div class="graph-section">${graphHtml}</div>` : ""}
       `;
@@ -4695,10 +4696,11 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       
         <div id="${
           this.namespace
-        }-container" class="custom-bar-graph-container">
+        }-container" class="custom-bar-graph-container content" style="padding-bottom:20px">
           <div id="chart">
             ${this._renderControls()}
           </div>
+          <br/>
           <div id="${this.namespace}-chart" style="display:grid"></div>
         </div>
       `;

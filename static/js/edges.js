@@ -3401,7 +3401,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     });
 
     if (content) {
-      return `<div class="content"><dl> ${content} </dl></div>`;
+      return `<div class="content"><dl> ${content} </dl></div><br/>`;
     } else {
       return "";
     }

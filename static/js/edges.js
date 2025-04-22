@@ -230,19 +230,17 @@ emlo.ProfileTemplate = class extends edges.Template {
             ${sidebarTitle}
           </div>
 
-          <div id="sidebar-actions">
+          <div id="sidebar-actions" style="font-family:sans-serif;cursor: auto;">
             <p style="margin-bottom: 1.25rem">
               <img src="../../static/img/icon-short-url.png" alt="short-url" />
               Short URL: <span id="short-url-link"></span>
             <p>
 
-            <p style="margin-bottom: 1.25rem">
-              <img src="../../static/img/icon-send-comment.png" alt="short-url" />
+            <p style="padding-bottom: 10px; padding-top:5px">
+              <img class="opacity50 icon-tweak" src="../../static/img/icon-send-comment.png" alt="short-url" />
               <a> Send Comment </a>
             </p>
-
           </div>
-
           <div id="more-options">
             ${sidebar}
           </div>
@@ -2905,13 +2903,13 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     }
 
     return `
-    <h4 class="main">
+    <div style="padding-bottom: 21px; padding-top:5px">
       ${imageTag}
       <strong style="font-family: Helvetica Neue,Helvetica,Roboto,Arial,sans-serif;cursor: auto;">${edges.util.escapeHtml(
         title
       )}</strong>
-    </h4>
-    <hr class="yellow-divider" />`;
+    </div>
+    <div class="yellow-divider"></div><br>`;
   }
 
   _renderRepoVersion() {
@@ -3497,7 +3495,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
     return `
         <div class="content">
-          <p class="highlight-box">
+          <p class="highlight-box" style="font-family:sans-serif;">
             ${statsHtml}
             </span>
           </p>

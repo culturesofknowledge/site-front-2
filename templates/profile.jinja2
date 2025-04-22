@@ -4,12 +4,29 @@
 {% block extra_stylesheets %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/chart.css') }}">
 <style>
-    h2{margin:20px 0px}
-    h3,h4{margin-top: 0.5rem;margin-bottom: 0.2rem;}
+   .content{
+    margin-left: 40px;
+   }
+   .tiny{
+        padding-top: 0.625rem;
+        padding-right: 1.25rem;
+        padding-bottom: 0.6875rem;
+        padding-left: 1.25rem;
+        font-size: 0.6875rem;
+        height: 40px;
+        margin: 0px 15px;
+    }
 	h3.worklegend{font-size:25px !important}
 	.profilepart h4{font-size:22px !important}
 	.profilepart h5 { font-size: 20px !important; }
-	p{margin-bottom:0}
+	p {
+        font-family: inherit;
+        font-weight: normal;
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 1.25rem;
+        text-rendering: optimizeLegibility;
+    }
 	span.as-marked {
 		font-family: monospace;
 		font-size: 17px;
@@ -37,23 +54,23 @@
 {% block content %}
     
     <div class="row row-with-side">
-    <div class="large-4"></div>
-    <div id="navigation-buttons" class="large-12 columns" style="margin-top: 15px; margin-bottom:-15px;">
-        {% if request.args.get('browsing') %}
-            <button id="back-to-browse">Back to Browse</button>
-        {% endif %}
-        
-        {% if request.args.get('type') %}
-            <button id="back-to-results">Back to Results</button>
-        {% endif %}
-        
-        {% if request.args.get('start') and request.args.get('numFound') %}
-            <button id="first-entry" title="First Entry"><<</button>
-            <button id="prev-entry" title="Previous Entry"><</button>
-            <button id="next-entry" title="Next Entry">></button>
-            <button id="last-entry" title="Last Entry">>></button>
-        {% endif %}
-    </div>
+        <div class="large-4"></div>
+        <div id="navigation-buttons" class="large-12 columns" style="margin-top: 15px; margin-bottom:-15px;">
+            {% if request.args.get('browsing') %}
+                <button id="back-to-browse">Back to Browse</button>
+            {% endif %}
+            
+            {% if request.args.get('type') %}
+                <button id="back-to-results">Back to Results</button>
+            {% endif %}
+            
+            {% if request.args.get('start') and request.args.get('numFound') %}
+                <button id="first-entry" title="First Entry"><<</button>
+                <button id="prev-entry" title="Previous Entry"><</button>
+                <button id="next-entry" title="Next Entry">></button>
+                <button id="last-entry" title="Last Entry">>></button>
+            {% endif %}
+        </div>
     </div>
 
     <div id="profile-display"></div>

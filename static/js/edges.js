@@ -4140,9 +4140,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     if (this.field == "geonames_alternateName") {
       return value
         ? `
-        <p style="white-space:pre-line;margin-top: -15px;margin-left: 25px;">
-           ${edges.util.escapeHtml(value)}
-        <p>
+        <div class="content">
+          <pre>${value}</pre>
+        </div>
       `
         : "";
     }

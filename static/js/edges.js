@@ -3117,14 +3117,14 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
               let html = `<div class="content">`;
 
               if (value) {
-                html += `<p class="${field.hideClass ? "" : "fieldlabel"}">${
+                html += `<span class="${field.hideClass ? "" : "fieldlabel"}">${
                   field.title
                 }: ${value}`;
 
                 if (additionalInfo) {
-                  html += ` (${additionalInfo})</p>`;
+                  html += ` (${additionalInfo})</span>`;
                 } else {
-                  html += `</p>`;
+                  html += `</span>`;
                 }
               }
               html += `</div>`;

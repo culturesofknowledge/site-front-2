@@ -4049,14 +4049,14 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                 const otherInfo = parentObject[subField.otherInfo];
 
                 const otherInfoDiv = otherInfo
-                  ? `<span>- ${edges.util.escapeHtml(otherInfo)} </span>`
+                  ? `- ${edges.util.escapeHtml(otherInfo)} `
                   : "";
                 if (subField.linkKey) {
                   if (subField.linkKey == "uuid") {
                     const collectionName = parentObject["object_type"];
 
                     cells.push(`
-                      <dd><p>
+                      <dd><p style="font-family:sans-serif;">
                         <a  href="/profile/${collectionName}/${
                       parentObject["uuid"]
                     }" class="clickable-row">${edges.util.escapeHtml(
@@ -4068,7 +4068,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                   } else {
                     if (parentObject[subField.linkKey]) {
                       cells.push(`
-                        <dd><p>
+                        <dd><p style="font-family:sans-serif;">
                           <a target="_blank" href="${edges.util.escapeHtml(
                             parentObject[subField.linkKey]
                           )}" class="clickable-row">${edges.util.escapeHtml(
@@ -4080,7 +4080,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                     } else {
                       cells.push(
                         `
-                        <dd><p>
+                        <dd><p style="font-family:sans-serif;">
                         <div>${edges.util.escapeHtml(
                           value || ""
                         )}</div> ${otherInfoDiv} </p> </dd>`
@@ -4109,10 +4109,12 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
     const labelsList = `
       <div>
+        <dl>
         <dt> 
           <strong> ${this.contentTitle} </strong> 
         </dt>
         ${rows}
+        </dl>
       </div>
     `;
     return rows ? labelsList : ""; // Return table or no results

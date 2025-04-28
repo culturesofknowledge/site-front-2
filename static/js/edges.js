@@ -4304,6 +4304,8 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const currentDomain = window.location.host;
     const result = this.component.results[0];
     const editIdValue = GetRecordID(this.footerType, result);
+    const currentHref = window.location.href;
+
     const shortURL = GenerateShortURL(
       editIdValue,
       this.footerType,
@@ -4360,7 +4362,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       }
 
       if (shortURL) {
-        htmlContent += `<li class="footer-links"><a href="${shortURL}">${shortURL}</a></li>`;
+        htmlContent += `<li class="footer-links"><a href="${currentHref}">${shortURL}</a></li>`;
       }
 
       htmlContent += `</ul>`;
@@ -4391,6 +4393,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const currentDomain = window.location.host;
     const result = this.component.results[0];
     const editIdValue = GetRecordID(this.footerType, result);
+    const currentHref = window.location.href;
 
     const shortURL = GenerateShortURL(
       editIdValue,
@@ -4401,7 +4404,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const doc = document.getElementById("short-url-link");
 
     if (doc) {
-      doc.innerHTML = `<a href=${shortURL}> ${shortURL} </a>`;
+      doc.innerHTML = `<a href=${currentHref}> ${shortURL} </a>`;
     }
   }
 

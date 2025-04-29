@@ -220,7 +220,7 @@ function _redirectToSearch(val, res, fieldName) {
   }
 
   if (val > 0) {
-    const baseURL = `/forms/advance`;
+    const baseURL = `/forms/advanced`;
     let query = "";
     const user = res["foaf_name"];
     const currentPageQ = `browsing=people&letter=${current_search_letter}`;

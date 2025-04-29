@@ -206,7 +206,7 @@ try {
 
 //   // console.log("finalURL", finalUrl);
 //   if (val > 0) {
-//     const baseURL = `/forms/advance`;
+//     const baseURL = `/forms/advanced`;
 //     let query = "";
 
 //     const user = res["foaf_name"];
@@ -250,7 +250,7 @@ function _redirectToSearch(val, res, fieldName, current_search_letter = "A") {
   }
 
   if (val > 0) {
-    const baseURL = `/forms/advance`;
+    const baseURL = `/forms/advanced`;
     const currentPageQ = `browsing=organisations&letter=${current_search_letter}`;
 
     const queryFields = {

@@ -3579,7 +3579,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
           const yearCounts = Object.entries(years)
             .map(
               ([year, count]) =>
-                `<a href="/forms/advance?${queryKey}=${queryVal}&dat_sin_year=${year}"> ${year}: ${count} </a>`
+                `<a href="/forms/advanced?${queryKey}=${queryVal}&dat_sin_year=${year}"> ${year}: ${count} </a>`
             )
             .join(" ♦ ");
           return `

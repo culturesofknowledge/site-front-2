@@ -759,6 +759,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
     const row = this.tableDisplay
       .map((field) => {
         let val = "";
+
         if (field.field) {
           val = this._getValue(field.field, res, val);
         }
@@ -768,7 +769,12 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
 
         if (field.valueFunction) {
           val = field.valueFunction(val, res, field.field, this, index);
-          return `<td>${val}</td>`;
+
+          if (field.header == "Repositories & Versions") {
+            return `<td id=repo-${index}> </td>`;
+          } else {
+            return `<td>${val}</td>`;
+          }
         }
 
         if (!val && this.omitFieldIfEmpty) {

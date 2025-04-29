@@ -396,7 +396,7 @@ try {
               field: "",
               pre: "",
               post: "",
-              valueFunction: null,
+              valueFunction: _displayRepoAndVersion,
             },
           ],
           arrayValueJoin: ", ",
@@ -571,5 +571,243 @@ function _displayDate(val, res) {
   }
 
   return parts.join(" ");
-  return "<p>Babu ji</p>";
+}
+
+// async function _displayRepoAndVersion(val, item) {
+//   const reposDetails = [];
+
+//   const manifFieldname = "frbr_Manifestation-manifestation";
+//   if (!item.hasOwnProperty(manifFieldname)) {
+//     return reposDetails;
+//   }
+
+//   const manifUris = item[manifFieldname];
+//   if (manifUris.length > 0) {
+//     const fieldsToGet = [
+//       "dcterms_type",
+//       "ox_resourceAt-institution",
+//       "dcterms_identifier-shelf_",
+//     ];
+
+//     const manifUuidDict = await get_records_from_solr(
+//       Array.isArray(manifUris) ? manifUris : [manifUris],
+//       fieldsToGet
+//     );
+
+//     const repoFieldsToGet = ["geonames_officialName"];
+
+//     let numPrintedEds = 0;
+
+//     for (const [manifUuid, manifFieldDict] of Object.entries(manifUuidDict)) {
+//       let documentLocationString = "";
+//       let reposNameAndLocation = "";
+//       let shelfmark = "";
+//       let documentType = "";
+
+//       if (manifFieldDict.hasOwnProperty("dcterms_type")) {
+//         documentType = manifFieldDict["dcterms_type"];
+//       }
+
+//       if (manifFieldDict.hasOwnProperty("dcterms_identifier-shelf_")) {
+//         shelfmark = manifFieldDict["dcterms_identifier-shelf_"];
+//       }
+
+//       if (manifFieldDict.hasOwnProperty("ox_resourceAt-institution")) {
+//         const reposUriList = manifFieldDict["ox_resourceAt-institution"];
+
+//         if (reposUriList.length > 0) {
+//           const reposUuidDict = await get_records_from_solr(
+//             Array.isArray(reposUriList) ? reposUriList : [reposUriList],
+//             repoFieldsToGet
+//           );
+
+//           for (const [reposUuid, reposFieldDict] of Object.entries(
+//             reposUuidDict
+//           )) {
+//             let reposName = "";
+//             let reposCity = "";
+//             let reposCountry = "";
+
+//             for (const [reposFieldname, reposFieldval] of Object.entries(
+//               reposFieldDict
+//             )) {
+//               if (reposFieldname === "geonames_officialName") {
+//                 reposName = reposFieldval;
+//               } else if (reposFieldname === "geonames_locatedIn") {
+//                 reposCity = reposFieldval;
+//               } else if (reposFieldname === "geonames_inCountry") {
+//                 reposCountry = reposFieldval;
+//               }
+//             }
+
+//             const reposFieldList = [];
+//             if (reposName) reposFieldList.push(reposName);
+//             if (reposCity) reposFieldList.push(reposCity);
+//             if (reposCountry) reposFieldList.push(reposCountry);
+//             reposNameAndLocation = reposFieldList.join(", ");
+//           }
+//         }
+//       }
+
+//       if (reposNameAndLocation && shelfmark) {
+//         documentLocationString = `${reposNameAndLocation}: ${shelfmark}`;
+//       } else if (reposNameAndLocation) {
+//         documentLocationString = reposNameAndLocation;
+//       } else if (shelfmark) {
+//         documentLocationString = shelfmark;
+//       } else if (documentType.startsWith("Printed")) {
+//         numPrintedEds += 1;
+//       }
+
+//       if (documentLocationString) {
+//         reposDetails.push(documentLocationString);
+//       }
+//     }
+
+//     if (numPrintedEds > 1) {
+//       reposDetails.push(`${numPrintedEds} printed editions`);
+//     } else if (numPrintedEds === 1) {
+//       reposDetails.push(`1 printed edition`);
+//     }
+//   }
+//   console.log("jsjs", reposDetails);
+//   return "hei";
+// }
+
+async function _displayRepoAndVersion(val, item, field, element, index) {
+  const reposDetails = [];
+
+  const manifFieldname = "frbr_Manifestation-manifestation";
+  if (!item.hasOwnProperty(manifFieldname)) {
+    return "";
+  }
+
+  const manifUris = item[manifFieldname];
+  if (manifUris.length > 0) {
+    const fieldsToGet = [
+      "dcterms_type",
+      "ox_resourceAt-institution",
+      "dcterms_identifier-shelf_",
+    ];
+
+    const manifUuidDict = await get_records_from_solr(
+      Array.isArray(manifUris) ? manifUris : [manifUris],
+      fieldsToGet,
+      "manifestation"
+    );
+
+    const repoFieldsToGet = ["geonames_officialName"];
+
+    let numPrintedEds = 0;
+
+    for (const [manifUuid, manifFieldDict] of Object.entries(manifUuidDict)) {
+      let documentLocationString = "";
+      let reposNameAndLocation = "";
+      let shelfmark = "";
+      let documentType = "";
+
+      if (manifFieldDict.hasOwnProperty("dcterms_type")) {
+        documentType = manifFieldDict["dcterms_type"];
+      }
+
+      if (manifFieldDict.hasOwnProperty("dcterms_identifier-shelf_")) {
+        shelfmark = manifFieldDict["dcterms_identifier-shelf_"];
+      }
+
+      if (manifFieldDict.hasOwnProperty("ox_resourceAt-institution")) {
+        const reposUriList = manifFieldDict["ox_resourceAt-institution"];
+
+        if (reposUriList.length > 0) {
+          const reposUuidDict = await get_records_from_solr(
+            Array.isArray(reposUriList) ? reposUriList : [reposUriList],
+            repoFieldsToGet,
+            "institution"
+          );
+
+          for (const [reposUuid, reposFieldDict] of Object.entries(
+            reposUuidDict
+          )) {
+            let reposName = "";
+            let reposCity = "";
+            let reposCountry = "";
+
+            for (const [reposFieldname, reposFieldval] of Object.entries(
+              reposFieldDict
+            )) {
+              if (reposFieldname === "geonames_officialName") {
+                reposName = reposFieldval;
+              } else if (reposFieldname === "geonames_locatedIn") {
+                reposCity = reposFieldval;
+              } else if (reposFieldname === "geonames_inCountry") {
+                reposCountry = reposFieldval;
+              }
+            }
+
+            const reposFieldList = [];
+            if (reposName) reposFieldList.push(reposName);
+            if (reposCity) reposFieldList.push(reposCity);
+            if (reposCountry) reposFieldList.push(reposCountry);
+            reposNameAndLocation = reposFieldList.join(", ");
+          }
+        }
+      }
+
+      if (reposNameAndLocation && shelfmark) {
+        documentLocationString = `${reposNameAndLocation}: ${shelfmark}`;
+      } else if (reposNameAndLocation) {
+        documentLocationString = reposNameAndLocation;
+      } else if (shelfmark) {
+        documentLocationString = shelfmark;
+      } else if (documentType.startsWith("Printed")) {
+        numPrintedEds += 1;
+      }
+
+      if (documentLocationString) {
+        reposDetails.push(documentLocationString);
+      }
+    }
+
+    if (numPrintedEds > 1) {
+      reposDetails.push(`${numPrintedEds} printed editions`);
+    } else if (numPrintedEds === 1) {
+      reposDetails.push(`1 printed edition`);
+    }
+  }
+
+  // Build <ul><li>...</li></ul> HTML
+  if (reposDetails.length === 0) return "";
+
+  const listItems = reposDetails.map((detail) => `• ${detail} <br/>`).join("");
+
+  // FIXME: Need a better code for rendering the data
+  const el = document.getElementById(`repo-${index}`);
+
+  if (el) {
+    el.innerHTML = `${listItems}`;
+  }
+}
+
+async function get_records_from_solr(uris, fieldsToGet, core) {
+  const uuids = uris.map((uri) => uri.split("/").pop());
+
+  const payload = {
+    solrCore: core,
+    uuids: uuids,
+    filter: "",
+  };
+
+  const response = await fetch("/stats-new", {
+    // <-- Update your actual API endpoint
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch records from Solr: ${response.status}`);
+  }
+
+  return await response.json();
 }

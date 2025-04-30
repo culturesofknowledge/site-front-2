@@ -206,16 +206,17 @@ function _redirectToSearch(val, res, fieldName) {
     const baseURL = `/forms/advanced`;
     let query = "";
     const location = res["browse"];
+    const uuid = res["uuid"];
     const currentPageQ = `browsing=locations&letter=${current_search_letter}`;
     switch (fieldName) {
       case "ox_totalWorksSentFromPlace":
-        query = `pla_ori_name=${location}`;
+        query = `mail_origin-location=${uuid}`;
         break;
       case "ox_totalWorksSentToPlace":
-        query = `pla_des_name=${location}`;
+        query = `mail_destination-location=${uuid}`;
         break;
       case "ox_totalWorksMentioningPlace":
-        query = `pla_ment_name=${location}`;
+        query = `dcterms_references-location=${uuid}`;
         break;
     }
 

@@ -2,6 +2,15 @@ const DEFAULT_SEARCH_FIELD_DISPLAY = 8;
 
 document.addEventListener("DOMContentLoaded", function () {
   function enhanceSelect(select, threshold = 10) {
+    // FIXME: A better solution to handle the DOM if the page is not refreshed
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramValue = urlParams.get(select.id);
+
+    if (paramValue && select.querySelector(`option[value="${paramValue}"]`)) {
+      select.value = paramValue;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+
     if (select.options.length > threshold) {
       select.style.display = "none"; // Hide original select
 

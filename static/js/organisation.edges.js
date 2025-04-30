@@ -251,39 +251,29 @@ function _redirectToSearch(val, res, fieldName, current_search_letter = "A") {
 
   if (val > 0) {
     const baseURL = `/forms/advanced`;
-    const currentPageQ = `browsing=organisations&letter=${current_search_letter}`;
-
-    const queryFields = {
-      ox_totalWorksByAgent: {
-        resKey: "frbr_creatorOf-work",
-        queryKey: "frbr_creator-person",
-      },
-      ox_totalWorksAddressedToAgent: {
-        resKey: "mail_recipientOf-work",
-        queryKey: "mail_recipient-person",
-      },
-      ox_totalWorksMentioningAgent: {
-        resKey: "dcterms_isReferencedBy-work",
-        queryKey: "dcterms_references-person",
-      },
-    };
-
-    const mapping = queryFields[fieldName];
     let query = "";
+    const user = res["foaf_name"];
+    const uuid = res["uuid"];
 
-    if (mapping) {
-      const values = res[mapping.resKey];
-      const newVal = `http://localhost/person/${res.uuid}`;
-      if (Array.isArray(values) && values.length > 0) {
-        query = `${mapping.queryKey}=${newVal}`;
-      }
+    const currentPageQ = `browsing=people&letter=${current_search_letter}`;
+
+    switch (fieldName) {
+      case "ox_totalWorksByAgent":
+        query = `frbr_creator-person=${uuid}`;
+        break;
+      case "ox_totalWorksAddressedToAgent":
+        query = `mail_recipient-person=${uuid}`;
+        break;
+      case "ox_totalWorksMentioningAgent":
+        query = `dcterms_references-person=${uuid}`;
+        break;
     }
 
-    query += query ? `&${currentPageQ}` : currentPageQ;
-    const finalUrl = `${baseURL}?${query}`;
+    query += query ? `&${currentPageQ}` : `${currentPageQ}`;
+    const finalUrl = query ? `${baseURL}?${query}` : `${baseURL}`;
 
-    return `<a href="${finalUrl}">${val}</a>`;
+    return `<a href="${finalUrl}"> ${val} </a>`;
+  } else {
+    return `-`;
   }
-
-  return `-`;
 }

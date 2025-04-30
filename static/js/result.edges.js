@@ -360,7 +360,7 @@ try {
               field: "started_date_sort",
               pre: "",
               post: "",
-              type: "date",
+              type: "work-date",
               valueFunction: null,
             },
             {

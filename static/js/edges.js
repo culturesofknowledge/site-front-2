@@ -1,5 +1,6 @@
 import { getCollectionTitle } from "../js/profile/collectionDetails.js";
 import PersonChart from "./chart.js";
+import { _renderPeopleProfile } from "./profile/peopleFrags.js";
 
 const emlo = {
   active: {},
@@ -2716,6 +2717,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     this.message = edges.util.getParam(params, "message", "");
     this.footerType = edges.util.getParam(params, "footerType", "");
     this.isSide = edges.util.getParam(params, "isSide", false); // Whether to render in a sidebar
+    this.subSection = edges.util.getParam(params, "subSection", false);
     this.namespace = "edges-custom-display";
   }
 
@@ -2818,12 +2820,23 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     let container = "";
 
     if (frag) {
+      // const content = this.isSide
+      //   ? `${sectionTitleFrag}${frag}`
+      //   : `<div class="" style="padding-bottom:20px;padding-left: 0.9375rem;padding-right: 0.9375rem">
+      //        ${sectionTitleFrag}
+      //        ${frag}
+      //      </div>`;
+
       const content = this.isSide
         ? `${sectionTitleFrag}${frag}`
-        : `<div class="" style="padding-bottom:20px;padding-left: 0.9375rem;padding-right: 0.9375rem">
-             ${sectionTitleFrag}
-             ${frag}
-           </div>`;
+        : `<div class="" ${
+            this.subSection
+              ? 'style="padding-left:0.9375rem;padding-right:0.9375rem"'
+              : 'style="padding-bottom:20px;padding-left:0.9375rem;padding-right:0.9375rem"'
+          }>
+       ${sectionTitleFrag}
+       ${frag}
+     </div>`;
 
       container = `<div class="${containerClasses}">
         ${dividerFrag} 
@@ -3227,7 +3240,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
       // Render the location and include a map container
       return `<div class="content">
-    <div class="content">
+    <div class="">
         <dl>  
             <dt> 
               <strong> Latitude </strong>
@@ -4429,6 +4442,59 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     }
   }
 };
+
+// emlo.ProfileRightRenderer = class extends edges.Renderer {
+//   constructor(params) {
+//     super(params);
+//     // this.fields = edges.util.getParam(params, "fields", []);
+//     // this.primaryField = edges.util.getParam(params, "primaryField", "");
+//     // this.sectionTitle = edges.util.getParam(params, "sectionTitle", "");
+//     // this.sectionTitleImage = edges.util.getParam(
+//     //   params,
+//     //   "sectionTitleImage",
+//     //   ""
+//     // );
+//     // this.subSections = edges.util.getParam(params, "subSections", []);
+//     this.profileType = edges.util.getParam(params, "profileType", "");
+//     // this.divider = edges.util.getParam(params, "divider", false);
+//     this.dividerFrag = ` <hr class="yellow-divider" />`;
+//   }
+
+//   draw() {
+//     let frag = "";
+//     const result = this.component.results[0];
+//     if (this.component.loading) {
+//       frag = "<div class='loading-message'>Loading...</div>"; // Show loading message
+//     } else if (this.component.errorMessage) {
+//       frag = `<div class='error-message'>${this.component.errorMessage}</div>`; // Show error message
+//     } else if (this.component.results && this.component.results.length > 0) {
+//       switch (this.profileType) {
+//         case "people":
+//           frag += _renderPeopleProfile(result);
+//           break;
+//         default:
+//           console.log("Nothing is valid");
+//       }
+//     }
+
+//     const containerClasses = edges.util.styleClasses(
+//       this.namespace,
+//       "container",
+//       this.component.id
+//     );
+
+//     let container = "";
+
+//     if (frag) {
+//       container = `
+//       <div id="details" class="${containerClasses} ">
+//         ${frag}
+//       </div>`;
+//     }
+
+//     this.component.context.html(container);
+//   }
+// };
 
 emlo.Stats = class extends edges.Component {
   constructor(params) {

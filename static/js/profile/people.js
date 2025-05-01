@@ -485,6 +485,7 @@ export function getPeopleComponents(emlo) {
         sectionTitle: "Catalogue Statistics",
         sectionTitleImage: "/static/img/icon-statistics.png",
         divider: true,
+        subSection: true,
         fields: [
           {
             name: "text",

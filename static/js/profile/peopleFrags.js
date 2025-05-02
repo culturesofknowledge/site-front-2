@@ -1,74 +1,137 @@
-import { getLabel } from "../../js/helper/getFieldLabls.js";
+// import { getLabel } from "../../js/helper/getFieldLabls.js";
+import {
+  defListItem,
+  hasAnyFieldValue,
+  decodeUncertaintyFlags,
+} from "../../js/helper/helper.js";
 
 export function _renderPeopleProfile(profile) {
   let frag = "";
 
-  // Helper to safely fetch values
-  const getFieldValue = (field) => profile[field];
-
-  // Renders a definition list item only if the field has a value
-  const renderDefListItem = (field, options = {}) => {
-    const value = getFieldValue(field);
-    if (!value) return "";
-
-    const label = getLabel(field); // Assuming translate is available
-    const displayValue = options.capitalize
-      ? value.charAt(0).toUpperCase() + value.slice(1)
-      : value;
-
-    if (options.link) {
-      const fullLink = options.link + value;
-      return `<dt>${label}</dt><dd><a href="${fullLink}">${displayValue}</a></dd>`;
-    }
-
-    return `<dt>${label}</dt><dd>${displayValue}</dd>`;
-  };
-
-  // First column - Details
-  let details = "";
-  details += renderDefListItem("skos_altLabel");
-  details += renderDefListItem("ox_titlesRolesOccupations");
-
-  if (!getFieldValue("ox_isOrganisation")) {
-    details += renderDefListItem("foaf_gender", {
-      capitalize: true,
-    });
-  }
-
-  if (details) {
-    frag += `
-        <div class="column profilepart">
-          <h3><img src="/static/img/icon-people.png" class=""/>Details</h3>
-          <div class="content">
-            <dl>${details}</dl>
-          </div>
-        </div>
-        <hr class="yellow-divider" />
-      `;
-  }
-
-  // Second column - Dates
-  const hasDateInfo = [
-    "get_birth_year_fieldname",
-    "get_birth_month_fieldname",
-    "get_birth_day_fieldname",
-    "get_death_year_fieldname",
-    "get_death_month_fieldname",
-    "get_death_day_fieldname",
-  ].some((field) => getFieldValue(field));
-
-  if (hasDateInfo) {
-    const dateInfo = this._renderBirthAndDeathDates(profile); // Assume this helper is implemented
-    frag += `
-        <div class="column profilepart">
-          <h3><img src="/img/icon-calendar.png" class=""/>Dates</h3>
-          <div class="content">
-            <dl>${dateInfo}</dl>
-          </div>
-          <br>
-        </div>
-      `;
-  }
+  frag += _renderDetailsSection(profile);
+  frag += _renderDateSection(profile);
 
   return frag;
+}
+
+function _renderDetailsSection(profile) {
+  let detailFrag = "";
+  const altLabelField = "skos_altLabel",
+    titlesRoleField = "ox_titlesRolesOccupations",
+    genderField = "foaf_gender";
+
+  if (
+    profile.hasOwnProperty(altLabelField) ||
+    profile.hasOwnProperty(titlesRoleField)
+  ) {
+    detailFrag += `
+      <div class="column profilepart">
+	      <h3><img src="/static/img/icon-people.png" class=""/>Details</h3>
+		    <div class="content">
+			    <dl>
+            ${defListItem(profile, altLabelField)}
+            ${defListItem(profile, titlesRoleField)}
+    `;
+
+    // if (
+    //   profile.hasOwnProperty("ox_isOrganisation") &&
+    //   !profile["ox_isOrganisation"]
+    // ) {
+    //   detailFrag += `${defListItem(profile, genderField)}</dl>`;
+    // } else {
+    //   detailFrag += "</dl>";
+    // }
+
+    detailFrag += "</dl></div></div>";
+
+    return detailFrag;
+  } else {
+    return "";
+  }
+}
+
+function _renderDateSection(profile) {
+  let dateSectionFrag = "";
+
+  const keys = {
+    birthYear: "bio_Birth-ox_year",
+    birthMonth: "bio_Birth-ox_month",
+    birthDay: "bio_Birth-ox_day",
+    flagsBirth: "bioBirth-indef_",
+    deathYear: "bio_Death-ox_year",
+    deathMonth: "bio_Death-ox_month",
+    deathDay: "bio_Death-ox_day",
+    flagsDeath: "bioDeath-indef_",
+  };
+
+  if (hasAnyFieldValue(profile, keys)) {
+    dateSectionFrag += `<div class="column profilepart">
+	    <h3><img src="/static/img/icon-calendar.png" class=""/>Dates</h3>
+		  <div class="content"><dl>${writeDate(profile, keys)}</dl></div>
+		  <br>
+	  </div>`;
+
+    return dateSectionFrag;
+  } else {
+    return "";
+  }
+}
+
+function writeDate(profile, keys) {
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+    "",
+  ];
+
+  // Get birth details
+  const year_b = profile[keys.birthYear] || "";
+  const month_b =
+    profile[keys.birthMonth] !== undefined ? profile[keys.birthMonth] : 13;
+  const day_b = profile[keys.birthDay] || "";
+
+  const date_b = `${day_b} ${
+    months[month_b - 1]
+  } ${year_b} ${decodeUncertaintyFlags(keys.flagsBirth, profile)}`.trim();
+
+  // Get death details
+  const year_d = profile[keys.deathYear] || "";
+  const month_d =
+    profile[keys.deathMonth] !== undefined ? profile[keys.deathMonth] : 13;
+  const day_d = profile[keys.deathDay] || "";
+
+  const date_d = `${day_d} ${
+    months[month_d - 1]
+  } ${year_d} ${decodeUncertaintyFlags(keys.flagsDeath, profile)}`.trim();
+
+  // Build HTML
+  let html = "";
+
+  if (date_b.trim()) {
+    if (profile["ox_isOrganisation"]) {
+      html += `<dt>Date of formation</dt>\n<dd>${date_b}</dd>`;
+    } else {
+      html += `<dt>Date of birth</dt>\n<dd>${date_b}</dd>`;
+    }
+  }
+
+  if (date_d.trim()) {
+    if (profile["ox_isOrganisation"]) {
+      html += `<dt>Date of disbandment</dt>\n<dd>${date_b}</dd>`;
+    } else {
+      html += `<dt>Date of death</dt>\n<dd>${date_d}</dd>`;
+    }
+  }
+
+  return html;
 }

@@ -258,6 +258,30 @@ export function renderH4Section(profile, field, icon = null) {
   `;
 }
 
+export function defListItem(profile, field, capitalize = false, link = "") {
+  if (profile.hasOwnProperty(field)) {
+    let label = getLabel(field);
+    let val = profile[field];
+
+    let html = `<dt>${label}</dt>`;
+
+    if (capitalize) {
+      val = val.toUpperCase();
+    }
+
+    if (link != "") {
+      let link = `${link}${val}`;
+      html += `<dd><a href="${full_link}">${val}</a></dd>`;
+    } else {
+      html += `<dd>${val}</dd>`;
+    }
+
+    return html;
+  } else {
+    return "";
+  }
+}
+
 function resourceRelation(profile, relations, field) {
   console.log("yellow please work");
   if (profile && profile.hasOwnProperty(field)) {

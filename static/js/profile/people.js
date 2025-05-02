@@ -417,65 +417,73 @@ export function getPeopleComponents(emlo) {
     }),
 
     new emlo.MultiFields({
-      id: "details",
+      id: "people-profile",
       category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "content",
-        sectionTitle: "Details",
-        sectionTitleImage: "/static/img/icon-people.png",
-        contentTitle: "",
-        divider: true,
-        fields: [
-          { title: "Alternative names", key: "skos_altLabel" },
-          { title: "Titles or roles", key: "ox_titlesRolesOccupations" },
-        ],
+      renderer: new emlo.ProfileRightRenderer({
+        profileType: "people",
       }),
     }),
 
-    new emlo.MultiFields({
-      id: "dates",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "date-people",
-        sectionTitle: "Dates",
-        sectionTitleImage: "/static/img/icon-calendar.png",
-        divider: true,
-        fields: [
-          {
-            title: "Date of birth",
-            core: "birth",
-            keys: {
-              date: {
-                day: "bio_Birth-ox_day",
-                month: "bio_Birth-ox_month",
-                year: "bio_Birth-ox_year",
-              },
-              flag: {
-                "bio_Birth-indef_uncertain": "uncertain",
-                "bio_Birth-indef_inferred": "inferred",
-                "bio_Birth-indef_approximate": "approximate",
-              },
-            },
-          },
-          {
-            title: "Date of death",
-            core: "death",
-            keys: {
-              date: {
-                day: "bio_Death-ox_day",
-                month: "bio_Death-ox_month",
-                year: "bio_Death-ox_year",
-              },
-              flag: {
-                "bio_Death-indef_uncertain": "uncertain",
-                "bio_Death-indef_inferred": "inferred",
-                "bio_Death-indef_approximate": "approximate",
-              },
-            },
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "details",
+    //   category: "results",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "content",
+    //     sectionTitle: "Details",
+    //     sectionTitleImage: "/static/img/icon-people.png",
+    //     contentTitle: "",
+    //     divider: true,
+    //     fields: [
+    //       { title: "Alternative names", key: "skos_altLabel" },
+    //       { title: "Titles or roles", key: "ox_titlesRolesOccupations" },
+    //     ],
+    //   }),
+    // }),
+
+    // new emlo.MultiFields({
+    //   id: "dates",
+    //   category: "results",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "date-people",
+    //     sectionTitle: "Dates",
+    //     sectionTitleImage: "/static/img/icon-calendar.png",
+    //     divider: true,
+    //     fields: [
+    //       {
+    //         title: "Date of birth",
+    //         core: "birth",
+    //         keys: {
+    //           date: {
+    //             day: "bio_Birth-ox_day",
+    //             month: "bio_Birth-ox_month",
+    //             year: "bio_Birth-ox_year",
+    //           },
+    //           flag: {
+    //             "bio_Birth-indef_uncertain": "uncertain",
+    //             "bio_Birth-indef_inferred": "inferred",
+    //             "bio_Birth-indef_approximate": "approximate",
+    //           },
+    //         },
+    //       },
+    //       {
+    //         title: "Date of death",
+    //         core: "death",
+    //         keys: {
+    //           date: {
+    //             day: "bio_Death-ox_day",
+    //             month: "bio_Death-ox_month",
+    //             year: "bio_Death-ox_year",
+    //           },
+    //           flag: {
+    //             "bio_Death-indef_uncertain": "uncertain",
+    //             "bio_Death-indef_inferred": "inferred",
+    //             "bio_Death-indef_approximate": "approximate",
+    //           },
+    //         },
+    //       },
+    //     ],
+    //   }),
+    // }),
 
     new emlo.MultiFields({
       id: "stats",

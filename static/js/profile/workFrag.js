@@ -15,7 +15,7 @@ export function _renderWorkProfile(profile, relations) {
   frag += renderDates(profile, relations);
   frag += _renderPeopleSection(profile, relations);
   frag += _renderPlacesSection(profile, relations);
-  frag += _renderContentSection(profile);
+  frag += _renderContentSection(profile, relations);
   frag += _renderRepoAndVersionSection(profile);
   //   frag += _renderRelatedResource(profile, relations);
   frag += _renderComment(profile, relations);
@@ -184,7 +184,8 @@ function _renderPeopleSection(profile, relations) {
               ${simpleRelations(
                 authorCommentField,
                 "list-style: none;",
-                profile
+                profile,
+                relations
               )}
             </div>
           `;
@@ -223,7 +224,12 @@ function _renderPeopleSection(profile, relations) {
         frag += `
             <div class="comment">
               <p><span class="fieldlabel">Comments about the recipients:</span></p>
-              ${simpleRelations(commentField, "list-style: none;", profile)}
+              ${simpleRelations(
+                commentField,
+                "list-style: none;",
+                profile,
+                relations
+              )}
             </div>
           `;
       }
@@ -252,7 +258,12 @@ function _renderPeopleSection(profile, relations) {
         frag += `
             <div class="comment">
               <p><span class="fieldlabel">Comments about mentioned:</span></p>
-              ${simpleRelations(commentsField, "list-style: none;", profile)}
+              ${simpleRelations(
+                commentsField,
+                "list-style: none;",
+                profile,
+                relations
+              )}
             </div>
           `;
       }
@@ -308,7 +319,12 @@ function _renderPlacesSection(profile, relations) {
         placesFrag += `
             <div class="comment">
               <p><span class="fieldlabel">Comments about the origin:</span></p>
-              ${simpleRelations(commentField, "list-style: none;", profile)}
+              ${simpleRelations(
+                commentField,
+                "list-style: none;",
+                profile,
+                relations
+              )}
             </div>
           `;
       }
@@ -346,7 +362,8 @@ function _renderPlacesSection(profile, relations) {
                 ${simpleRelations(
                   desCommentField,
                   "list-style: none;",
-                  profile
+                  profile,
+                  relations
                 )}
               </div>
             `;
@@ -374,7 +391,8 @@ function _renderPlacesSection(profile, relations) {
                   ${simpleRelations(
                     "ox_routeAnnotate-comment",
                     "list-style: none;",
-                    profile
+                    profile,
+                    relations
                   )}
               `;
 
@@ -388,7 +406,7 @@ function _renderPlacesSection(profile, relations) {
   }
 }
 
-function _renderContentSection(profile) {
+function _renderContentSection(profile, relations) {
   const keys = {
     abstractField: "dcterms_abstract",
     keyWordField: "ox_keywords",
@@ -416,7 +434,19 @@ function _renderContentSection(profile) {
 
     for (let key in keys) {
       if (key !== "abstractField") {
-        contentFrag += ` ${renderH4Section(profile, keys[key])}`;
+        if (
+          ["replyToField", "hasReplyField", "refField", "refByField"].includes(
+            key
+          )
+        ) {
+          contentFrag += ` ${h4RelationshipList(
+            profile,
+            relations,
+            keys[key]
+          )}`;
+        } else {
+          contentFrag += ` ${renderH4Section(profile, keys[key])}`;
+        }
       }
     }
 

@@ -117,6 +117,8 @@ export function h4RelationshipList(
     frag += `</div></div>`;
 
     return frag;
+  } else {
+    return "";
   }
 }
 

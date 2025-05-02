@@ -19,6 +19,7 @@ export function _renderWorkProfile(profile, relations) {
   frag += _renderRepoAndVersionSection(profile);
   //   frag += _renderRelatedResource(profile, relations);
   frag += _renderComment(profile, relations);
+
   return frag;
 }
 
@@ -51,8 +52,11 @@ function renderDates(profile, relations) {
   const dateTo = `${dayTo} ${months[monthTo - 1]} ${yearTo}`.trim();
   const dateToNoSpaces = dateTo.replace(/\s/g, "");
 
-  const isRange =
-    profile["ox_dateIsRange"] && profile[profile["ox_dateIsRange"]] === true;
+  let isRange = false;
+
+  if (profile.hasOwnProperty("ox_dateIsRange")) {
+    isRange = profile["ox_dateIsRange"];
+  }
 
   const originalCalendar = profile["ox_originalCalendar"] || "";
   const markedAs = profile["ox_dateMarked"] || "";
@@ -575,7 +579,6 @@ function _renderComment(profile, relations) {
   const field = "ox_isAnnotatedBy-comment";
 
   if (profile.hasOwnProperty(field)) {
-    console.log("inside");
     let frag = `<div class="column workfieldset  profilepart">
 		  <h3 class="worklegend">
 			  <img src="/static/img/icon-comment.png" class="workicon"/>

@@ -1,6 +1,7 @@
 import { getCollectionTitle } from "../js/profile/collectionDetails.js";
 import PersonChart from "./chart.js";
 import { _renderPeopleProfile } from "./profile/peopleFrags.js";
+import { _renderWorkProfile } from "./profile/workFrag.js";
 
 const emlo = {
   active: {},
@@ -2523,7 +2524,7 @@ emlo.MultiFields = class extends edges.Component {
     ); // Enable/disable secondary data fetch
 
     this.optimizedCode = edges.util.getParam(params, "optimizedCode", false);
-
+    this.relationships = [];
     this.loading = true; // Track loading state
     this.errorMessage = ""; // Track error message
   }
@@ -2546,6 +2547,9 @@ emlo.MultiFields = class extends edges.Component {
     try {
       await this._appendResults({ results: results });
       this.hitCount = source.total();
+
+      let relations = await this._fetchRelations(results[0]["uuid"]);
+      this.relationships = relations;
     } catch (error) {
       this.errorMessage = "Error fetching data.";
     } finally {
@@ -2555,6 +2559,31 @@ emlo.MultiFields = class extends edges.Component {
     this.renderer.draw();
 
     this.hitCount = source.total();
+  }
+
+  async _fetchRelations(uuid) {
+    try {
+      const response = await fetch(
+        `/solr/all/select?q=uuid_related:${uuid}&wt=json`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error(`Error fetching relations: ${response.statusText}`);
+        return [];
+      }
+
+      const json = await response.json();
+      return json.response.docs;
+    } catch (err) {
+      console.error("Error while fetching relations", err);
+      return [];
+    }
   }
 
   async _appendResults(params) {
@@ -4443,58 +4472,63 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   }
 };
 
-// emlo.ProfileRightRenderer = class extends edges.Renderer {
-//   constructor(params) {
-//     super(params);
-//     // this.fields = edges.util.getParam(params, "fields", []);
-//     // this.primaryField = edges.util.getParam(params, "primaryField", "");
-//     // this.sectionTitle = edges.util.getParam(params, "sectionTitle", "");
-//     // this.sectionTitleImage = edges.util.getParam(
-//     //   params,
-//     //   "sectionTitleImage",
-//     //   ""
-//     // );
-//     // this.subSections = edges.util.getParam(params, "subSections", []);
-//     this.profileType = edges.util.getParam(params, "profileType", "");
-//     // this.divider = edges.util.getParam(params, "divider", false);
-//     this.dividerFrag = ` <hr class="yellow-divider" />`;
-//   }
+emlo.ProfileRightRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+    // this.fields = edges.util.getParam(params, "fields", []);
+    // this.primaryField = edges.util.getParam(params, "primaryField", "");
+    // this.sectionTitle = edges.util.getParam(params, "sectionTitle", "");
+    // this.sectionTitleImage = edges.util.getParam(
+    //   params,
+    //   "sectionTitleImage",
+    //   ""
+    // );
+    // this.subSections = edges.util.getParam(params, "subSections", []);
+    this.profileType = edges.util.getParam(params, "profileType", "");
+    // this.divider = edges.util.getParam(params, "divider", false);
+    this.dividerFrag = ` <hr class="yellow-divider" />`;
+  }
 
-//   draw() {
-//     let frag = "";
-//     const result = this.component.results[0];
-//     if (this.component.loading) {
-//       frag = "<div class='loading-message'>Loading...</div>"; // Show loading message
-//     } else if (this.component.errorMessage) {
-//       frag = `<div class='error-message'>${this.component.errorMessage}</div>`; // Show error message
-//     } else if (this.component.results && this.component.results.length > 0) {
-//       switch (this.profileType) {
-//         case "people":
-//           frag += _renderPeopleProfile(result);
-//           break;
-//         default:
-//           console.log("Nothing is valid");
-//       }
-//     }
+  draw() {
+    let frag = "";
+    const result = this.component.results[0];
+    if (this.component.loading) {
+      frag = "<div class='loading-message'>Loading...</div>"; // Show loading message
+    } else if (this.component.errorMessage) {
+      frag = `<div class='error-message'>${this.component.errorMessage}</div>`; // Show error message
+    } else if (this.component.results && this.component.results.length > 0) {
+      switch (this.profileType) {
+        case "people":
+          frag += _renderPeopleProfile(result, this.component.relationships);
+          break;
+        case "work":
+          frag += _renderWorkProfile(result, this.component.relationships);
+          break;
+        default:
+          console.log("Nothing is valid");
+      }
+    }
 
-//     const containerClasses = edges.util.styleClasses(
-//       this.namespace,
-//       "container",
-//       this.component.id
-//     );
+    const containerClasses = edges.util.styleClasses(
+      this.namespace,
+      "container",
+      this.component.id
+    );
 
-//     let container = "";
+    let container = "";
 
-//     if (frag) {
-//       container = `
-//       <div id="details" class="${containerClasses} ">
-//         ${frag}
-//       </div>`;
-//     }
+    let row = ["work"].includes(this.profileType) ? "row" : "";
 
-//     this.component.context.html(container);
-//   }
-// };
+    if (frag) {
+      container = `
+      <div id="details" class="${containerClasses} ${row}">
+        ${frag}
+      </div>`;
+    }
+
+    this.component.context.html(container);
+  }
+};
 
 emlo.Stats = class extends edges.Component {
   constructor(params) {

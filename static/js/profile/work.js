@@ -77,352 +77,363 @@ export function getWorkComponents(emlo) {
     }),
 
     new emlo.MultiFields({
-      id: "dates",
+      id: "work-profile",
       category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "label",
-        sectionTitle: "Dates",
-        sectionTitleImage: "/static/img/icon-calendar.png",
-        divider: true,
-        fields: [
-          { title: "", key: "started_date_sort", type: "work-date" },
-          { title: "Calendar", key: "ox_originalCalendar" },
-          {
-            title: "Marked as",
-            key: "ox_dateMarked",
-            additonalInfo: [
-              {
-                mainKey: "ox_started-indef_approximate",
-                secondaryKey: "",
-                text: "(Date is approximate)",
-              },
-              {
-                mainKey: "ox_started-indef_inferred",
-                secondaryKey: "",
-                text: "(Date is inferred)",
-              },
-              {
-                mainKey: "ox_started-indef_uncertain",
-                secondaryKey: "",
-                text: "(Date is uncertain)",
-              },
-            ],
-          },
-        ],
+      renderer: new emlo.ProfileRightRenderer({
+        profileType: "work",
       }),
     }),
 
-    new emlo.MultiFields({
-      id: "gap",
-      category: "results",
-      primaryField: "comments",
-      renderer: new emlo.MultiFieldsRenderer({}),
-    }),
+    // new emlo.MultiFields({
+    //   id: "dates",
+    //   category: "results",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "label",
+    //     sectionTitle: "Dates",
+    //     sectionTitleImage: "/static/img/icon-calendar.png",
+    //     divider: true,
+    //     fields: [
+    //       { title: "", key: "started_date_sort", type: "work-date" },
+    //       { title: "Calendar", key: "ox_originalCalendar" },
+    //       {
+    //         title: "Marked as",
+    //         key: "ox_dateMarked",
+    //         additonalInfo: [
+    //           {
+    //             mainKey: "ox_started-indef_approximate",
+    //             secondaryKey: "",
+    //             text: "(Date is approximate)",
+    //           },
+    //           {
+    //             mainKey: "ox_started-indef_inferred",
+    //             secondaryKey: "",
+    //             text: "(Date is inferred)",
+    //           },
+    //           {
+    //             mainKey: "ox_started-indef_uncertain",
+    //             secondaryKey: "",
+    //             text: "(Date is uncertain)",
+    //           },
+    //         ],
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "comments-new",
-      category: "results",
-      fetchSecondaryData: true,
-      primaryField: "ox_dateAnnotate-comment",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested-list",
-        sectionTitle: "Comments about the date:",
-        sectionTitleStyle: "span",
-        primaryField: "ox_dateAnnotate-comment",
-        fields: [
-          {
-            title: "",
-            key: "bibo_Note",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "gap",
+    //   category: "results",
+    //   primaryField: "comments",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     subSection: true,
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "people",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "",
-        sectionTitle: "People",
-        sectionTitleImage: "/static/img/icon-people.png",
-        divider: true,
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "comments-new",
+    //   category: "results",
+    //   fetchSecondaryData: true,
+    //   primaryField: "ox_dateAnnotate-comment",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "nested-list",
+    //     sectionTitle: "Comments about the date:",
+    //     sectionTitleStyle: "span",
+    //     primaryField: "ox_dateAnnotate-comment",
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "bibo_Note",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "people-author",
-      category: "results",
-      fetchSecondaryData: true,
-      primaryField: "frbr_creator-person",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested-label",
-        sectionTitle: "Author",
-        primaryField: "frbr_creator-person",
-        fields: [
-          {
-            title: "",
-            key: "browse",
-            clickable: true,
-            collectionName: "person",
-            additionalInfoKey: "ox_titlesRolesOccupations",
-          },
-          {
-            title: "",
-            key: "",
-            additonalInfo: [
-              {
-                mainKey: "mail_authors-indef_inferred",
-                secondaryKey: "mail_authors-rdf_value",
-                text: "(Author is inferred)",
-              },
-              {
-                mainKey: "mail_authors-indef_uncertain",
-                secondaryKey: "mail_authors-rdf_value",
-                text: "(Author is uncertain)",
-              },
-              {
-                mainKey: "mail_authors-indef_approximate",
-                secondaryKey: "mail_authors-rdf_value",
-                text: "(Author is approximate)",
-              },
-            ],
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "people",
+    //   category: "results",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "",
+    //     sectionTitle: "People",
+    //     sectionTitleImage: "/static/img/icon-people.png",
+    //     divider: true,
+    //     subSection: true,
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "aut-commnents",
-      category: "results",
-      fetchSecondaryData: true,
-      primaryField: "ox_authorAnnotate-comment",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested-list",
-        sectionTitle: "Comments about the author:",
-        sectionTitleStyle: "span",
-        primaryField: "ox_authorAnnotate-comment",
-        fields: [
-          {
-            title: "",
-            key: "bibo_Note",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "people-author",
+    //   category: "results",
+    //   fetchSecondaryData: true,
+    //   primaryField: "frbr_creator-person",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "nested-label",
+    //     sectionTitle: "Author",
+    //     primaryField: "frbr_creator-person",
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "browse",
+    //         clickable: true,
+    //         collectionName: "person",
+    //         additionalInfoKey: "ox_titlesRolesOccupations",
+    //       },
+    //       {
+    //         title: "",
+    //         key: "",
+    //         additonalInfo: [
+    //           {
+    //             mainKey: "mail_authors-indef_inferred",
+    //             secondaryKey: "mail_authors-rdf_value",
+    //             text: "(Author is inferred)",
+    //           },
+    //           {
+    //             mainKey: "mail_authors-indef_uncertain",
+    //             secondaryKey: "mail_authors-rdf_value",
+    //             text: "(Author is uncertain)",
+    //           },
+    //           {
+    //             mainKey: "mail_authors-indef_approximate",
+    //             secondaryKey: "mail_authors-rdf_value",
+    //             text: "(Author is approximate)",
+    //           },
+    //         ],
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "people-recipient",
-      category: "results",
-      fetchSecondaryData: true,
-      primaryField: "mail_recipient-person",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested-label",
-        sectionTitle: "Recipient",
-        primaryField: "mail_recipient-person",
-        fields: [
-          {
-            title: "",
-            key: "browse",
-            clickable: true,
-            collectionName: "person",
-            additionalInfoKey: "ox_titlesRolesOccupations",
-          },
-          {
-            title: "",
-            additonalInfo: [
-              {
-                mainKey: "mail_addressees-indef_inferred",
-                secondaryKey: "mail_addressees-rdf_value",
-                text: "(Recipient is inferred)",
-              },
-              {
-                mainKey: "mail_addressees-indef_uncertain",
-                secondaryKey: "mail_addressees-rdf_value",
-                text: "(Recipient is uncertain)",
-              },
-              {
-                mainKey: "mail_addressees-indef_approximate",
-                secondaryKey: "mail_addressees-rdf_value",
-                text: "(Recipient is approximate)",
-              },
-            ],
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "aut-commnents",
+    //   category: "results",
+    //   fetchSecondaryData: true,
+    //   primaryField: "ox_authorAnnotate-comment",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "nested-list",
+    //     sectionTitle: "Comments about the author:",
+    //     sectionTitleStyle: "span",
+    //     primaryField: "ox_authorAnnotate-comment",
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "bibo_Note",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "rec-commnents",
-      category: "results",
-      fetchSecondaryData: true,
-      primaryField: " ox_addresseeAnnotate-comment",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested-list",
-        sectionTitle: "Comments about the recipient:",
-        sectionTitleStyle: "span",
-        primaryField: " ox_addresseeAnnotate-comment",
-        fields: [
-          {
-            title: "",
-            key: "bibo_Note",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "people-recipient",
+    //   category: "results",
+    //   fetchSecondaryData: true,
+    //   primaryField: "mail_recipient-person",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "nested-label",
+    //     sectionTitle: "Recipient",
+    //     primaryField: "mail_recipient-person",
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "browse",
+    //         clickable: true,
+    //         collectionName: "person",
+    //         additionalInfoKey: "ox_titlesRolesOccupations",
+    //       },
+    //       {
+    //         title: "",
+    //         additonalInfo: [
+    //           {
+    //             mainKey: "mail_addressees-indef_inferred",
+    //             secondaryKey: "mail_addressees-rdf_value",
+    //             text: "(Recipient is inferred)",
+    //           },
+    //           {
+    //             mainKey: "mail_addressees-indef_uncertain",
+    //             secondaryKey: "mail_addressees-rdf_value",
+    //             text: "(Recipient is uncertain)",
+    //           },
+    //           {
+    //             mainKey: "mail_addressees-indef_approximate",
+    //             secondaryKey: "mail_addressees-rdf_value",
+    //             text: "(Recipient is approximate)",
+    //           },
+    //         ],
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "people-mentions",
-      category: "results",
-      fetchSecondaryData: true,
-      primaryField: "dcterms_references-person",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested-label",
-        sectionTitle: "Mentions",
-        primaryField: "dcterms_references-person",
-        fields: [
-          {
-            title: "",
-            key: "browse",
-            clickable: true,
-            collectionName: "person",
-            additionalInfoKey: "ox_titlesRolesOccupations",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "rec-commnents",
+    //   category: "results",
+    //   fetchSecondaryData: true,
+    //   primaryField: " ox_addresseeAnnotate-comment",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "nested-list",
+    //     sectionTitle: "Comments about the recipient:",
+    //     sectionTitleStyle: "span",
+    //     primaryField: " ox_addresseeAnnotate-comment",
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "bibo_Note",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "places",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "",
-        sectionTitle: "Places",
-        sectionTitleImage: "/static/img/icon-globe.png",
-        divider: true,
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "people-mentions",
+    //   category: "results",
+    //   fetchSecondaryData: true,
+    //   primaryField: "dcterms_references-person",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "nested-label",
+    //     sectionTitle: "Mentions",
+    //     primaryField: "dcterms_references-person",
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "browse",
+    //         clickable: true,
+    //         collectionName: "person",
+    //         additionalInfoKey: "ox_titlesRolesOccupations",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "places-recipient",
-      category: "results",
-      fetchSecondaryData: true,
-      primaryField: "mail_origin-location",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested-label",
-        sectionTitle: "Origin",
-        primaryField: "mail_origin-location",
-        fields: [
-          {
-            title: "Marked as",
-            key: "geonames_name",
-            clickable: true,
-            collectionName: "location",
-            additonalInfo: [],
-          },
-          {
-            title: "Marked as",
-            key: "",
-            additonalInfo: [
-              {
-                mainKey: "mail_origin-indef_inferred",
-                secondaryKey: "mail_origin-rdf_value",
-                text: "(Origin is inferred)",
-              },
-              {
-                mainKey: "mail_origin-indef_uncertain",
-                secondaryKey: "mail_origin-rdf_value",
-                text: "(Origin is uncertain)",
-              },
-              {
-                mainKey: "mail_origin-indef_approximate",
-                secondaryKey: "mail_origin-rdf_value",
-                text: "(Origin is approximate)",
-              },
-            ],
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "places",
+    //   category: "results",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "",
+    //     sectionTitle: "Places",
+    //     sectionTitleImage: "/static/img/icon-globe.png",
+    //     divider: true,
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "ori-commnents",
-      category: "results",
-      fetchSecondaryData: true,
-      primaryField: "ox_originAnnotate-comment",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested-list",
-        sectionTitle: "Comments about the origin:",
-        sectionTitleStyle: "span",
-        primaryField: "ox_originAnnotate-comment",
-        fields: [
-          {
-            title: "",
-            key: "bibo_Note",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "places-recipient",
+    //   category: "results",
+    //   fetchSecondaryData: true,
+    //   primaryField: "mail_origin-location",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "nested-label",
+    //     sectionTitle: "Origin",
+    //     primaryField: "mail_origin-location",
+    //     fields: [
+    //       {
+    //         title: "Marked as",
+    //         key: "geonames_name",
+    //         clickable: true,
+    //         collectionName: "location",
+    //         additonalInfo: [],
+    //       },
+    //       {
+    //         title: "Marked as",
+    //         key: "",
+    //         additonalInfo: [
+    //           {
+    //             mainKey: "mail_origin-indef_inferred",
+    //             secondaryKey: "mail_origin-rdf_value",
+    //             text: "(Origin is inferred)",
+    //           },
+    //           {
+    //             mainKey: "mail_origin-indef_uncertain",
+    //             secondaryKey: "mail_origin-rdf_value",
+    //             text: "(Origin is uncertain)",
+    //           },
+    //           {
+    //             mainKey: "mail_origin-indef_approximate",
+    //             secondaryKey: "mail_origin-rdf_value",
+    //             text: "(Origin is approximate)",
+    //           },
+    //         ],
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "places-destionation",
-      category: "results",
-      fetchSecondaryData: true,
-      primaryField: "mail_destination-location",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested-label",
-        sectionTitle: "Destination",
-        primaryField: "mail_destination-location",
-        fields: [
-          {
-            title: "",
-            key: "geonames_name",
-            clickable: true,
-            collectionName: "location",
-            additonalInfo: [],
-          },
-          {
-            title: "Marked as",
-            key: "",
-            additonalInfo: [
-              {
-                mainKey: "mail_destination-indef_inferred",
-                secondaryKey: "mail_destination-rdf_value",
-                text: "(Destination is inferred)",
-              },
-              {
-                mainKey: "mail_destination-indef_uncertain",
-                secondaryKey: "mail_destination-rdf_value",
-                text: "(Destination is uncertain)",
-              },
-              {
-                mainKey: "mail_destination-indef_approximate",
-                secondaryKey: "mail_destination-rdf_value",
-                text: "(Destination is approximate)",
-              },
-            ],
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "ori-commnents",
+    //   category: "results",
+    //   fetchSecondaryData: true,
+    //   primaryField: "ox_originAnnotate-comment",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "nested-list",
+    //     sectionTitle: "Comments about the origin:",
+    //     sectionTitleStyle: "span",
+    //     primaryField: "ox_originAnnotate-comment",
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "bibo_Note",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "des-commnents",
-      category: "results",
-      fetchSecondaryData: true,
-      primaryField: "ox_destinationAnnotate-comment",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested-list",
-        sectionTitle: "Comments about the destination:",
-        sectionTitleStyle: "span",
-        primaryField: "ox_destinationAnnotate-comment",
-        fields: [
-          {
-            title: "",
-            key: "bibo_Note",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "places-destionation",
+    //   category: "results",
+    //   fetchSecondaryData: true,
+    //   primaryField: "mail_destination-location",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "nested-label",
+    //     sectionTitle: "Destination",
+    //     primaryField: "mail_destination-location",
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "geonames_name",
+    //         clickable: true,
+    //         collectionName: "location",
+    //         additonalInfo: [],
+    //       },
+    //       {
+    //         title: "Marked as",
+    //         key: "",
+    //         additonalInfo: [
+    //           {
+    //             mainKey: "mail_destination-indef_inferred",
+    //             secondaryKey: "mail_destination-rdf_value",
+    //             text: "(Destination is inferred)",
+    //           },
+    //           {
+    //             mainKey: "mail_destination-indef_uncertain",
+    //             secondaryKey: "mail_destination-rdf_value",
+    //             text: "(Destination is uncertain)",
+    //           },
+    //           {
+    //             mainKey: "mail_destination-indef_approximate",
+    //             secondaryKey: "mail_destination-rdf_value",
+    //             text: "(Destination is approximate)",
+    //           },
+    //         ],
+    //       },
+    //     ],
+    //   }),
+    // }),
+
+    // new emlo.MultiFields({
+    //   id: "des-commnents",
+    //   category: "results",
+    //   fetchSecondaryData: true,
+    //   primaryField: "ox_destinationAnnotate-comment",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "nested-list",
+    //     sectionTitle: "Comments about the destination:",
+    //     sectionTitleStyle: "span",
+    //     primaryField: "ox_destinationAnnotate-comment",
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "bibo_Note",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
     // new emlo.MultiFields({
     //   id: "places-ment-heading",
@@ -433,161 +444,162 @@ export function getWorkComponents(emlo) {
     //   }),
     // }),
 
-    new emlo.MultiFields({
-      id: "places-mentioned",
-      category: "results",
-      fetchSecondaryData: true,
-      primaryField: "dcterms_references-location",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested-label",
-        sectionTitle: "Mentions",
-        primaryField: "dcterms_references-location",
-        fields: [
-          {
-            title: "",
-            key: "geonames_name",
-            clickable: true,
-            collectionName: "location",
-            additonalInfo: [
-              {
-                mainKey: "mail_destination-indef_inferred",
-                secondaryKey: "mail_destination-rdf_value",
-                text: "(Destination is inferred)",
-              },
-            ],
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "places-mentioned",
+    //   category: "results",
+    //   fetchSecondaryData: true,
+    //   primaryField: "dcterms_references-location",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "nested-label",
+    //     sectionTitle: "Mentions",
+    //     primaryField: "dcterms_references-location",
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "geonames_name",
+    //         clickable: true,
+    //         collectionName: "location",
+    //         additonalInfo: [
+    //           {
+    //             mainKey: "mail_destination-indef_inferred",
+    //             secondaryKey: "mail_destination-rdf_value",
+    //             text: "(Destination is inferred)",
+    //           },
+    //         ],
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "contents",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "",
-        sectionTitle: "Content",
-        sectionTitleImage: "/static/img/icon-quill.png",
-        divider: true,
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "contents",
+    //   category: "results",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "",
+    //     sectionTitle: "Content",
+    //     sectionTitleImage: "/static/img/icon-quill.png",
+    //     divider: true,
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "content-abs",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "plain-text",
-        sectionTitle: "Abstract",
-        field: "dcterms_abstract",
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "content-abs",
+    //   category: "results",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "plain-text",
+    //     sectionTitle: "Abstract",
+    //     field: "dcterms_abstract",
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "content-keywords",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "plain-text",
-        sectionTitle: "Keywords",
-        field: "ox_keywords",
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "content-keywords",
+    //   category: "results",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "plain-text",
+    //     sectionTitle: "Keywords",
+    //     field: "ox_keywords",
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "content-lang",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "plain-text",
-        sectionTitle: "Language",
-        field: "dcterms_language",
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "content-lang",
+    //   category: "results",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "plain-text",
+    //     sectionTitle: "Language",
+    //     field: "dcterms_language",
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "content-implict",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "plain-text",
-        sectionTitle: "Incipit",
-        field: "ox_incipit",
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "content-implict",
+    //   category: "results",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "plain-text",
+    //     sectionTitle: "Incipit",
+    //     field: "ox_incipit",
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "content-excipit",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "plain-text",
-        sectionTitle: "Explicit",
-        field: "ox_excipit",
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "content-excipit",
+    //   category: "results",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "plain-text",
+    //     sectionTitle: "Explicit",
+    //     field: "ox_excipit",
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "content-postscript",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "plain-text",
-        sectionTitle: "Postscript",
-        field: "mail_postScript",
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "content-postscript",
+    //   category: "results",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "plain-text",
+    //     sectionTitle: "Postscript",
+    //     field: "mail_postScript",
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "content-reply-to",
-      category: "results",
-      fetchSecondaryData: true,
-      primaryField: "mail_replyTo-work",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested-label",
-        sectionTitle: "Reply To",
-        primaryField: "mail_replyTo-work",
-        fields: [
-          {
-            title: "",
-            key: "dcterms_description",
-            clickable: true,
-            collectionName: "work",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "content-reply-to",
+    //   category: "results",
+    //   fetchSecondaryData: true,
+    //   primaryField: "mail_replyTo-work",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "nested-label",
+    //     sectionTitle: "Reply To",
+    //     primaryField: "mail_replyTo-work",
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "dcterms_description",
+    //         clickable: true,
+    //         collectionName: "work",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "content-has-reply",
-      category: "results",
-      fetchSecondaryData: true,
-      primaryField: "mail_hasReply-work",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested-label",
-        sectionTitle: "Answered by",
-        primaryField: "mail_hasReply-work",
-        fields: [
-          {
-            title: "",
-            key: "dcterms_description",
-            clickable: true,
-            collectionName: "work",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "content-has-reply",
+    //   category: "results",
+    //   fetchSecondaryData: true,
+    //   primaryField: "mail_hasReply-work",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "nested-label",
+    //     sectionTitle: "Answered by",
+    //     primaryField: "mail_hasReply-work",
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "dcterms_description",
+    //         clickable: true,
+    //         collectionName: "work",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "repo-versions",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        divider: true,
-        sectionTitle: "Repositories and Versions ",
-        sectionTitleImage: "/static/img/icon-repository.png",
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "repo-versions",
+    //   category: "results",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     divider: true,
+    //     sectionTitle: "Repositories and Versions ",
+    //     sectionTitleImage: "/static/img/icon-repository.png",
+    //   }),
+    // }),
 
+    // FIXME: This is an hotfix for rendering repos.
     new emlo.MultiFields({
       id: "repo",
       category: "results",
       fetchSecondaryData: true,
       primaryField: "frbr_Manifestation-manifestation",
       renderer: new emlo.MultiFieldsRenderer({
-        type: "repo-version",
+        // type: "repo-version",
         primaryField: "frbr_Manifestation-manifestation",
       }),
     }),
@@ -615,16 +627,6 @@ export function getWorkComponents(emlo) {
             key: "ox_detailsOfResource",
           },
         ],
-      }),
-    }),
-
-    new emlo.MultiFields({
-      id: "comments",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        divider: true,
-        sectionTitle: "Comments",
-        sectionTitleImage: "/static/img/icon-comment.png",
       }),
     }),
 

@@ -360,7 +360,7 @@ function _renderPlacesSection(profile, relations) {
     if (profile.hasOwnProperty(mentionedField)) {
       placesFrag += `<h4>Mentions</h4>
             <div class="locations mentions">  
-                ${relationshipList(relations, profile, mentionedField)}
+                ${h4RelationshipList(profile, relations, mentionedField)}
             `;
 
       placesFrag += `</div>`;

@@ -72,9 +72,8 @@ export function h4RelationshipList(
       for (const relation of relations) {
         if (relation.id === relKey) {
           exist = true;
+          break;
         }
-
-        break;
       }
     }
 

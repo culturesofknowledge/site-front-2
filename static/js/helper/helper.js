@@ -66,7 +66,6 @@ export function h4RelationshipList(
   if (profile.hasOwnProperty(field)) {
     let exist = false;
     const typeList = ["image", "detailed", "simple", "resource"];
-    console.log("profile[field]", profile[field], field);
     for (let relation in profile[field]) {
       let relKey = uuidFromUri(relation, true);
       for (const relation of relations) {
@@ -77,8 +76,6 @@ export function h4RelationshipList(
         break;
       }
     }
-
-    console.log("exist", exist);
 
     if (!exist) {
       return "";
@@ -145,7 +142,6 @@ export function relationshipList(
 
   for (const relationVal of profile[field]) {
     const relKey = uuidFromUri(relationVal, true);
-
     for (const relation of relations) {
       if (relation.id === relKey) {
         let obj_type = relation["object_type"];

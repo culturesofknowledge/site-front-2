@@ -2547,7 +2547,6 @@ emlo.MultiFields = class extends edges.Component {
     try {
       await this._appendResults({ results: results });
       this.hitCount = source.total();
-
       let relations = await this._fetchRelations(results[0]["uuid"]);
       this.relationships = relations;
     } catch (error) {
@@ -2564,7 +2563,7 @@ emlo.MultiFields = class extends edges.Component {
   async _fetchRelations(uuid) {
     try {
       const response = await fetch(
-        `/solr/all/select?q=uuid_related:${uuid}&wt=json`,
+        `/solr/all/select?q=uuid_related:${uuid}&wt=json&rows=9999`,
         {
           method: "GET",
           headers: {

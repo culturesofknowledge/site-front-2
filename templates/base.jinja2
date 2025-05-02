@@ -16,7 +16,7 @@
             try {
                 const searchQuery = document.getElementById("all_search").value
 
-                window.location.href = `${window.location.origin}/forms/advance?everything=${searchQuery}&search_type=quick`
+                window.location.href = `${window.location.origin}/forms/advanced?everything=${searchQuery}&search_type=quick`
             } catch(err) {
                 console.error(err)
             } 
@@ -24,7 +24,7 @@
 
         // Controlling the search letters centrally for browse page
         function searchLetters(browsePage) {
-            const baseURL = `${window.location.origin}/forms/advance`;
+            const baseURL = `${window.location.origin}/forms/advanced`;
             const urlParams = new URLSearchParams(window.location.search);
             const uuids = urlParams.get("uuids");
             const currentLetter = urlParams.get("letter");

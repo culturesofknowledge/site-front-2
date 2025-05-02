@@ -162,7 +162,15 @@ export function relationshipList(
     }
   }
 
-  const sortedList = sortList.slice().sort((a, b) => a.sort - b.sort);
+  const sortedList = sortList.sort((a, b) => {
+    const key = a.sort;
+    const valA = a.obj[key];
+    const valB = b.obj[key];
+
+    if (valA < valB) return -1;
+    if (valA > valB) return 1;
+    return 0;
+  });
 
   if (displayLabel && sortList.length > 0) {
     html += `<dt>${sortedList[0]["label"]}</dt><dd>`;

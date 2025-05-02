@@ -630,23 +630,23 @@ export function getWorkComponents(emlo) {
       }),
     }),
 
-    new emlo.MultiFields({
-      id: "comments-general",
-      category: "results",
-      fetchSecondaryData: true,
-      primaryField: "comments",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested-list",
-        sectionTitle: "General Notes",
-        primaryField: "comments",
-        fields: [
-          {
-            title: "",
-            key: "bibo_Note",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "comments-general",
+    //   category: "results",
+    //   fetchSecondaryData: true,
+    //   primaryField: "comments",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "nested-list",
+    //     sectionTitle: "General Notes",
+    //     primaryField: "comments",
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "bibo_Note",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
     new emlo.MultiFields({
       id: "work-footer",

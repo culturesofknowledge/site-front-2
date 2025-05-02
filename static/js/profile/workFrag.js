@@ -12,7 +12,7 @@ import {
 export function _renderWorkProfile(profile, relations) {
   let frag = "";
 
-  frag += renderDates(profile);
+  frag += renderDates(profile, relations);
   frag += _renderPeopleSection(profile, relations);
   frag += _renderPlacesSection(profile, relations);
   frag += _renderContentSection(profile);
@@ -22,7 +22,7 @@ export function _renderWorkProfile(profile, relations) {
   return frag;
 }
 
-function renderDates(profile) {
+function renderDates(profile, relations) {
   const months = [
     "January",
     "February",
@@ -115,7 +115,8 @@ function renderDates(profile) {
           ${simpleRelations(
             "ox_dateAnnotate-comment",
             "list-style: none;",
-            profile
+            profile,
+            relations
           )}
         </div>
       `;
@@ -434,7 +435,7 @@ function _renderRepoAndVersionSection(profile) {
         frag += _getLetterRepoContent(item);
 
         if (item.hasOwnProperty("ox_resourceAt-institution")) {
-          this._getInstituteData(item["ox_resourceAt-institution"]);
+          _getInstituteData(item["ox_resourceAt-institution"]);
         }
       } else if (item.dcterms_type == "Manuscript copy") {
         frag += _getManuRepoContent(item);

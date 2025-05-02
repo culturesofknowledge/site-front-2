@@ -3,6 +3,7 @@ import {
   defListItem,
   hasAnyFieldValue,
   decodeUncertaintyFlags,
+  totalLinkingToListWork,
 } from "../../js/helper/helper.js";
 
 export function _renderPeopleProfile(profile) {
@@ -10,6 +11,7 @@ export function _renderPeopleProfile(profile) {
 
   frag += _renderDetailsSection(profile);
   frag += _renderDateSection(profile);
+  frag += _renderContentStatsSection(profile);
 
   return frag;
 }
@@ -75,6 +77,16 @@ function _renderDateSection(profile) {
   } else {
     return "";
   }
+}
+
+function _renderContentStatsSection(profile) {
+  let sectionFrag = `
+    <div class="column profilepart">
+      <h3><img src="/static/img/icon-statistics.png" class=""/>Catalogue Statistics</h3>
+      <div class="content">${totalLinkingToListWork(profile, "person")}`;
+
+  sectionFrag += "</div></div>";
+  return sectionFrag;
 }
 
 function writeDate(profile, keys) {

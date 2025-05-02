@@ -282,6 +282,104 @@ export function defListItem(profile, field, capitalize = false, link = "") {
   }
 }
 
+export function totalLinkingToListWork(profile, objectType) {
+  let frag = `<p class="highlight-box">`;
+
+  const uriField = "dcterms_identifier-uri_";
+  let uriSearch = profile[uriField];
+  uriSearch = uuidFromUri(uriSearch);
+  let totalLinks = [];
+
+  if (objectType == "person") {
+    totalLinks = [
+      {
+        linkText: "ox_totalWorksByAgent",
+        fieldNames: "frbr_creator-person",
+      },
+      {
+        linkText: "ox_totalWorksAddressedToAgent",
+        fieldNames: "mail_recipient-person",
+      },
+      {
+        linkText: "ox_totalWorksMentioningAgent",
+        fieldNames: "dcterms_references-person",
+      },
+    ];
+  } else if (objectType == "location") {
+    totalLinks = [
+      {
+        linkText: "mail_originOf-work",
+        fieldNames: "mail_origin-location",
+      },
+      {
+        linkText: "mail_destinationOf-work",
+        fieldNames: "mail_destination-location",
+      },
+      {
+        linkText: "dcterms_isReferencedBy-work",
+        fieldNames: "dcterms_references-location",
+      },
+    ];
+  } else {
+    return "";
+  }
+
+  let divider = false;
+
+  totalLinks.forEach((link) => {
+    if (divider) {
+      frag += "&diams;&nbsp;";
+    } else {
+      divider = true;
+    }
+
+    let label = getLabel(link.linkText);
+    let value = profile[link.linkText];
+    console.log("value", profile, link);
+    if (Array.isArray(value)) {
+      value = value.length; // Use the length if it's an array
+    } else if (typeof value !== "number") {
+      value = 0; // If it's neither a number nor an array, set it to 0
+    }
+
+    let linkText = `${value} ${label.toLowerCase()}&nbsp;`;
+
+    let href = `/forms/advanced?${link.fieldNames}=${uriSearch}`;
+
+    if (value > 0) {
+      frag += `<a href="${href}" title="${label}">${linkText}</a>`;
+    } else {
+      frag += `${linkText}`;
+    }
+  });
+
+  frag += "</p>";
+
+  return frag;
+}
+
+// NOT REQUIRED BUT KEEPING IT IN CASE IT'S NEEDED
+// function stripValuePrefix(fullString, prefix = "") {
+//   let retval = fullString;
+//   const plength = prefix.length;
+
+//   // Either strip off a specified prefix
+//   if (plength > 0) {
+//     if (fullString.startsWith(prefix)) {
+//       retval = fullString.slice(plength);
+//     }
+//   }
+//   // Or strip off everything up to and including the first underscore
+//   else {
+//     if (fullString.includes("_")) {
+//       const parts = fullString.split("_");
+//       retval = fullString.slice(parts[0].length + 1);
+//     }
+//   }
+
+//   return retval;
+// }
+
 function resourceRelation(profile, relations, field) {
   console.log("yellow please work");
   if (profile && profile.hasOwnProperty(field)) {

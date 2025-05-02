@@ -15,7 +15,7 @@ export function simpleRelations(
   field,
   style = "",
   profile = {},
-  relations = {},
+  relations,
   helper
 ) {
   if (!(field in profile)) {
@@ -28,18 +28,19 @@ export function simpleRelations(
   }
 
   let html = "<ul>";
-  for (const relation of items) {
+  for (const relation of profile[field]) {
     const uuid = uuidFromUri(relation, true);
-    if (!relations.hasOwnProperty(uuid)) {
-      continue;
+
+    for (let rel of relations) {
+      if (rel.id == uuid) {
+        const obj = rel;
+        const objectType = obj["object_type"];
+        const mainField = displayfields[objectType].value;
+        const value = obj[mainField] || "";
+
+        html += `<li style="${style}"><pre>${value}</pre></li>`;
+      }
     }
-
-    const obj = relations[uuid];
-    const objectType = obj["object_type"];
-    const mainField = helper.getMainDisplayableFieldname(objectType);
-    const value = obj[mainField] || "";
-
-    html += `<li style="${style}"><pre>${value}</pre></li>`;
   }
   html += "</ul>";
 

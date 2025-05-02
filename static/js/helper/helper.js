@@ -66,7 +66,8 @@ export function h4RelationshipList(
   if (profile.hasOwnProperty(field)) {
     let exist = false;
     const typeList = ["image", "detailed", "simple", "resource"];
-    for (let relation in profile[field]) {
+
+    for (let relation of profile[field]) {
       let relKey = uuidFromUri(relation, true);
       for (const relation of relations) {
         if (relation.id === relKey) {

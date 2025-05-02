@@ -134,7 +134,7 @@ function _redirectToSearch(val, res, fieldName) {
 
   // console.log("finalURL", finalUrl);
   if (val > 0) {
-    const baseURL = `/forms/advance`;
+    const baseURL = `/forms/advanced`;
     let query = "";
     const user = res["browse"];
     const currentPageQ = `browsing=organisations&letter=${current_search_letter}`;

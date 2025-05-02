@@ -220,20 +220,22 @@ function _redirectToSearch(val, res, fieldName) {
   }
 
   if (val > 0) {
-    const baseURL = `/forms/advance`;
+    const baseURL = `/forms/advanced`;
     let query = "";
     const user = res["foaf_name"];
+    const uuid = res["uuid"];
+
     const currentPageQ = `browsing=people&letter=${current_search_letter}`;
 
     switch (fieldName) {
       case "ox_totalWorksByAgent":
-        query = `aut=${user}`;
+        query = `frbr_creator-person=${uuid}`;
         break;
       case "ox_totalWorksAddressedToAgent":
-        query = `rec=${user}`;
+        query = `mail_recipient-person=${uuid}`;
         break;
       case "ox_totalWorksMentioningAgent":
-        query = `ment=${user}`;
+        query = `dcterms_references-person=${uuid}`;
         break;
     }
 

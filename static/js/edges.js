@@ -761,15 +761,24 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
     const row = this.tableDisplay
       .map((field) => {
         let val = "";
+
         if (field.field) {
           val = this._getValue(field.field, res, val);
         }
         if (val) {
           val = edges.util.escapeHtml(val);
         }
+
         if (field.valueFunction) {
           val = field.valueFunction(val, res, field.field, this, index);
+
+          if (field.header == "Repositories & Versions") {
+            return `<td id=repo-${index}> </td>`;
+          } else {
+            return `<td>${val}</td>`;
+          }
         }
+
         if (!val && this.omitFieldIfEmpty) {
           return "<td></td>";
         }
@@ -2114,6 +2123,15 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
 
       if (value && value.startsWith("*") && value.endsWith("*")) {
         value = value.slice(1, -1);
+      }
+
+      if (
+        typeof value === "string" &&
+        value.startsWith('"http') &&
+        value.endsWith('"')
+      ) {
+        value = value.split("/").filter(Boolean).pop();
+        value = value.slice(0, -1);
       }
 
       let collectionName = "";
@@ -3602,7 +3620,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
           const yearCounts = Object.entries(years)
             .map(
               ([year, count]) =>
-                `<a href="/forms/advance?${queryKey}=${queryVal}&dat_sin_year=${year}"> ${year}: ${count} </a>`
+                `<a href="/forms/advanced?${queryKey}=${queryVal}&dat_sin_year=${year}"> ${year}: ${count} </a>`
             )
             .join(" ♦ ");
           return `
@@ -4335,6 +4353,8 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const currentDomain = window.location.host;
     const result = this.component.results[0];
     const editIdValue = GetRecordID(this.footerType, result);
+    const currentHref = window.location.href;
+
     const shortURL = GenerateShortURL(
       editIdValue,
       this.footerType,
@@ -4391,7 +4411,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       }
 
       if (shortURL) {
-        htmlContent += `<li class="footer-links"><a href="${shortURL}">${shortURL}</a></li>`;
+        htmlContent += `<li class="footer-links"><a href="${currentHref}">${shortURL}</a></li>`;
       }
 
       htmlContent += `</ul>`;
@@ -4422,6 +4442,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const currentDomain = window.location.host;
     const result = this.component.results[0];
     const editIdValue = GetRecordID(this.footerType, result);
+    const currentHref = window.location.href;
 
     const shortURL = GenerateShortURL(
       editIdValue,
@@ -4432,7 +4453,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const doc = document.getElementById("short-url-link");
 
     if (doc) {
-      doc.innerHTML = `<a href=${shortURL}> ${shortURL} </a>`;
+      doc.innerHTML = `<a href=${currentHref}> ${shortURL} </a>`;
     }
   }
 

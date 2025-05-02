@@ -335,7 +335,7 @@ export function totalLinkingToListWork(profile, objectType) {
 
     let label = getLabel(link.linkText);
     let value = profile[link.linkText];
-    console.log("value", profile, link);
+
     if (Array.isArray(value)) {
       value = value.length; // Use the length if it's an array
     } else if (typeof value !== "number") {

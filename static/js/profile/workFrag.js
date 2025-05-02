@@ -154,6 +154,8 @@ function _renderPeopleSection(profile, relations) {
     if (profile[authorUriField]) {
       const authorLabel =
         profile[authorUriField].length > 1 ? "Authors" : "Author";
+      const certainLabel =
+        profile[authorUriField].length > 1 ? "Authors are" : "Author is";
       frag += `<h4>${authorLabel}</h4>
           <div class="people authors">
             ${relationshipList(relations, profile, authorUriField)}
@@ -170,7 +172,7 @@ function _renderPeopleSection(profile, relations) {
         profile
       );
       if (flagsDecoded) {
-        frag += `<p><span class="flags">Authors are ${flagsDecoded}</span></p>`;
+        frag += `<p><span class="flags">${certainLabel} ${flagsDecoded}</span></p>`;
       }
 
       const authorCommentField = "ox_authorAnnotate-comment";
@@ -195,6 +197,8 @@ function _renderPeopleSection(profile, relations) {
     if (profile[addresseeUriField]) {
       const recipientLabel =
         profile[addresseeUriField].length > 1 ? "Recipients" : "Recipient";
+      const certainLabel =
+        profile[authorUriField].length > 1 ? "Recipients are" : "Recipient is";
       frag += `<h4>${recipientLabel}</h4>
           <div class="people recipients">
             ${relationshipList(relations, profile, addresseeUriField)}
@@ -210,7 +214,7 @@ function _renderPeopleSection(profile, relations) {
         profile
       );
       if (flagsDecoded) {
-        frag += `<p><span class="flags">Recipients are ${flagsDecoded}</span></p>`;
+        frag += `<p><span class="flags">${certainLabel} ${flagsDecoded}</span></p>`;
       }
 
       const commentField = "ox_addresseeAnnotate-comment";
@@ -296,7 +300,7 @@ function _renderPlacesSection(profile, relations) {
       );
 
       if (originFlagDecoded) {
-        placesFrag += `<p><span class="flags">Origin are ${originFlagDecoded}</span></p>`;
+        placesFrag += `<p><span class="flags">Origin is ${originFlagDecoded}</span></p>`;
       }
 
       const commentField = "ox_originAnnotate-comment";
@@ -330,7 +334,7 @@ function _renderPlacesSection(profile, relations) {
       );
 
       if (destinationFlagDecoded) {
-        placesFrag += `<p><span class="flags">Destination are ${destinationFlagDecoded}</span></p>`;
+        placesFrag += `<p><span class="flags">Destination is ${destinationFlagDecoded}</span></p>`;
       }
 
       const desCommentField = "ox_destinationAnnotate-comment";

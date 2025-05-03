@@ -12,7 +12,7 @@ export function _renderPeopleProfile(profile, tableData) {
   frag += _renderDetailsSection(profile);
   frag += _renderDateSection(profile);
   frag += _renderContentStatsSection(profile);
-
+  _renderLettersWritten(profile);
   return frag;
 }
 
@@ -94,6 +94,16 @@ function _renderContentStatsSection(profile) {
 
   sectionFrag += "</div></div>";
   return sectionFrag;
+}
+
+function _renderLettersWritten(profile) {
+  const field = "frbr_creatorOf-work";
+
+  if (profile.hasOwnProperty(field)) {
+    // We need to generate table data first so that we can re use its
+  } else {
+    return "";
+  }
 }
 
 // END: Rendering section

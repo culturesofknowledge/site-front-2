@@ -419,6 +419,8 @@ export function getPeopleComponents(emlo) {
     new emlo.MultiFields({
       id: "people-profile",
       category: "results",
+      fetchTableData: true,
+      tableDataFields: ["frbr_creatorOf-work"],
       renderer: new emlo.ProfileRightRenderer({
         profileType: "people",
       }),

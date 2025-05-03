@@ -427,3 +427,126 @@ function resourceRelation(profile, relations, field) {
     }
   }
 }
+
+// START: Table rendering functions
+export function h4WorkList(
+  field,
+  profile,
+  data,
+  icon,
+  title = "",
+  sorting = true
+) {
+  // Will be done after testing the first implementations
+  // if (sorting) {
+  //   data = data.sort((a, b) => {
+  //     const startA = a["ox_started-ox_year"] ?? a["0x_completed-ox_year"];
+  //     const startB = b["ox_started-ox_year"] ?? b["0x_completed-ox_year"];
+  //     // If both values are undefined, consider them equal
+  //     if (startA === undefined && startB === undefined) return 0;
+  //     // If one value is undefined, treat it as larger (to push it to the end)
+  //     if (startA === undefined) return 1;
+  //     if (startB === undefined) return -1;
+  //     // Otherwise, compare the values normally
+  //     return startA - startB;
+  //   });
+  // }
+
+  if (title == "") {
+    title = getLabel(field);
+  }
+
+  let html = `<h3><img src="/static/img/${icon}"/>${title}</h3>
+		<div class="content">`;
+
+  if (data.length > 30) {
+    html += summaryByYear(field, profile, data);
+  }
+
+  html += "</div>";
+
+  return html;
+}
+
+function summaryByYear(field, profile, data) {
+  let queryVal = "";
+  let queryKey = field;
+
+  const decadeSummary = data.reduce((acc, parentObject) => {
+    if (!parentObject) return acc;
+
+    const year =
+      parentObject["ox_started-ox_year"] ||
+      parentObject["ox_completed-ox_year"];
+
+    if (field == "repository") {
+      queryVal = profile["browse"];
+    } else {
+      queryVal = profile["uuid"];
+    }
+
+    // if (this.primaryResultKey) {
+    //   queryVal = this.component.results[0][this.primaryResultKey];
+    // } else {
+    //   if (this.field == "repository") {
+    //     queryVal = this.component.results[0]["browse"];
+    //   } else {
+    //     queryVal = parentObject["author_sort"];
+    //   }
+    // }
+
+    if (year) {
+      const decade = Math.floor(year / 10) * 10; // Calculate decade
+
+      if (!acc[decade]) acc[decade] = {};
+      acc[decade][year] = (acc[decade][year] || 0) + 1;
+    } else {
+      if (!acc["????"]) acc["????"] = {};
+      acc["????"]["Unknown year"] = (acc["????"]["Unknown year"] || 0) + 1;
+    }
+
+    return acc;
+  }, {});
+
+  const rows = Object.entries(decadeSummary)
+    .map(([decade, years]) => {
+      const yearCounts = Object.entries(years)
+        .map(
+          ([year, count]) =>
+            `<a href="/forms/advanced?${queryKey}=${queryVal}&dat_sin_year=${year}"> ${year}: ${count} </a>`
+        )
+        .join(" ♦ ");
+      return `
+          <tr>
+            <td>
+              ${decade === "????" ? `????` : `${decade}s`}
+            </td>
+            <td> ${yearCounts} </td>
+          </tr>`;
+    })
+    .join("");
+
+  let countFrag = "";
+  if (field == "ox_hasResource-manifestation") {
+    countFrag += `${data.length} records`;
+  }
+
+  return `
+    ${countFrag}
+    <table class="nested-table">
+      <thead>
+        <tr>
+          <th>
+            Decade
+          </th>
+          <th>
+            Letters per year
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>
+`;
+}

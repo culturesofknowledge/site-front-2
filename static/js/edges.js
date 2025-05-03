@@ -3633,6 +3633,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       let queryKey = this.field;
 
       const decadeSummary = allParentObjects.reduce((acc, parentObject) => {
+        // console.log("acc", acc, parentObject);
         if (!parentObject) return acc;
 
         const year =

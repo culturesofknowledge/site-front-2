@@ -420,7 +420,11 @@ export function getPeopleComponents(emlo) {
       id: "people-profile",
       category: "results",
       fetchTableData: true,
-      tableDataFields: ["frbr_creatorOf-work"],
+      tableDataFields: [
+        "frbr_creatorOf-work",
+        "mail_recipientOf-work",
+        "dcterms_isReferencedBy-work",
+      ],
       renderer: new emlo.ProfileRightRenderer({
         profileType: "people",
       }),
@@ -577,57 +581,57 @@ export function getPeopleComponents(emlo) {
     //   }),
     // }),
 
-    new emlo.MultiFields({
-      id: "letters-recevied",
-      category: "results",
-      fetchSecondaryData: true,
-      optimizedCode: true,
-      primaryField: "mail_recipientOf-work",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested",
-        sectionTitle: "Letters Received",
-        sectionTitleImage: "/static/img/icon-quill.png",
-        primaryField: "mail_recipientOf-work",
-        field: "mail_recipient-person",
-        primaryResultKey: "uuid",
-        fields: [
-          { title: "", key: "ox_started-ox_year" },
-          {
-            title: "",
-            key: "dcterms_description",
-            clickable: true,
-            collectionName: "work",
-          },
-        ],
-        divider: true,
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "letters-recevied",
+    //   category: "results",
+    //   fetchSecondaryData: true,
+    //   optimizedCode: true,
+    //   primaryField: "mail_recipientOf-work",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "nested",
+    //     sectionTitle: "Letters Received",
+    //     sectionTitleImage: "/static/img/icon-quill.png",
+    //     primaryField: "mail_recipientOf-work",
+    //     field: "mail_recipient-person",
+    //     primaryResultKey: "uuid",
+    //     fields: [
+    //       { title: "", key: "ox_started-ox_year" },
+    //       {
+    //         title: "",
+    //         key: "dcterms_description",
+    //         clickable: true,
+    //         collectionName: "work",
+    //       },
+    //     ],
+    //     divider: true,
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "letters-mentioned",
-      category: "results",
-      fetchSecondaryData: true,
-      optimizedCode: true,
-      primaryField: "dcterms_isReferencedBy-work",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested",
-        sectionTitle: "Letters Mentioning",
-        sectionTitleImage: "/static/img/icon-quill.png",
-        primaryField: "dcterms_isReferencedBy-work",
-        field: "dcterms_references-person",
-        primaryResultKey: "uuid",
-        fields: [
-          { title: "", key: "ox_started-ox_year" },
-          {
-            title: "",
-            key: "dcterms_description",
-            clickable: true,
-            collectionName: "work",
-          },
-        ],
-        divider: true,
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "letters-mentioned",
+    //   category: "results",
+    //   fetchSecondaryData: true,
+    //   optimizedCode: true,
+    //   primaryField: "dcterms_isReferencedBy-work",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "nested",
+    //     sectionTitle: "Letters Mentioning",
+    //     sectionTitleImage: "/static/img/icon-quill.png",
+    //     primaryField: "dcterms_isReferencedBy-work",
+    //     field: "dcterms_references-person",
+    //     primaryResultKey: "uuid",
+    //     fields: [
+    //       { title: "", key: "ox_started-ox_year" },
+    //       {
+    //         title: "",
+    //         key: "dcterms_description",
+    //         clickable: true,
+    //         collectionName: "work",
+    //       },
+    //     ],
+    //     divider: true,
+    //   }),
+    // }),
 
     new emlo.MultiFields({
       id: "comments",

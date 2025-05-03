@@ -169,13 +169,23 @@ select {
   max-width: none;
 }
 
+.row .row-no-margin {
+  width: auto;
+  margin-top: 0;
+  margin-bottom: 0;
+  max-width: none;
+}
+
 .row .row:before,
-.row .row:after {
+.row .row:after,
+.row .row-no-margin:before,
+.row .row-no-margin:after {
   content: " ";
   display: table;
 }
 
-.row .row:after {
+.row .row:after,
+.row .row-no-margin:after {
   clear: both;
 }
 

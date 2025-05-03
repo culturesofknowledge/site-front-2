@@ -4537,7 +4537,7 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
 
     let container = "";
 
-    let row = ["work"].includes(this.profileType) ? "row" : "";
+    let row = ["work"].includes(this.profileType) ? "row" : "row-no-margin";
 
     if (frag) {
       container = `

@@ -381,7 +381,6 @@ export function totalLinkingToListWork(profile, objectType) {
 // }
 
 function resourceRelation(profile, relations, field) {
-  console.log("yellow please work");
   if (profile && profile.hasOwnProperty(field)) {
     let frag = "";
     for (let relation in profile[field]) {

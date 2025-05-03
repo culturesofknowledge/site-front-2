@@ -6,9 +6,9 @@ import {
   totalLinkingToListWork,
 } from "../../js/helper/helper.js";
 
-export function _renderPeopleProfile(profile) {
+export function _renderPeopleProfile(profile, tableData) {
   let frag = "";
-
+  console.log("tableData", tableData);
   frag += _renderDetailsSection(profile);
   frag += _renderDateSection(profile);
   frag += _renderContentStatsSection(profile);
@@ -16,6 +16,7 @@ export function _renderPeopleProfile(profile) {
   return frag;
 }
 
+// START: Rendering section
 function _renderDetailsSection(profile) {
   let detailFrag = "";
   const altLabelField = "skos_altLabel",
@@ -85,9 +86,17 @@ function _renderContentStatsSection(profile) {
       <h3><img src="/static/img/icon-statistics.png" class=""/>Catalogue Statistics</h3>
       <div class="content">${totalLinkingToListWork(profile, "person")}`;
 
+  // Rendering graph
+  let counts = {};
+  // setYearCountsForGraphs(profile, "frbr_creatorOf-work", "", counts);
+
+  // PENDING HOLD THE DEVELOPMENT OF GRAPH -
+
   sectionFrag += "</div></div>";
   return sectionFrag;
 }
+
+// END: Rendering section
 
 function writeDate(profile, keys) {
   const months = [

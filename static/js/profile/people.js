@@ -549,31 +549,31 @@ export function getPeopleComponents(emlo) {
       }),
     }),
 
-    new emlo.MultiFields({
-      id: "letters-written",
-      category: "results",
-      fetchSecondaryData: true,
-      optimizedCode: true,
-      primaryField: "frbr_creatorOf-work",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested",
-        primaryField: "frbr_creatorOf-work",
-        sectionTitle: "Letters Written",
-        sectionTitleImage: "/static/img/icon-quill.png",
-        field: "frbr_creator-person",
-        primaryResultKey: "uuid",
-        fields: [
-          { title: "", key: "ox_started-ox_year" },
-          {
-            title: "",
-            key: "dcterms_description",
-            clickable: true,
-            collectionName: "work",
-          },
-        ],
-        divider: true,
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "letters-written",
+    //   category: "results",
+    //   fetchSecondaryData: true,
+    //   optimizedCode: true,
+    //   primaryField: "frbr_creatorOf-work",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "nested",
+    //     primaryField: "frbr_creatorOf-work",
+    //     sectionTitle: "Letters Written",
+    //     sectionTitleImage: "/static/img/icon-quill.png",
+    //     field: "frbr_creator-person",
+    //     primaryResultKey: "uuid",
+    //     fields: [
+    //       { title: "", key: "ox_started-ox_year" },
+    //       {
+    //         title: "",
+    //         key: "dcterms_description",
+    //         clickable: true,
+    //         collectionName: "work",
+    //       },
+    //     ],
+    //     divider: true,
+    //   }),
+    // }),
 
     new emlo.MultiFields({
       id: "letters-recevied",

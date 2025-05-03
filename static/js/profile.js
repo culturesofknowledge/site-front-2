@@ -560,14 +560,22 @@ function _getCommentsComponents(emlo) {
       }),
     }),
 
+    // new emlo.MultiFields({
+    //   id: "para",
+    //   category: "results",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "dummy-message",
+    //     divider: true,
+    //     message:
+    //       "Sorry, this record has not been found. It may have been deleted as a duplicate. ",
+    //   }),
+    // }),
+
     new emlo.MultiFields({
-      id: "para",
+      id: "comment-profile",
       category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "dummy-message",
-        divider: true,
-        message:
-          "Sorry, this record has not been found. It may have been deleted as a duplicate. ",
+      renderer: new emlo.ProfileRightRenderer({
+        profileType: "comment",
       }),
     }),
 

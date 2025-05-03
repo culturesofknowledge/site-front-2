@@ -1,5 +1,6 @@
 import { getCollectionTitle } from "../js/profile/collectionDetails.js";
 import PersonChart from "./chart.js";
+import { _renderCommentProfile } from "./profile/commentFrag.js";
 import { _renderInstitutionProfile } from "./profile/institutionFrag.js";
 import { _renderLocationProfile } from "./profile/locationFrag.js";
 import { _renderPeopleProfile } from "./profile/peopleFrags.js";
@@ -2569,8 +2570,10 @@ emlo.MultiFields = class extends edges.Component {
     try {
       await this._appendResults({ results: results });
       this.hitCount = source.total();
-      let relations = await this._fetchRelations(results[0]["uuid"]);
-      this.relationships = relations;
+      if (results && results.length > 0) {
+        let relations = await this._fetchRelations(results[0]["uuid"]);
+        this.relationships = relations;
+      }
 
       if (this.fetchTableData && this.tableDataFields.length > 0) {
         const result = results[0];
@@ -4594,6 +4597,9 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
           break;
         case "institution":
           frag += _renderInstitutionProfile(result, this.component.tableData);
+          break;
+        case "comment":
+          frag += _renderCommentProfile();
           break;
         default:
           console.log("Nothing is valid");

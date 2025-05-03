@@ -462,6 +462,8 @@ export function h4WorkList(
 
   if (data.length > 30) {
     html += summaryByYear(linkField, profile, data);
+  } else {
+    html += summaryByDetail(linkField, profile, data);
   }
 
   html += "</div>";
@@ -550,4 +552,79 @@ function summaryByYear(field, profile, data) {
       </tbody>
     </table>
 `;
+}
+
+function summaryByDetail(field, profile, data) {
+  data.sort((a, b) => {
+    const startA = a["ox_started-ox_year"] ?? a["0x_completed-ox_year"];
+    const startB = b["ox_started-ox_year"] ?? b["0x_completed-ox_year"];
+
+    // If both values are undefined, consider them equal
+    if (startA === undefined && startB === undefined) return 0;
+
+    // If one value is undefined, treat it as larger (to push it to the end)
+    if (startA === undefined) return 1;
+    if (startB === undefined) return -1;
+
+    // Otherwise, compare the values normally
+    return startA - startB;
+  });
+
+  let lastfieldKey = 0;
+
+  const rows = data
+    .map((item) => {
+      let cells = [];
+      let rowStyle = ""; // Variable to hold the style for the row
+
+      if (
+        item.hasOwnProperty("ox_started-ox_year") ||
+        item.hasOwnProperty("ox_completed-ox_year")
+      ) {
+        const value = item["ox_started-ox_year"];
+        if (lastfieldKey != value) {
+          lastfieldKey = value;
+          // Use "????" if value is undefined
+          cells.push(`<td>${value !== undefined ? value : "????"}</td>`);
+          rowStyle = "border-top: #999 dashed 1px; padding: 5px 0px 5px 10px;"; // Apply dotted separation on the top of the rows
+        } else {
+          cells.push(`<td></td>`);
+        }
+      } else {
+        if (lastfieldKey != "????") {
+          lastfieldKey = "????";
+          // Use "????" if value is undefined
+          cells.push(`<td>????</td>`);
+          rowStyle = "border-top: #999 dashed 1px; padding: 5px 0px 5px 10px;"; // Apply dotted separation on the top of the rows
+        } else {
+          cells.push(`<td></td>`);
+        }
+      }
+
+      if (item.hasOwnProperty("dcterms_description")) {
+        cells.push(`<td>
+              <a href="/profile/work/${item["uuid"]}" class="clickable-row">
+                ${item["dcterms_description"]}</a>
+            </td>`);
+      }
+
+      return `<tr style="${rowStyle}">${cells.join("")}</tr>`;
+    })
+    .filter((row) => row)
+    .join("");
+
+  let countFrag = "";
+  if (field == "ox_hasResource-manifestation" && data.length > 0) {
+    countFrag += `${data.length} ${data.length > 1 ? "records" : "record"}`;
+  }
+
+  const table = `
+        ${countFrag}
+        <table class="nested-table" style="border-collapse: collapse;">
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+    `;
+  return table;
 }

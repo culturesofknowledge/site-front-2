@@ -2583,11 +2583,17 @@ emlo.MultiFields = class extends edges.Component {
             );
 
             if (uuids.length > 0) {
-              const payload = {
+              let payload = {
                 solrCore: "work",
                 uuids: uuids,
                 filter: "",
+                objectKey: "uuid",
               };
+
+              // In case of ox_hasResource-manifestation we need manifestation, core needs to be updated
+              if (field == "ox_hasResource-manifestation") {
+                payload.objectKey = "uuid_related";
+              }
 
               this.tableData[field] = await this._fetchMoreWorkData(payload);
             }
@@ -4587,7 +4593,7 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
           );
           break;
         case "institution":
-          frag += _renderInstitutionProfile(result);
+          frag += _renderInstitutionProfile(result, this.component.tableData);
           break;
         default:
           console.log("Nothing is valid");

@@ -530,7 +530,7 @@ function summaryByYear(field, profile, data) {
     .join("");
 
   let countFrag = "";
-  if (field == "ox_hasResource-manifestation") {
+  if (field == "repository") {
     countFrag += `${data.length} records`;
   }
 
@@ -614,7 +614,7 @@ function summaryByDetail(field, profile, data) {
     .join("");
 
   let countFrag = "";
-  if (field == "ox_hasResource-manifestation" && data.length > 0) {
+  if (field == "repository" && data.length > 0) {
     countFrag += `${data.length} ${data.length > 1 ? "records" : "record"}`;
   }
 

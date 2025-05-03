@@ -1,5 +1,6 @@
 import { getCollectionTitle } from "../js/profile/collectionDetails.js";
 import PersonChart from "./chart.js";
+import { _renderLocationProfile } from "./profile/locationFrag.js";
 import { _renderPeopleProfile } from "./profile/peopleFrags.js";
 import { _renderWorkProfile } from "./profile/workFrag.js";
 
@@ -2593,6 +2594,7 @@ emlo.MultiFields = class extends edges.Component {
         }
       }
     } catch (error) {
+      console.log("got error", error);
       this.errorMessage = "Error fetching data.";
     } finally {
       this.loading = false; // Stop loading
@@ -4576,6 +4578,13 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
         case "work":
           frag += _renderWorkProfile(result, this.component.relationships);
           break;
+        case "location":
+          frag += _renderLocationProfile(
+            result,
+            this.component.tableData,
+            this.component.relationships
+          );
+          break;
         default:
           console.log("Nothing is valid");
       }
@@ -4589,7 +4598,9 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
 
     let container = "";
 
-    let row = ["work"].includes(this.profileType) ? "row" : "row-no-margin";
+    let row = ["work", "location"].includes(this.profileType)
+      ? "row"
+      : "row-no-margin";
 
     if (frag) {
       container = `

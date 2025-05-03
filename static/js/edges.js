@@ -2544,6 +2544,9 @@ emlo.MultiFields = class extends edges.Component {
     this.relationships = [];
     this.loading = true; // Track loading state
     this.errorMessage = ""; // Track error message
+    this.fetchTableData = edges.util.getParam(params, "fetchTableData", false);
+    this.tableDataFields = edges.util.getParam(params, "tableDataFields", []);
+    this.tableData = {};
   }
 
   async synchronise() {
@@ -2566,6 +2569,29 @@ emlo.MultiFields = class extends edges.Component {
       this.hitCount = source.total();
       let relations = await this._fetchRelations(results[0]["uuid"]);
       this.relationships = relations;
+
+      if (this.fetchTableData && this.tableDataFields.length > 0) {
+        const result = results[0];
+
+        for (const field of this.tableDataFields) {
+          if (Object.prototype.hasOwnProperty.call(result, field)) {
+            const val = result[field]; // Assuming val is an array of URIs
+            const uuids = Array.from(
+              new Set(val.map((uri) => uri.split("/").pop()))
+            );
+
+            if (uuids.length > 0) {
+              const payload = {
+                solrCore: "work",
+                uuids: uuids,
+                filter: "",
+              };
+
+              this.tableData[field] = await this._fetchMoreWorkData(payload);
+            }
+          }
+        }
+      }
     } catch (error) {
       this.errorMessage = "Error fetching data.";
     } finally {
@@ -4541,7 +4567,7 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
     } else if (this.component.results && this.component.results.length > 0) {
       switch (this.profileType) {
         case "people":
-          frag += _renderPeopleProfile(result);
+          frag += _renderPeopleProfile(result, this.component.tableData);
           break;
         case "work":
           frag += _renderWorkProfile(result, this.component.relationships);

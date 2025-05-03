@@ -108,6 +108,7 @@ function _renderLettersWritten(profile, tableData) {
         field,
         profile,
         tableData[field],
+        "frbr_creator-person",
         "icon-quill.png"
       )}</div>`;
       return frag;
@@ -128,6 +129,7 @@ function _renderLettersRec(profile, tableData) {
         field,
         profile,
         tableData[field],
+        "mail_recipient-person",
         "icon-quill.png"
       )}</div>`;
       return frag;
@@ -148,6 +150,7 @@ function _renderLettersMent(profile, tableData) {
         field,
         profile,
         tableData[field],
+        "dcterms_references-person",
         "icon-quill.png"
       )}</div>`;
       return frag;

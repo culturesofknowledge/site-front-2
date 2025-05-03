@@ -433,6 +433,7 @@ export function h4WorkList(
   field,
   profile,
   data,
+  linkField,
   icon,
   title = "",
   sorting = true
@@ -460,7 +461,7 @@ export function h4WorkList(
 		<div class="content">`;
 
   if (data.length > 30) {
-    html += summaryByYear(field, profile, data);
+    html += summaryByYear(linkField, profile, data);
   }
 
   html += "</div>";

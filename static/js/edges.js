@@ -1,5 +1,6 @@
 import { getCollectionTitle } from "../js/profile/collectionDetails.js";
 import PersonChart from "./chart.js";
+import { _renderInstitutionProfile } from "./profile/institutionFrag.js";
 import { _renderLocationProfile } from "./profile/locationFrag.js";
 import { _renderPeopleProfile } from "./profile/peopleFrags.js";
 import { _renderWorkProfile } from "./profile/workFrag.js";
@@ -4584,6 +4585,9 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
             this.component.tableData,
             this.component.relationships
           );
+          break;
+        case "institution":
+          frag += _renderInstitutionProfile(result);
           break;
         default:
           console.log("Nothing is valid");

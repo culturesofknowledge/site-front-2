@@ -108,42 +108,50 @@ function _getInstitutionComponents(emlo) {
     }),
 
     new emlo.MultiFields({
-      id: "alternative-names",
+      id: "inst-profile",
       category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "text",
-        sectionTitle: "Alternative names",
-        sectionTitleImage: "/static/img/icon-repository.png",
-        field: "geonames_alternateName",
-        divider: true,
+      renderer: new emlo.ProfileRightRenderer({
+        profileType: "institution",
       }),
     }),
 
-    new emlo.MultiFields({
-      id: "locations",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "label",
-        sectionTitle: "Location",
-        sectionTitleImage: "/static/img/icon-globe.png",
-        divider: true,
-        fields: [
-          {
-            title: "City",
-            key: "geonames_locatedIn",
-            additonalInfo: [
-              {
-                mainKey: "ox_locatedInAlternate",
-                secondaryKey: "",
-                text: "",
-              },
-            ],
-            hideClass: true,
-          },
-          { title: "Country", key: "geonames_inCountry", hideClass: true },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "alternative-names",
+    //   category: "results",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "text",
+    //     sectionTitle: "Alternative names",
+    //     sectionTitleImage: "/static/img/icon-repository.png",
+    //     field: "geonames_alternateName",
+    //     divider: true,
+    //   }),
+    // }),
+
+    // new emlo.MultiFields({
+    //   id: "locations",
+    //   category: "results",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "label",
+    //     sectionTitle: "Location",
+    //     sectionTitleImage: "/static/img/icon-globe.png",
+    //     divider: true,
+    //     fields: [
+    //       {
+    //         title: "City",
+    //         key: "geonames_locatedIn",
+    //         additonalInfo: [
+    //           {
+    //             mainKey: "ox_locatedInAlternate",
+    //             secondaryKey: "",
+    //             text: "",
+    //           },
+    //         ],
+    //         hideClass: true,
+    //       },
+    //       { title: "Country", key: "geonames_inCountry", hideClass: true },
+    //     ],
+    //   }),
+    // }),
 
     new emlo.MultiFields({
       id: "contents",

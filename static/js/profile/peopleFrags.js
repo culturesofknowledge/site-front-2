@@ -5,9 +5,10 @@ import {
   decodeUncertaintyFlags,
   totalLinkingToListWork,
   h4WorkList,
+  h4RelationshipList,
 } from "../../js/helper/helper.js";
 
-export function _renderPeopleProfile(profile, tableData) {
+export function _renderPeopleProfile(profile, tableData, relations) {
   let frag = "";
 
   frag += _renderDetailsSection(profile);
@@ -16,6 +17,8 @@ export function _renderPeopleProfile(profile, tableData) {
   frag += _renderLettersWritten(profile, tableData);
   frag += _renderLettersRec(profile, tableData);
   frag += _renderLettersMent(profile, tableData);
+  frag += _renderComment(profile, relations);
+
   return frag;
 }
 
@@ -220,4 +223,17 @@ function writeDate(profile, keys) {
   }
 
   return html;
+}
+
+function _renderComment(profile, relations) {
+  const field = "ox_isAnnotatedBy-comment";
+
+  if (profile.hasOwnProperty(field)) {
+    let frag = `<div class="column profilepart">
+      ${h4RelationshipList(profile, relations, field, "", "simple")}</div>`;
+
+    return frag;
+  } else {
+    return "";
+  }
 }

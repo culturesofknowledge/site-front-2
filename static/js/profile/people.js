@@ -633,19 +633,19 @@ export function getPeopleComponents(emlo) {
     //   }),
     // }),
 
-    new emlo.MultiFields({
-      id: "comments",
-      category: "results",
-      fetchSecondaryData: true,
-      primaryField: "ox_isAnnotatedBy-comment",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested-list",
-        sectionTitle: "Comments",
-        primaryField: "ox_isAnnotatedBy-comment",
-        fields: [{ title: "", key: "bibo_Note" }],
-        divider: true,
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "comments",
+    //   category: "results",
+    //   fetchSecondaryData: true,
+    //   primaryField: "ox_isAnnotatedBy-comment",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "nested-list",
+    //     sectionTitle: "Comments",
+    //     primaryField: "ox_isAnnotatedBy-comment",
+    //     fields: [{ title: "", key: "bibo_Note" }],
+    //     divider: true,
+    //   }),
+    // }),
 
     new emlo.MultiFields({
       id: "people-footer",

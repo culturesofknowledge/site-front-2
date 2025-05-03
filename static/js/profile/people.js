@@ -485,40 +485,40 @@ export function getPeopleComponents(emlo) {
     //   }),
     // }),
 
-    new emlo.MultiFields({
-      id: "stats",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "stats",
-        sectionTitle: "Catalogue Statistics",
-        sectionTitleImage: "/static/img/icon-statistics.png",
-        divider: true,
-        subSection: true,
-        fields: [
-          {
-            name: "text",
-            title: "letters written",
-            key: "ox_totalWorksByAgent",
-            redirectUrl: "/forms/advanced?frbr_creator-person=",
-            redirectQueryName: "uuid",
-          },
-          {
-            name: "text",
-            title: "letters received ",
-            key: "ox_totalWorksAddressedToAgent",
-            redirectUrl: "/forms/advanced?mail_recipient-person=",
-            redirectQueryName: "uuid",
-          },
-          {
-            name: "text",
-            title: "letters mentioning",
-            key: "ox_totalWorksMentioningAgent",
-            redirectUrl: "/forms/advanced?dcterms_references-person=",
-            redirectQueryName: "uuid",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "stats",
+    //   category: "results",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "stats",
+    //     sectionTitle: "Catalogue Statistics",
+    //     sectionTitleImage: "/static/img/icon-statistics.png",
+    //     divider: true,
+    //     subSection: true,
+    //     fields: [
+    //       {
+    //         name: "text",
+    //         title: "letters written",
+    //         key: "ox_totalWorksByAgent",
+    //         redirectUrl: "/forms/advanced?frbr_creator-person=",
+    //         redirectQueryName: "uuid",
+    //       },
+    //       {
+    //         name: "text",
+    //         title: "letters received ",
+    //         key: "ox_totalWorksAddressedToAgent",
+    //         redirectUrl: "/forms/advanced?mail_recipient-person=",
+    //         redirectQueryName: "uuid",
+    //       },
+    //       {
+    //         name: "text",
+    //         title: "letters mentioning",
+    //         key: "ox_totalWorksMentioningAgent",
+    //         redirectUrl: "/forms/advanced?dcterms_references-person=",
+    //         redirectQueryName: "uuid",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
     // TODO: Temp removal of graphs
     new emlo.BarGraph({

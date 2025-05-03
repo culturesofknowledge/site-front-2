@@ -4,15 +4,18 @@ import {
   hasAnyFieldValue,
   decodeUncertaintyFlags,
   totalLinkingToListWork,
+  h4WorkList,
 } from "../../js/helper/helper.js";
 
 export function _renderPeopleProfile(profile, tableData) {
   let frag = "";
-  console.log("tableData", tableData);
+
   frag += _renderDetailsSection(profile);
   frag += _renderDateSection(profile);
   frag += _renderContentStatsSection(profile);
-  _renderLettersWritten(profile);
+  frag += _renderLettersWritten(profile, tableData);
+  frag += _renderLettersRec(profile, tableData);
+  frag += _renderLettersMent(profile, tableData);
   return frag;
 }
 
@@ -96,16 +99,65 @@ function _renderContentStatsSection(profile) {
   return sectionFrag;
 }
 
-function _renderLettersWritten(profile) {
+function _renderLettersWritten(profile, tableData) {
   const field = "frbr_creatorOf-work";
 
-  if (profile.hasOwnProperty(field)) {
-    // We need to generate table data first so that we can re use its
+  if (tableData.hasOwnProperty(field)) {
+    if (tableData[field].length > 0) {
+      let frag = `<div class="column profilepart"> ${h4WorkList(
+        field,
+        profile,
+        tableData[field],
+        "icon-quill.png"
+      )}</div>`;
+      return frag;
+    } else {
+      return "";
+    }
   } else {
     return "";
   }
 }
 
+function _renderLettersRec(profile, tableData) {
+  const field = "mail_recipientOf-work";
+
+  if (tableData.hasOwnProperty(field)) {
+    if (tableData[field].length > 0) {
+      let frag = `<div class="column profilepart"> ${h4WorkList(
+        field,
+        profile,
+        tableData[field],
+        "icon-quill.png"
+      )}</div>`;
+      return frag;
+    } else {
+      return "";
+    }
+  } else {
+    return "";
+  }
+}
+
+function _renderLettersMent(profile, tableData) {
+  const field = "dcterms_isReferencedBy-work";
+
+  if (tableData.hasOwnProperty(field)) {
+    if (tableData[field].length > 0) {
+      let frag = `<div class="column profilepart"> ${h4WorkList(
+        field,
+        profile,
+        tableData[field],
+        "icon-quill.png"
+      )}</div>`;
+      return frag;
+    } else {
+      return "";
+    }
+  } else {
+    return "";
+  }
+}
 // END: Rendering section
 
 function writeDate(profile, keys) {

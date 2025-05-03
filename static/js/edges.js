@@ -2540,7 +2540,6 @@ emlo.MultiFields = class extends edges.Component {
       "fetchSecondaryData",
       false
     ); // Enable/disable secondary data fetch
-
     this.optimizedCode = edges.util.getParam(params, "optimizedCode", false);
     this.relationships = [];
     this.loading = true; // Track loading state
@@ -2576,6 +2575,29 @@ emlo.MultiFields = class extends edges.Component {
     this.renderer.draw();
 
     this.hitCount = source.total();
+  }
+
+  async _fetchMoreWorkData(payload) {
+    try {
+      const response = await fetch(`/stats-new`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        console.error(`Error fetching relations: ${response.statusText}`);
+        return [];
+      }
+
+      const json = await response.json();
+      return json;
+    } catch (err) {
+      console.error("Error while fetching relations", err);
+      return [];
+    }
   }
 
   async _fetchRelations(uuid) {
@@ -4519,7 +4541,7 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
     } else if (this.component.results && this.component.results.length > 0) {
       switch (this.profileType) {
         case "people":
-          frag += _renderPeopleProfile(result, this.component.relationships);
+          frag += _renderPeopleProfile(result);
           break;
         case "work":
           frag += _renderWorkProfile(result, this.component.relationships);

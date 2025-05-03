@@ -4567,7 +4567,11 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
     } else if (this.component.results && this.component.results.length > 0) {
       switch (this.profileType) {
         case "people":
-          frag += _renderPeopleProfile(result, this.component.tableData);
+          frag += _renderPeopleProfile(
+            result,
+            this.component.tableData,
+            this.component.relationships
+          );
           break;
         case "work":
           frag += _renderWorkProfile(result, this.component.relationships);

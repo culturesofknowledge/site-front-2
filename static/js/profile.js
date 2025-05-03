@@ -110,6 +110,8 @@ function _getInstitutionComponents(emlo) {
     new emlo.MultiFields({
       id: "inst-profile",
       category: "results",
+      fetchTableData: true,
+      tableDataFields: ["ox_hasResource-manifestation"],
       renderer: new emlo.ProfileRightRenderer({
         profileType: "institution",
       }),
@@ -153,25 +155,25 @@ function _getInstitutionComponents(emlo) {
     //   }),
     // }),
 
-    new emlo.MultiFields({
-      id: "contents",
-      category: "results",
-      fetchSecondaryData: true,
-      optimizedCode: true,
-      primaryField: "ox_hasResource-manifestation",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested",
-        sectionTitle: "Collection overview",
-        sectionTitleImage: "/static/img/icon-quill.png",
-        primaryField: "ox_hasResource-manifestation",
-        field: "repository",
-        fields: [
-          { title: "", key: "ox_started-ox_year" },
-          { title: "", key: "dcterms_description", clickable: true },
-        ],
-        divider: true,
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "contents",
+    //   category: "results",
+    //   fetchSecondaryData: true,
+    //   optimizedCode: true,
+    //   primaryField: "ox_hasResource-manifestation",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "nested",
+    //     sectionTitle: "Collection overview",
+    //     sectionTitleImage: "/static/img/icon-quill.png",
+    //     primaryField: "ox_hasResource-manifestation",
+    //     field: "repository",
+    //     fields: [
+    //       { title: "", key: "ox_started-ox_year" },
+    //       { title: "", key: "dcterms_description", clickable: true },
+    //     ],
+    //     divider: true,
+    //   }),
+    // }),
 
     new emlo.MultiFields({
       id: "inst-footer",

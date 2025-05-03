@@ -1,9 +1,11 @@
-export function _renderInstitutionProfile(profile) {
+import { h4WorkList } from "../../js/helper/helper.js";
+
+export function _renderInstitutionProfile(profile, tableData) {
   let frag = "";
 
   frag += _renderAlternateSection(profile);
   frag += _renderLocationSection(profile);
-
+  frag += _renderCollectionOverview(profile, tableData);
   return frag;
 }
 
@@ -57,6 +59,28 @@ function _renderLocationSection(profile) {
     html += `</div><br/></div>`;
 
     return html;
+  } else {
+    return "";
+  }
+}
+
+function _renderCollectionOverview(profile, tableData) {
+  const field = "ox_hasResource-manifestation";
+
+  if (tableData.hasOwnProperty(field)) {
+    if (tableData[field].length > 0) {
+      let frag = `<div class="column profilepart"> ${h4WorkList(
+        field,
+        profile,
+        tableData[field],
+        "repository",
+        "icon-quill.png",
+        "Collection overview"
+      )}</div>`;
+      return frag;
+    } else {
+      return "";
+    }
   } else {
     return "";
   }

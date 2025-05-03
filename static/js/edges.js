@@ -3631,7 +3631,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       // Summarized format for large datasets
       let queryVal = "";
       let queryKey = this.field;
-
       const decadeSummary = allParentObjects.reduce((acc, parentObject) => {
         // console.log("acc", acc, parentObject);
         if (!parentObject) return acc;

@@ -59,7 +59,7 @@ export function h4RelationshipList(
   profile,
   relations,
   field,
-  title = "",
+  title = null,
   type = "",
   icon = null
 ) {
@@ -81,7 +81,7 @@ export function h4RelationshipList(
       return "";
     }
 
-    if (title == "") {
+    if (title == null) {
       title = getLabel(field);
     }
 
@@ -107,7 +107,7 @@ export function h4RelationshipList(
           frag += `${simpleRelations(field, "", profile, relations)}`;
           break;
         case "resource":
-          frag += `${resourceRelation(profile, null, field)}`;
+          frag += `${resourceRelation(profile, relations, field)}`;
           break;
       }
     } else {
@@ -383,48 +383,54 @@ export function totalLinkingToListWork(profile, objectType) {
 function resourceRelation(profile, relations, field) {
   if (profile && profile.hasOwnProperty(field)) {
     let frag = "";
-    for (let relation in profile[field]) {
-      let uuid = uuidFromUri(relation, true);
+    for (let uri of profile[field]) {
+      let uuid = uuidFromUri(uri, true);
 
-      if (relation.id != uuid) {
-        let resourceTitle = "",
-          resourceUrl = "",
-          resourceFurtherDetail = "";
+      for (let relation of relations) {
+        if (relation.id == uuid) {
+          let resourceTitle = "",
+            resourceUrl = "",
+            resourceFurtherDetail = "";
 
-        if (relation.hasOwnProperty("ox_titleOfResource")) {
-          resourceTitle = relation["ox_titleOfResource"];
+          if (relation.hasOwnProperty("ox_titleOfResource")) {
+            resourceTitle = relation["ox_titleOfResource"];
+          }
+
+          if (relation.hasOwnProperty("dcterms_relation")) {
+            resourceUrl = relation["dcterms_relation"];
+          }
+
+          if (relation.hasOwnProperty("ox_detailsOfResource")) {
+            resourceFurtherDetail = relation["ox_detailsOfResource"];
+          }
+
+          if (resourceUrl !== "" && resourceTitle === "") {
+            resourceTitle = resourceUrl;
+          }
+
+          frag += "<p>";
+
+          if (resourceUrl != "") {
+            frag += `<a href="${resourceUrl}" title="${resourceTitle}" target="_blank">
+            ${resourceTitle}
+             </a>`;
+          } else if (resourceTitle != "") {
+            frag += `${resourceTitle}`;
+          }
+
+          if (resourceFurtherDetail != "") {
+            frag += `<br/>
+            ${resourceFurtherDetail}`;
+          }
+
+          frag += "</p>";
         }
-
-        if (relation.hasOwnProperty("dcterms_relation")) {
-          resourceUrl = relation["dcterms_relation"];
-        }
-
-        if (relation.hasOwnProperty("ox_detailsOfResource")) {
-          resourceFurtherDetail = relation["ox_detailsOfResource"];
-        }
-
-        if (resourceUrl !== "" && resourceTitle === "") {
-          resourceTitle = resourceUrl;
-        }
-
-        frag += "<p>";
-
-        if (resourceUrl != "") {
-          frag += `<a href="${resourceUrl}" title="${resourceTitle}" target="_blank">
-          ${resourceTitle}
-           </a>`;
-        } else if (resourceTitle != "") {
-          frag += `${resourceTitle}`;
-        }
-
-        if (resourceFurtherDetail != "") {
-          frag += `<br/>
-          ${resourceFurtherDetail}`;
-        }
-
-        frag += "</p>";
       }
     }
+
+    return frag;
+  } else {
+    return "";
   }
 }
 

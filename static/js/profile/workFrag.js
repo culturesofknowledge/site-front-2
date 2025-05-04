@@ -17,7 +17,7 @@ export function _renderWorkProfile(profile, relations) {
   frag += _renderPlacesSection(profile, relations);
   frag += _renderContentSection(profile, relations);
   frag += _renderRepoAndVersionSection(profile);
-  //   frag += _renderRelatedResource(profile, relations);
+  frag += _renderRelatedResource(profile, relations);
   frag += _renderComment(profile, relations);
 
   return frag;

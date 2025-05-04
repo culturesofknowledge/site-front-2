@@ -7,7 +7,10 @@ import {
   getAnchorName,
   renderH4Section,
   h4RelationshipList,
+  resourceRelation,
 } from "../../js/helper/helper.js";
+import { getLabel } from "../helper/getFieldLabls.js";
+import { getCollectionTitle } from "../../js/profile/collectionDetails.js";
 
 export function _renderWorkProfile(profile, relations) {
   let frag = "";
@@ -21,6 +24,14 @@ export function _renderWorkProfile(profile, relations) {
   frag += _renderComment(profile, relations);
 
   return frag;
+}
+
+export function _renderWorkSidebar(profile, relations) {
+  let sideFrag = "";
+
+  sideFrag += _renderSideSection(profile, relations);
+
+  return sideFrag;
 }
 
 function renderDates(profile, relations) {
@@ -586,7 +597,6 @@ function _getInstituteData(institutions) {
   });
 }
 
-// PENDING:: FIX BEFORE DEPLOY
 function _renderRelatedResource(profile, relations) {
   if (profile.hasOwnProperty("rdfs_seeAlso-resource")) {
     let frag = `
@@ -607,6 +617,52 @@ function _renderRelatedResource(profile, relations) {
   } else {
     return "";
   }
+}
+
+function _renderSideSection(profile, relations) {
+  let frag = `<dl style="-margin-top:25px;">`;
+  const relatedResourceField = "rdfs_seeAlso-resource",
+    sourceDataField = "ox_sourceOfData",
+    catalogueField = "cito_Catalog";
+
+  // Rendering side section
+  if (profile.hasOwnProperty(relatedResourceField)) {
+    let label = getLabel(relatedResourceField);
+
+    frag += `
+      <dt>
+			  ${label}
+		  </dt>
+		  <dd>
+			  ${resourceRelation(profile, relations, relatedResourceField)}
+		  </dd>
+    `;
+  }
+
+  if (profile.hasOwnProperty(sourceDataField)) {
+    frag += `
+      <dt>Source of record</dt>
+      <dd> ${profile[sourceDataField]} </dd>
+    `;
+  }
+
+  // This is hidden as per request by EMLO team
+  // if (profile.hasOwnProperty(catalogueField)) {
+  //   const catLabel = getLabel(catalogueField);
+  //   const catVal = profile[catalogueField];
+
+  //   frag += `
+  //     <p style="margin-top: 10px;font-style: oblique;">
+  //          Collection details:
+  //         <a href="http://emlo-portal.bodleian.ox.ac.uk/collections/?catalogue=${
+  //           getCollectionTitle(catVal).href
+  //         }"> ${getCollectionTitle(catVal).title} </a>
+  //       <p>
+  //   `;
+  // }
+
+  frag += `</dl>`;
+  return frag;
 }
 
 function _renderComment(profile, relations) {

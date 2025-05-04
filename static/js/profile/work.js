@@ -53,17 +53,17 @@ export function getWorkComponents(emlo) {
     //   }),
     // }),
 
-    new emlo.MultiFields({
-      id: "source-record",
-      category: "sidebar",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "plain-text",
-        divider: true,
-        contentTitle: "Source of record",
-        isSide: true,
-        field: "ox_sourceOfData",
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "source-record",
+    //   category: "sidebar",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "plain-text",
+    //     divider: true,
+    //     contentTitle: "Source of record",
+    //     isSide: true,
+    //     field: "ox_sourceOfData",
+    //   }),
+    // }),
 
     new emlo.MultiFields({
       id: "catalog",
@@ -73,6 +73,14 @@ export function getWorkComponents(emlo) {
         sectionTitle: "",
         isSide: true,
         field: "cito_Catalog",
+      }),
+    }),
+
+    new emlo.MultiFields({
+      id: "work-profile-side",
+      category: "sidebar",
+      renderer: new emlo.ProfileLeftSideRenderer({
+        profileType: "work",
       }),
     }),
 

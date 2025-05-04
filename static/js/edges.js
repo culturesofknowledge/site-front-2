@@ -4,7 +4,7 @@ import { _renderCommentProfile } from "./profile/commentFrag.js";
 import { _renderInstitutionProfile } from "./profile/institutionFrag.js";
 import { _renderLocationProfile } from "./profile/locationFrag.js";
 import { _renderPeopleProfile } from "./profile/peopleFrags.js";
-import { _renderWorkProfile } from "./profile/workFrag.js";
+import { _renderWorkProfile, _renderWorkSidebar } from "./profile/workFrag.js";
 
 const emlo = {
   active: {},
@@ -4549,6 +4549,66 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     } else {
       return "";
     }
+  }
+};
+
+emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+    this.profileType = edges.util.getParam(params, "profileType", "");
+  }
+
+  draw() {
+    let frag = "";
+    const result = this.component.results[0];
+
+    if (this.component.loading) {
+      frag = "<div class='loading-message'>Loading...</div>"; // Show loading message
+    } else if (this.component.errorMessage) {
+      frag = `<div class='error-message'>${this.component.errorMessage}</div>`; // Show error message
+    } else if (this.component.results && this.component.results.length > 0) {
+      switch (this.profileType) {
+        case "people":
+          frag += _renderPeopleSidebar(
+            result,
+            this.component.tableData,
+            this.component.relationships
+          );
+          break;
+        case "work":
+          frag += _renderWorkSidebar(result, this.component.relationships);
+          break;
+        case "location":
+          frag += _renderLocationProfile(
+            result,
+            this.component.tableData,
+            this.component.relationships
+          );
+          break;
+        case "institution":
+          frag += _renderInstitutionProfile(result, this.component.tableData);
+          break;
+        case "comment":
+          frag += _renderCommentProfile();
+          break;
+        default:
+          console.log("Nothing is valid");
+      }
+    }
+
+    const containerClasses = edges.util.styleClasses(
+      this.namespace,
+      "container",
+      this.component.id
+    );
+
+    let container = "";
+
+    if (frag) {
+      container = `${frag}`;
+    }
+
+    this.component.context.html(container);
   }
 };
 

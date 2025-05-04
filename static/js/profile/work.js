@@ -1,15 +1,15 @@
 export function getWorkComponents(emlo) {
   return [
-    new emlo.MultiFields({
-      id: "title",
-      category: "sidebarTitle",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-title",
-        contentTitle: "Letter",
-        isSide: true,
-        contentTitleImage: "/static/img/letter_icon.png",
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "title",
+    //   category: "sidebarTitle",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "side-title",
+    //     contentTitle: "Letter",
+    //     isSide: true,
+    //     contentTitleImage: "/static/img/letter_icon.png",
+    //   }),
+    // }),
 
     new emlo.MultiFields({
       id: "page-title",
@@ -21,15 +21,15 @@ export function getWorkComponents(emlo) {
       }),
     }),
 
-    new emlo.MultiFields({
-      id: "enclosed-in-side",
-      category: "sidebar",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "shortUrl",
-        isSide: true,
-        footerType: "w",
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "enclosed-in-side",
+    //   category: "sidebar",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "shortUrl",
+    //     isSide: true,
+    //     footerType: "w",
+    //   }),
+    // }),
 
     // new emlo.MultiFields({
     //   id: "related-resources",
@@ -65,16 +65,16 @@ export function getWorkComponents(emlo) {
     //   }),
     // }),
 
-    new emlo.MultiFields({
-      id: "catalog",
-      category: "sidebar",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "text",
-        sectionTitle: "",
-        isSide: true,
-        field: "cito_Catalog",
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "catalog",
+    //   category: "sidebar",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "text",
+    //     sectionTitle: "",
+    //     isSide: true,
+    //     field: "cito_Catalog",
+    //   }),
+    // }),
 
     new emlo.MultiFields({
       id: "work-profile-side",

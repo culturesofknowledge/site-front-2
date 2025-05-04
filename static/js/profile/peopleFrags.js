@@ -13,6 +13,7 @@ import { getLabel } from "../helper/getFieldLabls.js";
 import PersonChart from "../chart.js";
 
 let personChart;
+let showUnkown = false;
 
 export function _renderPeopleProfile(profile, tableData, relations) {
   let frag = "";
@@ -462,7 +463,8 @@ function _attachEventListeners() {
   if (showUnknownButton) {
     showUnknownButton.addEventListener("click", function () {
       if (personChart) {
-        personChart.unknownShow();
+        personChart.unknownShow(showUnkown);
+        showUnkown = !showUnkown;
       }
       // Handle the click event for the 'Full screen' button
     });

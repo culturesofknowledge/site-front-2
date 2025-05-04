@@ -3,7 +3,10 @@ import PersonChart from "./chart.js";
 import { _renderCommentProfile } from "./profile/commentFrag.js";
 import { _renderInstitutionProfile } from "./profile/institutionFrag.js";
 import { _renderLocationProfile } from "./profile/locationFrag.js";
-import { _renderPeopleProfile } from "./profile/peopleFrags.js";
+import {
+  _renderPeopleProfile,
+  _renderPeopleSidebar,
+} from "./profile/peopleFrags.js";
 import { _renderWorkProfile, _renderWorkSidebar } from "./profile/workFrag.js";
 
 const emlo = {
@@ -4549,15 +4552,7 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
 
     let footerType = "";
 
-    let container = `
-      <div style="border-bottom:1px solid #efc319; padding-bottom: 21px; padding-top:5px">
-				<img src="${imageSrc}" id="profile-icon" style="float:left;height:25px;width:25px;margin-right:15px;">
-          <div>
-            <strong>${theTitle}</strong>
-          </div>
-			</div>
-      <br/>
-    `;
+    let container = "";
 
     if (this.component.loading) {
       frag = "<div class='loading-message'>Loading...</div>"; // Show loading message
@@ -4575,8 +4570,9 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
           const isOrg = result?.["ox_isOrganisation"] === true;
           imageSrc = isOrg
             ? "/static/img/people_icon.png"
-            : "/static/img/person_icon.png";
+            : "/static/img/person-icon.png";
           theTitle = isOrg ? "Organisation" : "Person";
+          footerType = "p";
 
           break;
         case "work":
@@ -4607,14 +4603,26 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
       const shortURL = GenerateShortURL(editIdValue, footerType, currentDomain);
 
       container += `
-        <p>
+        <div style="border-bottom:1px solid #efc319; padding-bottom: 21px; padding-top:5px">
+          <img src="${imageSrc}" id="profile-icon" style="float:left;height:25px;width:25px;margin-right:15px;">
+            <div>
+              <strong>${theTitle}</strong>
+            </div>
+        </div>
+        <br/>
+
+        <p style="${
+          ["work"].includes(this.profileType) ? "" : "margin-bottom:20px;"
+        }">
           <img src="../../static/img/icon-short-url.png" alt="short-url" />
           Short URL: <span id="short-url-link" class="showLink">
             <a href=${currentHref}> ${shortURL} </a>
           </span>
         <p>
 
-        <p>
+        <p style="${
+          ["work"].includes(this.profileType) ? "" : "margin-bottom:20px;"
+        }">
           <img class="opacity50 icon-tweak" src="../../static/img/icon-send-comment.png" alt="short-url" />
           <a> Send Comment </a>
         </p>

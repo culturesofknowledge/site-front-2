@@ -1,389 +1,397 @@
 export function getPeopleComponents(emlo) {
   return [
+    // new emlo.MultiFields({
+    //   id: "title",
+    //   category: "sidebarTitle",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "side-title",
+    //     contentTitle: "Person",
+    //     dynamicTitle: "Organization",
+    //     dynamicTitleField: "ox_isOrganisation",
+    //     dynamicImage: "/static/img/people_icon.png",
+    //     contentTitleImage: "/static/img/person-icon.png",
+    //     isSide: true,
+    //   }),
+    // }),
+
+    // new emlo.MultiFields({
+    //   id: "enclosed-in-side",
+    //   category: "sidebar",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "shortUrl",
+    //     footerType: "p",
+    //     isSide: true,
+    //   }),
+    // }),
+
+    // new emlo.MultiFields({
+    //   id: "related-resources",
+    //   category: "sidebar",
+    //   fetchSecondaryData: true,
+    //   primaryField: "rdfs_seeAlso-resource",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "side-nested-links",
+    //     divider: true,
+    //     contentTitle: "Related resources ",
+    //     primaryField: "rdfs_seeAlso-resource",
+    //     isSide: true,
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "ox_titleOfResource",
+    //         otherInfo: "ox_detailsOfResource",
+    //         linkKey: "dcterms_relation",
+    //       },
+    //     ],
+    //   }),
+    // }),
+
     new emlo.MultiFields({
-      id: "title",
-      category: "sidebarTitle",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-title",
-        contentTitle: "Person",
-        dynamicTitle: "Organization",
-        dynamicTitleField: "ox_isOrganisation",
-        dynamicImage: "/static/img/people_icon.png",
-        contentTitleImage: "/static/img/person-icon.png",
-        isSide: true,
+      id: "people-profile-side",
+      category: "sidebar",
+      renderer: new emlo.ProfileLeftSideRenderer({
+        profileType: "people",
       }),
     }),
 
-    new emlo.MultiFields({
-      id: "enclosed-in-side",
-      category: "sidebar",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "shortUrl",
-        footerType: "p",
-        isSide: true,
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "born-in",
+    //   category: "sidebar",
+    //   fetchSecondaryData: true,
+    //   primaryField: "ox_wasBornIn-location",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "side-nested-links",
+    //     divider: true,
+    //     contentTitle: "Place where born",
+    //     primaryField: "ox_wasBornIn-location",
+    //     isSide: true,
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "browse",
+    //         otherInfo: "",
+    //         linkKey: "uuid",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "related-resources",
-      category: "sidebar",
-      fetchSecondaryData: true,
-      primaryField: "rdfs_seeAlso-resource",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-nested-links",
-        divider: true,
-        contentTitle: "Related resources ",
-        primaryField: "rdfs_seeAlso-resource",
-        isSide: true,
-        fields: [
-          {
-            title: "",
-            key: "ox_titleOfResource",
-            otherInfo: "ox_detailsOfResource",
-            linkKey: "dcterms_relation",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "died-in",
+    //   category: "sidebar",
+    //   fetchSecondaryData: true,
+    //   primaryField: "ox_diedAt-location",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "side-nested-links",
+    //     divider: true,
+    //     contentTitle: "Place where died",
+    //     primaryField: "ox_diedAt-location",
+    //     isSide: true,
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "browse",
+    //         otherInfo: "",
+    //         linkKey: "uuid",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "born-in",
-      category: "sidebar",
-      fetchSecondaryData: true,
-      primaryField: "ox_wasBornIn-location",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-nested-links",
-        divider: true,
-        contentTitle: "Place where born",
-        primaryField: "ox_wasBornIn-location",
-        isSide: true,
-        fields: [
-          {
-            title: "",
-            key: "browse",
-            otherInfo: "",
-            linkKey: "uuid",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "visited-in",
+    //   category: "sidebar",
+    //   fetchSecondaryData: true,
+    //   primaryField: "ox_wasAt-location",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "side-nested-links",
+    //     divider: true,
+    //     contentTitle: "Places visited",
+    //     primaryField: "ox_wasAt-location",
+    //     isSide: true,
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "browse",
+    //         otherInfo: "",
+    //         linkKey: "uuid",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "died-in",
-      category: "sidebar",
-      fetchSecondaryData: true,
-      primaryField: "ox_diedAt-location",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-nested-links",
-        divider: true,
-        contentTitle: "Place where died",
-        primaryField: "ox_diedAt-location",
-        isSide: true,
-        fields: [
-          {
-            title: "",
-            key: "browse",
-            otherInfo: "",
-            linkKey: "uuid",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "child-of",
+    //   category: "sidebar",
+    //   fetchSecondaryData: true,
+    //   primaryField: "rel_childOf-person",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "side-nested-links",
+    //     contentTitle: "Child of ",
+    //     primaryField: "rel_childOf-person",
+    //     isSide: true,
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "browse",
+    //         otherInfo: "ox_titlesRolesOccupations",
+    //         linkKey: "uuid",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "visited-in",
-      category: "sidebar",
-      fetchSecondaryData: true,
-      primaryField: "ox_wasAt-location",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-nested-links",
-        divider: true,
-        contentTitle: "Places visited",
-        primaryField: "ox_wasAt-location",
-        isSide: true,
-        fields: [
-          {
-            title: "",
-            key: "browse",
-            otherInfo: "",
-            linkKey: "uuid",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "parent-of",
+    //   category: "sidebar",
+    //   fetchSecondaryData: true,
+    //   primaryField: "rel_parentOf-person",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "side-nested-links",
+    //     contentTitle: "Parent of ",
+    //     primaryField: "rel_parentOf-person",
+    //     isSide: true,
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "browse",
+    //         otherInfo: "ox_titlesRolesOccupations",
+    //         linkKey: "uuid",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "child-of",
-      category: "sidebar",
-      fetchSecondaryData: true,
-      primaryField: "rel_childOf-person",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-nested-links",
-        contentTitle: "Child of ",
-        primaryField: "rel_childOf-person",
-        isSide: true,
-        fields: [
-          {
-            title: "",
-            key: "browse",
-            otherInfo: "ox_titlesRolesOccupations",
-            linkKey: "uuid",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "sibling-of",
+    //   category: "sidebar",
+    //   fetchSecondaryData: true,
+    //   primaryField: "rel_siblingOf-person",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "side-nested-links",
+    //     contentTitle: "Sibling of ",
+    //     primaryField: "rel_siblingOf-person",
+    //     isSide: true,
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "browse",
+    //         otherInfo: "ox_titlesRolesOccupations",
+    //         linkKey: "uuid",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "parent-of",
-      category: "sidebar",
-      fetchSecondaryData: true,
-      primaryField: "rel_parentOf-person",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-nested-links",
-        contentTitle: "Parent of ",
-        primaryField: "rel_parentOf-person",
-        isSide: true,
-        fields: [
-          {
-            title: "",
-            key: "browse",
-            otherInfo: "ox_titlesRolesOccupations",
-            linkKey: "uuid",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "spouse-of",
+    //   category: "sidebar",
+    //   fetchSecondaryData: true,
+    //   primaryField: "rel_spouseOf-person",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "side-nested-links",
+    //     contentTitle: "Spouse of ",
+    //     primaryField: "rel_spouseOf-person",
+    //     isSide: true,
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "browse",
+    //         otherInfo: "ox_titlesRolesOccupations",
+    //         linkKey: "uuid",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "sibling-of",
-      category: "sidebar",
-      fetchSecondaryData: true,
-      primaryField: "rel_siblingOf-person",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-nested-links",
-        contentTitle: "Sibling of ",
-        primaryField: "rel_siblingOf-person",
-        isSide: true,
-        fields: [
-          {
-            title: "",
-            key: "browse",
-            otherInfo: "ox_titlesRolesOccupations",
-            linkKey: "uuid",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "rel_relativeOf",
+    //   category: "sidebar",
+    //   fetchSecondaryData: true,
+    //   primaryField: "rel_relativeOf-person",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "side-nested-links",
+    //     contentTitle: "Relative of ",
+    //     primaryField: "rel_relativeOf-person",
+    //     isSide: true,
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "browse",
+    //         otherInfo: "ox_titlesRolesOccupations",
+    //         linkKey: "uuid",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "spouse-of",
-      category: "sidebar",
-      fetchSecondaryData: true,
-      primaryField: "rel_spouseOf-person",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-nested-links",
-        contentTitle: "Spouse of ",
-        primaryField: "rel_spouseOf-person",
-        isSide: true,
-        fields: [
-          {
-            title: "",
-            key: "browse",
-            otherInfo: "ox_titlesRolesOccupations",
-            linkKey: "uuid",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "unkown-relationship",
+    //   category: "sidebar",
+    //   fetchSecondaryData: true,
+    //   primaryField: "ox_unspecifiedRelationshipWith-person",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "side-nested-links",
+    //     contentTitle: "Unspecified relationship with ",
+    //     primaryField: "ox_unspecifiedRelationshipWith-person",
+    //     isSide: true,
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "browse",
+    //         otherInfo: "ox_titlesRolesOccupations",
+    //         linkKey: "uuid",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "rel_relativeOf",
-      category: "sidebar",
-      fetchSecondaryData: true,
-      primaryField: "rel_relativeOf-person",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-nested-links",
-        contentTitle: "Relative of ",
-        primaryField: "rel_relativeOf-person",
-        isSide: true,
-        fields: [
-          {
-            title: "",
-            key: "browse",
-            otherInfo: "ox_titlesRolesOccupations",
-            linkKey: "uuid",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "taught",
+    //   category: "sidebar",
+    //   fetchSecondaryData: true,
+    //   primaryField: "taught-person",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "side-nested-links",
+    //     contentTitle: "Was taught by",
+    //     primaryField: "taught-person",
+    //     isSide: true,
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "browse",
+    //         otherInfo: "ox_titlesRolesOccupations",
+    //         linkKey: "uuid",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "unkown-relationship",
-      category: "sidebar",
-      fetchSecondaryData: true,
-      primaryField: "ox_unspecifiedRelationshipWith-person",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-nested-links",
-        contentTitle: "Unspecified relationship with ",
-        primaryField: "ox_unspecifiedRelationshipWith-person",
-        isSide: true,
-        fields: [
-          {
-            title: "",
-            key: "browse",
-            otherInfo: "ox_titlesRolesOccupations",
-            linkKey: "uuid",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "taught-by",
+    //   category: "sidebar",
+    //   fetchSecondaryData: true,
+    //   primaryField: "was_taught_by-person",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "side-nested-links",
+    //     contentTitle: "Taught",
+    //     primaryField: "was_taught_by-person",
+    //     isSide: true,
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "browse",
+    //         otherInfo: "ox_titlesRolesOccupations",
+    //         linkKey: "uuid",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "taught",
-      category: "sidebar",
-      fetchSecondaryData: true,
-      primaryField: "taught-person",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-nested-links",
-        contentTitle: "Was taught by",
-        primaryField: "taught-person",
-        isSide: true,
-        fields: [
-          {
-            title: "",
-            key: "browse",
-            otherInfo: "ox_titlesRolesOccupations",
-            linkKey: "uuid",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "employed",
+    //   category: "sidebar",
+    //   fetchSecondaryData: true,
+    //   primaryField: "employed-person",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "side-nested-links",
+    //     contentTitle: "Was employed by",
+    //     primaryField: "employed-person",
+    //     isSide: true,
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "browse",
+    //         otherInfo: "ox_titlesRolesOccupations",
+    //         linkKey: "uuid",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "taught-by",
-      category: "sidebar",
-      fetchSecondaryData: true,
-      primaryField: "was_taught_by-person",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-nested-links",
-        contentTitle: "Taught",
-        primaryField: "was_taught_by-person",
-        isSide: true,
-        fields: [
-          {
-            title: "",
-            key: "browse",
-            otherInfo: "ox_titlesRolesOccupations",
-            linkKey: "uuid",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "employed-by",
+    //   category: "sidebar",
+    //   fetchSecondaryData: true,
+    //   primaryField: "was_employed_by-person",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "side-nested-links",
+    //     contentTitle: "Employed",
+    //     primaryField: "was_employed_by-person",
+    //     isSide: true,
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "browse",
+    //         otherInfo: "ox_titlesRolesOccupations",
+    //         linkKey: "uuid",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "employed",
-      category: "sidebar",
-      fetchSecondaryData: true,
-      primaryField: "employed-person",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-nested-links",
-        contentTitle: "Was employed by",
-        primaryField: "employed-person",
-        isSide: true,
-        fields: [
-          {
-            title: "",
-            key: "browse",
-            otherInfo: "ox_titlesRolesOccupations",
-            linkKey: "uuid",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "friend-of",
+    //   category: "sidebar",
+    //   fetchSecondaryData: true,
+    //   primaryField: "friend-person",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "side-nested-links",
+    //     contentTitle: "Friend of",
+    //     primaryField: "friend-person",
+    //     isSide: true,
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "browse",
+    //         otherInfo: "ox_titlesRolesOccupations",
+    //         linkKey: "uuid",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "employed-by",
-      category: "sidebar",
-      fetchSecondaryData: true,
-      primaryField: "was_employed_by-person",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-nested-links",
-        contentTitle: "Employed",
-        primaryField: "was_employed_by-person",
-        isSide: true,
-        fields: [
-          {
-            title: "",
-            key: "browse",
-            otherInfo: "ox_titlesRolesOccupations",
-            linkKey: "uuid",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "member-of-person",
+    //   category: "sidebar",
+    //   fetchSecondaryData: true,
+    //   primaryField: "ox_memberOf-person",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "side-nested-links",
+    //     contentTitle: "Member of ",
+    //     primaryField: "ox_memberOf-person",
+    //     isSide: true,
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "browse",
+    //         otherInfo: "ox_titlesRolesOccupations",
+    //         linkKey: "uuid",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
-    new emlo.MultiFields({
-      id: "friend-of",
-      category: "sidebar",
-      fetchSecondaryData: true,
-      primaryField: "friend-person",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-nested-links",
-        contentTitle: "Friend of",
-        primaryField: "friend-person",
-        isSide: true,
-        fields: [
-          {
-            title: "",
-            key: "browse",
-            otherInfo: "ox_titlesRolesOccupations",
-            linkKey: "uuid",
-          },
-        ],
-      }),
-    }),
-
-    new emlo.MultiFields({
-      id: "member-of-person",
-      category: "sidebar",
-      fetchSecondaryData: true,
-      primaryField: "ox_memberOf-person",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-nested-links",
-        contentTitle: "Member of ",
-        primaryField: "ox_memberOf-person",
-        isSide: true,
-        fields: [
-          {
-            title: "",
-            key: "browse",
-            otherInfo: "ox_titlesRolesOccupations",
-            linkKey: "uuid",
-          },
-        ],
-      }),
-    }),
-
-    new emlo.MultiFields({
-      id: "members",
-      category: "sidebar",
-      fetchSecondaryData: true,
-      primaryField: "foaf_member-person",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-nested-links",
-        contentTitle: "Members",
-        primaryField: "foaf_member-person",
-        isSide: true,
-        fields: [
-          {
-            title: "",
-            key: "browse",
-            otherInfo: "ox_titlesRolesOccupations",
-            linkKey: "uuid",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "members",
+    //   category: "sidebar",
+    //   fetchSecondaryData: true,
+    //   primaryField: "foaf_member-person",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "side-nested-links",
+    //     contentTitle: "Members",
+    //     primaryField: "foaf_member-person",
+    //     isSide: true,
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "browse",
+    //         otherInfo: "ox_titlesRolesOccupations",
+    //         linkKey: "uuid",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
     new emlo.MultiFields({
       id: "further-reading",

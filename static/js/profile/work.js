@@ -31,27 +31,27 @@ export function getWorkComponents(emlo) {
       }),
     }),
 
-    new emlo.MultiFields({
-      id: "related-resources",
-      category: "sidebar",
-      fetchSecondaryData: true,
-      primaryField: "rdfs_seeAlso-resource",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-nested-links",
-        divider: true,
-        contentTitle: "Related Resources ",
-        isSide: true,
-        primaryField: "rdfs_seeAlso-resource",
-        fields: [
-          {
-            title: "",
-            key: "ox_titleOfResource",
-            otherInfo: "ox_detailsOfResource",
-            linkKey: "dcterms_relation",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "related-resources",
+    //   category: "sidebar",
+    //   fetchSecondaryData: true,
+    //   primaryField: "rdfs_seeAlso-resource",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "side-nested-links",
+    //     divider: true,
+    //     contentTitle: "Related Resources ",
+    //     isSide: true,
+    //     primaryField: "rdfs_seeAlso-resource",
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "ox_titleOfResource",
+    //         otherInfo: "ox_detailsOfResource",
+    //         linkKey: "dcterms_relation",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
     new emlo.MultiFields({
       id: "source-record",
@@ -604,31 +604,31 @@ export function getWorkComponents(emlo) {
       }),
     }),
 
-    new emlo.MultiFields({
-      id: "resources",
-      category: "results",
-      fetchSecondaryData: true,
-      primaryField: "resources",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "nested-label",
-        sectionTitle: "Related Resources",
-        sectionTitleImage: "/static/img/icon-related-resources.png",
-        divider: true,
-        primaryField: "resources",
-        fields: [
-          {
-            title: "",
-            key: "ox_titleOfResource",
-            clickable: true,
-            collectionName: "dcterms_relation",
-          },
-          {
-            title: "",
-            key: "ox_detailsOfResource",
-          },
-        ],
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "resources",
+    //   category: "results",
+    //   fetchSecondaryData: true,
+    //   primaryField: "resources",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     type: "nested-label",
+    //     sectionTitle: "Related Resources",
+    //     sectionTitleImage: "/static/img/icon-related-resources.png",
+    //     divider: true,
+    //     primaryField: "resources",
+    //     fields: [
+    //       {
+    //         title: "",
+    //         key: "ox_titleOfResource",
+    //         clickable: true,
+    //         collectionName: "dcterms_relation",
+    //       },
+    //       {
+    //         title: "",
+    //         key: "ox_detailsOfResource",
+    //       },
+    //     ],
+    //   }),
+    // }),
 
     // new emlo.MultiFields({
     //   id: "comments-general",

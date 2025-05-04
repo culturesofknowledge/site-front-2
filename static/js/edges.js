@@ -231,24 +231,7 @@ emlo.ProfileTemplate = class extends edges.Template {
         </div>
 
         <div class="columns large-3 large-pull-9 side">
-          <div id="sidebar-title">
-            ${sidebarTitle}
-          </div>
-
-          <div id="sidebar-actions" style="font-family:sans-serif;cursor: auto;">
-            <p style="margin-bottom: 1.25rem">
-              <img src="../../static/img/icon-short-url.png" alt="short-url" />
-              Short URL: <span id="short-url-link"></span>
-            <p>
-
-            <p style="padding-bottom: 10px; padding-top:5px">
-              <img class="opacity50 icon-tweak" src="../../static/img/icon-send-comment.png" alt="short-url" />
-              <a> Send Comment </a>
-            </p>
-          </div>
-          <div id="more-options">
-            ${sidebar}
-          </div>
+          ${sidebar}
         </div>
       </div>
     `;
@@ -4561,6 +4544,20 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
   draw() {
     let frag = "";
     const result = this.component.results[0];
+    let imageSrc = "/static/img/letter_icon.png",
+      theTitle = "Letter";
+
+    let footerType = "";
+
+    let container = `
+      <div style="border-bottom:1px solid #efc319; padding-bottom: 21px; padding-top:5px">
+				<img src="${imageSrc}" id="profile-icon" style="float:left;height:25px;width:25px;margin-right:15px;">
+          <div>
+            <strong>${theTitle}</strong>
+          </div>
+			</div>
+      <br/>
+    `;
 
     if (this.component.loading) {
       frag = "<div class='loading-message'>Loading...</div>"; // Show loading message
@@ -4574,9 +4571,17 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
             this.component.tableData,
             this.component.relationships
           );
+
+          const isOrg = result?.["ox_isOrganisation"] === true;
+          imageSrc = isOrg
+            ? "/static/img/people_icon.png"
+            : "/static/img/person_icon.png";
+          theTitle = isOrg ? "Organisation" : "Person";
+
           break;
         case "work":
           frag += _renderWorkSidebar(result, this.component.relationships);
+          footerType = "w";
           break;
         case "location":
           frag += _renderLocationProfile(
@@ -4594,6 +4599,38 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
         default:
           console.log("Nothing is valid");
       }
+
+      const currentDomain = window.location.host;
+      const editIdValue = GetRecordID(footerType, result);
+      const currentHref = window.location.href;
+      console.debug("Current URL: ", currentHref);
+      const shortURL = GenerateShortURL(editIdValue, footerType, currentDomain);
+
+      container += `
+        <p>
+          <img src="../../static/img/icon-short-url.png" alt="short-url" />
+          Short URL: <span id="short-url-link" class="showLink">
+            <a href=${currentHref}> ${shortURL} </a>
+          </span>
+        <p>
+
+        <p>
+          <img class="opacity50 icon-tweak" src="../../static/img/icon-send-comment.png" alt="short-url" />
+          <a> Send Comment </a>
+        </p>
+
+
+        <div class="addthis_toolbox addthis_default_style " style="border-bottom:1px solid #efc319; padding-bottom: 10px; padding-top:5px">
+					<span style="text-align:center;"><a class="addthis_button_preferred_1" style="border-bottom:none;"></a>
+					<a class="addthis_button_preferred_2" style="border-bottom:none;"></a>
+					<a class="addthis_button_preferred_3" style="border-bottom:none;"></a>
+					<a class="addthis_button_preferred_4" style="border-bottom:none;"></a>
+					<a class="addthis_button_compact" style="border-bottom:none;"></a>
+					<a class="addthis_counter addthis_bubble_style" style="border-bottom:none;"></a></span>
+				</div>
+
+        <br/>
+      `;
     }
 
     const containerClasses = edges.util.styleClasses(
@@ -4602,10 +4639,8 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
       this.component.id
     );
 
-    let container = "";
-
     if (frag) {
-      container = `${frag}`;
+      container += `${frag}`;
     }
 
     this.component.context.html(container);

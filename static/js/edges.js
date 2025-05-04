@@ -10,6 +10,7 @@ import {
   _renderLocationSidebar,
 } from "./profile/locationFrag.js";
 import {
+  _renderGraphSection,
   _renderPeopleProfile,
   _renderPeopleSidebar,
 } from "./profile/peopleFrags.js";
@@ -2542,6 +2543,7 @@ emlo.MultiFields = class extends edges.Component {
     this.fetchTableData = edges.util.getParam(params, "fetchTableData", false);
     this.tableDataFields = edges.util.getParam(params, "tableDataFields", []);
     this.tableData = {};
+    this.graphData;
   }
 
   async synchronise() {
@@ -4749,6 +4751,8 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
     }
 
     this.component.context.html(container);
+    // _renderGraphSection(this.tableData);
+    // this.draw();
   }
 };
 

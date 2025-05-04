@@ -55,13 +55,10 @@ export function getComponents(collectionName, emlo) {
 function _getInstitutionComponents(emlo) {
   return [
     new emlo.MultiFields({
-      id: "title",
-      category: "sidebarTitle",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-title",
-        contentTitle: "Institution",
-        isSide: true,
-        contentTitleImage: "/static/img/repository-icon.png",
+      id: "institution-profile-side",
+      category: "sidebar",
+      renderer: new emlo.ProfileLeftSideRenderer({
+        profileType: "institution",
       }),
     }),
 
@@ -76,38 +73,6 @@ function _getInstitutionComponents(emlo) {
     }),
 
     new emlo.MultiFields({
-      id: "enclosed-in-side",
-      category: "sidebar",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "shortUrl",
-        isSide: true,
-        footerType: "r",
-      }),
-    }),
-
-    new emlo.MultiFields({
-      id: "related-resources",
-      category: "sidebar",
-      fetchSecondaryData: true,
-      primaryField: "rdfs_seeAlso-resource",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-nested-links",
-        divider: true,
-        isSide: true,
-        contentTitle: "Related Resources ",
-        primaryField: "rdfs_seeAlso-resource",
-        fields: [
-          {
-            title: "",
-            key: "ox_titleOfResource",
-            otherInfo: "ox_detailsOfResource",
-            linkKey: "dcterms_relation",
-          },
-        ],
-      }),
-    }),
-
-    new emlo.MultiFields({
       id: "inst-profile",
       category: "results",
       fetchTableData: true,
@@ -116,64 +81,6 @@ function _getInstitutionComponents(emlo) {
         profileType: "institution",
       }),
     }),
-
-    // new emlo.MultiFields({
-    //   id: "alternative-names",
-    //   category: "results",
-    //   renderer: new emlo.MultiFieldsRenderer({
-    //     type: "text",
-    //     sectionTitle: "Alternative names",
-    //     sectionTitleImage: "/static/img/icon-repository.png",
-    //     field: "geonames_alternateName",
-    //     divider: true,
-    //   }),
-    // }),
-
-    // new emlo.MultiFields({
-    //   id: "locations",
-    //   category: "results",
-    //   renderer: new emlo.MultiFieldsRenderer({
-    //     type: "label",
-    //     sectionTitle: "Location",
-    //     sectionTitleImage: "/static/img/icon-globe.png",
-    //     divider: true,
-    //     fields: [
-    //       {
-    //         title: "City",
-    //         key: "geonames_locatedIn",
-    //         additonalInfo: [
-    //           {
-    //             mainKey: "ox_locatedInAlternate",
-    //             secondaryKey: "",
-    //             text: "",
-    //           },
-    //         ],
-    //         hideClass: true,
-    //       },
-    //       { title: "Country", key: "geonames_inCountry", hideClass: true },
-    //     ],
-    //   }),
-    // }),
-
-    // new emlo.MultiFields({
-    //   id: "contents",
-    //   category: "results",
-    //   fetchSecondaryData: true,
-    //   optimizedCode: true,
-    //   primaryField: "ox_hasResource-manifestation",
-    //   renderer: new emlo.MultiFieldsRenderer({
-    //     type: "nested",
-    //     sectionTitle: "Collection overview",
-    //     sectionTitleImage: "/static/img/icon-quill.png",
-    //     primaryField: "ox_hasResource-manifestation",
-    //     field: "repository",
-    //     fields: [
-    //       { title: "", key: "ox_started-ox_year" },
-    //       { title: "", key: "dcterms_description", clickable: true },
-    //     ],
-    //     divider: true,
-    //   }),
-    // }),
 
     new emlo.MultiFields({
       id: "inst-footer",

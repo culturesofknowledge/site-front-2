@@ -1,4 +1,5 @@
-import { h4WorkList } from "../../js/helper/helper.js";
+import { h4WorkList, resourceRelation } from "../../js/helper/helper.js";
+import { getLabel } from "../helper/getFieldLabls.js";
 
 export function _renderInstitutionProfile(profile, tableData) {
   let frag = "";
@@ -6,6 +7,26 @@ export function _renderInstitutionProfile(profile, tableData) {
   frag += _renderAlternateSection(profile);
   frag += _renderLocationSection(profile);
   frag += _renderCollectionOverview(profile, tableData);
+  return frag;
+}
+
+export function _renderInstitutionSidebar(profile, relations) {
+  let frag = "";
+
+  if (profile.hasOwnProperty("rdfs_seeAlso-resource")) {
+    let label = getLabel("rdfs_seeAlso-resource");
+    frag += `
+      <dl>
+			  <dt>
+				  ${label}
+			  </dt>
+			  <dd>
+				  ${resourceRelation(profile, relations, "rdfs_seeAlso-resource")}
+			  </dd>
+	    </dl>
+    `;
+  }
+
   return frag;
 }
 

@@ -1,7 +1,10 @@
 import { getCollectionTitle } from "../js/profile/collectionDetails.js";
 import PersonChart from "./chart.js";
 import { _renderCommentProfile } from "./profile/commentFrag.js";
-import { _renderInstitutionProfile } from "./profile/institutionFrag.js";
+import {
+  _renderInstitutionProfile,
+  _renderInstitutionSidebar,
+} from "./profile/institutionFrag.js";
 import {
   _renderLocationProfile,
   _renderLocationSidebar,
@@ -4596,7 +4599,10 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
           theTitle = "Location";
           break;
         case "institution":
-          frag += _renderInstitutionProfile(result, this.component.tableData);
+          frag += _renderInstitutionSidebar(
+            result,
+            this.component.relationships
+          );
           imageSrc = "/static/img/repository-icon.png";
           footerType = "r";
           theTitle = "Institution";

@@ -5,7 +5,10 @@ import {
   totalLinkingToListWork,
   h4WorkList,
   h4RelationshipList,
+  resourceRelation,
+  relationshipList,
 } from "../../js/helper/helper.js";
+import { getLabel } from "../helper/getFieldLabls.js";
 
 export function _renderLocationProfile(profile, tableData, relations) {
   let frag = "";
@@ -18,6 +21,46 @@ export function _renderLocationProfile(profile, tableData, relations) {
   frag += _renderLetterMent(profile, tableData);
   frag += _renderComment(profile, relations);
 
+  return frag;
+}
+
+export function _renderLocationSidebar(profile, tableData, relations) {
+  let sideFrag = "";
+
+  sideFrag += _renderSideSection(profile, relations);
+
+  return sideFrag;
+}
+
+function _renderSideSection(profile, relations) {
+  let frag = `<dl style="-margin-top:25px;">`;
+
+  const relatedResourceField = "rdfs_seeAlso-resource";
+
+  if (profile.hasOwnProperty(relatedResourceField)) {
+    let label = getLabel(relatedResourceField);
+
+    frag += `
+          <dt>
+            ${label}
+          </dt>
+          <dd>
+            ${resourceRelation(profile, relations, relatedResourceField)}
+          </dd>
+        `;
+  }
+
+  const relationList = [
+    "rel_wasBirthplaceOf-person",
+    "rel_wasPlaceOfDeathOf-person",
+    "rel_wasVisitedBy-person",
+  ];
+
+  for (let relation of relationList) {
+    frag += `${relationshipList(relations, profile, relation, true)}`;
+  }
+
+  frag += "</dl>";
   return frag;
 }
 

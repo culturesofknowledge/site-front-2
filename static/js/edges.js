@@ -4547,8 +4547,8 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
   draw() {
     let frag = "";
     const result = this.component.results[0];
-    let imageSrc = "/static/img/letter_icon.png",
-      theTitle = "Letter";
+    let imageSrc = "/static/img/resources-icon.png",
+      theTitle = "";
 
     let footerType = "";
 
@@ -4578,6 +4578,8 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
         case "work":
           frag += _renderWorkSidebar(result, this.component.relationships);
           footerType = "w";
+          imageSrc = "/static/img/letter_icon.png";
+          theTitle = "Letter";
           break;
         case "location":
           frag += _renderLocationProfile(
@@ -4585,12 +4587,21 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
             this.component.tableData,
             this.component.relationships
           );
+
+          footerType = "w";
+          imageSrc = "/static/img/places-icon.png";
+          theTitle = "Location";
           break;
         case "institution":
           frag += _renderInstitutionProfile(result, this.component.tableData);
+          imageSrc = "/static/img/repository-icon.png";
+          footerType = "r";
+          theTitle = "Institution";
           break;
         case "comment":
           frag += _renderCommentProfile();
+          footerType = "c";
+          theTitle = "Comment";
           break;
         default:
           console.log("Nothing is valid");

@@ -380,7 +380,7 @@ export function totalLinkingToListWork(profile, objectType) {
 //   return retval;
 // }
 
-function resourceRelation(profile, relations, field) {
+export function resourceRelation(profile, relations, field) {
   if (profile && profile.hasOwnProperty(field)) {
     let frag = "";
     for (let uri of profile[field]) {

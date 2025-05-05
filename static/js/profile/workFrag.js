@@ -506,45 +506,114 @@ function _renderRepoAndVersionSection(profile) {
 }
 
 function _getLetterRepoContent(content) {
-  return `
-  <div class="display_details_of_one_object False">
-	  <h3>Version: Letter</h3>
-		
-    <p><span class="fieldlabel">Repository:</span></p>
-      <div id="repo-section"></div>
-		  <p>
-        <span class="fieldlabel">Shelfmark:</span> ${content["dcterms_identifier-shelf_"]} 
-      </p>
-      <p>
-        <span class="fieldlabel">Postage mark:</span>${content.mail_postageMark}
-      </p>
-	</div>
-  <br/>
-    `;
+  let frag = "";
+
+  console.log("content", content);
+
+  const shelfmarkField = "dcterms_identifier-shelf_",
+    postageMarkField = "mail_postageMark";
+
+  if (
+    content.hasOwnProperty(shelfmarkField) ||
+    content.hasOwnProperty(postageMarkField)
+  ) {
+    frag += `
+      <div class="display_details_of_one_object False">
+	      <h3>Version: Letter</h3>
+        <p><span class="fieldlabel">Repository:</span></p>
+        <div id="repo-section"></div>  
+      `;
+
+    if (content[shelfmarkField]) {
+      frag += `
+        <p>
+          <span class="fieldlabel">Shelfmark:</span> ${content[shelfmarkField]} 
+        </p>
+        `;
+    }
+
+    if (content[postageMarkField]) {
+      frag += `
+        <p>
+          <span class="fieldlabel">Postage mark:</span>${content.mail_postageMark}
+        </p>
+      `;
+    }
+    frag += `</div><br/>`;
+    return frag;
+  } else {
+    return "";
+  }
 }
 
 function _getManuRepoContent(content) {
-  return `
-    <div class="display_details_of_one_object False">
-      <h3>Version:  Manuscript copy </h3>
+  const keys = {
+    shelfmarkField: "dcterms_identifier-shelf_",
+    paperSizeField: "mail_paperSize",
+    biboNumField: "bibo_numPages",
+    pageTextField: "ox_numPageText",
+  };
+
+  let frag = "";
+
+  if (hasAnyFieldValue(content, keys)) {
+    frag += `
+      <div class="display_details_of_one_object False">
+        <h3>Version:  Manuscript copy </h3>
       
-      <p><span class="fieldlabel">Repository:</span></p>
+        <p><span class="fieldlabel">Repository:</span></p>
         <div id="repo-section"></div>
+    `;
+
+    if (content[keys.shelfmarkField]) {
+      frag += `
         <p>
-          <span class="fieldlabel">Shelfmark:</span> ${content["dcterms_identifier-shelf_"]} 
+          <span class="fieldlabel">Shelfmark:</span> ${
+            content[keys.shelfmarkField]
+          } 
         </p>
+        `;
+    }
+
+    if (content[keys.paperSizeField]) {
+      frag += `
         <p>
-          <span class="fieldlabel">Paper size:</span> ${content["mail_paperSize"]} 
+          <span class="fieldlabel">Paper size:</span> ${
+            content[keys.paperSizeField]
+          } 
         </p>
+        `;
+    }
+
+    if (content[keys.biboNumField]) {
+      frag += `
         <p>
-          <span class="fieldlabel">Number of pages of document:</span> ${content["bibo_numPages"]} 
+          <span class="fieldlabel">Number of pages of document:</span> ${
+            content[keys.biboNumField]
+          } 
         </p>
-        <p>
-          <span class="fieldlabel">Number of pages of text:</span>${content.ox_numPageText}
+        `;
+    }
+
+    if (content[keys.pageTextField]) {
+      frag += `
+       <p>
+          <span class="fieldlabel">Number of pages of text:</span>${
+            content[keys.pageTextField]
+          }
         </p>
-    </div>
-    <br/>
-      `;
+        `;
+    }
+
+    frag += `
+      </div>
+      <br/>
+    `;
+
+    return frag;
+  } else {
+    return "";
+  }
 }
 
 function _getInstituteData(institutions) {

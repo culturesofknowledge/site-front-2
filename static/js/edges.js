@@ -4416,7 +4416,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     );
     const url = this._generateURL(result, this.footerType, currentDomain);
 
-    let htmlContent = `<div class="column"><br/><br/><br/><br/><div class="change">`;
+    let htmlContent = `<div class=""><br/><br/><br/><br/><div class="change">`;
 
     // Check for Source of Data
     if (

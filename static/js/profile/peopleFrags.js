@@ -316,7 +316,7 @@ function _renderComment(profile, relations) {
 
   if (profile.hasOwnProperty(field)) {
     let frag = `<div class="column profilepart">
-      ${h4RelationshipList(profile, relations, field, "", "simple")}</div>`;
+      ${h4RelationshipList(profile, relations, field, null, "simple")}</div>`;
 
     return frag;
   } else {

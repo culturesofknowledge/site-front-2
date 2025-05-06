@@ -2542,7 +2542,13 @@ emlo.MultiFields = class extends edges.Component {
     this.errorMessage = ""; // Track error message
     this.fetchTableData = edges.util.getParam(params, "fetchTableData", false);
     this.tableDataFields = edges.util.getParam(params, "tableDataFields", []);
-    this.tableData = {};
+    this.fetchImageData = edges.util.getParam(params, "fetchImageData", false);
+    this.manifestationField = edges.util.getParam(
+      params,
+      "manifestationField",
+      ""
+    );
+    this.gneratedData = {}; // this data will be used for displayig linked information
     this.graphData;
   }
 
@@ -2592,7 +2598,7 @@ emlo.MultiFields = class extends edges.Component {
                 payload.objectKey = "uuid_related";
               }
 
-              this.tableData[field] = await this._fetchMoreWorkData(payload);
+              this.gneratedData[field] = await this._fetchMoreWorkData(payload);
             }
           }
         }
@@ -4571,7 +4577,7 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
         case "people":
           frag += _renderPeopleSidebar(
             result,
-            this.component.tableData,
+            this.component.gneratedData,
             this.component.relationships
           );
 
@@ -4592,7 +4598,7 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
         case "location":
           frag += _renderLocationSidebar(
             result,
-            this.component.tableData,
+            this.component.gneratedData,
             this.component.relationships
           );
 
@@ -4706,7 +4712,7 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
         case "people":
           frag += _renderPeopleProfile(
             result,
-            this.component.tableData,
+            this.component.gneratedData,
             this.component.relationships
           );
           break;
@@ -4716,12 +4722,15 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
         case "location":
           frag += _renderLocationProfile(
             result,
-            this.component.tableData,
+            this.component.gneratedData,
             this.component.relationships
           );
           break;
         case "institution":
-          frag += _renderInstitutionProfile(result, this.component.tableData);
+          frag += _renderInstitutionProfile(
+            result,
+            this.component.gneratedData
+          );
           break;
         case "comment":
           frag += _renderCommentProfile();

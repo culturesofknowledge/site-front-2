@@ -4422,7 +4422,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     );
     const url = this._generateURL(result, this.footerType, currentDomain);
 
-    let htmlContent = `<div class=""><br/><br/><br/><br/><div class="change">`;
+    let htmlContent = `<div class="yellow-divider"><br/><br/><br/><br/><div class="change">`;
 
     // Check for Source of Data
     if (
@@ -4489,7 +4489,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       }
     }
 
-    htmlContent += `</div><br/></div>`;
+    htmlContent += `</div></div>`;
 
     return `${htmlContent}`;
   }

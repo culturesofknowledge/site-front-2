@@ -2627,8 +2627,9 @@ emlo.MultiFields = class extends edges.Component {
                   objectKey: "uuid_related",
                 };
 
-                this.gneratedData["imageData"][uuid] =
-                  await this._fetchMoreWorkData(payload);
+                this.gneratedData["imageData"][uuid] = await this._fetchImages(
+                  uuid
+                );
               }
             }
           }
@@ -2673,6 +2674,31 @@ emlo.MultiFields = class extends edges.Component {
     try {
       const response = await fetch(
         `/solr/all/select?q=uuid_related:${uuid}&wt=json&rows=9999`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error(`Error fetching relations: ${response.statusText}`);
+        return [];
+      }
+
+      const json = await response.json();
+      return json.response.docs;
+    } catch (err) {
+      console.error("Error while fetching relations", err);
+      return [];
+    }
+  }
+
+  async _fetchImages(uuid) {
+    try {
+      const response = await fetch(
+        `/solr/images/select?q=uuid_related:${uuid}&wt=json&rows=9999`,
         {
           method: "GET",
           headers: {

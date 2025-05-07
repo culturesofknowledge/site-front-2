@@ -2603,6 +2603,37 @@ emlo.MultiFields = class extends edges.Component {
           }
         }
       }
+
+      // This will only work for manifestation since they are only fields which can have image values
+      if (this.fetchImageData && this.manifestationField !== "") {
+        const result = results[0];
+
+        if (result.hasOwnProperty(this.manifestationField)) {
+          const maniUris = result[this.manifestationField];
+
+          if (Array.isArray(maniUris) && maniUris.length > 0) {
+            for (const uri of maniUris) {
+              const uuid = uri.split("/").pop();
+
+              if (uuid) {
+                if (!this.gneratedData.hasOwnProperty("imageData")) {
+                  this.gneratedData["imageData"] = {};
+                }
+
+                const payload = {
+                  solrCore: "image",
+                  uuids: [uuid],
+                  filter: "",
+                  objectKey: "uuid_related",
+                };
+
+                this.gneratedData["imageData"][uuid] =
+                  await this._fetchMoreWorkData(payload);
+              }
+            }
+          }
+        }
+      }
     } catch (error) {
       console.log("got error", error);
       this.errorMessage = "Error fetching data.";
@@ -4590,7 +4621,11 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
 
           break;
         case "work":
-          frag += _renderWorkSidebar(result, this.component.relationships);
+          frag += _renderWorkSidebar(
+            result,
+            this.component.relationships,
+            this.component.gneratedData
+          );
           footerType = "w";
           imageSrc = "/static/img/letter_icon.png";
           theTitle = "Letter";

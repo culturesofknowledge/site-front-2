@@ -8,6 +8,7 @@ import {
   renderH4Section,
   h4RelationshipList,
   resourceRelation,
+  displayImage,
 } from "../../js/helper/helper.js";
 import { getLabel } from "../helper/getFieldLabls.js";
 import { getCollectionTitle } from "../../js/profile/collectionDetails.js";
@@ -31,6 +32,7 @@ export function _renderWorkSidebar(profile, relations, data) {
 
   console.log("data", data);
   sideFrag += _renderSideSection(profile, relations);
+  sideFrag += _renderImageSidebar(profile, relations, data);
 
   return sideFrag;
 }
@@ -755,5 +757,29 @@ function _renderComment(profile, relations) {
     return frag;
   } else {
     return "";
+  }
+}
+
+function _renderImageSidebar(profile, relations, data) {
+  if (
+    profile.hasOwnProperty("manifestations") &&
+    data.hasOwnProperty("imageData")
+  ) {
+    let frag = "";
+    const imageData = data["imageData"];
+    console.log("imageData", imageData);
+
+    for (let maniuri of profile["manifestations"]) {
+      const uuid = maniuri.split("/").pop();
+      console.log("uuid", uuid);
+
+      if (imageData.hasOwnProperty(uuid)) {
+        frag += displayImage(profile, imageData[uuid]);
+      }
+    }
+
+    return frag;
+  } else {
+    return "Frag";
   }
 }

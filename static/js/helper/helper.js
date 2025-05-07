@@ -634,3 +634,158 @@ function summaryByDetail(field, profile, data) {
     `;
   return table;
 }
+
+export function displayImage(profile, data, listAll = false) {
+  const imageSourceField = "dcterms_source",
+    thumbnailField = "foaf_thumbnail",
+    uriField = "dcterms_identifier-uri_";
+
+  let sortedList = data;
+  // Add sorting logic later
+
+  if (listAll) {
+    let imageCount = 0;
+
+    let frag = `
+      <div class="profilepart">
+      <br/>
+      <ul class="small-block-grid-2 medium-block-grid-4 large-block-grid-2">`;
+
+    for (let img of data) {
+      let imageSource = img[thumbnailField];
+
+      if (imageSource) {
+        imageSource = img[imageSourceField];
+      }
+
+      const imgSourceUrl = ImageUrl(imageSource);
+      const isDisplayImage = isDisplayImageType(imgSourceUrl);
+      const imageStyle = "border:6px solid #800000";
+
+      imageCount += 1;
+
+      if (img[uriField] == profile[uriField]) {
+        if (isDisplayImage) {
+          frag += `<li><img style="width:100%;${imageStyle}" src="${imgSourceUrl}" /></li>`;
+        }
+      } else {
+        const pageUri = img[uriField];
+        const pageUrl = profileFromUri(pageUri);
+        frag += `<li>`;
+
+        if (isDisplayImage) {
+          frag += `
+            <a href="${pageUrl}">
+              <img style="width:100%;" src="${imgSourceUrl}" />
+            </a>
+          `;
+        } else {
+          // PENDING: Function needs to be written
+          // frag += `
+          //   <a href="${imgSourceUrl}">
+          //     ${self.link_text_for_non_displayable_image(imgSourceUrl)} ${str(
+          //   img_count
+          // )}
+          //   </a>
+          // `;
+        }
+        frag += `</li>`;
+      }
+    }
+
+    frag += `</ul></div>`;
+
+    return frag;
+  } else {
+    let frag = "";
+    let imageCount = 0;
+    let firstImg = {};
+
+    if (imageCount == 0) {
+      firstImg = data[0];
+    }
+    imageCount = data.length;
+
+    if (imageCount > 0) {
+      let imageSource = firstImg[thumbnailField];
+
+      if (imageSource) {
+        imageSource = firstImg[imageSourceField];
+      }
+
+      const imgSourceUrl = ImageUrl(imageSource);
+      const isDisplayImage = isDisplayImageType(imgSourceUrl);
+
+      const pageUri = firstImg[uriField];
+      const pageUrl = profileFromUri(pageUri);
+
+      frag += `
+        <div class="profilepart thumbnail specialthumb">
+          <p style="text-align:center"></p>
+          <p style="text-align:center">
+             <a href="${pageUrl}">
+      `;
+
+      if (isDisplayImage) {
+        frag += `<img style="max-width: 100%;min-width: 100px;" src="${imgSourceUrl}" />`;
+      } else {
+        // PENDING: Function needs to be written
+        // frag += `
+        //     <a href="${imgSourceUrl}">
+        //       ${self.link_text_for_non_displayable_image(imgSourceUrl)} ${str(
+        //     img_count
+        //   )}
+        //     </a>
+        //   `;
+      }
+
+      frag += `</a></p>`;
+
+      const furtherImageCount = imageCount - 1;
+
+      let msg = "";
+
+      if (furtherImageCount == 0) {
+        msg = "No further images";
+      } else if (furtherImageCount == 1) {
+        msg = "1 further image";
+      } else {
+        msg = `${furtherImageCount} further images`;
+      }
+
+      frag += `
+        <p style="text-align:center">
+          (<a href="${pageUrl}">${msg}</a>)
+        <p>
+        </div>
+      `;
+
+      return frag;
+    } else {
+      return "No image";
+    }
+  }
+}
+
+function ImageUrl(url) {
+  let newURL = "";
+  if (url.startsWith("http")) {
+    newURL = url;
+  } else {
+    newURL = "/scans" + url;
+  }
+
+  return newURL;
+}
+
+function isDisplayImageType(url) {
+  const displayTypes = ["jpg", "png", "gif"];
+
+  for (let type in displayTypes) {
+    if (url.toLowerCase().endsWith(type)) {
+      return true;
+    }
+  }
+
+  return false;
+}

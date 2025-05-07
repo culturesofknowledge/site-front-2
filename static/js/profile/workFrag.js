@@ -26,9 +26,10 @@ export function _renderWorkProfile(profile, relations) {
   return frag;
 }
 
-export function _renderWorkSidebar(profile, relations) {
+export function _renderWorkSidebar(profile, relations, data) {
   let sideFrag = "";
 
+  console.log("data", data);
   sideFrag += _renderSideSection(profile, relations);
 
   return sideFrag;

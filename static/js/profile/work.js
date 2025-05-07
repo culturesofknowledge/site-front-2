@@ -3,6 +3,8 @@ export function getWorkComponents(emlo) {
     new emlo.MultiFields({
       id: "work-profile-side",
       category: "sidebar",
+      fetchImageData: true,
+      manifestationField: "manifestations",
       renderer: new emlo.ProfileLeftSideRenderer({
         profileType: "work",
       }),

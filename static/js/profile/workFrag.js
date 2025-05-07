@@ -769,9 +769,11 @@ function _renderImageSidebar(profile, relations, data) {
 
     for (let maniuri of profile["manifestations"]) {
       const uuid = maniuri.split("/").pop();
+      const maniObj = relations.find((obj) => obj.uuid === uuid);
 
+      console.log("uuid", maniObj);
       if (imageData.hasOwnProperty(uuid)) {
-        frag += displayImage(profile, imageData[uuid]);
+        frag += displayImage(profile, imageData[uuid], maniObj);
       }
     }
 

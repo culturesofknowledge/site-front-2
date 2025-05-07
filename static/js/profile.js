@@ -392,22 +392,10 @@ function _getImageComponents(emlo) {
     }),
 
     new emlo.MultiFields({
-      id: "image",
+      id: "image-profile",
       category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "img",
-        sectionTitle: "Images",
-        divider: true,
-        field: "dcterms_source",
-      }),
-    }),
-
-    new emlo.MultiFields({
-      id: "image-credit",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "text",
-        field: "ox_imageCredits",
+      renderer: new emlo.ProfileRightRenderer({
+        profileType: "image",
       }),
     }),
 

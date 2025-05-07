@@ -1,6 +1,7 @@
 import { getCollectionTitle } from "../js/profile/collectionDetails.js";
 import PersonChart from "./chart.js";
 import { _renderCommentProfile } from "./profile/commentFrag.js";
+import { _renderImageProfile } from "./profile/imageFrag.js";
 import {
   _renderInstitutionProfile,
   _renderInstitutionSidebar,
@@ -4795,6 +4796,9 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
           break;
         case "comment":
           frag += _renderCommentProfile();
+          break;
+        case "image":
+          frag += _renderImageProfile(result, this.component.relationships);
           break;
         default:
           console.log("Nothing is valid");

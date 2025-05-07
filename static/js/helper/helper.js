@@ -635,7 +635,7 @@ function summaryByDetail(field, profile, data) {
   return table;
 }
 
-export function displayImage(profile, data, listAll = false) {
+export function displayImage(profile, data, maniObj, listAll = false) {
   const imageSourceField = "dcterms_source",
     thumbnailField = "foaf_thumbnail",
     uriField = "dcterms_identifier-uri_";
@@ -719,10 +719,16 @@ export function displayImage(profile, data, listAll = false) {
 
       const pageUri = firstImg[uriField];
       const pageUrl = profileFromUri(pageUri);
+      let imageTitle = "";
+
+      if (maniObj.hasOwnProperty("dcterms_type")) {
+        imageTitle = maniObj["dcterms_type"];
+      }
 
       frag += `
         <div class="profilepart thumbnail specialthumb">
           <p style="text-align:center;margin-bottom:0px;">
+            ${imageTitle}
           </p>
           <p style="text-align:center;margin-bottom:0px;">
              <a href="${pageUrl}">

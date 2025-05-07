@@ -30,7 +30,6 @@ export function _renderWorkProfile(profile, relations) {
 export function _renderWorkSidebar(profile, relations, data) {
   let sideFrag = "";
 
-  console.log("data", data);
   sideFrag += _renderSideSection(profile, relations);
   sideFrag += _renderImageSidebar(profile, relations, data);
 
@@ -767,11 +766,9 @@ function _renderImageSidebar(profile, relations, data) {
   ) {
     let frag = "";
     const imageData = data["imageData"];
-    console.log("imageData", imageData);
 
     for (let maniuri of profile["manifestations"]) {
       const uuid = maniuri.split("/").pop();
-      console.log("uuid", uuid);
 
       if (imageData.hasOwnProperty(uuid)) {
         frag += displayImage(profile, imageData[uuid]);

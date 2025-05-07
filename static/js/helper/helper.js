@@ -714,6 +714,7 @@ export function displayImage(profile, data, listAll = false) {
       }
 
       const imgSourceUrl = ImageUrl(imageSource);
+
       const isDisplayImage = isDisplayImageType(imgSourceUrl);
 
       const pageUri = firstImg[uriField];
@@ -721,13 +722,14 @@ export function displayImage(profile, data, listAll = false) {
 
       frag += `
         <div class="profilepart thumbnail specialthumb">
-          <p style="text-align:center"></p>
-          <p style="text-align:center">
+          <p style="text-align:center;margin-bottom:0px;">
+          </p>
+          <p style="text-align:center;margin-bottom:0px;">
              <a href="${pageUrl}">
       `;
 
       if (isDisplayImage) {
-        frag += `<img style="max-width: 100%;min-width: 100px;" src="${imgSourceUrl}" />`;
+        frag += `<img style="width: 100px;" src="${imgSourceUrl}" />`;
       } else {
         // PENDING: Function needs to be written
         // frag += `
@@ -754,9 +756,9 @@ export function displayImage(profile, data, listAll = false) {
       }
 
       frag += `
-        <p style="text-align:center">
+        <p style="text-align:center;margin-bottom:0px;">
           (<a href="${pageUrl}">${msg}</a>)
-        <p>
+        </p>
         </div>
       `;
 
@@ -781,7 +783,7 @@ function ImageUrl(url) {
 function isDisplayImageType(url) {
   const displayTypes = ["jpg", "png", "gif"];
 
-  for (let type in displayTypes) {
+  for (let type of displayTypes) {
     if (url.toLowerCase().endsWith(type)) {
       return true;
     }

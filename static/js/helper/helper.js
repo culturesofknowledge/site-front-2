@@ -1,4 +1,5 @@
 import { getLabel } from "../../js/helper/getFieldLabls.js";
+import { getAddtionalFields, getFieldsToDisplayInProfile } from "./fields.js";
 
 const displayfields = {
   work: { display: "Description", value: "dcterms_description" },
@@ -796,4 +797,289 @@ export function isDisplayImageType(url) {
   }
 
   return false;
+}
+
+export function detailsOfOneObject(profile, obj, nested = false) {
+  let relation = structuredClone(obj);
+
+  let frag = ` <div class="display_details_of_one_object ${nested}">`;
+
+  const uriFieldName = "dcterms_identifier-uri_";
+
+  if (
+    relation.hasOwnProperty(uriFieldName) &&
+    relation.hasOwnProperty("object_type")
+  ) {
+    const uri = relation[uriFieldName];
+    const url = profileFromUri(uri);
+    const objectType = relation["object_type"];
+    const mainDisplayValue = relation[displayfields[objectType].value];
+
+    let fieldsToDisplay = [],
+      detailsToDisplay = [],
+      label = "",
+      displayValue = "",
+      relatedUri = "",
+      relatedObj = {},
+      link = "";
+
+    if (objectType == "manifestation") {
+      fieldsToDisplay = getFieldsToDisplayInProfile(objectType);
+
+      const maniReceiptCal = "ox_manifestation_receipt_calendar";
+
+      if (relation.hasOwnProperty(maniReceiptCal)) {
+        if (
+          ["U", "u", "Unknown", "unknown"].includes(relation[maniReceiptCal])
+        ) {
+          if (fieldsToDisplay.includes(maniReceiptCal)) {
+            fieldsToDisplay = fieldsToDisplay.filter(
+              (item) => item !== maniReceiptCal
+            );
+          }
+        } else if (relation[maniReceiptCal] == "G") {
+          relation[maniReceiptCal] = "Gregorian";
+        } else if (["J", "JJ", "JM"].includes(relation[maniReceiptCal])) {
+          relation[maniReceiptCal] = "Julian";
+        }
+      }
+
+      const creationDate = {
+        year: "dcterms_created-ox_year",
+        month: "dcterms_created-ox_month",
+        day: "dcterms_created-ox_day",
+      };
+      let date;
+      if (
+        relation.hasOwnProperty(creationDate.year) ||
+        (relation.hasOwnProperty(creationDate.month) &&
+          relation[creationDate.month] != 0) ||
+        (relation.hasOwnProperty(creationDate.day) &&
+          relation[creationDate.day] != 0)
+      ) {
+        date = getFullDate(
+          relation[creationDate.year],
+          relation[creationDate.month],
+          relation[creationDate.day]
+        );
+
+        relation["dcterms_created"] = date;
+      }
+
+      // Tweaking values
+      if (relation.hasOwnProperty("ox_manifestation_receipt_date_year")) {
+        delete relation["ox_manifestation_receipt_date_year"];
+      }
+
+      if (relation.hasOwnProperty("ox_manifestation_receipt_date_month")) {
+        delete relation["ox_manifestation_receipt_date_month"];
+      }
+
+      if (relation.hasOwnProperty("ox_manifestation_receipt_date_day")) {
+        delete relation["ox_manifestation_receipt_date_day"];
+      }
+
+      relation["ox_manifestation_receipt_date"] = date;
+
+      if (
+        relation.hasOwnProperty("ox_manifestation_receipt_date_inferred") ||
+        relation.hasOwnProperty("ox_manifestation_receipt_date_uncertain") ||
+        relation.hasOwnProperty("ox_manifestation_receipt_date_approx")
+      ) {
+        relation["ox_manifestation_receipt_date"] += "  (";
+
+        if (relation.hasOwnProperty("ox_manifestation_receipt_date_inferred")) {
+          relation["ox_manifestation_receipt_date"] += "inferred ";
+        }
+        if (
+          relation.hasOwnProperty("ox_manifestation_receipt_date_uncertain")
+        ) {
+          relation["ox_manifestation_receipt_date"] += "uncertain ";
+        }
+        if (relation.hasOwnProperty("ox_manifestation_receipt_date_approx")) {
+          relation["ox_manifestation_receipt_date"] += "approx ";
+        }
+
+        relation["ox_manifestation_receipt_date"] += ")";
+
+        const inferredKey = "ox_manifestation_receipt_date_inferred";
+        const uncertainKey = "ox_manifestation_receipt_date_uncertain";
+        const approxKey = "ox_manifestation_receipt_date_approx";
+
+        if (fields_to_display.includes(inferredKey)) {
+          fields_to_display = fields_to_display.filter(
+            (f) => f !== inferredKey
+          );
+        }
+        if (fields_to_display.includes(uncertainKey)) {
+          fields_to_display = fields_to_display.filter(
+            (f) => f !== uncertainKey
+          );
+        }
+        if (fields_to_display.includes(approxKey)) {
+          fields_to_display = fields_to_display.filter((f) => f !== approxKey);
+        }
+      }
+
+      if (relation.hasOwnProperty("ox_manifestation_receipt_date_gregorian")) {
+        const dateObj = new Date(
+          relation["ox_manifestation_receipt_date_gregorian"]
+        );
+        relation["ox_manifestation_receipt_date_gregorian"] = dateObj
+          .toISOString()
+          .slice(0, 10);
+      }
+    }
+
+    if (fieldsToDisplay.length > 0) {
+      for (let field of fieldsToDisplay) {
+        if (relation.hasOwnProperty(field)) {
+          const label = getLabel(field);
+
+          let rawValues = relation[field];
+
+          if (!Array.isArray(rawValues)) {
+            rawValues = [rawValues];
+          }
+
+          for (let val of rawValues) {
+            let displayValue = "",
+              relatedUri = "",
+              relatedObj = {},
+              link = "";
+
+            if (field == "ox_opened") {
+              if (val == "Opened") {
+                continue;
+              }
+            } else if (typeof val == "unicode" || typeof val == "string") {
+              if (val.startsWith("http")) {
+                relatedUri = val;
+                relatedObj = {}; // Pending Need to fix the API call here
+              } else if (field == "dcterms_identifier-shelf_") {
+                val = stripValuePrefix(val, "dcterms_identifier-shelf_");
+              }
+            } else if (field == "ox_isTranslation") {
+              if (!val) {
+                continue;
+              }
+            }
+
+            if (relatedUri == "") {
+              displayValue = val;
+            }
+
+            const details = {
+              fieldname: field,
+              label: label,
+              displayValue: displayValue,
+              relatedObj: relatedObj,
+              link: link,
+            };
+
+            detailsToDisplay.push(details);
+          }
+        }
+      }
+    }
+
+    if (detailsToDisplay.length == 0) {
+      if (objectType == "comment") {
+        frag += `<pre> ${mainDisplayValue} </pre>`;
+      } else {
+        frag += `<a href="${url}">${mainDisplayValue}</a><br/>`;
+      }
+
+      const additional = getAddtionalFields(objectType);
+      let val;
+      if (additional) {
+        for (let label in additional) {
+          val = relation[additional[label]];
+
+          if (typeof val == "unicode" || typeof val == "string") {
+            if (val.startsWith("http")) {
+              frag += `<span style="color:#172854;">${label}</span>:<br/>&nbsp;&nbsp;&nbsp; <a href="${val}" target="_blank">${val}</a><br/>`;
+            } else {
+              frag += `<span style="color:#172854;">${label}</span>:<br/>&nbsp;&nbsp;&nbsp; ${val}<br/>`;
+            }
+          } else {
+            frag += `<span style="color:#172854;">${label}</span>:<br/>&nbsp;&nbsp;&nbsp; ${val}<br/>`;
+          }
+        }
+      }
+    } else {
+      frag += `<h5>Version: ${mainDisplayValue}</h5>`;
+
+      detailsToDisplay.forEach((detailsDict) => {
+        const fieldToDisplay = detailsDict["fieldname"];
+        const label = detailsDict["label"];
+        const displayValue = detailsDict["display_value"];
+        const relatedObj = detailsDict["related_obj"];
+
+        if (relation.hasOwnProperty(fieldToDisplay)) {
+          if (relatedObj && relatedObj.length > 0) {
+            if (label) {
+              frag += `<p><span class="fieldlabel">${label}:</span></p>`;
+            }
+            frag += displayDetailsOfOneObject(relatedObj, true); // Assumes it returns a string
+          } else {
+            if (label) {
+              frag += `<p><span class="fieldlabel">${label}:</span>${displayValue}</p>`;
+            } else {
+              frag += `<p>${displayValue}</p>`;
+            }
+          }
+        }
+      });
+    }
+  } else {
+    return "</div>";
+  }
+
+  frag += `</div>`;
+  return frag;
+}
+
+function getFullDate(year, month, day) {
+  let date = "";
+
+  if (year) {
+    date += String(year);
+  } else {
+    date += "????";
+  }
+
+  if (month && month !== 0) {
+    date += month < 10 ? ` - 0${month}` : ` - ${month}`;
+  } else {
+    date += " - ??";
+  }
+
+  if (day && day !== 0) {
+    date += day < 10 ? ` - 0${day}` : ` - ${day}`;
+  } else {
+    date += " - ??";
+  }
+
+  return date;
+}
+
+function stripValuePrefix(fullString, prefix = "") {
+  let retval = fullString;
+
+  // Strip specified prefix if provided
+  if (prefix.length > 0) {
+    if (fullString.startsWith(prefix)) {
+      retval = fullString.slice(prefix.length);
+    }
+  } else {
+    // Otherwise, strip everything up to and including the first underscore
+    if (fullString.includes("_")) {
+      const parts = fullString.split("_");
+      const plength = parts[0].length + 1; // +1 for the underscore
+      retval = fullString.slice(plength);
+    }
+  }
+
+  return retval;
 }

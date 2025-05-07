@@ -1,4 +1,5 @@
 import {
+  detailsOfOneObject,
   hasAnyFieldValue,
   ImageUrl,
   isDisplayImageType,
@@ -9,7 +10,7 @@ export function _renderImageProfile(profile, relations) {
   let frag = "";
 
   frag += _renderImageSection(profile, relations);
-  // frag += _renderDetailSection(profile, relations);
+  frag += _renderDetailSection(profile, relations);
 
   return frag;
 }
@@ -76,7 +77,8 @@ function _renderImageSection(profile, relations) {
     if (displayImage) {
       frag += `<img src="${url}" class="specialthumb" />`;
     } else {
-      frag += `${textForNonDisplayImage(url)}`;
+      // Pending function: Needs to be implemented
+      // frag += `${textForNonDisplayImage(url)}`;
     }
 
     frag += "</a>";
@@ -101,17 +103,44 @@ function _renderImageSection(profile, relations) {
 }
 
 function _renderDetailSection(profile, relations) {
-  let frag = `
-    <div class="column profilepart">
-				<h3><img src="/img/icon-quill.png"/>Details</h3>
-				<div class="content">
-					Document type: ${self.display_details_of_one_object(
-            manifestation_obj,
-            (nested = True)
-          )}
-				</div>
-			</div>
-  `;
+  if (profile.hasOwnProperty("frbr_Manifestation-manifestation")) {
+    const manUri = profile["frbr_Manifestation-manifestation"][0];
+    const manUUID = uuidFromUri(manUri, true);
+    let frag = "";
+    if (relations && relations.length > 0) {
+      for (let relation of relations) {
+        if (
+          relation["object_type"] == "manifestation" &&
+          relation.id == manUUID
+        ) {
+          frag += `
+             <div class="column profilepart">
+  			      <h3><img src="/static/img/icon-quill.png"/>Details</h3>
+  			      <div class="content">
+  				      Document type: ${detailsOfOneObject(profile, relation, true)}
+  			      </div>
+  		      </div>
+          `;
+        }
+      }
+    }
+
+    return frag;
+  } else {
+    return "";
+  }
+
+  // let frag = `
+  //   <div class="column profilepart">
+  // 			<h3><img src="/img/icon-quill.png"/>Details</h3>
+  // 			<div class="content">
+  // 				Document type: ${self.display_details_of_one_object(
+  //           manifestation_obj,
+  //           (nested = True)
+  //         )}
+  // 			</div>
+  // 		</div>
+  // `;
 }
 
 function textForNonDisplayImage(url) {

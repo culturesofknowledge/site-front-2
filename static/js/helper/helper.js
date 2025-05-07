@@ -775,7 +775,7 @@ export function displayImage(profile, data, maniObj, listAll = false) {
   }
 }
 
-function ImageUrl(url) {
+export function ImageUrl(url) {
   let newURL = "";
   if (url.startsWith("http")) {
     newURL = url;
@@ -786,7 +786,7 @@ function ImageUrl(url) {
   return newURL;
 }
 
-function isDisplayImageType(url) {
+export function isDisplayImageType(url) {
   const displayTypes = ["jpg", "png", "gif"];
 
   for (let type of displayTypes) {

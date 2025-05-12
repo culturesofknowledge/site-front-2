@@ -710,7 +710,7 @@ export function displayImage(profile, data, maniObj, listAll = false) {
     if (imageCount > 0) {
       let imageSource = firstImg[thumbnailField];
 
-      if (imageSource) {
+      if (imageSource || imageSource != "undefined") {
         imageSource = firstImg[imageSourceField];
       }
 
@@ -778,10 +778,13 @@ export function displayImage(profile, data, maniObj, listAll = false) {
 
 export function ImageUrl(url) {
   let newURL = "";
-  if (url.startsWith("http")) {
-    newURL = url;
-  } else {
-    newURL = "/scans" + url;
+
+  if (url) {
+    if (url.startsWith("http")) {
+      newURL = url;
+    } else {
+      newURL = "/scans" + url;
+    }
   }
 
   return newURL;

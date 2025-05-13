@@ -177,7 +177,11 @@ try {
             post: "",
             type: "multiple",
             multipleFields: [
-              { label: "Alternative names", field: "ox_locationAlternateName" },
+              {
+                label: "Alternative names",
+                field: "ox_locationAlternateName",
+                isSemiColon: true,
+              },
               { label: "Latitude", field: "geo_lat" },
               { label: "Longitude", field: "geo_long" },
             ],

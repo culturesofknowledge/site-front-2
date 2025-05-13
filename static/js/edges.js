@@ -813,7 +813,19 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
           if (field.type === "multiple" && field.multipleFields) {
             const multipleFieldDisplay = field.multipleFields
               .map((item) => {
-                const value = this._getValue(item.field, res, "");
+                let value = "";
+
+                if (item.isSemiColon) {
+                  if (
+                    res &&
+                    res.hasOwnProperty(item.field) &&
+                    res[item.field]
+                  ) {
+                    value = res[item.field].split("\n").join("; ");
+                  }
+                } else {
+                  value = this._getValue(item.field, res, "");
+                }
                 return value ? `<div>${item.label}: ${value}</div>` : "";
               })
               .join("");

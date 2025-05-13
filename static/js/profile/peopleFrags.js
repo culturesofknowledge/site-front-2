@@ -13,7 +13,7 @@ import { getLabel } from "../helper/getFieldLabls.js";
 import PersonChart from "../chart.js";
 
 let personChart;
-let showUnkown = false;
+let showUnkown = true;
 let isDisplayUnkown = false;
 
 export function _renderPeopleProfile(profile, tableData, relations) {

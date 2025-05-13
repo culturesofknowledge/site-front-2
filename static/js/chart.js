@@ -514,6 +514,7 @@ class PersonChart {
           });
 
         // Create any new bars
+        const self = this;
         bars
           .enter()
           .append("rect")
@@ -524,7 +525,7 @@ class PersonChart {
           .attr("width", xScale.rangeBand())
           .attr("height", 0)
           .classed("unknown", function (d) {
-            return d.year == this.unknownYear;
+            return d.year == self.unknownYear;
           });
 
         // Remove unwanted bars

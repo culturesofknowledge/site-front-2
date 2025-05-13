@@ -243,7 +243,7 @@ try {
 //   }
 // }
 
-function _redirectToSearch(val, res, fieldName, current_search_letter = "A") {
+function _redirectToSearch(val, res, fieldName) {
   if (typeof res !== "object" || res === null) {
     console.log("Invalid input: res is not an object");
     return "<div>Invalid input</div>";
@@ -255,7 +255,9 @@ function _redirectToSearch(val, res, fieldName, current_search_letter = "A") {
     const user = res["foaf_name"];
     const uuid = res["uuid"];
 
-    const currentPageQ = `browsing=people&letter=${current_search_letter}`;
+    console.log("current_search_letter", current_search_letter);
+
+    const currentPageQ = `browsing=organisations&letter=${current_search_letter}`;
 
     switch (fieldName) {
       case "ox_totalWorksByAgent":

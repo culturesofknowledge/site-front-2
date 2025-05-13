@@ -655,7 +655,7 @@ export function displayImage(profile, data, maniObj, listAll = false) {
     for (let img of data) {
       let imageSource = img[thumbnailField];
 
-      if (imageSource || imageSource != "undefined") {
+      if (imageSource || imageSource != "undefined" ) {
         imageSource = img[imageSourceField];
       }
 

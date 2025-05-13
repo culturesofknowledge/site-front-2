@@ -692,7 +692,7 @@ class PersonChart {
     } else {
       //highlight(["#hide_unknown"], true);
       this.highlight(["#show_unknown"], false);
-      d3.select("#show_unknown").text("Show unknown");
+      d3.select("#show_unknown").text("Show unknown years");
 
       this.showUnknown = false;
     }

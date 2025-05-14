@@ -68,6 +68,7 @@ export function getPeopleComponents(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "footer",
         footerType: "p",
+        isDivider: false,
       }),
     }),
   ];

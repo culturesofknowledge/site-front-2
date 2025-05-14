@@ -2836,6 +2836,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     this.footerType = edges.util.getParam(params, "footerType", "");
     this.isSide = edges.util.getParam(params, "isSide", false); // Whether to render in a sidebar
     this.subSection = edges.util.getParam(params, "subSection", false);
+    this.isDivider = edges.util.getParam(params, "isDivider", true);
     this.namespace = "edges-custom-display";
   }
 
@@ -4434,7 +4435,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     );
     const url = this._generateURL(result, this.footerType, currentDomain);
 
-    let htmlContent = `<div class="yellow-divider"><br/><br/><br/><br/><div class="change">`;
+    let htmlContent = `<div class="${
+      this.isDivider ? "yellow-divider" : ""
+    }"><br/><br/><br/><br/><div class="change">`;
 
     // Check for Source of Data
     if (

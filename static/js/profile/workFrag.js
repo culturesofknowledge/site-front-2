@@ -527,7 +527,9 @@ function _getLetterRepoContent(content) {
     if (content[shelfmarkField]) {
       frag += `
         <p>
-          <span class="fieldlabel">Shelfmark:</span> ${content[shelfmarkField]} 
+          <span class="fieldlabel">Shelfmark:</span> ${content[
+            shelfmarkField
+          ].replace("shelf_", "")} 
         </p>
         `;
     }

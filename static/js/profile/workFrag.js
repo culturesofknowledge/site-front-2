@@ -508,8 +508,6 @@ function _renderRepoAndVersionSection(profile) {
 function _getLetterRepoContent(content) {
   let frag = "";
 
-  console.log("content", content);
-
   const shelfmarkField = "dcterms_identifier-shelf_",
     postageMarkField = "mail_postageMark";
 

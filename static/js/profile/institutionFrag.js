@@ -97,7 +97,7 @@ function _renderCollectionOverview(profile, tableData) {
         "repository",
         "icon-quill.png",
         "Collection overview"
-      )}</div>`;
+      )}<br/></div>`;
       return frag;
     } else {
       return "";

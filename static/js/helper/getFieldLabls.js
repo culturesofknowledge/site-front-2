@@ -138,7 +138,7 @@ const labels = {
   "rel_childOf-person": "Child of",
   "rel_parentOf-person": "Parent of",
   "rel_siblingOf-person": "Sibling of",
-  "rel_spouseOf-person  ": "Spouse of",
+  "rel_spouseOf-person": "Spouse of",
   "rel_relativeOf-person": "Relative of",
   "ox_unspecifiedRelationshipWith-person": "Unspecified relationship with",
   "dcterms_identifier-editi_": "ID",

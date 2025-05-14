@@ -42,6 +42,7 @@ class PersonChart {
     this.person_data_length = 0;
     this.svgChart;
     this.max_value;
+    this.fullscreen = false;
 
     this.setupData();
     this.setupcharts();
@@ -636,14 +637,14 @@ class PersonChart {
     if (d3FullscreenButton) {
       this.hide(["#fullscreen"], false);
 
-      var fullscreen = false;
-
       var d3Chart = d3.select("#chart");
-      if (fullscreen) {
+      if (this.fullscreen) {
         d3Chart.style("-ms-transform", "");
         d3Chart.style("-webkit-transform", "");
         d3Chart.style("transform", "");
+
         d3FullscreenButton.text("Fullscreen");
+        this.highlight(["#fullscreen"], false);
       } else {
         d3FullscreenButton.text("Close");
 
@@ -677,10 +678,10 @@ class PersonChart {
         d3Chart.style("-ms-transform", transform);
         d3Chart.style("-webkit-transform", transform);
         d3Chart.style("transform", transform);
+        this.highlight(["#fullscreen"], fullscreen);
       }
 
-      fullscreen = !fullscreen;
-      this.highlight(["#fullscreen"], fullscreen);
+      this.fullscreen = !this.fullscreen;
     }
   }
 

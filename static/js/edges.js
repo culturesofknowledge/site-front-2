@@ -355,6 +355,7 @@ emlo.DropDownRenderer = class extends edges.Renderer {
 
     // variables for internal state
     this.namespace = "edges-bs3-results-dropdown";
+    this.isSelected = false;
   }
 
   draw() {
@@ -370,9 +371,10 @@ emlo.DropDownRenderer = class extends edges.Renderer {
         .map((result) => this._renderOption(result))
         .join("");
 
+      const selected = this.isSelected ? "" : "selected";
       // Add default option at the beginning
       options =
-        `<option value="" disabled selected>${this.defaultOptionText}</option>` +
+        `<option value="${this.defaultOptionText}" disabled ${selected}>${this.defaultOptionText}</option>` +
         options;
 
       const dropdownClass = edges.util.allClasses(
@@ -417,9 +419,12 @@ emlo.DropDownRenderer = class extends edges.Renderer {
       const value = this._getValue(this.field, result, "");
       const displayText = this._getValue(this.field, result, "");
 
-      return `<option value="${edges.util.escapeHtml(
-        value
-      )}">${edges.util.escapeHtml(displayText)}</option>`;
+      if (this.defaultOptionText == value) {
+        this.isSelected = true;
+        return `<option value="${value}" selected>${displayText}</option>`;
+      } else {
+        return `<option value="${value}">${displayText}</option>`;
+      }
     }
   }
 

@@ -36,7 +36,7 @@ function _renderAlternateSection(profile) {
       	<div class="column profilepart">
     				<h3><img src="/static/img/icon-repository.png"/>Alternative names</h3>
 				<div class="content">
-					${profile["geonames_alternateName"].replace("\n", "<br/>") || ""}
+					${profile["geonames_alternateName"].replaceAll("\n", "<br/>") || ""}
 				</div>
 			</div>
     `;

@@ -318,7 +318,6 @@ function advanceSearch(event){
         inputs.forEach(input => {
             if(document.getElementById(input.id)) {
                 const value = document.getElementById(input.id).value;
-                console.log("value: ", value , input.id)
                 if (value && value !== input.defaultValue) {
                     sendQuery = true;
                     queryString += `${checkQueryOpt(queryString)}${input.paramName}=${value}`;

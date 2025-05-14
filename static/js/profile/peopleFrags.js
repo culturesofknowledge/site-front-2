@@ -129,11 +129,11 @@ function _renderDateSection(profile) {
     birthYear: "bio_Birth-ox_year",
     birthMonth: "bio_Birth-ox_month",
     birthDay: "bio_Birth-ox_day",
-    flagsBirth: "bioBirth-indef_",
+    flagsBirth: "bio_Birth-indef_",
     deathYear: "bio_Death-ox_year",
     deathMonth: "bio_Death-ox_month",
     deathDay: "bio_Death-ox_day",
-    flagsDeath: "bioDeath-indef_",
+    flagsDeath: "bio_Death-indef_",
   };
 
   if (hasAnyFieldValue(profile, keys)) {

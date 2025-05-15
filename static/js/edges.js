@@ -3008,8 +3008,15 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   }
 
   _pageHeading() {
+    const params = new URLSearchParams(window.location.search);
+    let extraBr = "<br/>";
+    if (params.get("type")) {
+      console.log("Hacker h bhai");
+      extraBr = "";
+    }
+
     return `
-      <br/>
+      ${extraBr}
       <h2>
         ${edges.util.escapeHtml(this.component.results[0][this.field] || "")}
       </h2> 

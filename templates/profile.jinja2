@@ -144,13 +144,18 @@
 
                         // Back to browse
                         if (browsing) {
+                            backBrowseDoc.style.display = ""
                             document.getElementById('back-to-browse').onclick = () => window.location.href = `/browse/${browsing}?letter=${letter}&uuids=${uuids}&filters=${filters}`;
                         }
 
                         // Back to results
                         if (type) {
                             // enable divs
-                           modDoc.style.display = "inline"
+                           
+                            if(!browsing) {
+                                modDoc.style.display = "inline"
+                            }
+
                            backResultDoc.style.display = "inline"
                            controlDoc.style.display = "inline"
 

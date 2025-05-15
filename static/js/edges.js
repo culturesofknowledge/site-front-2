@@ -238,7 +238,7 @@ emlo.ProfileTemplate = class extends edges.Template {
       <div id="main" class="row">
         <div class="columns large-9 large-push-3">
 
-          <div class="pagination">
+          <div id="pagination" class="pagination">
             <h4 id="count-heading" style="margin-top: 0.5rem;margin-bottom: 0.2rem;"></h4>
             <button class="small button" style="display:none;" id="back-to-browse">Back to Browse</button>
                 
@@ -3011,8 +3011,14 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const params = new URLSearchParams(window.location.search);
     let extraBr = "<br/>";
     if (params.get("type")) {
-      console.log("Hacker h bhai");
       extraBr = "";
+    } else {
+      // Hiding pagination just to remove extra space
+      const paginationDoc = document.getElementById("pagination");
+
+      if (paginationDoc) {
+        paginationDoc.style.display = "none";
+      }
     }
 
     return `

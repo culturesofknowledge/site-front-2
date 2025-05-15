@@ -165,11 +165,11 @@
                             document.getElementById('back-to-results').onclick = () => window.location.href = href;
                             document.getElementById('modify-search').onclick = () => window.location.href = modSearch;
                         }
-                        
+
                         if(numFound && start >= 0) {
                             const count = document.getElementById("count-heading")
                             if(count) {
-                                count.innerHTML = `Result ${start + 1} of ${numFound}`
+                                count.innerHTML = `Result ${start + 1} of ${numFound + 1}`
                             }
                         }
                     });

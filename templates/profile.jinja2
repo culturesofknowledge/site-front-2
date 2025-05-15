@@ -62,27 +62,6 @@
 {% endblock %}
 
 {% block content %}
-    
-    <div class="row row-with-side">
-        <div class="large-4"></div>
-        <div id="navigation-buttons" class="large-12 columns" style="margin-top: 15px; margin-bottom:-15px;">
-            {% if request.args.get('browsing') %}
-                <button id="back-to-browse">Back to Browse</button>
-            {% endif %}
-            
-            {% if request.args.get('type') %}
-                <button id="back-to-results">Back to Results</button>
-            {% endif %}
-            
-            {% if request.args.get('start') and request.args.get('numFound') %}
-                <button id="first-entry" title="First Entry"><<</button>
-                <button id="prev-entry" title="Previous Entry"><</button>
-                <button id="next-entry" title="Next Entry">></button>
-                <button id="last-entry" title="Last Entry">>></button>
-            {% endif %}
-        </div>
-    </div>
-
     <div id="profile-display"></div>
 {% endblock %}
 
@@ -106,6 +85,12 @@
             const uuids = urlParams.get('uuids');
             const filters = urlParams.get('filters');
 
+
+            let modDoc = document.getElementById("modify-search")
+            let controlDoc = document.getElementById("control")
+            let backResultDoc = document.getElementById("back-to-results")
+            let backBrowseDoc = document.getElementById("back-to-browse")
+
             // Only make the API call if uuid, type, and start are present
             if (!isNaN(start)) {
                 let apiUrl = '/results?';
@@ -126,6 +111,9 @@
                     .then(response => response.json())
                     .then(data => {
                         const { first_entry, prev_entry, next_entry, last_entry } = data;
+
+                        
+                        
 
                         // Enable/Disable navigation buttons based on API response
                         if (!prev_entry) {
@@ -161,7 +149,28 @@
 
                         // Back to results
                         if (type) {
-                            document.getElementById('back-to-results').onclick = () => window.location.href = `/forms/advanced?sort=${sort}&start=${start}&letter=${letter}&browsing=${browsing}&uuids=${uuids}`;
+                            // enable divs
+                           modDoc.style.display = "inline"
+                           backResultDoc.style.display = "inline"
+                           controlDoc.style.display = "inline"
+
+                            const params = new URLSearchParams(window.location.search);
+
+                            // Delete 'type' and 'numFound' if present
+                            params.delete('type');
+                            params.delete('numFound');
+                            const newQuery = params.toString()
+                            const href = newQuery ? `/forms/advanced?${newQuery}` : '/forms/advanced';
+                            const modSearch =  newQuery ? `/advanced?${newQuery}` : '/advanced';
+                            document.getElementById('back-to-results').onclick = () => window.location.href = href;
+                            document.getElementById('modify-search').onclick = () => window.location.href = modSearch;
+                        }
+
+                        if(numFound && start) {
+                            const count = document.getElementById("count-heading")
+                            if(count) {
+                                count.innerHTML = `Result ${start + 1} of ${numFound}`
+                            }
                         }
                     });
             }

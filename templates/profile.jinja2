@@ -71,8 +71,9 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     {# <script src="https://d3js.org/d3.v7.min.js"></script> #}
     <script type="text/javascript" src="{{ url_for('static', filename='libs/d3/d3.v3.min.js') }}"></script>
+    <script type="module">
+        import { searchQueryObj } from "{{ url_for('static', filename='js/search.js') }}";
 
-    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const uuid = urlParams.get('uuid');
@@ -91,9 +92,14 @@
             let backResultDoc = document.getElementById("back-to-results")
             let backBrowseDoc = document.getElementById("back-to-browse")
 
+            const queryObj = searchQueryObj()
+            const query = buildSolrQuery(queryObj.openingQuery)
+
             // Only make the API call if uuid, type, and start are present
             if (!isNaN(start)) {
                 let apiUrl = '/results?';
+
+                if(query) apiUrl += `q=${query}&`
 
                 // Add parameters only if they exist
                 if (uuid) apiUrl += `uuid=${uuid}&`;
@@ -111,9 +117,6 @@
                     .then(response => response.json())
                     .then(data => {
                         const { first_entry, prev_entry, next_entry, last_entry } = data;
-
-                        
-                        
 
                         // Enable/Disable navigation buttons based on API response
                         if (!prev_entry) {
@@ -204,6 +207,30 @@
                 }
             }, 100);
         })
+
+        function buildSolrQuery(config) {
+            const { queryStrings = [], sort = [], size = 10 } = config;
+
+            // 1. Handle `queryStrings`
+            let queryParts = [];
+            for (const q of queryStrings) {
+                const subQueries = q.fields.map(f => `${f.field}:(${q.queryString})`);
+                const combined = subQueries.join(` ${q.fields[0].operator} `);
+                queryParts.push(`(${combined})`);
+            }
+
+            // Combine all query parts using AND
+            const qString = queryParts.length > 0 ? queryParts.join(' AND ') : '*:*';
+
+            // 2. Handle `sort`
+            const sortString = sort.map(s => `${s.field} ${s.order}`).join(',');
+
+            // 3. Handle `size`
+            const rows = size;
+
+            // Return full Solr query
+            return qString
+        }
     </script>
 
 {% endblock extra_js_bottom %}

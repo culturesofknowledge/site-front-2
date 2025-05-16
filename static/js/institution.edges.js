@@ -71,7 +71,7 @@ try {
         noResultsText: "No results to display",
         serialHeader: "",
         showIndex: false,
-        showCheckbox: true,
+        showCheckbox: false,
         selectField: "ox_hasResource-manifestation",
         displayField: "browse",
         tableDisplay: [

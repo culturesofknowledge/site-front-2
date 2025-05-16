@@ -13,7 +13,8 @@ import { getLabel } from "../helper/getFieldLabls.js";
 import PersonChart from "../chart.js";
 
 let personChart;
-let showUnkown = false;
+let showUnkown = true;
+let isDisplayUnkown = false;
 
 export function _renderPeopleProfile(profile, tableData, relations) {
   let frag = "";
@@ -128,11 +129,11 @@ function _renderDateSection(profile) {
     birthYear: "bio_Birth-ox_year",
     birthMonth: "bio_Birth-ox_month",
     birthDay: "bio_Birth-ox_day",
-    flagsBirth: "bioBirth-indef_",
+    flagsBirth: "bio_Birth-indef_",
     deathYear: "bio_Death-ox_year",
     deathMonth: "bio_Death-ox_month",
     deathDay: "bio_Death-ox_day",
-    flagsDeath: "bioDeath-indef_",
+    flagsDeath: "bio_Death-indef_",
   };
 
   if (hasAnyFieldValue(profile, keys)) {
@@ -151,6 +152,8 @@ function _renderDateSection(profile) {
 function _renderContentStatsSection(profile, data) {
   const graphDataKeys = Object.keys(data);
 
+  _renderGraphSection(data);
+
   let sectionFrag = `
     <div class="column profilepart">
       <h3><img src="/static/img/icon-statistics.png" class=""/>Catalogue Statistics</h3>
@@ -159,12 +162,11 @@ function _renderContentStatsSection(profile, data) {
   sectionFrag += `
       <div id="chart">
         <div class="button-bar">
-          <ul class="button-group unknown" style="${
-            graphDataKeys.length > 1 ? "" : "display:none"
+          <ul id="hello" class="button-group unknown" style="${
+            isDisplayUnkown ? "" : "display:none"
           }">
             <li><button id="show_unknown" class="button tiny">Show unknown years</button></li>
           </ul>
-
 
           <ul class="button-group bars" style="${
             graphDataKeys.length > 1 ? "" : "display:none"
@@ -184,7 +186,6 @@ function _renderContentStatsSection(profile, data) {
 
   sectionFrag += "</div></div>";
 
-  _renderGraphSection(data);
   return sectionFrag;
 }
 
@@ -428,6 +429,7 @@ function setFirstAndLastYearsForGraphs(counts) {
   for (let year in counts) {
     if (counts.hasOwnProperty(year)) {
       if (year === "?") {
+        isDisplayUnkown = true;
         year = 9999;
       } else {
         year = parseInt(year); // Convert the year to an integer (since the keys are strings)

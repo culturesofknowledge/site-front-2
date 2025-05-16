@@ -510,8 +510,6 @@ function _renderRepoAndVersionSection(profile) {
 function _getLetterRepoContent(content) {
   let frag = "";
 
-  console.log("content", content);
-
   const shelfmarkField = "dcterms_identifier-shelf_",
     postageMarkField = "mail_postageMark";
 
@@ -529,7 +527,9 @@ function _getLetterRepoContent(content) {
     if (content[shelfmarkField]) {
       frag += `
         <p>
-          <span class="fieldlabel">Shelfmark:</span> ${content[shelfmarkField]} 
+          <span class="fieldlabel">Shelfmark:</span> ${content[
+            shelfmarkField
+          ].replace("shelf_", "")} 
         </p>
         `;
     }

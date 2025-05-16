@@ -32,7 +32,7 @@ DOCUMENT_TYPES = [
     "Digital copy", "Draft", "Extract", "Letter", "Manuscript copy", "Printed copy", "Other"
 ]
 
-@advance_bp.route('/advance')
+@advance_bp.route('/advanced')
 def advance():
     # Default values for query parameters
     default_values = {

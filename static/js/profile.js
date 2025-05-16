@@ -394,6 +394,8 @@ function _getImageComponents(emlo) {
     new emlo.MultiFields({
       id: "image-profile",
       category: "results",
+      fetchImageData: true,
+      manifestationField: "frbr_Manifestation-manifestation",
       renderer: new emlo.ProfileRightRenderer({
         profileType: "image",
       }),

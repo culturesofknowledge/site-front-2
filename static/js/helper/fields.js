@@ -108,7 +108,7 @@ export function getFieldsToDisplayInProfile(objectType, nested = true) {
 }
 
 export function getAddtionalFields(objectType) {
-  if (additional.hasOwnPropert(objectType)) {
+  if (additional.hasOwnProperty(objectType)) {
     return additional[objectType];
   } else {
     return {};

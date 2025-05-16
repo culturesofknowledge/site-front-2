@@ -2631,6 +2631,18 @@ emlo.MultiFields = class extends edges.Component {
                 this.gneratedData["imageData"][uuid] = await this._fetchImages(
                   uuid
                 );
+
+                if (!this.gneratedData.hasOwnProperty("manifestationData")) {
+                  this.gneratedData["manifestationData"] = {};
+                }
+
+                let relationsArray = await this._fetchRelations(uuid);
+
+                this.gneratedData["manifestationData"][uuid] =
+                  relationsArray.reduce((acc, item) => {
+                    acc[item.uuid] = item;
+                    return acc;
+                  }, {});
               }
             }
           }
@@ -4798,7 +4810,11 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
           frag += _renderCommentProfile();
           break;
         case "image":
-          frag += _renderImageProfile(result, this.component.relationships);
+          frag += _renderImageProfile(
+            result,
+            this.component.relationships,
+            this.component.gneratedData
+          );
           break;
         default:
           console.log("Nothing is valid");

@@ -655,7 +655,7 @@ export function displayImage(profile, data, maniObj, listAll = false) {
     for (let img of data) {
       let imageSource = img[thumbnailField];
 
-      if (imageSource || imageSource != "undefined" ) {
+      if (imageSource || imageSource != "undefined") {
         imageSource = img[imageSourceField];
       }
 
@@ -802,8 +802,16 @@ export function isDisplayImageType(url) {
   return false;
 }
 
-export function detailsOfOneObject(profile, obj, nested = false) {
+export function detailsOfOneObject(profile, obj, data, nested = false) {
   let relation = structuredClone(obj);
+
+  // Getting further data for relation
+  let manifestationData = {};
+  if (data.hasOwnProperty("manifestationData")) {
+    if (data["manifestationData"].hasOwnProperty(relation.uuid)) {
+      manifestationData = data["manifestationData"][relation.uuid];
+    }
+  }
 
   let frag = ` <div class="display_details_of_one_object ${nested}">`;
 
@@ -958,9 +966,15 @@ export function detailsOfOneObject(profile, obj, nested = false) {
             } else if (typeof val == "unicode" || typeof val == "string") {
               if (val.startsWith("http")) {
                 relatedUri = val;
-                relatedObj = {}; // Pending Need to fix the API call here
+                const relatedUUID = uuidFromUri(relatedUri, false);
+
+                if (manifestationData.hasOwnProperty(relatedUUID)) {
+                  relatedObj = manifestationData[relatedUUID];
+                } else {
+                  relatedObj = {};
+                }
               } else if (field == "dcterms_identifier-shelf_") {
-                val = stripValuePrefix(val, "dcterms_identifier-shelf_");
+                val = stripValuePrefix(val, "shelf_");
               }
             } else if (field == "ox_isTranslation") {
               if (!val) {
@@ -999,14 +1013,16 @@ export function detailsOfOneObject(profile, obj, nested = false) {
         for (let label in additional) {
           val = relation[additional[label]];
 
-          if (typeof val == "unicode" || typeof val == "string") {
-            if (val.startsWith("http")) {
-              frag += `<span style="color:#172854;">${label}</span>:<br/>&nbsp;&nbsp;&nbsp; <a href="${val}" target="_blank">${val}</a><br/>`;
+          if (val) {
+            if (typeof val == "unicode" || typeof val == "string") {
+              if (val.startsWith("http")) {
+                frag += `<span style="color:#172854;">${label}</span>:<br/>&nbsp;&nbsp;&nbsp; <a href="${val}" target="_blank">${val}</a><br/>`;
+              } else {
+                frag += `<span style="color:#172854;">${label}</span>:<br/>&nbsp;&nbsp;&nbsp; ${val}<br/>`;
+              }
             } else {
               frag += `<span style="color:#172854;">${label}</span>:<br/>&nbsp;&nbsp;&nbsp; ${val}<br/>`;
             }
-          } else {
-            frag += `<span style="color:#172854;">${label}</span>:<br/>&nbsp;&nbsp;&nbsp; ${val}<br/>`;
           }
         }
       }
@@ -1016,15 +1032,15 @@ export function detailsOfOneObject(profile, obj, nested = false) {
       detailsToDisplay.forEach((detailsDict) => {
         const fieldToDisplay = detailsDict["fieldname"];
         const label = detailsDict["label"];
-        const displayValue = detailsDict["display_value"];
-        const relatedObj = detailsDict["related_obj"];
+        const displayValue = detailsDict["displayValue"];
+        const relatedObj = detailsDict["relatedObj"];
 
         if (relation.hasOwnProperty(fieldToDisplay)) {
-          if (relatedObj && relatedObj.length > 0) {
+          if (relatedObj && Object.entries(relatedObj).length > 0) {
             if (label) {
               frag += `<p><span class="fieldlabel">${label}:</span></p>`;
             }
-            frag += displayDetailsOfOneObject(relatedObj, true); // Assumes it returns a string
+            frag += detailsOfOneObject({}, relatedObj, {}, true); // Assumes it returns a string
           } else {
             if (label) {
               frag += `<p><span class="fieldlabel">${label}:</span>${displayValue}</p>`;
@@ -1069,7 +1085,6 @@ function getFullDate(year, month, day) {
 
 function stripValuePrefix(fullString, prefix = "") {
   let retval = fullString;
-
   // Strip specified prefix if provided
   if (prefix.length > 0) {
     if (fullString.startsWith(prefix)) {

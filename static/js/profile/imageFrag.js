@@ -6,11 +6,11 @@ import {
   uuidFromUri,
 } from "../../js/helper/helper.js";
 
-export function _renderImageProfile(profile, relations) {
+export function _renderImageProfile(profile, relations, data) {
   let frag = "";
-
+  console.log("fata", data);
   frag += _renderImageSection(profile, relations);
-  frag += _renderDetailSection(profile, relations);
+  frag += _renderDetailSection(profile, relations, data);
 
   return frag;
 }
@@ -102,7 +102,8 @@ function _renderImageSection(profile, relations) {
   }
 }
 
-function _renderDetailSection(profile, relations) {
+function _renderDetailSection(profile, relations, data) {
+  console.log("relations", data);
   if (profile.hasOwnProperty("frbr_Manifestation-manifestation")) {
     const manUri = profile["frbr_Manifestation-manifestation"][0];
     const manUUID = uuidFromUri(manUri, true);
@@ -117,7 +118,7 @@ function _renderDetailSection(profile, relations) {
              <div class="column profilepart">
   			      <h3><img src="/static/img/icon-quill.png"/>Details</h3>
   			      <div class="content">
-  				      Document type: ${detailsOfOneObject(profile, relation, true)}
+  				      Document type: ${detailsOfOneObject(profile, relation, data, true)}
   			      </div>
   		      </div>
           `;

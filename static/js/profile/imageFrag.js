@@ -8,7 +8,7 @@ import {
 
 export function _renderImageProfile(profile, relations, data) {
   let frag = "";
-  console.log("fata", data);
+
   frag += _renderImageSection(profile, relations);
   frag += _renderDetailSection(profile, relations, data);
 
@@ -103,7 +103,6 @@ function _renderImageSection(profile, relations) {
 }
 
 function _renderDetailSection(profile, relations, data) {
-  console.log("relations", data);
   if (profile.hasOwnProperty("frbr_Manifestation-manifestation")) {
     const manUri = profile["frbr_Manifestation-manifestation"][0];
     const manUUID = uuidFromUri(manUri, true);

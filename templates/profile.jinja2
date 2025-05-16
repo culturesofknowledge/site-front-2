@@ -86,7 +86,6 @@
             const uuids = urlParams.get('uuids');
             const filters = urlParams.get('filters');
 
-
             let modDoc = document.getElementById("modify-search")
             let controlDoc = document.getElementById("control")
             let backResultDoc = document.getElementById("back-to-results")
@@ -139,11 +138,14 @@
                             document.getElementById('navigation-buttons').style.display = 'none';
                         }
 
+                         // Deleting start from params after adding it's value
+                        urlParams.delete("start")
+                        console.log("Got start as: " , start)
                         // Set navigation button actions
-                        document.getElementById('first-entry').onclick = () => window.location.href = `/profile/${first_entry.object_type}/${first_entry.uuid}?type=${type}&start=0&sort=${sort}&letter=${letter}&browsing=${browsing}&uuids=${uuids}&numFound=${numFound}`;
-                        document.getElementById('prev-entry').onclick = () => window.location.href = `/profile/${prev_entry.object_type}/${prev_entry.uuid}?type=${type}&start=${start - 1}&sort=${sort}&letter=${letter}&browsing=${browsing}&uuids=${uuids}&numFound=${numFound}`;
-                        document.getElementById('next-entry').onclick = () => window.location.href = `/profile/${next_entry.object_type}/${next_entry.uuid}?type=${type}&start=${start + 1}&sort=${sort}&letter=${letter}&browsing=${browsing}&uuids=${uuids}&numFound=${numFound}`;
-                        document.getElementById('last-entry').onclick = () => window.location.href = `/profile/${last_entry.object_type}/${last_entry.uuid}?type=${type}&start=${numFound}&sort=${sort}&letter=${letter}&browsing=${browsing}&uuids=${uuids}&numFound=${numFound}`;
+                        document.getElementById('first-entry').onclick = () => window.location.href = `/profile/${first_entry.object_type}/${first_entry.uuid}?${urlParams}&start=0`;
+                        document.getElementById('prev-entry').onclick = () => window.location.href = `/profile/${prev_entry.object_type}/${prev_entry.uuid}?${urlParams}&start=${start - 1}`;
+                        document.getElementById('next-entry').onclick = () => window.location.href = `/profile/${next_entry.object_type}/${next_entry.uuid}?${urlParams}&start=${start + 1}`;
+                        document.getElementById('last-entry').onclick = () => window.location.href = `/profile/${last_entry.object_type}/${last_entry.uuid}?${urlParams}&start=${numFound}`;
 
                         // Back to browse
                         if (browsing) {

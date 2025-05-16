@@ -17,7 +17,7 @@ function modifyCurrentSearch() {
     try {
         const currentParams = new URLSearchParams(window.location.search);
             
-        let advanceSearchUrl = `${window.location.origin}/advance`;
+        let advanceSearchUrl = `${window.location.origin}/advanced`;
 
         if(currentParams.size > 0) {
             advanceSearchUrl = `${advanceSearchUrl}?${currentParams.toString()}`

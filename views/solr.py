@@ -175,6 +175,7 @@ def fetchNextResults():
         sort = request.args.get('sort', '')  # Optional sort query
         uuids = request.args.getlist('uuids')  # List of UUIDs
         numFound = int(request.args.get('numFound', '0'))
+        q = request.args.get('q' , '')
 
         if numFound == 0:
             return jsonify({'error': 'Error fetching data from Solr', 'details': "numFound is missing or invalid"}), 400
@@ -187,6 +188,10 @@ def fetchNextResults():
 
         # Default query and sort options
         query = "*:*"
+
+        if q:
+            query = q 
+
         sort_query = "started_date_sort asc"
 
         # Add sort parameter if provided
@@ -214,7 +219,7 @@ def fetchNextResults():
             "fl" : "uuid, object_type",
             "rows": 1  # Only fetch a single document at a time for pagination
         }
-
+        
         # Fetch first entry
         first_entry = requests.get(solr_query_url, params=solr_params)
         if first_entry.status_code != 200:

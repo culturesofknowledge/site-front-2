@@ -238,6 +238,22 @@ emlo.ProfileTemplate = class extends edges.Template {
     let frag = `
       <div id="main" class="row">
         <div class="columns large-9 large-push-3">
+
+          <div id="pagination" class="pagination">
+            <h4 id="count-heading" style="margin-top: 0.5rem;margin-bottom: 0.2rem;"></h4>
+            <button class="small button" style="display:none;" id="back-to-browse">Back to Browse</button>
+                
+            <button class="small button" style="display:none;" id="modify-search">Modify your search</button>
+            <button class="small button" style="display:none;" id="back-to-results">Back to Results</button>
+            
+            <span id="control" style="display:none;">
+              <button class="small button" id="first-entry" title="First Entry"><<</button>
+              <button class="small button" id="prev-entry" title="Previous Entry"><</button>
+              <button class="small button" id="next-entry" title="Next Entry">></button>
+              <button class="small button" id="last-entry" title="Last Entry">>></button>
+            </span>
+          </div>
+
           ${results}
         </div>
 
@@ -356,6 +372,7 @@ emlo.DropDownRenderer = class extends edges.Renderer {
 
     // variables for internal state
     this.namespace = "edges-bs3-results-dropdown";
+    this.isSelected = false;
   }
 
   draw() {
@@ -371,9 +388,10 @@ emlo.DropDownRenderer = class extends edges.Renderer {
         .map((result) => this._renderOption(result))
         .join("");
 
+      const selected = this.isSelected ? "" : "selected";
       // Add default option at the beginning
       options =
-        `<option value="" disabled selected>${this.defaultOptionText}</option>` +
+        `<option value="${this.defaultOptionText}" disabled ${selected}>${this.defaultOptionText}</option>` +
         options;
 
       const dropdownClass = edges.util.allClasses(
@@ -418,9 +436,12 @@ emlo.DropDownRenderer = class extends edges.Renderer {
       const value = this._getValue(this.field, result, "");
       const displayText = this._getValue(this.field, result, "");
 
-      return `<option value="${edges.util.escapeHtml(
-        value
-      )}">${edges.util.escapeHtml(displayText)}</option>`;
+      if (this.defaultOptionText == value) {
+        this.isSelected = true;
+        return `<option value="${value}" selected>${displayText}</option>`;
+      } else {
+        return `<option value="${value}">${displayText}</option>`;
+      }
     }
   }
 
@@ -814,7 +835,19 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
           if (field.type === "multiple" && field.multipleFields) {
             const multipleFieldDisplay = field.multipleFields
               .map((item) => {
-                const value = this._getValue(item.field, res, "");
+                let value = "";
+
+                if (item.isSemiColon) {
+                  if (
+                    res &&
+                    res.hasOwnProperty(item.field) &&
+                    res[item.field]
+                  ) {
+                    value = res[item.field].split("\n").join("; ");
+                  }
+                } else {
+                  value = this._getValue(item.field, res, "");
+                }
                 return value ? `<div>${item.label}: ${value}</div>` : "";
               })
               .join("");
@@ -2894,6 +2927,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     this.footerType = edges.util.getParam(params, "footerType", "");
     this.isSide = edges.util.getParam(params, "isSide", false); // Whether to render in a sidebar
     this.subSection = edges.util.getParam(params, "subSection", false);
+    this.isDivider = edges.util.getParam(params, "isDivider", true);
     this.namespace = "edges-custom-display";
   }
 
@@ -3044,8 +3078,21 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   }
 
   _pageHeading() {
+    const params = new URLSearchParams(window.location.search);
+    let extraBr = "<br/>";
+    if (params.get("type")) {
+      extraBr = "";
+    } else {
+      // Hiding pagination just to remove extra space
+      const paginationDoc = document.getElementById("pagination");
+
+      if (paginationDoc) {
+        paginationDoc.style.display = "none";
+      }
+    }
+
     return `
-      <br/>
+      ${extraBr}
       <h2>
         ${edges.util.escapeHtml(this.component.results[0][this.field] || "")}
       </h2> 
@@ -4492,7 +4539,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     );
     const url = this._generateURL(result, this.footerType, currentDomain);
 
-    let htmlContent = `<div class="yellow-divider"><br/><br/><br/><br/><div class="change">`;
+    let htmlContent = `<div class="${
+      this.isDivider ? "yellow-divider" : ""
+    }"><br/><br/><br/><br/><div class="change">`;
 
     // Check for Source of Data
     if (

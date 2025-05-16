@@ -138,7 +138,7 @@ const labels = {
   "rel_childOf-person": "Child of",
   "rel_parentOf-person": "Parent of",
   "rel_siblingOf-person": "Sibling of",
-  "rel_spouseOf-person  ": "Spouse of",
+  "rel_spouseOf-person": "Spouse of",
   "rel_relativeOf-person": "Relative of",
   "ox_unspecifiedRelationshipWith-person": "Unspecified relationship with",
   "dcterms_identifier-editi_": "ID",
@@ -288,10 +288,10 @@ const labels = {
   ox_manifestation_receipt_date_uncertain: "Date of receipt uncertain",
   ox_manifestation_receipt_date_approx: "Date of receipt approx",
   ox_accompaniments: "Accompaniments",
-  "taught-person": "Taught",
-  "was_taught_by-person": "Was taught by",
-  "employed-person": "Employed",
-  "was_employed_by-person": "Was employed by",
+  "taught-person": "Was taught by",
+  "was_taught_by-person": "Taught",
+  "employed-person": "Was employed by",
+  "was_employed_by-person": "Employed",
   "friend-person": "Friend of",
 };
 

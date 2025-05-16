@@ -140,7 +140,7 @@
 
                          // Deleting start from params after adding it's value
                         urlParams.delete("start")
-                        console.log("Got start as: " , start)
+                        
                         // Set navigation button actions
                         document.getElementById('first-entry').onclick = () => window.location.href = `/profile/${first_entry.object_type}/${first_entry.uuid}?${urlParams}&start=0`;
                         document.getElementById('prev-entry').onclick = () => window.location.href = `/profile/${prev_entry.object_type}/${prev_entry.uuid}?${urlParams}&start=${start - 1}`;

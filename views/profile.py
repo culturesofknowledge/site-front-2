@@ -17,4 +17,4 @@ def profile(collection, id):
     except Exception as e:
         print("Exception occurred while querying Solr:", e)
 
-    return render_template('data_not_found.jinja2', title="Page not found"), 404
+    return render_template('data_not_found.jinja2', title="Data not found"), 404

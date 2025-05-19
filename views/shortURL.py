@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, url_for, abort, redirect
+from flask import Blueprint, jsonify, request, url_for, abort, redirect, render_template
 import requests
 from views.solr import getSolrURL
 
@@ -60,14 +60,12 @@ REDIRECT_COLLECTION_MAP = {
 def index(type, id):
     # Check if the type exists in the core map
     if type not in CORE_MAP:
-        return "Invalid type", 400
+        return render_template('data_not_found.jinja2', title="Data not found"), 404
     
     # Special case for type 'm'
     if type == 'm' and 2 <= len(id) <= 10:
         # Append leading zeros to make id length 10
         id = id.zfill(10)
-
-    print(f"Got ID as {id}")
 
     core = CORE_MAP[type]  # Get the core name based on type
     return redirect_function(type, id, core)
@@ -91,4 +89,4 @@ def redirect_function(type, id, core):
     if collection:
         return redirect(url_for("profile.profile", collection=collection, id=uuid), code=301)
     else:
-        return f"Profile for type '{type}' not found", 404
+        return render_template('data_not_found.jinja2', title="Data not found"), 404

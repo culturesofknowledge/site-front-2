@@ -3080,6 +3080,58 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   _pageHeading() {
     const params = new URLSearchParams(window.location.search);
     let extraBr = "<br/>";
+
+    if (this.field == "frbr_Work-work") {
+      const workUri = this.component.relationships[0]["frbr_Work-work"][0];
+
+      const workUUID = workUri.split("/").pop();
+
+      const apiUrl = `/solr/works/select?q=uuid:${workUUID}&wt=json&fl=dcterms_description,uuid`;
+
+      fetch(apiUrl)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          // Step 3: Use the data to update the DOM
+          const element = document.getElementById("heading");
+
+          if (
+            data &&
+            data.response &&
+            data.response.docs &&
+            data.response.docs.length > 0
+          ) {
+            const result = data.response.docs[0];
+
+            if (element) {
+              element.innerHTML = `
+                <a href=/profile/work/${result.uuid}> ${result.dcterms_description} </a>
+              `;
+            }
+          }
+
+          console.log("data", data, element);
+
+          //   if (element) {
+          //     // Customize this part to match the structure of your API response
+          //     element.innerHTML = `
+          //   <h3>Title: ${data.title}</h3>
+          //   <p>Author: ${data.author}</p>
+          //   <p>Description: ${data.description}</p>
+          // `;
+          //   } else {
+          //     console.warn("Element with ID 'work-info' not found.");
+          //   }
+        })
+        .catch((error) => {
+          console.error("Failed to fetch work info:", error);
+        });
+    }
+
     if (params.get("type")) {
       extraBr = "";
     } else {
@@ -3093,7 +3145,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
     return `
       ${extraBr}
-      <h2>
+      <h2 id="heading">
         ${edges.util.escapeHtml(this.component.results[0][this.field] || "")}
       </h2> 
       <br/>

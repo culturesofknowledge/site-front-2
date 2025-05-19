@@ -1,10 +1,19 @@
 import {
   detailsOfOneObject,
+  displayImage,
   hasAnyFieldValue,
   ImageUrl,
   isDisplayImageType,
   uuidFromUri,
 } from "../../js/helper/helper.js";
+
+export function _renderImageSidebar(profile, relations, data) {
+  let sideFrag = "";
+
+  sideFrag += _renderSidebar(profile, relations, data);
+
+  return sideFrag;
+}
 
 export function _renderImageProfile(profile, relations, data) {
   let frag = "";
@@ -154,4 +163,27 @@ function textForNonDisplayImage(url) {
   }
 
   return fileType;
+}
+
+function _renderSidebar(profile, relations, data) {
+  if (
+    profile.hasOwnProperty("frbr_Manifestation-manifestation") &&
+    data.hasOwnProperty("imageData")
+  ) {
+    let frag = "";
+    const imageData = data["imageData"];
+
+    for (let maniuri of profile["frbr_Manifestation-manifestation"]) {
+      const uuid = maniuri.split("/").pop();
+      const maniObj = relations.find((obj) => obj.uuid === uuid);
+
+      if (imageData.hasOwnProperty(uuid)) {
+        frag += displayImage(profile, imageData[uuid], maniObj, true);
+      }
+    }
+
+    return frag;
+  } else {
+    return "";
+  }
 }

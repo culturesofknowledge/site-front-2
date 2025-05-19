@@ -771,7 +771,6 @@ function _renderImageSidebar(profile, relations, data) {
       const uuid = maniuri.split("/").pop();
       const maniObj = relations.find((obj) => obj.uuid === uuid);
 
-      console.log("uuid", maniObj);
       if (imageData.hasOwnProperty(uuid)) {
         frag += displayImage(profile, imageData[uuid], maniObj);
       }
@@ -779,6 +778,6 @@ function _renderImageSidebar(profile, relations, data) {
 
     return frag;
   } else {
-    return "Frag";
+    return "";
   }
 }

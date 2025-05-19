@@ -372,12 +372,12 @@ function _getImageComponents(emlo) {
     }),
 
     new emlo.MultiFields({
-      id: "enclosed-in-side",
+      id: "image-profile-side",
       category: "sidebar",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "shortUrl",
-        isSide: true,
-        footerType: "i",
+      fetchImageData: true,
+      manifestationField: "frbr_Manifestation-manifestation",
+      renderer: new emlo.ProfileLeftSideRenderer({
+        profileType: "image",
       }),
     }),
 
@@ -398,18 +398,6 @@ function _getImageComponents(emlo) {
       manifestationField: "frbr_Manifestation-manifestation",
       renderer: new emlo.ProfileRightRenderer({
         profileType: "image",
-      }),
-    }),
-
-    new emlo.MultiFields({
-      id: "details",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "img",
-        sectionTitle: "Details",
-        sectionTitleImage: "/static/img/icon-quill.png",
-        divider: true,
-        field: "",
       }),
     }),
 

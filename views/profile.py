@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request
-from .solr import solr_proxy
+from .solr import check_profile
 
 profile_bp = Blueprint('profile', __name__, url_prefix='/profile')
 
@@ -7,12 +7,10 @@ profile_bp = Blueprint('profile', __name__, url_prefix='/profile')
 def profile(collection, id):
     solr_core = "people" if collection == "person" else f"{collection}s"
 
-    solr_url = f'/{solr_core}/select?q=uuid:{id}&wt=json&rows=1&fl=uuid'  # Adjust if needed
-
     try:
-        response_obj, status_code = solr_proxy(solr_url)
+        is_valid = check_profile(solr_core , id)
         
-        if status_code == 200:
+        if is_valid:
             return render_template('profile.jinja2', title=collection.capitalize(), collection=collection, id=id)
     except Exception as e:
         print("Exception occurred while querying Solr:", e)

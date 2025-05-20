@@ -771,7 +771,7 @@ export function displayImage(profile, data, maniObj, listAll = false) {
 
       return frag;
     } else {
-      return "No image";
+      return "";
     }
   }
 }

@@ -450,6 +450,17 @@ function _getTypeOfRecord(val, res, fieldName, edge, currentIndex) {
     value = objectMap[val];
   }
 
+  // Changing value in case of comment
+  if (val == "comment") {
+    if (res.hasOwnProperty("bibo_annotates-person")) {
+      value = "Person commented on";
+    } else if (res.hasOwnProperty("bibo_annotates-manifestation")) {
+      value = "Manifestation commented on";
+    } else if (res.hasOwnProperty("bibo_annotates-location")) {
+      value = "Place commented on";
+    }
+  }
+
   // Retrieve existing query parameters from the current URL
   const urlParams = new URLSearchParams(window.location.search);
 

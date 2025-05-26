@@ -518,6 +518,7 @@ emlo.ResultTable = class extends edges.Component {
     this.infiniteScrollQuery = false;
 
     this.hitCount = 0;
+    this.highlighting = {};
   }
 
   synchronise() {
@@ -535,6 +536,10 @@ emlo.ResultTable = class extends edges.Component {
     // result set
     if (!source) {
       return;
+    }
+
+    if (source && source.data && source.data.hasOwnProperty("highlighting")) {
+      this.highlighting = source.data["highlighting"];
     }
 
     // first filter the results

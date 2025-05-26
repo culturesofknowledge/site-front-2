@@ -511,38 +511,44 @@ function _getBriefDetails(val, res, fieldName) {
 
   return "";
 }
-function _getAllMatchingFieldsHTML(val, res, fieldName) {
+function _getAllMatchingFieldsHTML(val, res, fieldName, edge) {
   if (typeof res !== "object" || res === null) {
     console.log("Invalid input: res is not an object");
     return "<div>Invalid input</div>";
   }
 
-  let currentVal = val;
+  if (edge && edge.component && edge.component.highlighting) {
+    if (res["id"] && edge.component.highlighting.hasOwnProperty(res["id"])) {
+      const highlights = edge.component.highlighting[res.id];
+      const results = [];
 
-  if (!currentVal) {
-    currentVal = _getBriefDetails("", res, "_name");
-  }
+      // Convert to entries and map to include label
+      const entriesWithLabels = Object.entries(highlights).map(
+        ([key, value]) => ({
+          key,
+          label: getLabel(key),
+          value,
+        })
+      );
 
-  const results = [];
-  for (const key in res) {
-    if (Object.hasOwn(res, key)) {
-      if (
-        currentVal != "" &&
-        typeof res[key] == "string" &&
-        res[key].includes(currentVal)
-      ) {
-        let label = getLabel(key);
+      // Sort by label
+      entriesWithLabels.sort((a, b) => a.label.localeCompare(b.label));
 
+      // Build results
+      for (const { label, value } of entriesWithLabels) {
+        const lines = value.join("");
         results.push(
-          `Found in <strong>${label}</strong>: 
-          ${currentVal}`
+          `<p class="highlighter">Found in <strong>${label}</strong>:<br>${lines}<p>`
         );
       }
-    }
-  }
 
-  // Join results with \n\n and wrap in a div
-  return `<div>${results.join("\n\n")}</div>`;
+      return `<div>${results.join("")}</div>`;
+    } else {
+      return "";
+    }
+  } else {
+    return "";
+  }
 }
 
 function _redirectToProfile(val, res, fieldName, edge, currentIndex) {

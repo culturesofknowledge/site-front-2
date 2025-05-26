@@ -582,11 +582,10 @@ function _redirectToProfile(val, res, fieldName, edge, currentIndex) {
 }
 
 function _displayDate(val, res) {
-  const day = res["ox_started-ox_day"];
-  const month = res["ox_started-ox_month"];
-  const year = res["ox_started-ox_year"];
-
-  const monthNames = [
+  // Data from this.component.results[0]
+  const result = res;
+  // Month names array
+  const months = [
     "January",
     "February",
     "March",
@@ -601,25 +600,43 @@ function _displayDate(val, res) {
     "December",
   ];
 
-  let parts = [];
+  // Get the date fields
+  const startDay = result["ox_started-ox_day"] || "";
+  const startMonth = result["ox_started-ox_month"] || 13; // Default to 13 (invalid month)
+  const startYear = result["ox_started-ox_year"] || "";
 
-  if (day !== undefined && day !== null) {
-    parts.push(day);
+  const endDay = result["ox_completed-ox_day"] || "";
+  const endMonth = result["ox_completed-ox_month"] || 13; // Default to 13 (invalid month)
+  const endYear = result["ox_completed-ox_year"] || "";
+
+  // Construct the date string for the start
+  let date = `${startDay} ${months[startMonth - 1]} ${startYear}`;
+
+  // Check if the date is a range
+  const isRange = result["ox_dateIsRange"] || false;
+
+  // Construct the date string for the end
+  let dateTo = `${endDay} ${months[endMonth - 1]} ${endYear}`;
+
+  // Remove spaces from the date strings
+  const dateNoSpaces = date.replace(" ", "");
+  const dateToNoSpaces = dateTo.replace(" ", "");
+
+  // Handle cases where the date strings are empty
+  if (dateNoSpaces + dateToNoSpaces === "") {
+    date = "Unknown date";
   }
 
-  if (month !== undefined && month !== null) {
-    // Convert month (1–12 or 0–11) to name
-    let monthIndex = Number(month) - 1;
-    if (monthIndex >= 0 && monthIndex < 12) {
-      parts.push(monthNames[monthIndex]);
-    }
+  // Output the date information
+  if (!isRange) {
+    return `${date}`;
+  } else if (dateNoSpaces > "" && dateToNoSpaces > "") {
+    return `Between ${date} and ${dateTo}`;
+  } else if (dateNoSpaces > "") {
+    return `On or after ${date}`;
+  } else {
+    return `On or before ${dateTo}`;
   }
-
-  if (year !== undefined && year !== null) {
-    parts.push(year);
-  }
-
-  return parts.join(" ");
 }
 
 // async function _displayRepoAndVersion(val, item) {

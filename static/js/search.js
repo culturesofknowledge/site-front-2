@@ -19,40 +19,34 @@ export function searchQueryObj() {
 function quickSearch(params) {
   let openingQuery = {
     must: [],
+    queryStrings: [],
     size: ROWS_COUNT, // This will allow us to fetch number of rows using solr query.
     sort: [{ field: "score", order: "desc" }],
   };
 
   if (params != null) {
-    const searchQuery = params.get("everything");
+    const searchQuery = params.get("everything")
+      ? params.get("everything")
+      : "*";
 
     if (params.get("cito_Catalog")) {
-      openingQuery.must.push({
-        field: "cito_Catalog",
-        value: `"${params.get("cito_Catalog")}"`,
+      openingQuery.queryStrings.push({
+        queryString: `${params.get("cito_Catalog")}`,
+        fields: [{ field: "cito_Catalog", operator: "OR" }],
       });
     }
 
     if (params.get("object_type")) {
-      openingQuery.must.push({
-        field: "object_type",
-        value: `"${params.get("object_type")}"`,
+      openingQuery.queryStrings.push({
+        queryString: `${params.get("object_type")}`,
+        fields: [{ field: "object_type", operator: "OR" }],
       });
     }
 
-    if (searchQuery != "") {
-      openingQuery.must.push({
-        term: {
-          default_search_field: searchQuery,
-        },
-      });
-    } else {
-      openingQuery.must.push({
-        term: {
-          default_search_field: "*",
-        },
-      });
-    }
+    openingQuery.queryStrings.push({
+      queryString: searchQuery,
+      fields: [{ field: "default_search_field", operator: "OR" }],
+    });
   }
 
   return {

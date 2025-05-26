@@ -22,6 +22,15 @@ function quickSearch(params) {
     queryStrings: [],
     size: ROWS_COUNT, // This will allow us to fetch number of rows using solr query.
     sort: [{ field: "score", order: "desc" }],
+    highlights: [
+      {
+        filter: "*",
+        pre: '<span class="highlight">',
+        post: "</span>",
+        hl: "on",
+        indent: "on",
+      },
+    ],
   };
 
   if (params != null) {

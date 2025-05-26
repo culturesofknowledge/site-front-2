@@ -430,7 +430,10 @@ function _testValueFunction(val, res, self) {
   // console.log("got vals", val, res, self);
 }
 
-function _getTypeOfRecord(val, res, fieldName) {
+function _getTypeOfRecord(val, res, fieldName, edge, currentIndex) {
+  const total = edge.total(); // Total number of items
+  const start = currentIndex;
+
   const objectMap = {
     comment: "Document commented on ",
     person: " Person or organisation ",
@@ -439,11 +442,36 @@ function _getTypeOfRecord(val, res, fieldName) {
     institution: "Institution",
   };
 
+  let value = "";
+
+  let baseURL = `/profile/${val}/${res["uuid"]}`;
+
   if (objectMap[val]) {
-    return objectMap[val];
+    value = objectMap[val];
   }
 
-  return val;
+  // Retrieve existing query parameters from the current URL
+  const urlParams = new URLSearchParams(window.location.search);
+
+  // Initialize a query string for new or updated parameters
+  let queryParams = new URLSearchParams(urlParams);
+
+  // Always set 'start' and 'numFound' if they are relevant
+  queryParams.set("start", start);
+  queryParams.set("numFound", total);
+  queryParams.set("type", "quick");
+
+  // Ensure all other parameters from the current URL are maintained
+  ["sort", "letter", "browsing", "uuids"].forEach((param) => {
+    if (urlParams.has(param)) {
+      queryParams.set(param, urlParams.get(param)); // Keep the existing query value
+    }
+  });
+
+  // Final URL construction: Base URL + query parameters
+  const finalUrl = `${baseURL}?${queryParams.toString()}`;
+
+  return `<a href='${finalUrl}'> ${value} </a> `;
 }
 
 function _getBriefDetails(val, res, fieldName) {

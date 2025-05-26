@@ -1,4 +1,5 @@
 import emlo from "./edges.js";
+import { getLabel } from "./helper/getFieldLabls.js";
 import { searchQueryObj } from "./search.js";
 
 try {
@@ -491,8 +492,11 @@ function _getAllMatchingFieldsHTML(val, res, fieldName) {
         typeof res[key] == "string" &&
         res[key].includes(currentVal)
       ) {
+        let label = getLabel(key);
+
         results.push(
-          `Found in <strong>${key}</strong>: ${key} = ${currentVal}`
+          `Found in <strong>${label}</strong>: 
+          ${currentVal}`
         );
       }
     }

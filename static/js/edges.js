@@ -1092,6 +1092,7 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
       rec: "person-recipient",
       let_con: "Contents",
       locations: "Locations",
+      everything: "Text",
       // Add more mappings as needed
     };
 
@@ -1106,7 +1107,7 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
       let translate_val = this._translate(val);
       let displayValue = val !== translate_val ? translate_val : val;
 
-      if (!keys.includes(filters[i].field)) {
+      if (!keys.includes(filters[i].field) && filters[i].field) {
         keys.push(filters[i].field);
 
         this.filters.push({
@@ -1129,30 +1130,41 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
         "uuids",
         "letter",
         "rec",
+        "search_type",
       ];
 
       if (fieldMapping.hasOwnProperty(key) && !keys.includes(key)) {
-        keys.push(key);
+        if (value) {
+          keys.push(key);
 
-        this.filters.push({
-          display: value,
-          term: value,
-          field: fieldMapping[key],
-        });
+          this.filters.push({
+            display: value,
+            term: value,
+            field: fieldMapping[key],
+          });
+        }
       } else if (!keys.includes(key) && !notToBeAdded.includes(key)) {
-        keys.push(key);
+        if (value) {
+          keys.push(key);
 
-        this.filters.push({
-          display: value,
-          term: value,
-          field: key,
-        });
+          this.filters.push({
+            display: value,
+            term: value,
+            field: key,
+          });
+        }
       }
     }
   }
 
   removeFilter(field, term) {
     let nq = this.edge.cloneQuery();
+
+    // Special case for handling everything
+    if (field == "Text") {
+      field = "default_search_field";
+    }
+
     // Remove the filter from the "must" clause
     nq.removeMust(
       new es.TermFilter({
@@ -6210,6 +6222,10 @@ function _removeUrlParam(field) {
     delete_field = "uuids";
   }
 
+  if (field == "default_search_field") {
+    delete_field = "everything";
+  }
+
   const validFields = [
     "dcterms_references-location",
     "mail_destination-location",
@@ -6226,9 +6242,8 @@ function _removeUrlParam(field) {
   if (fieldMap.hasOwnProperty(field)) {
     delete_field = fieldMap[field].primary;
     secondaryField = fieldMap[field].secondary;
-  } else {
-    delete_field = field;
   }
+
   const url = new URL(window.location.href);
 
   if (url.searchParams.has(delete_field)) {

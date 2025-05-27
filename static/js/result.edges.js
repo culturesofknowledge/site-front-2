@@ -1,6 +1,7 @@
 import emlo from "./edges.js";
 import { getAddtionalFields } from "./helper/fields.js";
 import { getLabel } from "./helper/getFieldLabls.js";
+import { stripValuePrefix } from "./helper/helper.js";
 import { searchQueryObj } from "./search.js";
 
 try {
@@ -814,7 +815,8 @@ async function _displayRepoAndVersion(val, item, field, element, index) {
       }
 
       if (manifFieldDict.hasOwnProperty("dcterms_identifier-shelf_")) {
-        shelfmark = manifFieldDict["dcterms_identifier-shelf_"];
+        const val = manifFieldDict["dcterms_identifier-shelf_"];
+        shelfmark = stripValuePrefix(val, "shelf_");
       }
 
       if (manifFieldDict.hasOwnProperty("ox_resourceAt-institution")) {
@@ -880,7 +882,9 @@ async function _displayRepoAndVersion(val, item, field, element, index) {
   // Build <ul><li>...</li></ul> HTML
   if (reposDetails.length === 0) return "";
 
-  const listItems = reposDetails.map((detail) => `• ${detail} <br/>`).join("");
+  const listItems = reposDetails
+    .map((detail) => `${reposDetails.length > 1 ? "• " : ""}${detail} <br/>`)
+    .join("");
 
   // FIXME: Need a better code for rendering the data
   const el = document.getElementById(`repo-${index}`);

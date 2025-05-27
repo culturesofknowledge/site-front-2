@@ -1341,7 +1341,7 @@ emlo.FacetRenderer = class extends edges.Renderer {
           val.term
         )}">
                     <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
-                    ${edges.util.escapeHtml(val.display)}
+                    ${this._displayFacetValue(this.component.field, val.term)}
                     </a>
                     </td>
                   <td>${val.count}</td>
@@ -1360,7 +1360,7 @@ emlo.FacetRenderer = class extends edges.Renderer {
           val.term
         )}">
                   <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
-                  ${edges.util.escapeHtml(val.display)}
+                   ${this._displayFacetValue(this.component.field, val.display)}
                   </a>
                   </td>
                   <td>${val.count}</td>
@@ -1465,6 +1465,24 @@ emlo.FacetRenderer = class extends edges.Renderer {
       edges.on(showMoreSelector, "click", this, "openModal");
     }
     edges.on(modalCloseSelector, "click", this, "closeModal");
+  }
+
+  _displayFacetValue(field, val) {
+    if (field == "object_type") {
+      const typeMap = {
+        work: "Letter",
+        manifestation: "Document",
+        resource: "Related resource",
+      };
+
+      if (typeMap.hasOwnProperty(val)) {
+        return typeMap[val];
+      } else {
+        return val.charAt(0).toUpperCase() + val.slice(1);
+      }
+    } else {
+      return val;
+    }
   }
 
   openModal() {

@@ -463,11 +463,12 @@ function _getTypeOfRecord(val, res, fieldName, edge, currentIndex) {
 
   const objectMap = {
     comment: "Document commented on ",
-    person: " Person or organisation ",
+    person: "Person or organisation ",
     location: "Location",
     work: "Letter",
     institution: "Institution",
     image: "Image",
+    manifestation: "Manifestation",
   };
 
   let value = "";

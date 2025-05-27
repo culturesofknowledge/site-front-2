@@ -433,6 +433,11 @@ function _testValueFunction(val, res, self) {
 
 function _renderMultipleFields(val, res, fieldName) {
   if (res && res.hasOwnProperty("object_type")) {
+    // New requirement don't want further details for images
+    if (res["object_type"] == "image") {
+      return "";
+    }
+
     const htmlParts = [];
 
     const fields = getAddtionalFields(res["object_type"]);
@@ -462,6 +467,7 @@ function _getTypeOfRecord(val, res, fieldName, edge, currentIndex) {
     location: "Location",
     work: "Letter",
     institution: "Institution",
+    image: "Image",
   };
 
   let value = "";
@@ -529,6 +535,10 @@ function _getBriefDetails(val, res, fieldName) {
 
   if (res["dcterms_description"]) {
     return res["dcterms_description"];
+  }
+
+  if (res && res.hasOwnProperty("foaf_thumbnail")) {
+    return res["foaf_thumbnail"];
   }
 
   return "";

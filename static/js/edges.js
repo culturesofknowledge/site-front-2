@@ -1473,6 +1473,7 @@ emlo.FacetRenderer = class extends edges.Renderer {
         work: "Letter",
         manifestation: "Document",
         resource: "Related resource",
+        person: "Person or organisation",
       };
 
       if (typeMap.hasOwnProperty(val)) {

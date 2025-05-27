@@ -450,26 +450,6 @@ function _renderMultipleFields(val, res, fieldName) {
   } else {
     return "";
   }
-
-  // const additional = getAddtionalFields();
-  //  const multipleFieldDisplay = field.multipleFields
-  //             .map((item) => {
-  //               let value = "";
-  //               if (item.isSemiColon) {
-  //                 if (
-  //                   res &&
-  //                   res.hasOwnProperty(item.field) &&
-  //                   res[item.field]
-  //                 ) {
-  //                   value = res[item.field].split("\n").join("; ");
-  //                 }
-  //               } else {
-  //                 value = this._getValue(item.field, res, "");
-  //               }
-  //               return value ? `<div>${item.label}: ${value}</div>` : "";
-  //             })
-  //             .join("");
-  //           return `<td>${multipleFieldDisplay}</td>`;
 }
 
 function _getTypeOfRecord(val, res, fieldName, edge, currentIndex) {

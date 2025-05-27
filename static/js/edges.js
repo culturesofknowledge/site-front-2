@@ -5194,7 +5194,11 @@ emlo.PaginationRenderer = class extends edges.Renderer {
 
     // Render the navigation UI with page information
     var nav = this._renderNavigation();
-    var pageInfo = `<p>Page ${this.component.page} of ${this.component.totalPages}. (The arrows will jump blocks of 10 pages.)  </p>`;
+    const jumpMessage =
+      this.component.totalPages > 10
+        ? "(The arrows will jump blocks of 10 pages.)"
+        : "";
+    var pageInfo = `<p>Page ${this.component.page} of ${this.component.totalPages}. ${jumpMessage}  </p>`;
     var container =
       this.component.totalPages > 1
         ? `
@@ -5224,11 +5228,15 @@ emlo.PaginationRenderer = class extends edges.Renderer {
     var lastClass = edges.util.allClasses(this.namespace, "last", this);
     var ellipsisClass = edges.util.allClasses(this.namespace, "ellipsis", this);
 
+    let firstActive = this.component.page == 1 ? "active" : "";
+    let lastActive =
+      this.component.totalPages == this.component.page ? "active" : "";
+
     // Generate first, prev, next, last buttons
-    var firstBtn = `<div class="button-wrapper ${firstClass}">First</div>`;
-    var prevBlockBtn = `<div class="button-wrapper ${prevBlockClass}"><<<</div>`;
-    var nextBlockBtn = `<div class="button-wrapper ${nextBlockClass}">>>></div>`;
-    var lastBtn = `<div class="button-wrapper ${lastClass}">Last</div>`;
+    var firstBtn = `<div class="button-wrapper ${firstClass} ${firstActive}">First</div>`;
+    var prevBlockBtn = `<div class="button-wrapper ${prevBlockClass}"> « </div>`;
+    var nextBlockBtn = `<div class="button-wrapper ${nextBlockClass}"> » </div>`;
+    var lastBtn = `<div class="button-wrapper ${lastClass} ${lastActive}">Last</div>`;
 
     // Ellipsis buttons for indicating more pages to the back or forward
     var prevEllipsis =

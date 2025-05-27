@@ -1,4 +1,5 @@
 import emlo from "./edges.js";
+import { getAddtionalFields } from "./helper/fields.js";
 import { getLabel } from "./helper/getFieldLabls.js";
 import { searchQueryObj } from "./search.js";
 
@@ -107,7 +108,7 @@ try {
                 { label: "Longitude", field: "geo_long" },
                 { label: "Alternative names", field: "skos_altLabel" },
                 {
-                  label: "Titles or roles",
+                  label: "Roles or titles",
                   field: "ox_titlesRolesOccupations",
                 },
                 {
@@ -115,7 +116,7 @@ try {
                   field: "ox_started-ox_year",
                 },
               ],
-              valueFunction: null,
+              valueFunction: _renderMultipleFields,
             },
             {
               header: "Where found",
@@ -428,6 +429,47 @@ $(document).ready(function () {
 
 function _testValueFunction(val, res, self) {
   // console.log("got vals", val, res, self);
+}
+
+function _renderMultipleFields(val, res, fieldName) {
+  if (res && res.hasOwnProperty("object_type")) {
+    const htmlParts = [];
+
+    const fields = getAddtionalFields(res["object_type"]);
+
+    for (const key in fields) {
+      const fieldKey = fields[key];
+
+      if (res.hasOwnProperty(fieldKey) && res[fieldKey]) {
+        const value = res[fieldKey];
+        htmlParts.push(`<div>${key}: ${value}</div>`);
+      }
+    }
+
+    return htmlParts.join("");
+  } else {
+    return "";
+  }
+
+  // const additional = getAddtionalFields();
+  //  const multipleFieldDisplay = field.multipleFields
+  //             .map((item) => {
+  //               let value = "";
+  //               if (item.isSemiColon) {
+  //                 if (
+  //                   res &&
+  //                   res.hasOwnProperty(item.field) &&
+  //                   res[item.field]
+  //                 ) {
+  //                   value = res[item.field].split("\n").join("; ");
+  //                 }
+  //               } else {
+  //                 value = this._getValue(item.field, res, "");
+  //               }
+  //               return value ? `<div>${item.label}: ${value}</div>` : "";
+  //             })
+  //             .join("");
+  //           return `<td>${multipleFieldDisplay}</td>`;
 }
 
 function _getTypeOfRecord(val, res, fieldName, edge, currentIndex) {

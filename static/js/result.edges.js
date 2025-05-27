@@ -468,7 +468,7 @@ function _getTypeOfRecord(val, res, fieldName, edge, currentIndex) {
     work: "Letter",
     institution: "Institution",
     image: "Image",
-    manifestation: "Manifestation",
+    manifestation: "Document",
   };
 
   let value = "";
@@ -540,6 +540,10 @@ function _getBriefDetails(val, res, fieldName) {
 
   if (res && res.hasOwnProperty("foaf_thumbnail")) {
     return res["foaf_thumbnail"];
+  }
+
+  if (res && res.hasOwnProperty("dcterms_type")) {
+    return res["dcterms_type"];
   }
 
   return "";

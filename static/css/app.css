@@ -10592,3 +10592,7 @@ button.tiny {
   font-size: smaller;
   list-style: none;
 }
+
+.capitalize-first-letter::first-letter {
+  text-transform: uppercase;
+}

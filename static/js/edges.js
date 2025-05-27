@@ -1683,7 +1683,7 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
     ts.filters.forEach((filt) => {
       filterFrag += `
         <tr class="${resultClass}">
-          <td>
+          <td class="capitalize-first-letter">
           ${this._getSelectedFieldLabel(filt.field)}
           </td>
           <td style="min-width: 110px;">

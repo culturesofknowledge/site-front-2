@@ -31,3 +31,7 @@ def forms():
 @forms_bp.route('/advanced')
 def results():
     return render_template('results.jinja2', title="Results")
+
+@forms_bp.route('/quick')
+def quick():
+    return render_template('results.jinja2', title="Results")

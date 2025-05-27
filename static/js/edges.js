@@ -1668,14 +1668,19 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
           ${this._getSelectedFieldLabel(filt.field)}
           </td>
           <td style="min-width: 100px;">
-            <a href="#" class="${filterRemoveClass} selected-facets" data-key="${edges.util.escapeHtml(
+            <span class="${filterRemoveClass} selected-facets" data-key="${edges.util.escapeHtml(
         filt.term
       )}" data-field="${edges.util.escapeHtml(filt.field)}" >
                    ${edges.util.escapeHtml(
                      this._getDisplayValue(filt.field, filt.display)
                    )}
-                  <img class="facet" src="../../static/img/minus-facet.png" style="height:15px;" />
-                </a>
+                  
+                </span>
+          </td>
+          <td class="${filterRemoveClass} selected-facets" data-key="${edges.util.escapeHtml(
+        filt.term
+      )}" data-field="${edges.util.escapeHtml(filt.field)}">
+            <img class="facet" src="../../static/img/minus-facet.png" style="height:15px;" />
           </td>
         </tr>
       `;

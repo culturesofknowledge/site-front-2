@@ -1083,7 +1083,7 @@ function getFullDate(year, month, day) {
   return date;
 }
 
-function stripValuePrefix(fullString, prefix = "") {
+export function stripValuePrefix(fullString, prefix = "") {
   let retval = fullString;
   // Strip specified prefix if provided
   if (prefix.length > 0) {

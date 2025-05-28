@@ -96,23 +96,10 @@ function _getInstitutionComponents(emlo) {
 function _getManifestation(emlo) {
   return [
     new emlo.MultiFields({
-      id: "title",
-      category: "sidebarTitle",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "side-title",
-        contentTitle: "Document",
-        isSide: true,
-        contentTitleImage: "/static/img/person-icon.png",
-      }),
-    }),
-
-    new emlo.MultiFields({
-      id: "enclosed-in-side",
+      id: "mani-profile-side",
       category: "sidebar",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "shortUrl",
-        isSide: true,
-        footerType: "m",
+      renderer: new emlo.ProfileLeftSideRenderer({
+        profileType: "manifestation",
       }),
     }),
 

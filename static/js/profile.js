@@ -135,33 +135,6 @@ function _getManifestation(emlo) {
     }),
 
     new emlo.MultiFields({
-      id: "shelfmark",
-      category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "plain-text",
-        sectionTitle: "Shelfmark",
-        sectionTitleImage: "/static/img/icon-related-resources.png",
-        divider: true,
-        field: "dcterms_identifier-shelf_",
-      }),
-    }),
-
-    new emlo.MultiFields({
-      id: "images",
-      category: "results",
-      fetchSecondaryData: true,
-      primaryField: "frbr_Image-image",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "images",
-        sectionTitle: "Images",
-        sectionTitleImage: "/static/img/icon-related-resources.png",
-        divider: true,
-        primaryField: "frbr_Image-image",
-        field: "dcterms_source",
-      }),
-    }),
-
-    new emlo.MultiFields({
       id: "repos",
       category: "results",
       fetchSecondaryData: true,

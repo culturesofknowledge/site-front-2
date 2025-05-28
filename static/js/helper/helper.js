@@ -99,7 +99,7 @@ export function h4RelationshipList(
     if (type != "" && typeList.includes(type)) {
       switch (type) {
         case "image":
-          getImageRelation(field);
+          getImageRelation(field, profile, relations);
           break;
         case "detailed":
           getDetailedRelation(field);
@@ -121,6 +121,42 @@ export function h4RelationshipList(
   } else {
     return "";
   }
+}
+
+export function getImageRelation(field, profile, relations) {
+  const imageField = "dcterms_source";
+  let frag = ` <div class="thumbnail specialthumb">`;
+
+  for (let imageUri of profile[field]) {
+    const uuid = uuidFromUri(imageUri);
+    const url = profileFromUri(imageUri);
+    let image = null;
+
+    for (let relationItem of relations) {
+      if (
+        relationItem["uuid"] === uuid &&
+        relationItem["object_type"] === "image"
+      ) {
+        image = relationItem["dcterms_source"];
+        break;
+      }
+    }
+
+    if (image) {
+      // Optional: prepend "/scans" if it's not an absolute URL
+      if (!image.startsWith("http")) {
+        image = "/scans" + image;
+      }
+
+      frag += `
+      <a href="${url}"><img src="${image}" /></a>
+    `;
+    }
+  }
+
+  frag += "</div>";
+
+  return frag;
 }
 
 export function relationshipList(

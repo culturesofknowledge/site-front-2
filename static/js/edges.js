@@ -4543,7 +4543,7 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
         case "manifestation":
           frag += _renderManuscriptSection(
             result,
-            this.component.relations,
+            this.component.relationships,
             this.component.gneratedData
           );
           break;

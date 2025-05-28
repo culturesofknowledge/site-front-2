@@ -1,4 +1,10 @@
-import { getImageRelation, stripValuePrefix } from "../helper/helper.js";
+import {
+  decodeUncertaintyFlags,
+  getImageRelation,
+  h4RelationshipList,
+  renderH4Section,
+  stripValuePrefix,
+} from "../helper/helper.js";
 
 export function _renderManuscriptSection(profile, relations, data) {
   let frag = "";
@@ -6,6 +12,8 @@ export function _renderManuscriptSection(profile, relations, data) {
   frag += _renderDetailSection(profile);
   frag += _renderShelfmarkSection(profile);
   frag += _renderImageSection(profile, relations);
+  frag += _renderOtherDetails(profile, relations);
+  frag += _renderDateSection(profile);
 
   return frag;
 }
@@ -66,4 +74,182 @@ function _renderImageSection(profile, relations) {
   } else {
     return "";
   }
+}
+
+function _renderOtherDetails(profile, relations) {
+  // Type will allow us to know which function to be called and if empty we will skip that object
+  const fieldsToRender = [
+    {
+      field: "ox_resourceAt-institution",
+      type: "relationList",
+      title: "Repository",
+      image: "/static/img/icon-repository.png",
+    },
+    {
+      field: "ox_printedEditionDetails",
+      type: "section",
+      title: "",
+      image: "",
+    },
+    {
+      field: "frbr_Work-work",
+      type: "relationList",
+      title: null,
+      image: "/static/img/icon-quill.png",
+    },
+    {
+      field: "mail_enclosedBy-manifestation",
+      type: "relationList",
+      title: null,
+      image: "/static/img/icon-quill.png",
+    },
+    {
+      field: "mail_enclosureOf-manifestation",
+      type: "relationList",
+      title: null,
+      image: "/static/img/icon-quill.png",
+    },
+    {
+      field: "ox_nonLetterEnclosures",
+      type: "section",
+      title: "",
+      image: "",
+    },
+    {
+      field: "mail_destination",
+      type: "section",
+      title: "",
+      image: "",
+    },
+    {
+      field: "mail_seal",
+      type: "section",
+      title: "",
+      image: "",
+    },
+    {
+      field: "mail_postageMark",
+      type: "section",
+      title: "",
+      image: "",
+    },
+    {
+      field: "ox_endorsements",
+      type: "section",
+      title: "",
+      image: "",
+    },
+    {
+      field: "mail_paperSize",
+      type: "section",
+      title: "",
+      image: "",
+    },
+    {
+      field: "mail_paper",
+      type: "section",
+      title: "",
+      image: "",
+    },
+    {
+      field: "bibo_numPages",
+      type: "section",
+      title: "",
+      image: "",
+    },
+    {
+      field: "ox_numPageText",
+      type: "section",
+      title: "",
+      image: "",
+    },
+    {
+      field: "dcterms_language",
+      type: "section",
+      title: "",
+      image: "",
+    },
+    {
+      field: "ox_incipit",
+      type: "section",
+      title: "",
+      image: "",
+    },
+    {
+      field: "ox_excipit",
+      type: "section",
+      title: "",
+      image: "",
+    },
+  ];
+
+  let frag = "";
+
+  for (let field of fieldsToRender) {
+    if (field.type != "") {
+      if (field.type == "relationList") {
+        frag += h4RelationshipList(
+          profile,
+          relations,
+          field.field,
+          field.title,
+          "",
+          field.image
+        );
+      } else if (field.type == "section") {
+        frag += renderH4Section(profile, field.field, field.image);
+      }
+    }
+  }
+
+  return frag;
+}
+
+function _renderDateSection(profile) {
+  let range = false;
+
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+    "",
+  ];
+
+  const year = profile["dcterms_created-ox_year"] || "";
+  const month = profile["dcterms_created-ox_month"] ?? 13; // Use nullish coalescing in case it's 0 or undefined
+  const day = profile["dcterms_created-ox_day"] || "";
+
+  const date = `${day} ${months[month - 1]} ${year}`;
+  let frag = "";
+
+  if (date.trim()) {
+    frag += `
+      <div class="column profilepart">
+				<h3><img src="/static/img/icon-calendar.png"/>Date of creation</h3>
+				<div class="content">
+    `;
+
+    if (profile.hasOwnProperty("ox_originalCalendar")) {
+      frag += `${profile["ox_originalCalendar"]}: `;
+    }
+
+    frag += `${date}`;
+
+    const flags = decodeUncertaintyFlags("dcterms_created-indef_", profile);
+
+    frag += flags;
+
+    frag += `</div></div>`;
+  }
+
+  return frag;
 }

@@ -13,7 +13,10 @@ import {
   _renderLocationProfile,
   _renderLocationSidebar,
 } from "./profile/locationFrag.js";
-import { _renderManuscriptSection } from "./profile/manifestationFrag.js";
+import {
+  _renderManifestationSection,
+  _renderManifestationSidebar,
+} from "./profile/manifestationFrag.js";
 import {
   _renderGraphSection,
   _renderPeopleProfile,
@@ -4414,6 +4417,16 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
           imageSrc = "/static/img/images-icon.png";
           theTitle = "Image";
           break;
+        case "manifestation":
+          frag += _renderManifestationSidebar(
+            result,
+            this.component.relationships,
+            this.component.gneratedData
+          );
+          footerType = "m";
+          imageSrc = "/static/img/resources-icon.png";
+          theTitle = "Document";
+          break;
         default:
           console.log("Nothing is valid");
       }
@@ -4541,7 +4554,7 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
           );
           break;
         case "manifestation":
-          frag += _renderManuscriptSection(
+          frag += _renderManifestationSection(
             result,
             this.component.relationships,
             this.component.gneratedData

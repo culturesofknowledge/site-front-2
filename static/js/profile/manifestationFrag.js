@@ -6,7 +6,7 @@ import {
   stripValuePrefix,
 } from "../helper/helper.js";
 
-export function _renderManuscriptSection(profile, relations, data) {
+export function _renderManifestationSection(profile, relations, data) {
   let frag = "";
 
   frag += _renderDetailSection(profile);
@@ -14,6 +14,14 @@ export function _renderManuscriptSection(profile, relations, data) {
   frag += _renderImageSection(profile, relations);
   frag += _renderOtherDetails(profile, relations);
   frag += _renderDateSection(profile);
+
+  return frag;
+}
+
+export function _renderManifestationSidebar(profile) {
+  let frag = "";
+
+  // frag +=
 
   return frag;
 }

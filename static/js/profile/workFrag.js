@@ -9,18 +9,19 @@ import {
   h4RelationshipList,
   resourceRelation,
   displayImage,
+  detailsOfOneObject,
 } from "../../js/helper/helper.js";
 import { getLabel } from "../helper/getFieldLabls.js";
 import { getCollectionTitle } from "../../js/profile/collectionDetails.js";
 
-export function _renderWorkProfile(profile, relations) {
+export function _renderWorkProfile(profile, relations, data) {
   let frag = "";
 
   frag += renderDates(profile, relations);
   frag += _renderPeopleSection(profile, relations);
   frag += _renderPlacesSection(profile, relations);
   frag += _renderContentSection(profile, relations);
-  frag += _renderRepoAndVersionSection(profile);
+  frag += _renderRepoAndVersionSection(profile, relations, data);
   frag += _renderRelatedResource(profile, relations);
   frag += _renderComment(profile, relations);
 
@@ -471,201 +472,37 @@ function _renderContentSection(profile, relations) {
   }
 }
 
-function _renderRepoAndVersionSection(profile) {
-  const field = "frbr_Manifestation-manifestation";
-  if (profile.hasOwnProperty(field)) {
-    let frag = `<div class="column workfieldset profilepart">
-	  <h3 class="worklegend">
-		  <img src="/static/img/icon-repository.png" class="workicon"/>
-		  Repositories and Versions
-	  </h3><div class="workspacing content">
-			<h4>Versions (originals, copies, digital, etc.)</h4>`;
-
-    profile[field].forEach((item) => {
-      if (item.dcterms_type == "Letter") {
-        frag += _getLetterRepoContent(item);
-
-        if (item.hasOwnProperty("ox_resourceAt-institution")) {
-          _getInstituteData(item["ox_resourceAt-institution"]);
+function _renderRepoAndVersionSection(profile, relations, data) {
+  if (profile.hasOwnProperty("frbr_Manifestation-manifestation")) {
+    const manUri = profile["frbr_Manifestation-manifestation"][0];
+    const manUUID = uuidFromUri(manUri, true);
+    let frag = "";
+    if (relations && relations.length > 0) {
+      for (let relation of relations) {
+        if (
+          relation["object_type"] == "manifestation" &&
+          relation.id == manUUID
+        ) {
+          frag += `
+             <div class="column workfieldset profilepart">
+              <h3 class="worklegend">
+                <img src="/static/img/icon-repository.png" class="workicon"/>
+                Repositories and Versions
+              </h3>
+              <div class="workspacing content">
+                <h4>Versions (originals, copies, digital, etc.)</h4>
+                ${detailsOfOneObject(profile, relation, data, false)}
+              </div>
+            </div>
+          `;
         }
-      } else if (item.dcterms_type == "Manuscript copy") {
-        frag += _getManuRepoContent(item);
-        if (item.hasOwnProperty("ox_resourceAt-institution")) {
-          _getInstituteData(item["ox_resourceAt-institution"]);
-        }
-      } else {
-        frag += `
-              <h3>Version: ${item.dcterms_type}</h3>
-            <p> ${item.ox_printedEditionDetails}</p>
-            `;
       }
-    });
-
-    frag += `</div></div>`;
-
-    return frag;
-  }
-}
-
-function _getLetterRepoContent(content) {
-  let frag = "";
-
-  const shelfmarkField = "dcterms_identifier-shelf_",
-    postageMarkField = "mail_postageMark";
-
-  if (
-    content.hasOwnProperty(shelfmarkField) ||
-    content.hasOwnProperty(postageMarkField)
-  ) {
-    frag += `
-      <div class="display_details_of_one_object False">
-	      <h3>Version: Letter</h3>
-        <p><span class="fieldlabel">Repository:</span></p>
-        <div id="repo-section"></div>  
-      `;
-
-    if (content[shelfmarkField]) {
-      frag += `
-        <p>
-          <span class="fieldlabel">Shelfmark:</span> ${content[
-            shelfmarkField
-          ].replace("shelf_", "")} 
-        </p>
-        `;
     }
-
-    if (content[postageMarkField]) {
-      frag += `
-        <p>
-          <span class="fieldlabel">Postage mark:</span>${content.mail_postageMark}
-        </p>
-      `;
-    }
-    frag += `</div><br/>`;
-    return frag;
-  } else {
-    return "";
-  }
-}
-
-function _getManuRepoContent(content) {
-  const keys = {
-    shelfmarkField: "dcterms_identifier-shelf_",
-    paperSizeField: "mail_paperSize",
-    biboNumField: "bibo_numPages",
-    pageTextField: "ox_numPageText",
-  };
-
-  let frag = "";
-
-  if (hasAnyFieldValue(content, keys)) {
-    frag += `
-      <div class="display_details_of_one_object False">
-        <h3>Version:  Manuscript copy </h3>
-      
-        <p><span class="fieldlabel">Repository:</span></p>
-        <div id="repo-section"></div>
-    `;
-
-    if (content[keys.shelfmarkField]) {
-      frag += `
-        <p>
-          <span class="fieldlabel">Shelfmark:</span> ${
-            content[keys.shelfmarkField]
-          } 
-        </p>
-        `;
-    }
-
-    if (content[keys.paperSizeField]) {
-      frag += `
-        <p>
-          <span class="fieldlabel">Paper size:</span> ${
-            content[keys.paperSizeField]
-          } 
-        </p>
-        `;
-    }
-
-    if (content[keys.biboNumField]) {
-      frag += `
-        <p>
-          <span class="fieldlabel">Number of pages of document:</span> ${
-            content[keys.biboNumField]
-          } 
-        </p>
-        `;
-    }
-
-    if (content[keys.pageTextField]) {
-      frag += `
-       <p>
-          <span class="fieldlabel">Number of pages of text:</span>${
-            content[keys.pageTextField]
-          }
-        </p>
-        `;
-    }
-
-    frag += `
-      </div>
-      <br/>
-    `;
 
     return frag;
   } else {
     return "";
   }
-}
-
-function _getInstituteData(institutions) {
-  institutions.forEach(async (url) => {
-    const parts = url.split("/");
-    const institutionId = parts.at(-1); // Last part is the ID
-    const field = "geonames_officialName,geonames_locatedIn,geonames_inCountry";
-
-    try {
-      // Fetch institution details from API
-      const response = await fetch(
-        `/solr/institutions/select?q=uuid:${institutionId}&fl=${field}&wt=json`
-      );
-      if (!response.ok)
-        throw new Error(`Failed to fetch details for ${institutionId}`);
-
-      const data = await response.json();
-      const institutionData = data?.response?.docs?.[0] || {};
-
-      // Conditionally build name, city, and country sections
-      const nameHTML = institutionData.geonames_officialName
-        ? `<a href="/profile/institution/${institutionId}">${institutionData.geonames_officialName}</a><br>`
-        : "";
-      const cityHTML = institutionData.geonames_locatedIn
-        ? `<span style="color:#172854;">City</span>:<br>&nbsp;&nbsp;&nbsp; ${institutionData.geonames_locatedIn}<br>`
-        : "";
-      const countryHTML = institutionData.geonames_inCountry
-        ? `<span style="color:#172854;">Country</span>:<br>&nbsp;&nbsp;&nbsp; ${institutionData.geonames_inCountry}<br>`
-        : "";
-
-      // Only return non-empty sections
-      if (!nameHTML && !cityHTML && !countryHTML) return;
-
-      // Return the constructed HTML for this institution
-      const frag = `
-          <div class="display_details_of_one_object True">
-            ${nameHTML}
-            ${cityHTML}
-            ${countryHTML}
-          </div>
-        `;
-
-      const repo = document.getElementById("repo-section");
-      if (repo) {
-        repo.innerHTML = frag;
-      }
-    } catch (error) {
-      console.error(`Error fetching institution details for ${url}:`, error);
-    }
-  });
 }
 
 function _renderRelatedResource(profile, relations) {

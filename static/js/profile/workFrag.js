@@ -474,30 +474,32 @@ function _renderContentSection(profile, relations) {
 
 function _renderRepoAndVersionSection(profile, relations, data) {
   if (profile.hasOwnProperty("frbr_Manifestation-manifestation")) {
-    const manUri = profile["frbr_Manifestation-manifestation"][0];
-    const manUUID = uuidFromUri(manUri, true);
-    let frag = "";
-    if (relations && relations.length > 0) {
-      for (let relation of relations) {
-        if (
-          relation["object_type"] == "manifestation" &&
-          relation.id == manUUID
-        ) {
-          frag += `
-             <div class="column workfieldset profilepart">
+    let frag = `<div class="column workfieldset profilepart">
               <h3 class="worklegend">
                 <img src="/static/img/icon-repository.png" class="workicon"/>
                 Repositories and Versions
               </h3>
+              
               <div class="workspacing content">
                 <h4>Versions (originals, copies, digital, etc.)</h4>
-                ${detailsOfOneObject(profile, relation, data, false)}
-              </div>
-            </div>
-          `;
+              `;
+
+    for (let manUri of profile["frbr_Manifestation-manifestation"]) {
+      const manUUID = uuidFromUri(manUri, true);
+
+      if (relations && relations.length > 0) {
+        for (let relation of relations) {
+          if (
+            relation["object_type"] == "manifestation" &&
+            relation.id == manUUID
+          ) {
+            frag += detailsOfOneObject(profile, relation, data, false);
+          }
         }
       }
     }
+
+    frag += `</div></div>`;
 
     return frag;
   } else {

@@ -4510,7 +4510,11 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
           );
           break;
         case "work":
-          frag += _renderWorkProfile(result, this.component.relationships);
+          frag += _renderWorkProfile(
+            result,
+            this.component.relationships,
+            this.component.gneratedData
+          );
           break;
         case "location":
           frag += _renderLocationProfile(

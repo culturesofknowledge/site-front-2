@@ -667,7 +667,7 @@ export function displayImage(profile, data, maniObj, listAll = false) {
 
       if (img[uriField] == profile[uriField]) {
         if (isDisplayImage) {
-          frag += `<li><img style="max-width: 100%;min-width: 100px; ${imageStyle}" src="${imgSourceUrl}" /></li>`;
+          frag += `<li><img style="max-width: 100%;max-width: 100px; ${imageStyle}" src="${imgSourceUrl}" /></li>`;
         }
       } else {
         const pageUri = img[uriField];
@@ -677,7 +677,7 @@ export function displayImage(profile, data, maniObj, listAll = false) {
         if (isDisplayImage) {
           frag += `
             <a href="${pageUrl}">
-              <img style="max-width: 100%;min-width: 100px;" src="${imgSourceUrl}" />
+              <img style="max-width: 100%;max-width: 100px;" src="${imgSourceUrl}" />
             </a>
           `;
         } else {
@@ -835,7 +835,7 @@ export function detailsOfOneObject(profile, obj, data, nested = false) {
       link = "";
 
     if (objectType == "manifestation") {
-      fieldsToDisplay = getFieldsToDisplayInProfile(objectType);
+      fieldsToDisplay = getFieldsToDisplayInProfile(objectType, nested);
 
       const maniReceiptCal = "ox_manifestation_receipt_calendar";
 
@@ -1042,10 +1042,12 @@ export function detailsOfOneObject(profile, obj, data, nested = false) {
             }
             frag += detailsOfOneObject({}, relatedObj, {}, true); // Assumes it returns a string
           } else {
-            if (label) {
-              frag += `<p><span class="fieldlabel">${label}:</span>${displayValue}</p>`;
-            } else {
-              frag += `<p>${displayValue}</p>`;
+            if (displayValue) {
+              if (label) {
+                frag += `<p><span class="fieldlabel">${label}:</span>${displayValue}</p>`;
+              } else {
+                frag += `<p>${displayValue}</p>`;
+              }
             }
           }
         }

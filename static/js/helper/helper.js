@@ -835,7 +835,7 @@ export function detailsOfOneObject(profile, obj, data, nested = false) {
       link = "";
 
     if (objectType == "manifestation") {
-      fieldsToDisplay = getFieldsToDisplayInProfile(objectType);
+      fieldsToDisplay = getFieldsToDisplayInProfile(objectType, nested);
 
       const maniReceiptCal = "ox_manifestation_receipt_calendar";
 
@@ -1042,10 +1042,12 @@ export function detailsOfOneObject(profile, obj, data, nested = false) {
             }
             frag += detailsOfOneObject({}, relatedObj, {}, true); // Assumes it returns a string
           } else {
-            if (label) {
-              frag += `<p><span class="fieldlabel">${label}:</span>${displayValue}</p>`;
-            } else {
-              frag += `<p>${displayValue}</p>`;
+            if (displayValue) {
+              if (label) {
+                frag += `<p><span class="fieldlabel">${label}:</span>${displayValue}</p>`;
+              } else {
+                frag += `<p>${displayValue}</p>`;
+              }
             }
           }
         }

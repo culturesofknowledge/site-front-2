@@ -1683,7 +1683,7 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
     ts.filters.forEach((filt) => {
       filterFrag += `
         <tr class="${resultClass}">
-          <td>
+          <td class="capitalize-first-letter">
           ${this._getSelectedFieldLabel(filt.field)}
           </td>
           <td style="min-width: 110px;">
@@ -4510,7 +4510,11 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
           );
           break;
         case "work":
-          frag += _renderWorkProfile(result, this.component.relationships);
+          frag += _renderWorkProfile(
+            result,
+            this.component.relationships,
+            this.component.gneratedData
+          );
           break;
         case "location":
           frag += _renderLocationProfile(

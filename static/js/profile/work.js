@@ -23,22 +23,24 @@ export function getWorkComponents(emlo) {
     new emlo.MultiFields({
       id: "work-profile",
       category: "results",
+      fetchImageData: true,
+      manifestationField: "frbr_Manifestation-manifestation",
       renderer: new emlo.ProfileRightRenderer({
         profileType: "work",
       }),
     }),
 
     // FIXME: This is an hotfix for rendering repos.
-    new emlo.MultiFields({
-      id: "repo",
-      category: "results",
-      fetchSecondaryData: true,
-      primaryField: "frbr_Manifestation-manifestation",
-      renderer: new emlo.MultiFieldsRenderer({
-        // type: "repo-version",
-        primaryField: "frbr_Manifestation-manifestation",
-      }),
-    }),
+    // new emlo.MultiFields({
+    //   id: "repo",
+    //   category: "results",
+    //   fetchSecondaryData: true,
+    //   primaryField: "frbr_Manifestation-manifestation",
+    //   renderer: new emlo.MultiFieldsRenderer({
+    //     // type: "repo-version",
+    //     primaryField: "frbr_Manifestation-manifestation",
+    //   }),
+    // }),
 
     new emlo.MultiFields({
       id: "work-footer",

@@ -5762,7 +5762,7 @@ function GetRecordID(type, result) {
       splitValue: "edit_cofk_union_resource-",
     }, // Resource query pattern
     m: {
-      field: "dcterms_identifier-edit_:",
+      field: "dcterms_identifier-edit_",
       splitValue: "edit_cofk_union_manifestation-cofk_edit_interface-iwork_id:",
     }, // Manifestation query pattern
   };

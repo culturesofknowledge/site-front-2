@@ -109,7 +109,6 @@ function _getManifestation(emlo) {
       renderer: new emlo.MultiFieldsRenderer({
         type: "heading",
         isSide: true,
-        field: "frbr_Work-work",
       }),
     }),
 

@@ -2699,7 +2699,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       const workUUID = workUri.split("/").pop();
 
       const apiUrl = `/solr/works/select?q=uuid:${workUUID}&wt=json&fl=dcterms_description,uuid`;
-      console.log("what????");
+
       fetch(apiUrl)
         .then((response) => {
           if (!response.ok) {

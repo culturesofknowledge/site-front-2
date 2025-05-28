@@ -15,6 +15,23 @@ export function _renderManifestationSection(profile, relations, data) {
   frag += _renderOtherDetails(profile, relations);
   frag += _renderDateSection(profile);
 
+  const intervalId = setInterval(() => {
+    const headingDiv = document.getElementById("heading");
+
+    if (headingDiv) {
+      const firstWork = relations.find(
+        (item) => item["object_type"] === "work"
+      );
+
+      if (firstWork && firstWork.hasOwnProperty("dcterms_description")) {
+        console.log("Found work object and heading element");
+        headingDiv.innerHTML = firstWork["dcterms_description"];
+      }
+
+      clearInterval(intervalId); // Stop checking once headingDiv is found
+    }
+  }, 100); // check every 300 milliseconds
+
   return frag;
 }
 

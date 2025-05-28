@@ -13,6 +13,7 @@ import {
   _renderLocationProfile,
   _renderLocationSidebar,
 } from "./profile/locationFrag.js";
+import { _renderManuscriptSection } from "./profile/manifestationFrag.js";
 import {
   _renderGraphSection,
   _renderPeopleProfile,
@@ -2695,7 +2696,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       const workUUID = workUri.split("/").pop();
 
       const apiUrl = `/solr/works/select?q=uuid:${workUUID}&wt=json&fl=dcterms_description,uuid`;
-
+      console.log("what????");
       fetch(apiUrl)
         .then((response) => {
           if (!response.ok) {
@@ -4536,6 +4537,13 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
           frag += _renderImageProfile(
             result,
             this.component.relationships,
+            this.component.gneratedData
+          );
+          break;
+        case "manifestation":
+          frag += _renderManuscriptSection(
+            result,
+            this.component.relations,
             this.component.gneratedData
           );
           break;

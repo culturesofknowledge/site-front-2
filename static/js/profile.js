@@ -127,14 +127,10 @@ function _getManifestation(emlo) {
     }),
 
     new emlo.MultiFields({
-      id: "document-type",
+      id: "manifestation-profile",
       category: "results",
-      renderer: new emlo.MultiFieldsRenderer({
-        type: "plain-text",
-        sectionTitle: "Document type",
-        sectionTitleImage: "/static/img/icon-quill.png",
-        divider: true,
-        field: "dcterms_type",
+      renderer: new emlo.ProfileRightRenderer({
+        profileType: "manifestation",
       }),
     }),
 

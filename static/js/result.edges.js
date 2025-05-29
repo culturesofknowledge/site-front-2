@@ -640,21 +640,32 @@ function _displayDate(val, res) {
 
   // Get the date fields
   const startDay = result["ox_started-ox_day"] || "";
-  const startMonth = result["ox_started-ox_month"] || 13; // Default to 13 (invalid month)
+  const startMonth = result["ox_started-ox_month"] || ""; // Default to 13 (invalid month)
   const startYear = result["ox_started-ox_year"] || "";
 
   const endDay = result["ox_completed-ox_day"] || "";
   const endMonth = result["ox_completed-ox_month"] || 13; // Default to 13 (invalid month)
   const endYear = result["ox_completed-ox_year"] || "";
 
+  const isValidMonth = (m) => Number.isInteger(m) && m >= 1 && m <= 12;
+
+  const formatDate = (day, month, year) => {
+    const parts = [];
+    if (day) parts.push(day);
+    if (isValidMonth(month)) parts.push(months[month - 1]);
+    if (year) parts.push(year);
+
+    return parts.join(" ");
+  };
+
   // Construct the date string for the start
-  let date = `${startDay} ${months[startMonth - 1]} ${startYear}`;
+  let date = formatDate(startDay, startMonth, startYear);
 
   // Check if the date is a range
   const isRange = result["ox_dateIsRange"] || false;
 
   // Construct the date string for the end
-  let dateTo = `${endDay} ${months[endMonth - 1]} ${endYear}`;
+  let dateTo = formatDate(endDay, endMonth, endYear);
 
   // Remove spaces from the date strings
   const dateNoSpaces = date.replace(" ", "");

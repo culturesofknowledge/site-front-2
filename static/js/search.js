@@ -589,7 +589,7 @@ function advanceSearch(params) {
 
     if (sinDay) {
       openingQuery.queryStrings.push({
-        queryString: sinMonth,
+        queryString: sinDay,
         fields: [
           { field: "ox_started-ox_day", operator: "OR" },
           { field: "ox_completed-ox_day", operator: "OR" },

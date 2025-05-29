@@ -121,7 +121,7 @@ try {
       id: "alert-box",
       category: "results",
       renderer: new emlo.AlertBoxRenderer({
-        message: ` You can select up to 10 organisations using the checkboxes below, and then display associated letters.
+        message: ` You can select up to 10 organizations using the checkboxes below, and then display associated letters.
 		                To save your selection for later use, bookmark this page.
 				  `,
       }),
@@ -257,7 +257,7 @@ function _redirectToSearch(val, res, fieldName) {
 
     console.log("current_search_letter", current_search_letter);
 
-    const currentPageQ = `browsing=organisations&letter=${current_search_letter}`;
+    const currentPageQ = `browsing=organizations&letter=${current_search_letter}`;
 
     switch (fieldName) {
       case "ox_totalWorksByAgent":

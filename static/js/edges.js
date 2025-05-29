@@ -1154,6 +1154,7 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
         "letter",
         "rec",
         "search_type",
+        "filters",
       ];
 
       if (fieldMapping.hasOwnProperty(key) && !keys.includes(key)) {
@@ -1705,19 +1706,16 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
           ${this._getSelectedFieldLabel(filt.field)}
           </td>
 
-          <td style="max-width:120px" class="${filterRemoveClass} selected-facets" data-key="${
+          <td class="${filterRemoveClass} selected-facets" data-key="${
         filt.term
       }" data-field="${filt.field}" >
+              <span  style="width:100px">
               ${this._getDisplayValue(filt.field, filt.display)}
-          </td>
-
-          <td style="width:50px;padding:0;" class="${filterRemoveClass}" data-key="${
-        filt.term
-      }" data-field="${filt.field}" >
-            <a title="Remove from your search criteria">
-               <img class="facet" src="../../static/img/minus-facet.png" alt="Remove from your search criteria" height="15px" width="15px">
-            </a>
-          </td>
+              </span>
+              <span style="widht:50px">
+                <img class="facet" src="../../static/img/minus-facet.png" style="height:15px;" />
+              </span>
+            </td>
         </tr>
       `;
     });
@@ -1808,7 +1806,6 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
             .forEach((el) => {
               el.innerHTML = `
                 ${edges.util.escapeHtml(names)}
-                <img class="facet" src="../../static/img/minus-facet.png" style="height:15px;" />
               `;
             });
         }

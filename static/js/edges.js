@@ -398,7 +398,7 @@ emlo.DropDownRenderer = class extends edges.Renderer {
       const selected = this.isSelected ? "" : "selected";
       // Add default option at the beginning
       options =
-        `<option value="${this.defaultOptionText}" disabled ${selected}>${this.defaultOptionText}</option>` +
+        `<option value="all repositories" ${selected}>all repositories</option>` +
         options;
 
       const dropdownClass = edges.util.allClasses(
@@ -435,7 +435,11 @@ emlo.DropDownRenderer = class extends edges.Renderer {
 
   // This function is called when the user changes the sort option
   changeRepoValue = function (element) {
-    _addUrlParam("repository", element.value);
+    if (element.value == "all repositories") {
+      _removeUrlParam("repository");
+    } else {
+      _addUrlParam("repository", element.value);
+    }
   };
 
   _renderOption(result) {
@@ -5873,6 +5877,10 @@ function _removeUrlParam(field) {
   if (fieldMap.hasOwnProperty(field)) {
     delete_field = fieldMap[field].primary;
     secondaryField = fieldMap[field].secondary;
+  }
+
+  if (delete_field == "") {
+    delete_field = field;
   }
 
   const url = new URL(window.location.href);

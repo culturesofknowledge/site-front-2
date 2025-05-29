@@ -430,6 +430,13 @@ emlo.DropDownRenderer = class extends edges.Renderer {
       this
     );
 
+    // Triggering the combo box logic
+    const doc = document.getElementById("repository");
+
+    if (doc) {
+      enhanceSelect(doc);
+    }
+
     edges.on(dropdownSelector, "change", this, "changeRepoValue");
   }
 

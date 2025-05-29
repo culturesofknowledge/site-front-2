@@ -1686,20 +1686,23 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
     let filterFrag = "";
     ts.filters.forEach((filt) => {
       filterFrag += `
-        <tr class="${resultClass}">
-          <td class="capitalize-first-letter">
+        <tr class="${resultClass}" style="vertical-align: middle;">
+          <td style="width:80px" class="capitalize-first-letter">
           ${this._getSelectedFieldLabel(filt.field)}
           </td>
-          <td style="min-width: 110px;">
-            <span class="${filterRemoveClass} selected-facets" data-key="${edges.util.escapeHtml(
+
+          <td style="max-width:120px" class="${filterRemoveClass} selected-facets" data-key="${
         filt.term
-      )}" data-field="${edges.util.escapeHtml(filt.field)}" >
-                   ${edges.util.escapeHtml(
-                     this._getDisplayValue(filt.field, filt.display)
-                   )}
-                  
-                   <img class="facet" src="../../static/img/minus-facet.png" style="height:15px;" />
-                </span>
+      }" data-field="${filt.field}" >
+              ${this._getDisplayValue(filt.field, filt.display)}
+          </td>
+
+          <td style="width:50px;padding:0;" class="${filterRemoveClass}" data-key="${
+        filt.term
+      }" data-field="${filt.field}" >
+            <a title="Remove from your search criteria">
+               <img class="facet" src="../../static/img/minus-facet.png" alt="Remove from your search criteria" height="15px" width="15px">
+            </a>
           </td>
         </tr>
       `;

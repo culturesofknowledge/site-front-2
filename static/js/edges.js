@@ -581,7 +581,9 @@ emlo.ResultTable = class extends edges.Component {
         if (this.hitCount > 50) {
           currentDoc.innerHTML = `${this.hitCount} results (50 results per page)`;
         } else {
-          currentDoc.innerHTML = `${this.hitCount} results`;
+          currentDoc.innerHTML = `${this.hitCount} ${
+            this.hitCount > 1 ? "results" : "result"
+          }`;
         }
       } else {
         // Fallback message when results are not fetched

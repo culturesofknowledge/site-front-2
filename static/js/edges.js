@@ -1706,9 +1706,9 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
           ${this._getSelectedFieldLabel(filt.field)}
           </td>
 
-          <td class="${filterRemoveClass} selected-facets" data-key="${
+          <td class="${filterRemoveClass} selected-facets" data-key='${
         filt.term
-      }" data-field="${filt.field}" >
+      }' data-field='${filt.field}' >
               <span  style="width:100px">
               ${this._getDisplayValue(filt.field, filt.display)}
               </span>
@@ -1979,7 +1979,7 @@ emlo.MultiFields = class extends edges.Component {
         }
       }
     } catch (error) {
-      console.log("got error", error);
+      console.error("got error", error);
       this.errorMessage = "Error fetching data.";
     } finally {
       this.loading = false; // Stop loading
@@ -2410,19 +2410,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
               `;
             }
           }
-
-          console.log("data", data, element);
-
-          //   if (element) {
-          //     // Customize this part to match the structure of your API response
-          //     element.innerHTML = `
-          //   <h3>Title: ${data.title}</h3>
-          //   <p>Author: ${data.author}</p>
-          //   <p>Description: ${data.description}</p>
-          // `;
-          //   } else {
-          //     console.warn("Element with ID 'work-info' not found.");
-          //   }
         })
         .catch((error) => {
           console.error("Failed to fetch work info:", error);

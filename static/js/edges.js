@@ -1764,6 +1764,17 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
       "dcterms_references-person": "people",
     };
 
+    const displayFieldMapping = {
+      work: "Letter",
+      manifestation: "Document",
+      resource: "Related resource",
+      person: "Person or organization",
+      location: "Location",
+      image: "Image",
+      institution: "Repository",
+      comment: "Comment",
+    };
+
     const validFields = [
       "uuid_related",
       "dcterms_references-location",
@@ -1813,6 +1824,14 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
 
       return placeholder;
     } else {
+      if (value && value.startsWith('"') && value.endsWith('"')) {
+        value = value.slice(1, -1);
+      }
+
+      if (field == "object_type" && displayFieldMapping.hasOwnProperty(value)) {
+        return displayFieldMapping[value];
+      }
+
       return value;
     }
   }

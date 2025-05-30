@@ -5548,6 +5548,14 @@ function _removeUrlParam(field) {
     delete_field = "uuids";
   }
 
+  if (field == "Contents") {
+    delete_field = "let_con";
+  }
+
+  if (field == "Locations") {
+    delete_field = "locations";
+  }
+
   if (field == "default_search_field") {
     delete_field = "everything";
   }

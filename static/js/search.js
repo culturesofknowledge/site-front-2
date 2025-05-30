@@ -24,7 +24,7 @@ function quickSearch(params) {
     sort: [{ field: "score", order: "desc" }],
     highlights: [
       {
-        filter: "*",
+        filter: ["*"],
         pre: '<span class="highlight">',
         post: "</span>",
         hl: "on",
@@ -74,7 +74,20 @@ function advanceSearch(params) {
       { field: "started_date_sort", order: "asc" },
       { field: "score", order: "desc" },
     ],
+    highlights: [],
   };
+
+  const contents = getContentFields();
+
+  if (contents.length > 0) {
+    openingQuery.highlights.push({
+      filter: contents,
+      pre: '<span class="highlight">',
+      post: "</span>",
+      hl: "on",
+      indent: "on",
+    });
+  }
 
   if (params != null) {
     // Define an array of objects that map parameter names to query configurations
@@ -648,4 +661,82 @@ function generateTimestamp(year, month, day, range = "from") {
   }
 
   return date;
+}
+
+function getContentFields() {
+  let contentFields = [];
+  const multiSearchFields = getMultiSearchFields();
+  if (multiSearchFields.hasOwnProperty("let_con")) {
+    contentFields = multiSearchFields["let_con"];
+  }
+  return contentFields;
+}
+
+function getMultiSearchFields() {
+  const multiSearchFields = {};
+
+  // Letter contents
+  multiSearchFields["let_con"] = [
+    "dcterms_abstract",
+    "ox_keywords",
+    "ox_incipit",
+    "ox_excipit",
+    "mail_postScript",
+  ];
+
+  // People: authors or senders
+  multiSearchFields["people"] = [
+    "person-author",
+    "person-recipient",
+    "person-mentioned",
+  ];
+
+  multiSearchFields["people_gend"] = [
+    "person-author-gender",
+    "person-recipient-gender",
+    "person-mentioned-gender",
+  ];
+
+  multiSearchFields["people_roles"] = [
+    "person-author-roles",
+    "person-addressee-roles",
+    "person-mentioned-roles",
+  ];
+
+  multiSearchFields["agent_org"] = [
+    "person-author-organisation",
+    "person-recipient-organisation",
+    "person-mentioned-organisation",
+  ];
+
+  // Places: origins or destinations
+  multiSearchFields["locations"] = [
+    "location-origin",
+    "location-destination",
+    "location-mentioned",
+  ];
+
+  // Manifestations with enclosures (letters and non-letters)
+  multiSearchFields["let_with_en_tex"] = [
+    "manifestation-enclosure",
+    "manifestation-non_letter_enclosures",
+  ];
+
+  // Single dates - can be START or END of date range
+  multiSearchFields["dat_sin_year"] = [
+    "ox_started-ox_year",
+    "ox_completed-ox_year",
+  ];
+
+  multiSearchFields["dat_sin_month"] = [
+    "ox_started-ox_month",
+    "ox_completed-ox_month",
+  ];
+
+  multiSearchFields["dat_sin_day"] = [
+    "ox_started-ox_day",
+    "ox_completed-ox_day",
+  ];
+
+  return multiSearchFields;
 }

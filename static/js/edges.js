@@ -738,7 +738,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
 
       if (!shouldCall) {
         this.tableDisplay = this.tableDisplay.filter(
-          (item) => item.header !== "Where found"
+          (item) => item.field !== "let_con"
         );
       }
 

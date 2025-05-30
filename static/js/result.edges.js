@@ -403,7 +403,7 @@ try {
             },
             {
               header: "Where found",
-              field: "",
+              field: "let_con",
               pre: "",
               post: "",
               valueFunction: _displayWhereFound,

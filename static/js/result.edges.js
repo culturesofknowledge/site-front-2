@@ -401,6 +401,13 @@ try {
               post: "",
               valueFunction: _displayRepoAndVersion,
             },
+            {
+              header: "Where found",
+              field: "",
+              pre: "",
+              post: "",
+              valueFunction: _displayWhereFound,
+            },
           ],
           arrayValueJoin: ", ",
           omitFieldIfEmpty: true,
@@ -430,6 +437,15 @@ $(document).ready(function () {
 
 function _testValueFunction(val, res, self) {
   // console.log("got vals", val, res, self);
+}
+
+function _displayWhereFound(val, res, fieldName, edge) {
+  const urlParams = new URLSearchParams(window.location.search);
+  const shouldCall = urlParams.has("let_con"); // replace with actual param name
+
+  if (shouldCall) {
+    return _getAllMatchingFieldsHTML(val, res, fieldName, edge);
+  }
 }
 
 function _renderMultipleFields(val, res, fieldName) {

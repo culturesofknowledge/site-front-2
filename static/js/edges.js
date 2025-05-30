@@ -733,6 +733,15 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
         this.component.id
       );
 
+      const urlParams = new URLSearchParams(window.location.search);
+      const shouldCall = urlParams.has("let_con"); // replace with actual param name
+
+      if (!shouldCall) {
+        this.tableDisplay = this.tableDisplay.filter(
+          (item) => item.header !== "Where found"
+        );
+      }
+
       // create table headers
       const headers = this.tableDisplay
         .map((field) => `<th>${edges.util.escapeHtml(field.header)}</th>`)

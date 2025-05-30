@@ -1718,7 +1718,7 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
           <td class="${filterRemoveClass} selected-facets" data-key='${
         filt.term
       }' data-field='${filt.field}' >
-              <span  style="width:100px">
+              <span data-val='${filt.field}'  style="width:100px">
               ${this._getDisplayValue(filt.field, filt.display)}
               </span>
               <span style="widht:50px">
@@ -1822,7 +1822,7 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
         if (names) {
           // Find all matching elements dynamically and update their content
           document
-            .querySelectorAll(`[data-field="${edges.util.escapeHtml(field)}"]`)
+            .querySelectorAll(`[data-val="${edges.util.escapeHtml(field)}"]`)
             .forEach((el) => {
               el.innerHTML = `
                 ${edges.util.escapeHtml(names)}

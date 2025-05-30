@@ -619,7 +619,7 @@ function _redirectToProfile(val, res, fieldName, edge, currentIndex) {
   // Always set 'start' and 'numFound' if they are relevant
   queryParams.set("start", start);
   queryParams.set("numFound", total);
-  queryParams.set("type", "advance");
+  queryParams.set("type", "advanced");
 
   // Ensure all other parameters from the current URL are maintained
   ["sort", "letter", "browsing", "uuids"].forEach((param) => {

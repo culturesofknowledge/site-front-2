@@ -128,7 +128,7 @@ def AdditionalWorksData( use_staging=True ) : #{
                           f.get_resource_title_fieldname() ]
 
   start = 0
-  batch = 200
+  batch = 100
 
   if use_staging :
     solr_works = solr.SolrConnection( solrconfig.solr_urls_stage['works'], persistent=True )
@@ -731,14 +731,23 @@ def get_details_from_uri_list( solr_instance, uri_list, field_list ): #{
 
   if uri_list : #{
     uri_list = [ escaped_uri_prefix + escape_colons(one_uri) for one_uri in uri_list ]
-
     query_str = escaped_uri_fieldname + ":(" + " ".join( uri_list ) + ")"
-
-    # field_str = ','.join( field_list )
-
-    further_details = solr_instance.query( query_str, fields=field_list,
+    # Maybe convert into a curl with a POST commnd?, as in
+    # https://stackoverflow.com/questions/2997014/can-you-use-post-to-run-a-query-in-solr-select
+    try:
+      # field_str = ','.join( field_list )
+      further_details = solr_instance.query( query_str, fields=field_list,
                                            start=0, rows=len( uri_list ), score=False )
-    return further_details
+      return further_details
+    except Exception as e:
+    #####
+      print(f"Failed to query solr. Query too long? Query length : {len(query_str)}")
+      print(f"Field list : {field_list}")
+      # Need a magic query which returns an empty Response object
+      further_details = solr_instance.query( "id:abcdefghijkllkjihgfedcba" )
+      print(f"Returning hopefully empty record : {further_details}")
+      return further_details
+    #####
   #}
   else:
     return uri_list

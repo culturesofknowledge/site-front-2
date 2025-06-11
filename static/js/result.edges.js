@@ -747,7 +747,6 @@ async function _displayRepoAndVersion(val, item, field, element, index) {
 
       if (manifFieldDict.hasOwnProperty("ox_resourceAt-institution")) {
         const reposUriList = manifFieldDict["ox_resourceAt-institution"];
-        console.log("reposUriList", reposUriList);
         if (reposUriList.length > 0) {
           const reposUuidDict = await getRecordsFromSolr(
             Array.isArray(reposUriList) ? reposUriList : [reposUriList],
@@ -773,8 +772,6 @@ async function _displayRepoAndVersion(val, item, field, element, index) {
                 reposCountry = reposFieldval;
               }
             }
-
-            console.log("reposNameAndLocation", reposNameAndLocation);
 
             const reposFieldList = [];
             if (reposName) reposFieldList.push(reposName);

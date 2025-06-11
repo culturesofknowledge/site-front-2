@@ -738,7 +738,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
 
       if (!shouldCall) {
         this.tableDisplay = this.tableDisplay.filter(
-          (item) => item.header !== "Where found"
+          (item) => item.field !== "let_con"
         );
       }
 
@@ -1358,23 +1358,42 @@ emlo.FacetRenderer = class extends edges.Renderer {
       filter.field ? filter.field.toString() : ""
     );
 
+    let uuidsToFetch = [];
+
     let limitedResults = "";
     ts.values.forEach((val, idx) => {
       if (val.count > 0) {
         const isHidden = idx >= this.displayLimit;
+        const field = this.component.field;
+
+        let displayVal = this._displayFacetValue(field, val.term);
+
+        // Collect UUIDs for async update
+        if (
+          ["frbr_creator-person", "mail_recipient-person"].includes(field) &&
+          displayVal === "Loading"
+        ) {
+          let UUID = val.term.startsWith('"')
+            ? val.term.slice(1, -1).split("/").pop()
+            : val.term.split("/").pop();
+          if (UUID && !uuidsToFetch.includes(UUID)) {
+            uuidsToFetch.push(UUID);
+          }
+        }
+
         limitedResults += `
-                <tr style="${isHidden ? "display:none;" : ""}">
-                  <td>
-                    <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
+      <tr style="${isHidden ? "display:none;" : ""}">
+        <td>
+          <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
           val.term
-        )}">
-                    <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
-                    ${this._displayFacetValue(this.component.field, val.term)}
-                    </a>
-                    </td>
-                  <td>${val.count}</td>
-                </tr>
-            `;
+        )}" data-changekey="${field}${edges.util.escapeHtml(val.term)}">
+            <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
+            ${displayVal}
+          </a>
+        </td>
+        <td>${val.count}</td>
+      </tr>
+    `;
       }
     });
 
@@ -1444,6 +1463,44 @@ emlo.FacetRenderer = class extends edges.Renderer {
 
     ts.context.html(frag);
 
+    this._fetchNamesNew(uuidsToFetch, "people").then((names) => {
+      if (names && names.length > 0) {
+        for (let name of names) {
+          localStorage.setItem(name.uuid, name.browse);
+          console.log("name", name);
+          document
+            .querySelectorAll(`[data-key*="${name.uuid}"]`)
+            .forEach((el) => {
+              el.innerHTML = `
+            <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
+            ${edges.util.escapeHtml(names)}
+          `;
+            });
+        }
+      }
+    });
+
+    // Fetching the UUID
+    // Array.from(uuidsToFetch).forEach((UUID) => {
+    //   const collectionName = "people";
+
+    //   if (localStorage.getItem(UUID)) return; // already cached
+
+    //   this._fetchNames(UUID, collectionName).then((names) => {
+    //     if (names) {
+    //       localStorage.setItem(UUID, names);
+
+    //       // Update all matching DOM elements
+    //       document.querySelectorAll(`[data-key*="${UUID}"]`).forEach((el) => {
+    //         el.innerHTML = `
+    //         <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
+    //         ${edges.util.escapeHtml(names)}
+    //       `;
+    //       });
+    //     }
+    //   });
+    // });
+
     this.setUISize();
     this.setUISort();
     this.setUIOpen();
@@ -1495,6 +1552,64 @@ emlo.FacetRenderer = class extends edges.Renderer {
     edges.on(modalCloseSelector, "click", this, "closeModal");
   }
 
+  // _displayFacetValue(field, val, fetch = false) {
+  //   if (field == "object_type") {
+  //     const typeMap = {
+  //       work: "Letter",
+  //       manifestation: "Document",
+  //       resource: "Related resource",
+  //       person: "Person or organization",
+  //     };
+
+  //     if (typeMap.hasOwnProperty(val)) {
+  //       return typeMap[val];
+  //     } else {
+  //       return val.charAt(0).toUpperCase() + val.slice(1);
+  //     }
+  //   } else if (
+  //     ["frbr_creator-person", "mail_recipient-person"].includes(field) &&
+  //     fetch
+  //   ) {
+  //     let value = val;
+  //     let UUID = "";
+  //     if (value && value.startsWith('"') && value.endsWith('"')) {
+  //       value = value.slice(1, -1);
+  //     }
+
+  //     if (typeof value === "string" && value.startsWith("http")) {
+  //       UUID = value.split("/").pop();
+  //     }
+
+  //     if (UUID == "") {
+  //       return "";
+  //     }
+
+  //     if (localStorage.getItem(UUID)) {
+  //       return localStorage.getItem(UUID);
+  //     }
+
+  //     let collectionName = "people";
+
+  //     this._fetchNames(UUID, collectionName).then((names) => {
+  //       if (names) {
+  //         // Find all matching elements dynamically and update their content
+  //         document
+  //           .querySelectorAll(`[data-key="${edges.util.escapeHtml(val)}"]`)
+  //           .forEach((el) => {
+  //             el.innerHTML = `
+  //               <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
+  //               ${edges.util.escapeHtml(names)}
+  //             `;
+  //           });
+  //       }
+  //     });
+
+  //     return "Loading";
+  //   } else {
+  //     return val;
+  //   }
+  // }
+
   _displayFacetValue(field, val) {
     if (field == "object_type") {
       const typeMap = {
@@ -1503,15 +1618,101 @@ emlo.FacetRenderer = class extends edges.Renderer {
         resource: "Related resource",
         person: "Person or organization",
       };
-
-      if (typeMap.hasOwnProperty(val)) {
-        return typeMap[val];
-      } else {
-        return val.charAt(0).toUpperCase() + val.slice(1);
+      return typeMap[val] || val.charAt(0).toUpperCase() + val.slice(1);
+    } else if (
+      ["frbr_creator-person", "mail_recipient-person"].includes(field)
+    ) {
+      let value = val;
+      if (value && value.startsWith('"') && value.endsWith('"')) {
+        value = value.slice(1, -1);
       }
+
+      let UUID = value.startsWith("http") ? value.split("/").pop() : "";
+
+      if (!UUID) return "";
+
+      const cached = localStorage.getItem(UUID);
+      return cached ? cached : "Loading";
     } else {
       return val;
     }
+  }
+
+  async _fetchNamesNew(uuids, collectionName) {
+    if (collectionName == "") {
+      return [];
+    }
+
+    let payload = {};
+    if (uuids.length > 0) {
+      payload = {
+        solrCore: collectionName,
+        uuids: uuids,
+        filter: "browse,uuid",
+        objectKey: "uuid",
+      };
+    } else {
+      return [];
+    }
+
+    try {
+      const response = await fetch(`/stats-new`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        console.error(`Error fetching names: ${response.statusText}`);
+        return [];
+      }
+
+      const json = await response.json();
+      return json;
+    } catch (err) {
+      console.error("Error while fetching names", err);
+      return [];
+    }
+  }
+
+  async _fetchNames(value, colName) {
+    let collectionName = "";
+    let fl = "browse";
+
+    if (colName) {
+      collectionName = colName;
+    } else {
+      const urlParams = new URLSearchParams(window.location.search);
+      const browsing = urlParams.get("browsing");
+
+      collectionName =
+        browsing && browsing != "organizations" ? `${browsing}` : `people`;
+    }
+
+    if (!collectionName) {
+      console.error("Collection name not found in the URL.");
+      return "";
+    }
+
+    const response = await fetch(
+      `/solr/${collectionName}/select?q=uuid:${value}&fl=${fl}&wt=json`
+    );
+    const data = await response.json();
+
+    // Extract and process `browse` values
+    const browseNames = data.response.docs.map((doc) => doc[fl]);
+
+    const browseNamesString = browseNames.join(", ");
+
+    try {
+      localStorage.setItem(value, browseNamesString);
+    } catch (err) {
+      console.error(`Got err: ${err} while setting key for ${value}`);
+    }
+
+    return browseNamesString;
   }
 
   openModal() {
@@ -1718,7 +1919,7 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
           <td class="${filterRemoveClass} selected-facets" data-key='${
         filt.term
       }' data-field='${filt.field}' >
-              <span  style="width:100px">
+              <span data-val='${filt.field}'  style="width:100px">
               ${this._getDisplayValue(filt.field, filt.display)}
               </span>
               <span style="widht:50px">
@@ -1822,7 +2023,7 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
         if (names) {
           // Find all matching elements dynamically and update their content
           document
-            .querySelectorAll(`[data-field="${edges.util.escapeHtml(field)}"]`)
+            .querySelectorAll(`[data-val="${edges.util.escapeHtml(field)}"]`)
             .forEach((el) => {
               el.innerHTML = `
                 ${edges.util.escapeHtml(names)}

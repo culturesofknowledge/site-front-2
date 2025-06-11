@@ -228,9 +228,9 @@ try {
       }),
 
       new emlo.Facet({
-        id: "author_sort",
+        id: "frbr_creator-person",
         category: "refine_search",
-        field: "author_sort",
+        field: "frbr_creator-person",
         display: "Author",
         size: 5000,
         renderer: new emlo.FacetRenderer({
@@ -244,9 +244,9 @@ try {
       }),
 
       new emlo.Facet({
-        id: "recipient_sort",
+        id: "mail_recipient-person",
         category: "refine_search",
-        field: "recipient_sort",
+        field: "mail_recipient-person",
         display: "Recipient",
         size: 5000,
         renderer: new emlo.FacetRenderer({
@@ -403,7 +403,7 @@ try {
             },
             {
               header: "Where found",
-              field: "",
+              field: "let_con",
               pre: "",
               post: "",
               valueFunction: _displayWhereFound,
@@ -619,7 +619,7 @@ function _redirectToProfile(val, res, fieldName, edge, currentIndex) {
   // Always set 'start' and 'numFound' if they are relevant
   queryParams.set("start", start);
   queryParams.set("numFound", total);
-  queryParams.set("type", "advance");
+  queryParams.set("type", "advanced");
 
   // Ensure all other parameters from the current URL are maintained
   ["sort", "letter", "browsing", "uuids"].forEach((param) => {

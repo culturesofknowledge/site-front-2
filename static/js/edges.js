@@ -1467,13 +1467,12 @@ emlo.FacetRenderer = class extends edges.Renderer {
       if (names && names.length > 0) {
         for (let name of names) {
           localStorage.setItem(name.uuid, name.browse);
-          console.log("name", name);
           document
             .querySelectorAll(`[data-key*="${name.uuid}"]`)
             .forEach((el) => {
               el.innerHTML = `
             <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
-            ${edges.util.escapeHtml(names)}
+            ${edges.util.escapeHtml(name.browse)}
           `;
             });
         }

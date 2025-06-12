@@ -1,25 +1,22 @@
-<div class="section clearfix">
-    <hr class="yellow-divider" />
-    
-    <h3>
-        <img
-        src="/static/img/icon-people.png"
-        alt="People Icon"
-        />People
-    </h3>
 
-    {# All people search section #}
-    {% include 'components/advance/people/all_people.jinja2' %}
+<h3>
+    <img
+    src="/static/img/icon-people.png"
+    alt="People Icon"
+    />People
+</h3>
 
-    {# Senders search section #}
-    {% include 'components/advance/people/sender.jinja2' %}
+{# All people search section #}
+{% include 'components/advance/people/all_people.jinja2' %}
 
-    {# Recipient search section #}
-    {% include 'components/advance/people/recipient.jinja2' %}
+{# Senders search section #}
+{% include 'components/advance/people/sender.jinja2' %}
 
-    {# Mentioned search section #}
-    {% include 'components/advance/people/mentioned.jinja2' %}
+{# Recipient search section #}
+{% include 'components/advance/people/recipient.jinja2' %}
+
+{# Mentioned search section #}
+{% include 'components/advance/people/mentioned.jinja2' %}
 
 
-    <button onclick="advanceSearch()" name="submit-advanced" type="submit" class="button submit search-related">Search</button>
-    </div>
+<button onclick="advanceSearch()" name="submit-advanced" type="submit" class="button submit search-related">Search</button>

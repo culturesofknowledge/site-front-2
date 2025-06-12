@@ -99,16 +99,15 @@ def fetchStatsNew():
             # Construct the Solr query for the current batch
             uuid_query = ' OR '.join([f'"{uuid}"' for uuid in batch])  # Ensure UUIDs are quoted correctly
             solr_query = f'{objectKey}:({uuid_query})'
-            print(f"Got query: {solr_query}")
-            if filter_query:
-                solr_query += f' AND ({filter_query})'
 
             # Build the Solr URL
-            solr_url = f'{SOLR_URL}{solr_core}s/select'
+            core = f"{solr_core}s" if solr_core not in ["people", "all"] else solr_core
+            solr_url = f'{SOLR_URL}{core}/select'
             params = {
                 'q': solr_query,
                 'wt': 'json',
-                'rows': len(batch)  # Fetch results only for the current batch
+                'rows': len(batch),  # Fetch results only for the current batch
+                'fl' : filter_query
             }
 
             # Make the request to Solr

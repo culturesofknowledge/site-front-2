@@ -4,6 +4,16 @@
 
 {% block extra_stylesheets %}
 <style>
+.section {
+				border-top: 1px solid #EFC319; /* Yellow */
+			}
+			.section h3 {
+				padding: 10px 0 10px 0;
+			}
+			.section:last-child {
+				border-bottom: 1px solid #EFC319; /* Yellow */
+				margin-bottom: 40px;
+			}
 @media only screen and (min-width: 64.063em) {  /* min-width 1025px, large screens */
     .side {
         position: fixed;
@@ -211,22 +221,22 @@ input[type="checkbox"]:checked {
                         <h2 class="main">Search+</h2>
                     </div>
 
-                    <div id="people_section" class="large-12 columns" style="padding-left:25px">
+                    <div id="people_section" class="section clearfix">
                         {% include './components/advance/people.jinja2' %}
                     </div>
 
-                    <div id="dates_section" class="large-12 columns" style="padding-left:25px">
+                    <div id="dates_section" class="section clearfix">
                         {% include './components/advance/dates.jinja2' %}
                     </div>
-                    <div id="places_section" class="large-12 columns" style="padding-left:25px">
+                    <div id="places_section" class="section clearfix">
                         {% include './components/advance/places.jinja2' %}
                     </div>
 
-                    <div id="letters_section" class="large-12 columns" style="padding-left:25px">
+                    <div id="letters_section" class="section clearfix">
                         {% include './components/advance/letters.jinja2' %}
                     </div>
 
-                    <div id="institutions_section" class="large-12 columns" style="padding-left:25px">
+                    <div id="institutions_section" class="section clearfix">
                         {% include './components/advance/institutions.jinja2' %}
                     </div>
 

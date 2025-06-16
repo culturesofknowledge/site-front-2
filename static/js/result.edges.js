@@ -1,7 +1,11 @@
 import emlo from "./edges.js";
 import { getAddtionalFields } from "./helper/fields.js";
 import { getLabel } from "./helper/getFieldLabls.js";
-import { displayfields, stripValuePrefix } from "./helper/helper.js";
+import {
+  displayfields,
+  stripValuePrefix,
+  uuidFromUri,
+} from "./helper/helper.js";
 import { searchQueryObj } from "./search.js";
 
 try {
@@ -478,6 +482,10 @@ function _getTypeOfRecord(val, res, fieldName, edge, currentIndex) {
   const total = edge.total(); // Total number of items
   const start = currentIndex;
 
+  if (!val) {
+    return "";
+  }
+
   const objectMap = {
     comment: "Document commented on ",
     person: "Person or organization ",
@@ -488,23 +496,58 @@ function _getTypeOfRecord(val, res, fieldName, edge, currentIndex) {
     manifestation: "Document",
   };
 
+  let profileKey = val;
+  let uuid = res["uuid"];
   let value = "";
-
-  let baseURL = `/profile/${val}/${res["uuid"]}`;
 
   if (objectMap[val]) {
     value = objectMap[val];
   }
 
-  // Changing value in case of comment
-  if (val == "comment") {
-    if (res.hasOwnProperty("bibo_annotates-person")) {
-      value = "Person commented on";
-    } else if (res.hasOwnProperty("bibo_annotates-manifestation")) {
-      value = "Manifestation commented on";
-    } else if (res.hasOwnProperty("bibo_annotates-location")) {
-      value = "Place commented on";
+  const label = getLabel(val);
+
+  if (label != "-") {
+    value = label;
+  }
+
+  let relation = "";
+
+  const relationMap = {
+    comment: {
+      work: [
+        "bibo_annotates-work",
+        "ox_annotatesDate-work",
+        "ox_annotatesAuthor-work",
+        "ox_annotatesAddressee-work",
+        "ox_annotatesAgentsReferenced-work",
+      ],
+      person: ["bibo_annotates-person"],
+      location: ["bibo_annotates-location"],
+      manifestation: ["bibo_annotates-manifestation"],
+    },
+    resource: {
+      work: ["rdfs_seeAlso-work"],
+      person: ["rdfs_seeAlso-person"],
+    },
+  };
+
+  const possibleRelation = relationMap[val];
+
+  if (possibleRelation) {
+    outer: for (const [type, keys] of Object.entries(possibleRelation)) {
+      for (const key of keys) {
+        if (res?.[key]) {
+          relation = key;
+          uuid = uuidFromUri(res[key][0]);
+          profileKey = type;
+          break outer;
+        }
+      }
     }
+  }
+
+  if (relation) {
+    value = getLabel(relation);
   }
 
   // Retrieve existing query parameters from the current URL
@@ -524,6 +567,8 @@ function _getTypeOfRecord(val, res, fieldName, edge, currentIndex) {
       queryParams.set(param, urlParams.get(param)); // Keep the existing query value
     }
   });
+
+  let baseURL = `/profile/${profileKey}/${uuid}`;
 
   // Final URL construction: Base URL + query parameters
   const finalUrl = `${baseURL}?${queryParams.toString()}`;

@@ -1,7 +1,7 @@
 import { getLabel } from "../../js/helper/getFieldLabls.js";
 import { getAddtionalFields, getFieldsToDisplayInProfile } from "./fields.js";
 
-const displayfields = {
+export const displayfields = {
   work: { display: "Description", value: "dcterms_description" },
   manifestation: { display: "Type", value: "dcterms_type" },
   person: { display: "Name", value: "foaf_name" },

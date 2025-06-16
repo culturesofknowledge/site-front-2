@@ -1,7 +1,7 @@
 import emlo from "./edges.js";
 import { getAddtionalFields } from "./helper/fields.js";
 import { getLabel } from "./helper/getFieldLabls.js";
-import { stripValuePrefix } from "./helper/helper.js";
+import { displayfields, stripValuePrefix } from "./helper/helper.js";
 import { searchQueryObj } from "./search.js";
 
 try {
@@ -545,8 +545,22 @@ function _getBriefDetails(val, res, fieldName) {
     }
   }
 
-  // TODO:L write a better code to handle this values from the object not hardcoded
+  if (res && res.hasOwnProperty("object_type")) {
+    const objectType = res["object_type"];
+    if (displayfields.hasOwnProperty(objectType)) {
+      const field = displayfields[objectType]?.value;
+
+      if (res.hasOwnProperty(field)) {
+        return res[field];
+      }
+
+      return "";
+    }
+  }
+
+  // Fail safe code since the above one added later
   // Returning hardcoded bibo_Note - this is default in case of comment, since rest of the object have _name and for work
+  console.log("displayfields", displayfields, val, res["object_type"]);
   if (res["bibo_Note"]) {
     return res["bibo_Note"];
   }

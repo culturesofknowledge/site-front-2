@@ -31,6 +31,7 @@ function quickSearch(params) {
         indent: "on",
       },
     ],
+    queryString: {},
   };
 
   if (params != null) {
@@ -52,10 +53,15 @@ function quickSearch(params) {
       });
     }
 
-    openingQuery.queryStrings.push({
+    // openingQuery.queryStrings.push({
+    //   queryString: searchQuery,
+    //   fields: [{ field: "default_search_field", operator: "OR" }],
+    // });
+
+    openingQuery.queryString = {
       queryString: searchQuery,
-      fields: [{ field: "default_search_field", operator: "OR" }],
-    });
+      defaultField: "default_search_field",
+    };
   }
 
   return {

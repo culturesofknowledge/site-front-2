@@ -252,7 +252,7 @@ def fetchNextResults():
         }
         
         # Fetch first entry
-        first_entry = requests.get(solr_query_url, params=solr_params)
+        first_entry = requests.get(solr_query_url, params={**solr_params, "start": 0})
         if first_entry.status_code != 200:
             return jsonify({'error': 'Error fetching first entry', 'details': first_entry.text}), 500
 

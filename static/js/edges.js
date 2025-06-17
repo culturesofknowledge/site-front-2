@@ -5059,10 +5059,11 @@ emlo.Pagination = class extends edges.Component {
       // Checking if start value is present in URL
       const url = new URL(window.location.href);
       const val = url.searchParams.get("start");
+      console.log("got val as:", val);
       const start = parseInt(val);
       const from = parseInt(this.edge.currentQuery.getFrom());
 
-      if (start != from) {
+      if (!start) {
         this.from = parseInt(this.edge.currentQuery.getFrom()) + 1;
       } else {
         this.from = start + 1;
@@ -5080,6 +5081,8 @@ emlo.Pagination = class extends edges.Component {
       this.page = Math.ceil((this.from - 1) / this.pageSize) + 1;
       this.totalPages = Math.ceil(this.total / this.pageSize);
     }
+
+    console.log("Setting value as: ", this.from);
 
     if (typeof this.from === "number") {
       _addUrlParam("start", this.from - 1);

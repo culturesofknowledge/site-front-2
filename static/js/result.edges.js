@@ -666,9 +666,12 @@ function _getAllMatchingFieldsHTML(val, res, fieldName, edge) {
 
 function _redirectToProfile(val, res, fieldName, edge, currentIndex) {
   const total = edge.total(); // Total number of items
-  const start = currentIndex; // Current start index
+  let start = currentIndex - 1; // Current start index
   const baseURL = `/profile/work/${val}`;
 
+  if (start < 0) {
+    start = 0;
+  }
   // Retrieve existing query parameters from the current URL
   const urlParams = new URLSearchParams(window.location.search);
 

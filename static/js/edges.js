@@ -809,6 +809,11 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       pageNumber = paginationComponent.page;
     }
 
+    // Retrieve existing query parameters from the current URL
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Initialize a query string for new or updated parameters
+    let queryParams = new URLSearchParams(urlParams);
     const continuousIndex = (pageNumber - 1) * pageSize + index + 1;
 
     const row = this.tableDisplay
@@ -823,10 +828,16 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
         }
 
         if (field.valueFunction) {
-          val = field.valueFunction(val, res, field.field, this, index);
+          val = field.valueFunction(
+            val,
+            res,
+            field.field,
+            this,
+            continuousIndex
+          );
 
           if (field.header == "Repositories & Versions") {
-            return `<td id=repo-${index}> </td>`;
+            return `<td id=repo-${continuousIndex}> </td>`;
           } else {
             return `<td>${val}</td>`;
           }

@@ -953,18 +953,14 @@ export function detailsOfOneObject(profile, obj, data, nested = false) {
         const uncertainKey = "ox_manifestation_receipt_date_uncertain";
         const approxKey = "ox_manifestation_receipt_date_approx";
 
-        if (fields_to_display.includes(inferredKey)) {
-          fields_to_display = fields_to_display.filter(
-            (f) => f !== inferredKey
-          );
+        if (fieldsToDisplay.includes(inferredKey)) {
+          fieldsToDisplay = fieldsToDisplay.filter((f) => f !== inferredKey);
         }
-        if (fields_to_display.includes(uncertainKey)) {
-          fields_to_display = fields_to_display.filter(
-            (f) => f !== uncertainKey
-          );
+        if (fieldsToDisplay.includes(uncertainKey)) {
+          fieldsToDisplay = fieldsToDisplay.filter((f) => f !== uncertainKey);
         }
-        if (fields_to_display.includes(approxKey)) {
-          fields_to_display = fields_to_display.filter((f) => f !== approxKey);
+        if (fieldsToDisplay.includes(approxKey)) {
+          fieldsToDisplay = fieldsToDisplay.filter((f) => f !== approxKey);
         }
       }
 

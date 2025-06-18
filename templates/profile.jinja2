@@ -92,14 +92,14 @@
             let backBrowseDoc = document.getElementById("back-to-browse")
 
             const queryObj = searchQueryObj()
-            
+
             const query = buildSolrQuery(queryObj.openingQuery)
 
             // Only make the API call if uuid, type, and start are present
             if (!isNaN(start)) {
                 let apiUrl = '/results?';
 
-                if(query) apiUrl += `q=${query}&`
+                if(query) apiUrl += `q={!q.op=AND} ${query}&`
 
                 // Add parameters only if they exist
                 if (uuid) apiUrl += `uuid=${uuid}&`;

@@ -506,6 +506,10 @@ export function h4WorkList(
   if (data.length > 30) {
     html += summaryByYear(linkField, profile, data);
   } else {
+    const sortedData = data.sort(
+      (a, b) =>
+        new Date(a["started_date_sort"]) - new Date(b["started_date_sort"])
+    );
     html += summaryByDetail(linkField, profile, data);
   }
 

@@ -5063,10 +5063,10 @@ emlo.Pagination = class extends edges.Component {
       const start = parseInt(val);
       const from = parseInt(this.edge.currentQuery.getFrom());
 
-      if (start != from) {
-        this.from = parseInt(this.edge.currentQuery.getFrom()) + 1;
-      } else {
+      if (start && start != from) {
         this.from = start + 1;
+      } else {
+        this.from = parseInt(this.edge.currentQuery.getFrom()) + 1;
       }
 
       this.pageSize = parseInt(this.edge.currentQuery.getSize());
@@ -5105,6 +5105,7 @@ emlo.Pagination = class extends edges.Component {
   decrementPage() {
     const from = Math.max(this.from - 10 * this.pageSize, 1);
     this.setFrom(from);
+    _addUrlParam("start", from - 1);
   }
 
   incrementPage() {
@@ -5113,20 +5114,25 @@ emlo.Pagination = class extends edges.Component {
       (this.totalPages - 1) * this.pageSize + 1
     );
     this.setFrom(from);
+    _addUrlParam("start", from - 1);
   }
 
   goToPage(params) {
     const page = params.page;
     const nf = (page - 1) * this.pageSize + 1;
     this.setFrom(nf);
+    _addUrlParam("start", nf - 1);
   }
 
   goToFirst() {
     this.setFrom(1);
+    _addUrlParam("start", 0);
   }
 
   goToLast() {
-    this.setFrom((this.totalPages - 1) * this.pageSize + 1);
+    const from = (this.totalPages - 1) * this.pageSize + 1;
+    this.setFrom();
+    _addUrlParam("start", from - 1);
   }
 };
 

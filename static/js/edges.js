@@ -5727,6 +5727,17 @@ function _addUrlParam(field, term) {
   let url_param_field = field;
   const url = new URL(window.location.href);
 
+  if (
+    ["frbr_creator-person", "mail_recipient-person"].includes(field) &&
+    term.startsWith("http")
+  ) {
+    let UUID = term.startsWith('"')
+      ? term.slice(1, -1).split("/").pop()
+      : term.split("/").pop();
+
+    term = UUID;
+  }
+
   const fieldMap = {
     author_sort: "aut",
     recipient_sort: "rec",

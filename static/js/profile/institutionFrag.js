@@ -62,9 +62,10 @@ function _renderLocationSection(profile) {
     if (profile.hasOwnProperty(repoCityName)) {
       html += `City: ${profile[repoCityName]}`;
 
-      if (profile.hasOwnProperty("ox_locatedInAlternate")) {
-        html += `(${profile["ox_locatedInAlternate"]})`;
-      }
+      // Hidden based on the issue: https://github.com/culturesofknowledge/emlo-project/issues/418
+      // if (profile.hasOwnProperty("ox_locatedInAlternate")) {
+      //   html += `(${profile["ox_locatedInAlternate"]})`;
+      // }
 
       html += `<br/>`;
     }

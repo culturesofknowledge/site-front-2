@@ -4312,7 +4312,7 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
           );
           imageSrc = "/static/img/repository-icon.png";
           footerType = "r";
-          theTitle = "Institution";
+          theTitle = "Repository";
           break;
         case "comment":
           frag += _renderCommentProfile();

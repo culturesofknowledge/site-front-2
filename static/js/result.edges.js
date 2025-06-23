@@ -544,7 +544,7 @@ function _getTypeOfRecord(val, res, fieldName, edge, currentIndex) {
     person: "Person or organization ",
     location: "Location",
     work: "Letter",
-    institution: "Institution",
+    institution: "Repository",
     image: "Image",
     manifestation: "Document",
   };

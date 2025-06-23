@@ -120,6 +120,14 @@ try {
                   label: "Year",
                   field: "ox_started-ox_year",
                 },
+                {
+                  label: "",
+                  field: "ox_titleOfResource",
+                },
+                {
+                  label: "",
+                  field: "bibo_Note",
+                },
               ],
               valueFunction: _renderMultipleFields,
             },
@@ -439,10 +447,6 @@ $(document).ready(function () {
   }
 });
 
-function _testValueFunction(val, res, self) {
-  // console.log("got vals", val, res, self);
-}
-
 function _displayWhereFound(val, res, fieldName, edge) {
   const urlParams = new URLSearchParams(window.location.search);
   const shouldCall = urlParams.has("let_con"); // replace with actual param name
@@ -453,29 +457,78 @@ function _displayWhereFound(val, res, fieldName, edge) {
 }
 
 function _renderMultipleFields(val, res, fieldName) {
-  if (res && res.hasOwnProperty("object_type")) {
-    // New requirement don't want further details for images
-    if (res["object_type"] == "image") {
-      return "";
-    }
+  if (!res?.object_type) return "";
 
-    const htmlParts = [];
+  let objectType = res.object_type;
 
-    const fields = getAddtionalFields(res["object_type"]);
+  if (objectType === "image") return "";
 
-    for (const key in fields) {
-      const fieldKey = fields[key];
+  const htmlParts = [];
 
-      if (res.hasOwnProperty(fieldKey) && res[fieldKey]) {
-        const value = res[fieldKey];
-        htmlParts.push(`<div>${key}: ${value}</div>`);
+  // Infer type based on relation map
+  const relationMap = {
+    comment: {
+      work: [
+        "bibo_annotates-work",
+        "ox_annotatesDate-work",
+        "ox_annotatesAuthor-work",
+        "ox_annotatesAddressee-work",
+        "ox_annotatesAgentsReferenced-work",
+      ],
+      person: ["bibo_annotates-person"],
+      location: ["bibo_annotates-location"],
+      manifestation: ["bibo_annotates-manifestation"],
+    },
+    resource: {
+      work: ["rdfs_seeAlso-work"],
+      person: ["rdfs_seeAlso-person"],
+    },
+  };
+
+  let inferredType = objectType;
+  let uuid = "";
+  const possibleRelation = relationMap[objectType];
+  let moreData = {};
+  if (possibleRelation) {
+    outer: for (const [type, keys] of Object.entries(possibleRelation)) {
+      for (const key of keys) {
+        if (res[key]) {
+          inferredType = type;
+          uuid = uuidFromUri(res[key][0]);
+          fetchMoreData(uuid, possibleRelation[type]).then((response) => {
+            const fields = displayfields[inferredType];
+            let data = [];
+
+            for (const [label, fieldKey] of Object.entries(fields)) {
+              if (response[0]?.[fieldKey]) {
+                const value = response[0][fieldKey];
+                data.push(`${value}`);
+              }
+            }
+            const div = document.getElementById(uuid);
+            if (div) {
+              div.innerHTML = data.join("");
+            }
+          });
+          break outer;
+        }
       }
     }
-
-    return htmlParts.join("");
-  } else {
-    return "";
   }
+
+  const fields = getAddtionalFields(inferredType);
+  for (const [label, fieldKey] of Object.entries(fields)) {
+    if (res?.[fieldKey]) {
+      const value = res[fieldKey];
+      htmlParts.push(`<div>${label}: ${value}</div>`);
+    } else {
+      if (["comment", "resource"].includes(res["object_type"])) {
+        htmlParts.push(`<p id=${uuid}></p>`);
+      }
+    }
+  }
+
+  return htmlParts.join("");
 }
 
 function _getTypeOfRecord(val, res, fieldName, edge, currentIndex) {
@@ -882,6 +935,7 @@ async function _displayRepoAndVersion(val, item, field, element, index) {
 }
 
 async function getRecordsFromSolr(uris, fieldsToGet, core) {
+  console.log("uris", uris);
   const uuids = uris.map((uri) => uri.split("/").pop());
 
   const payload = {
@@ -904,4 +958,29 @@ async function getRecordsFromSolr(uris, fieldsToGet, core) {
   }
 
   return await response.json();
+}
+
+async function fetchMoreData(uuid, fieldsToGet) {
+  try {
+    const response = await fetch(
+      `/solr/all/select?q=uuid:${uuid}&wt=json&rows=9999`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      console.error(`Error fetching relations: ${response.statusText}`);
+      return [];
+    }
+
+    const json = await response.json();
+    return json.response.docs;
+  } catch (err) {
+    console.error("Error while fetching relations", err);
+    return [];
+  }
 }

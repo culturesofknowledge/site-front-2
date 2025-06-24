@@ -39,19 +39,34 @@ function quickSearch(params) {
       ? params.get("everything")
       : "*";
 
+    // if (params.get("cito_Catalog")) {
+    //   openingQuery.queryStrings.push({
+    //     queryString: `${params.get("cito_Catalog")}`,
+    //     fields: [{ field: "cito_Catalog", operator: "OR" }],
+    //   });
+    // }
+
     if (params.get("cito_Catalog")) {
-      openingQuery.queryStrings.push({
-        queryString: `${params.get("cito_Catalog")}`,
-        fields: [{ field: "cito_Catalog", operator: "OR" }],
+      openingQuery.must.push({
+        field: "cito_Catalog",
+        value: `"${params.get("cito_Catalog")}"`,
       });
     }
 
     if (params.get("object_type")) {
-      openingQuery.queryStrings.push({
-        queryString: `${params.get("object_type")}`,
-        fields: [{ field: "object_type", operator: "OR" }],
+      openingQuery.must.push({
+        field: "object_type",
+        value: `"${params.get("object_type")}"`,
       });
     }
+
+    // if (params.get("object_type")) {
+    //   console.log("jjs", params.get("object_type"));
+    //   openingQuery.queryStrings.push({
+    //     queryString: `${params.get("object_type")}`,
+    //     fields: [{ field: "object_type", operator: "OR" }],
+    //   });
+    // }
 
     // openingQuery.queryStrings.push({
     //   queryString: searchQuery,

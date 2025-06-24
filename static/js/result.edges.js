@@ -610,7 +610,7 @@ function _getTypeOfRecord(val, res, fieldName, edge, currentIndex) {
   let queryParams = new URLSearchParams(urlParams);
 
   // Always set 'start' and 'numFound' if they are relevant
-  queryParams.set("start", start);
+  queryParams.set("start", start - 1);
   queryParams.set("numFound", total);
   queryParams.set("type", "quick");
 

@@ -93,13 +93,21 @@
 
             const queryObj = searchQueryObj()
 
+            console.log("obj" , queryObj)
+
+
             const query = buildSolrQuery(queryObj.openingQuery)
 
             // Only make the API call if uuid, type, and start are present
             if (!isNaN(start)) {
                 let apiUrl = '/results?';
+                let qAndOp = "q={!q.op=AND}"
 
-                if(query) apiUrl += `q={!q.op=AND} ${query}&`
+                if(queryObj.collection && queryObj.collection == "/solr/all/select") {
+                    qAndOp = ""
+                }
+
+                if(query) apiUrl += `${qAndOp} ${query}&`
 
                 // Add parameters only if they exist
                 if (uuid) apiUrl += `uuid=${uuid}&`;
@@ -212,10 +220,14 @@
         })
 
         function buildSolrQuery(config) {
-            const { queryStrings = [], sort = [], size = 10 , must = [] } = config;
+            const { queryStrings = [], sort = [], size = 10 , must = [] , queryString = ""} = config;
 
-            // 1. Handle `queryStrings`
             let queryParts = [];
+            
+            if(queryString) {
+                queryParts.push(`${queryString.defaultField}:"${queryString.queryString}"`);
+            }
+
             for (const q of queryStrings) {
                 const subQueries = q.fields.map(f => `${f.field}:(${q.queryString})`);
                 const combined = subQueries.join(` ${q.fields[0].operator} `);
@@ -226,6 +238,7 @@
                 const query = `${m.field}:${m.value}`
                 queryParts.push(query)
             }
+
 
             // Combine all query parts using AND
             const qString = queryParts.length > 0 ? queryParts.join(' AND ') : '*:*';

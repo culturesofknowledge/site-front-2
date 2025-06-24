@@ -658,7 +658,6 @@ function _getBriefDetails(val, res, fieldName) {
 
   // Fail safe code since the above one added later
   // Returning hardcoded bibo_Note - this is default in case of comment, since rest of the object have _name and for work
-  console.log("displayfields", displayfields, val, res["object_type"]);
   if (res["bibo_Note"]) {
     return res["bibo_Note"];
   }
@@ -935,7 +934,6 @@ async function _displayRepoAndVersion(val, item, field, element, index) {
 }
 
 async function getRecordsFromSolr(uris, fieldsToGet, core) {
-  console.log("uris", uris);
   const uuids = uris.map((uri) => uri.split("/").pop());
 
   const payload = {

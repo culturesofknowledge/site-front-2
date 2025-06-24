@@ -201,7 +201,7 @@ def fetchNextResults():
         }
 
         # Retrieve query parameters
-        search_type = request.args.get('search_type', '')
+        search_type = request.args.get('type', '')
         start = int(request.args.get('start', '0'))  # Default to "0" if not provided
         sort = request.args.get('sort', '')  # Optional sort query
         uuids = request.args.getlist('uuids')  # List of UUIDs
@@ -223,7 +223,7 @@ def fetchNextResults():
         if q:
             query = q 
 
-        sort_query = "started_date_sort asc"
+        sort_query = "" if search_type == "quick" else "started_date_sort asc"
 
         # Add sort parameter if provided
         if sort and sort in SORT_OPTIONS:

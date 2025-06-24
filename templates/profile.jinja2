@@ -101,13 +101,13 @@
             // Only make the API call if uuid, type, and start are present
             if (!isNaN(start)) {
                 let apiUrl = '/results?';
-                let qAndOp = "q={!q.op=AND}"
+                let qAndOp = "{!q.op=AND} "
 
                 if(queryObj.collection && queryObj.collection == "/solr/all/select") {
                     qAndOp = ""
                 }
 
-                if(query) apiUrl += `${qAndOp} ${query}&`
+                if(query) apiUrl += `q=${qAndOp}${query}&`
 
                 // Add parameters only if they exist
                 if (uuid) apiUrl += `uuid=${uuid}&`;

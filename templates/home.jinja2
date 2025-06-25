@@ -47,7 +47,14 @@
 
 {% include "_edges_common_js.jinja2" %}
 <script type="module" src="../static/js/home.edges.js"></script>
-<script type="module" src="../static/js/tooltip.js"></script>
+{# <script type="module" src="../static/js/tooltip.js"></script> #}
+
+<script src="{{ url_for('static', filename='libs/foundation/dist/js/plugins/foundation.core.min.js') }}"></script>
+<script src="{{ url_for('static', filename='libs/foundation/dist/js/plugins/foundation.tooltip.min.js') }}"></script>
+<script src="{{ url_for('static', filename='libs/foundation/dist/js/plugins/foundation.util.box.min.js') }}"></script>
+<script src="{{ url_for('static', filename='libs/foundation/dist/js/plugins/foundation.util.mediaQuery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='libs/foundation/dist/js/plugins/foundation.util.triggers.min.js') }}"></script>
+
 
 <script>
 var starter = 0

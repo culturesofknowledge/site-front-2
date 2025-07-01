@@ -178,6 +178,15 @@
                             // Delete 'type' and 'numFound' if present
                             params.delete('type');
                             params.delete('numFound');
+
+                            let pageNumber = 0;
+                            const start = params.get("start")
+                            if (start != null) {
+                                // Calculate page number from start offset
+                                pageNumber = Math.floor(start / 50) * 50;
+                            }
+                            
+                            params.set('start' , pageNumber);
                             const newQuery = params.toString()
                             const href = newQuery ? `/forms/advanced?${newQuery}` : '/forms/advanced';
                             const modSearch =  newQuery ? `/advanced?${newQuery}` : '/advanced';

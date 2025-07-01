@@ -5131,7 +5131,7 @@ emlo.Pagination = class extends edges.Component {
 
   goToLast() {
     const from = (this.totalPages - 1) * this.pageSize + 1;
-    this.setFrom();
+    this.setFrom(from);
     _addUrlParam("start", from - 1);
   }
 };

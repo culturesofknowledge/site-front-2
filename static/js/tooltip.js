@@ -12,22 +12,33 @@ $(document).ready(function () {
 
     // Function to show tooltip
     const showTooltip = (event, applyDelay = true) => {
-      let tooltipX = event.pageX - 15;
-      let tooltipY = event.pageY - tooltip.outerHeight() - 30; // Position tooltip above pointer
+      let tooltipX, tooltipY;
+      const $target = $(event.target);
 
-      // Check if the tooltip goes beyond the top of the screen
-      if (tooltipY < $(window).scrollTop()) {
-        tooltipY = event.pageY + 15; // Move it below the pointer if there's no space above
-      }
+      if ($target.is("img")) {
+        // For images, position at top-right corner
+        const $img = $target;
+        const imgOffset = $img.offset();
+        tooltipX = imgOffset.left + $img.outerWidth() - 30;
+        tooltipY = imgOffset.top - tooltip.outerHeight() - 5;
+      } else {
+        // Default behavior for non-image elements
+        tooltipX = event.pageX - 15;
+        tooltipY = event.pageY - tooltip.outerHeight() - 30;
 
-      // Check if the tooltip overflows the right edge of the window
-      const windowWidth = $(window).width();
-      const tooltipWidth = tooltip.outerWidth();
-      const spaceLeft = windowWidth - tooltipX;
+        // Check if the tooltip goes beyond the top of the screen
+        if (tooltipY < $(window).scrollTop()) {
+          tooltipY = event.pageY + 15;
+        }
 
-      if (spaceLeft < tooltipWidth) {
-        // If there's not enough space on the right, position on the left
-        tooltipX = event.pageX - tooltipWidth - 15; // 15px from the pointer
+        // Check if the tooltip overflows the right edge of the window
+        const windowWidth = $(window).width();
+        const tooltipWidth = tooltip.outerWidth();
+        const spaceLeft = windowWidth - tooltipX;
+
+        if (spaceLeft < tooltipWidth) {
+          tooltipX = event.pageX - tooltipWidth - 15;
+        }
       }
 
       tooltip.css({
@@ -54,9 +65,21 @@ $(document).ready(function () {
     const targets = $this.find("input, select, #help-icon");
 
     targets.on("mouseenter", function (event) {
-      const isHelpIcon = $(this).is("#help-icon");
-      showTooltip(event, !isHelpIcon); // No delay for #help-icon
+      const $target = $(event.target);
+      const isHelpIcon = $target.is("#help-icon");
+      
+      if ($target.is('img')) {
+        const fakeEvent = {
+          target: event.target,
+          pageX: $target.offset().left + $target.outerWidth(),
+          pageY: $target.offset().top
+        };
+        showTooltip(fakeEvent, false);
+      } else if (!isHelpIcon) {
+        showTooltip(event, true);
+      }
     });
+
 
     targets.on("mouseleave", hideTooltip);
   });

@@ -36,11 +36,13 @@ function quickSearch(params) {
   };
 
   if (params != null) {
-    const urlStartParam = params.get("start");
-    const urlStart = parseInt(urlStartParam, 10);
+    if (params && params.get("start")) {
+      const urlStartParam = params.get("start");
+      const urlStart = parseInt(urlStartParam, 10);
 
-    if (!isNaN(urlStart)) {
-      openingQuery.from = urlStart;
+      if (!isNaN(urlStart)) {
+        openingQuery.from = urlStart;
+      }
     }
 
     const searchQuery = params.get("everything")
@@ -107,11 +109,13 @@ function advanceSearch(params) {
     from: 0,
   };
 
-  const urlStartParam = params.get("start");
-  const urlStart = parseInt(urlStartParam, 10);
+  if (params && params.get("start")) {
+    const urlStartParam = params.get("start");
+    const urlStart = parseInt(urlStartParam, 10);
 
-  if (!isNaN(urlStart)) {
-    openingQuery.from = urlStart;
+    if (!isNaN(urlStart)) {
+      openingQuery.from = urlStart;
+    }
   }
 
   const contents = getContentFields();

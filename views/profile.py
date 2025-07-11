@@ -11,11 +11,15 @@ def profile(collection, id):
         else f"{collection}s"
     )
 
+    pageTitle = collection.capitalize()
+
     try:
-        is_valid = check_profile(solr_core , id)
+        is_valid , is_organisation = check_profile(solr_core , id)
         
         if is_valid:
-            return render_template('profile.jinja2', title=collection.capitalize(), collection=collection, id=id)
+            if is_organisation:
+                pageTitle = "Organization"
+            return render_template('profile.jinja2', title=pageTitle, collection=collection, id=id)
     except Exception as e:
         print("Exception occurred while querying Solr:", e)
 

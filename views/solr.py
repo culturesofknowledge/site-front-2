@@ -39,16 +39,48 @@ def solr_proxy(subpath):
         return jsonify({"error": str(err)}), 500
     
 # Only used internally 
-def check_profile(collection_name , uuid):
+# def check_profile(collection_name , uuid):
+#     try:
+#         # Check for empty or None inputs
+#         if not collection_name or not uuid:
+#             print("Invalid input: collection_name or uuid is empty.")
+#             return False
+
+#         SOLR_URL = getSolrURL()
+
+#         solr_url = f'{collection_name}/select?q=uuid:{uuid}&wt=json&rows=1&fl=uuid'
+#         full_url = SOLR_URL + solr_url
+
+#         response = requests.get(full_url)
+#         response.raise_for_status()
+
+#         if response.status_code == 200:
+#             data = response.json()
+#             if data.get("response", {}).get("numFound", 0) > 0:
+#                 return True
+#             else:
+#                 return False
+
+#         return False
+
+#     except requests.exceptions.HTTPError as http_err:
+#         print(f"Got HTTP error: {http_err}")
+#         return False
+#     except Exception as err:
+#         print(f"Got error: {err}")
+#         return False
+
+def check_profile(collection_name, uuid):
     try:
         # Check for empty or None inputs
         if not collection_name or not uuid:
             print("Invalid input: collection_name or uuid is empty.")
-            return False
+            return (False, False)
 
         SOLR_URL = getSolrURL()
-
-        solr_url = f'{collection_name}/select?q=uuid:{uuid}&wt=json&rows=1&fl=uuid'
+        
+        # Query both uuid and ox_isOrganisation fields
+        solr_url = f'{collection_name}/select?q=uuid:{uuid}&wt=json&rows=1&fl=uuid,ox_isOrganisation'
         full_url = SOLR_URL + solr_url
 
         response = requests.get(full_url)
@@ -56,19 +88,24 @@ def check_profile(collection_name , uuid):
 
         if response.status_code == 200:
             data = response.json()
-            if data.get("response", {}).get("numFound", 0) > 0:
-                return True
+            docs = data.get("response", {}).get("docs", [])
+            if docs:
+                doc = docs[0]
+                # If field is missing, return False as value
+                is_organisation = bool(doc.get('ox_isOrganisation', False))
+                return (True, is_organisation)
             else:
-                return False
+                # Document not found
+                return (False, False)
 
-        return False
+        return (False, False)
 
     except requests.exceptions.HTTPError as http_err:
         print(f"Got HTTP error: {http_err}")
-        return False
+        return (False, False)
     except Exception as err:
         print(f"Got error: {err}")
-        return False
+        return (False, False)
     
 
 @solr_bp.route('/stats-new', methods=['POST'])

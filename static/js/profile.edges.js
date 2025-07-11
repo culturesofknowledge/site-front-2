@@ -4,7 +4,7 @@ const collectionMap = {
   person: "people",
   location: "locations",
   work: "works",
-  institution: "institutions",
+  repository: "institutions",
   manifestation: "manifestations",
   image: "images",
   comment: "comments",

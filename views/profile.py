@@ -5,7 +5,11 @@ profile_bp = Blueprint('profile', __name__, url_prefix='/profile')
 
 @profile_bp.route('/<collection>/<id>')
 def profile(collection, id):
-    solr_core = "people" if collection == "person" else f"{collection}s"
+    solr_core = (
+        "people" if collection == "person" 
+        else "institutions" if collection == "repository" 
+        else f"{collection}s"
+    )
 
     try:
         is_valid = check_profile(solr_core , id)

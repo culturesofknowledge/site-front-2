@@ -870,6 +870,9 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
                 : "";
 
               if (subPagen != "") {
+                if (subPagen == "institution") {
+                  return `<td><a href="${prefix}/repository/${href}">${linkText}</a></td>`;
+                }
                 return `<td><a href="${prefix}/${subPagen}/${href}">${linkText}</a></td>`;
               }
 
@@ -2814,7 +2817,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
         // Conditionally build name, city, and country sections
         const nameHTML = institutionData.geonames_officialName
-          ? `<a href="/profile/institution/${institutionId}">${institutionData.geonames_officialName}</a><br>`
+          ? `<a href="/profile/repository/${institutionId}">${institutionData.geonames_officialName}</a><br>`
           : "";
         const cityHTML = institutionData.geonames_locatedIn
           ? `<span style="color:#172854;">City</span>:<br>&nbsp;&nbsp;&nbsp; ${institutionData.geonames_locatedIn}<br>`

@@ -137,7 +137,7 @@ function _redirectToSearch(val, res, fieldName) {
     const baseURL = `/forms/advanced`;
     let query = "";
     const user = res["browse"];
-    const currentPageQ = `browsing=organizations&letter=${current_search_letter}`;
+    const currentPageQ = `browsing=repositories&letter=${current_search_letter}`;
 
     switch (fieldName) {
       case "ox_totalDocsInRepository":

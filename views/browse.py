@@ -50,9 +50,9 @@ def organisations():
     return render_template('/pages/browse/organisations.jinja2', title="Browse: Organizations", letter=letter, filters=filter_param)
 
 
-@browse_bp.route('/institutions')
+@browse_bp.route('/repositories')
 def institutions():
-    return render_template('/pages/browse/institutions.jinja2', title="Browse: Institutions")
+    return render_template('/pages/browse/institutions.jinja2', title="Browse: Repositories")
 
 
 @browse_bp.route('/works')

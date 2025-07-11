@@ -14,7 +14,6 @@ const validCollections = [
 ];
 
 export function getComponents(collectionName, emlo) {
-  console.log("collectionName", collectionName);
   try {
     let components = [];
 

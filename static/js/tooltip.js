@@ -62,13 +62,22 @@ $(document).ready(function () {
     };
 
     // Bind events to both input and help icon
-    const targets = $this.find("input, select, #help-icon");
+    const targets = $this.find("input, select, #help-icon, .has-tip");
 
     targets.on("mouseenter", function (event) {
       const $target = $(event.target);
-      const isHelpIcon = $target.is("#help-icon");
-      
-      if ($target.is('img')) {
+      const isHelpIcon = $target.is("#help-icon") || $target.closest("#help-icon").length > 0;
+
+      // Show tooltip only if .has-tip contains an image
+      if ($target.hasClass('has-tip') && $target.find('img').length > 0) {
+        const img = $target.find('img').first();
+        const fakeEvent = {
+          target: img[0],
+          pageX: img.offset().left + img.outerWidth(),
+          pageY: img.offset().top
+        };
+        showTooltip(fakeEvent, false);
+      } else if ($target.is('img') || $target.hasClass('help')) {
         const fakeEvent = {
           target: event.target,
           pageX: $target.offset().left + $target.outerWidth(),
@@ -79,7 +88,6 @@ $(document).ready(function () {
         showTooltip(event, true);
       }
     });
-
 
     targets.on("mouseleave", hideTooltip);
   });

@@ -204,10 +204,11 @@ input[type="checkbox"]:checked {
                 <li>
                     <a href="#institutions_section">Repositories and Editions</a>
                 </li>
-			    <li>
+			<li>
                     <form onsubmit="return false;" style="width:200px">
                         <button onclick="advanceSearch()" style="margin-top:10px;margin-right:45px;" 
                     name="submit-advanced" type="submit" class="button submit search-related">Search</button>
+                        <button onclick="clearAllAdvanceFields()" class="button" style="margin-top:10px;margin-right:36px;">Clear All</button>
                     </form>
                 </li>
 			</ul>
@@ -253,6 +254,7 @@ input[type="checkbox"]:checked {
 {% include "_edges_common_js.jinja2" %}
 <script type="module" src="../static/js/repository_dropdown.edges.js"></script>
 <script type="module" src="../static/js/tooltip.js"></script>
+<script src="../static/js/clearFields.js"></script>
 
 <script>
 const inputs = [
@@ -483,4 +485,19 @@ $(document).on("keypress" , (e) => {
     }
 })
 </script>
+
+<script>
+  function clearAllAdvanceFields() {
+    const container = document.querySelector('.main');
+    clearFields(container);
+
+    // Clear URL parameters without reloading the page
+    if (window.history && window.history.replaceState) {
+      const url = new URL(window.location);
+      url.search = '';
+      window.history.replaceState({}, document.title, url.toString());
+    }
+  }
+</script>
+
 {% endblock extra_js_bottom %}

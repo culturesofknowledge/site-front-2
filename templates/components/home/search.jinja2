@@ -113,7 +113,7 @@
       {# Search content - Ends #}
 
       <div class="large-12">
-        <div class="large-9 hide-for-small columns" style="margin-top: 10px">
+        <div class="large-6 hide-for-small columns" style="margin-top: 10px">
           <p class="text-center" style="margin-bottom: 0">
             Want a full set of fields? Try
             <a href="{{ url_for('advance.advance') }}">Search+</a>
@@ -133,7 +133,7 @@
             <a href="{{ url_for('browse.people') }}">Browse</a>
           </p>
         </div>
-        <div class="large-3 columns">
+        <div class="large-4 columns">
           <input
             class="button submit search-related"
             type="submit"
@@ -141,6 +141,14 @@
             value="Search"
             style="margin-top: 13px;float:left;"
           />
+          <button
+            type="button"
+            class="button"
+            style="margin-top: 13px; margin-left: 10px;"
+            onclick="clearAllSearchFields()"
+          >
+            Clear All
+          </button>
 
           <input
             type="hidden"
@@ -153,4 +161,19 @@
     </form>
 
   </div>
+
+  <script src="../static/js/clearFields.js"></script>
+  <script>
+    function clearAllSearchFields() {
+      const form = document.getElementById('search');
+      clearFields(form);
+
+      // Clear URL parameters without reloading the page
+      if (window.history && window.history.replaceState) {
+        const url = new URL(window.location);
+        url.search = '';
+        window.history.replaceState({}, document.title, url.toString());
+      }
+    }
+  </script>
 </div>

@@ -13,22 +13,108 @@
 <script type="module" src="../static/js/result.edges.js"></script>
 
 <script>
-function modifyCurrentSearch() {
+
+async function modifyCurrentSearch() {
     try {
         const currentParams = new URLSearchParams(window.location.search);
-            
-        let advanceSearchUrl = `${window.location.origin}/advanced`;
 
-        if(currentParams.size > 0) {
-            advanceSearchUrl = `${advanceSearchUrl}?${currentParams.toString()}`
+        const mapping = {
+            "frbr_creator-person": "aut",
+            "mail_recipient-person": "rec",
+            "origin_sort": "pla_ori_name",
+            "destination_sort": "pla_des_name",
+            "ox_started-ox_year": "dat_sin_year"
+        };
+
+        const apiKeys = ["frbr_creator-person", "mail_recipient-person"];
+        const collectionName = "people";
+        const uuidsMap = {}; // { key: [uuid1, uuid2] }
+        const newParams = new URLSearchParams();
+
+        // Step 1: Collect UUIDs for API keys
+        for (const [key, value] of currentParams.entries()) {
+            if (apiKeys.includes(key)) {
+                if (!uuidsMap[key]) uuidsMap[key] = [];
+                uuidsMap[key].push(value);
+            }
         }
 
+        // Step 2: Call _fetchNamesNew for all UUIDs (flattened into one array)
+        const allUuids = Object.values(uuidsMap).flat();
+        const resolvedValues = await _fetchNamesNew(allUuids, collectionName);
+        const uuidToNameMap = {};
+
+        // Step 3: Create a quick lookup map from UUID to resolved name
+        resolvedValues.forEach(entry => {
+            uuidToNameMap[entry.uuid] = entry.browse || entry.uuid;
+        });
+
+        // Step 4: Build new URLSearchParams
+        for (const [key, value] of currentParams.entries()) {
+            if (mapping.hasOwnProperty(key)) {
+                const newKey = mapping[key];
+
+                if (apiKeys.includes(key)) {
+                    const resolvedValue = uuidToNameMap[value] || value;
+                    newParams.set(newKey, resolvedValue);
+                } else {
+                    newParams.set(newKey, value);
+                }
+            } else {
+                // Not mapped, keep as-is
+                newParams.set(key, value);
+            }
+        }
+
+        // Step 5: Redirect
+        const advanceSearchUrl = `${window.location.origin}/advanced` +
+            (newParams.toString() ? `?${newParams.toString()}` : '');
         window.location.href = advanceSearchUrl;
-    } catch(err) {
-        console.error(`got an error ${err} while redirecting the user to search+ page`)
-        alert("Unable to redirect you to modify your search")
+
+    } catch (err) {
+        console.error(`Unexpected error during redirect: ${err}`);
+        alert("Unable to redirect you to modify your search.");
     }
 }
+
+  async function _fetchNamesNew(uuids, collectionName) {
+    if (collectionName == "") {
+      return [];
+    }
+
+    let payload = {};
+    if (uuids.length > 0) {
+      payload = {
+        solrCore: collectionName,
+        uuids: uuids,
+        filter: "browse,uuid",
+        objectKey: "uuid",
+      };
+    } else {
+      return [];
+    }
+
+    try {
+      const response = await fetch(`/stats-new`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        console.error(`Error fetching names: ${response.statusText}`);
+        return [];
+      }
+
+      const json = await response.json();
+      return json;
+    } catch (err) {
+      console.error("Error while fetching names", err);
+      return [];
+    }
+  }
 
 function returnToBrowse(){
     const baseURL = `${window.location.origin}/browse`;

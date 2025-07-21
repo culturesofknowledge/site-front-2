@@ -329,7 +329,31 @@ def fetchNextResults():
         print(e)
         return jsonify({'error': 'Internal Server Error', 'details': str(e)}), 500
 
-    
+@solr_bp.route('/repos', methods=['GET'])
+def fetch_institutions():
+    SOLR_URL = getSolrURL()
+    COLLECTION = "institutions"
+
+    # Solr query parameters
+    params = {
+        'q': '*:*',              # match all documents
+        'fl': 'browse,geonames_officialName',          # only fetch the 'browse' field
+        'rows': 1000,            # fetch 1000 rows
+        'sort': 'browse asc',    # sort by 'browse' ascending
+        'wt': 'json'             # response format
+    }
+
+    solr_query_url = f"{SOLR_URL}{COLLECTION}/select"
+
+    try:
+        response = requests.get(solr_query_url, params=params)
+        response.raise_for_status()
+        
+        return jsonify(response.json()), response.status_code
+
+    except requests.RequestException as e:
+        return jsonify({'error': str(e)}), 500
+
 
 # Function to handle the solr url for each API call. 
 # Todo: we can store solr URL in global variable instead of making call to multiple times to env file.

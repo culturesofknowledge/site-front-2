@@ -11,7 +11,8 @@ if (paramValue) {
 
 // try {
 emlo.selector = "repository-dropdown";
-emlo.collection = "/solr/institutions/select";
+// emlo.collection = "/solr/institutions/select";
+emlo.collection = "/repos";
 emlo.components = [
   new emlo.DropDown({
     id: "repository_dropdown",

@@ -386,7 +386,7 @@ emlo.DropDownRenderer = class extends edges.Renderer {
   draw() {
     let frag = this.noResultsText;
     if (this.component.results === false) {
-      frag = "";
+      frag = "Loading...";
     }
 
     const results = this.component.results;

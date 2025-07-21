@@ -31,13 +31,27 @@ $(document).ready(function () {
           tooltipY = event.pageY + 15;
         }
 
-        // Check if the tooltip overflows the right edge of the window
+        // Check if the tooltip overflows the right or left edge of the window
         const windowWidth = $(window).width();
         const tooltipWidth = tooltip.outerWidth();
         const spaceLeft = windowWidth - tooltipX;
+        const leftSpace = tooltipX;
 
-        if (spaceLeft < tooltipWidth) {
-          tooltipX = event.pageX - tooltipWidth - 15;
+        if (spaceLeft < tooltipWidth || leftSpace < tooltipWidth) {
+          console.log("Adjusting tooltip width due to limited space");
+          // Set width to 200px with !important to override CSS
+          tooltip.attr(
+            "style",
+            "width: 180px !important; white-space: normal; height: auto; max-width: none;"
+          );
+          // Force reflow
+          const reflow = tooltip[0].offsetHeight;
+          // Recalculate tooltip height and adjust Y position accordingly
+          tooltipY = event.pageY - tooltip.outerHeight() - 30;
+          if (tooltipY < $(window).scrollTop()) {
+            tooltipY = event.pageY + 15;
+          }
+          tooltipX = event.pageX - tooltip.outerWidth() - 15;
         }
       }
 
@@ -66,22 +80,23 @@ $(document).ready(function () {
 
     targets.on("mouseenter", function (event) {
       const $target = $(event.target);
-      const isHelpIcon = $target.is("#help-icon") || $target.closest("#help-icon").length > 0;
+      const isHelpIcon =
+        $target.is("#help-icon") || $target.closest("#help-icon").length > 0;
 
       // Show tooltip only if .has-tip contains an image
-      if ($target.hasClass('has-tip') && $target.find('img').length > 0) {
-        const img = $target.find('img').first();
+      if ($target.hasClass("has-tip") && $target.find("img").length > 0) {
+        const img = $target.find("img").first();
         const fakeEvent = {
           target: img[0],
           pageX: img.offset().left + img.outerWidth(),
-          pageY: img.offset().top
+          pageY: img.offset().top,
         };
         showTooltip(fakeEvent, false);
-      } else if ($target.is('img') || $target.hasClass('help')) {
+      } else if ($target.is("img") || $target.hasClass("help")) {
         const fakeEvent = {
           target: event.target,
           pageX: $target.offset().left + $target.outerWidth(),
-          pageY: $target.offset().top
+          pageY: $target.offset().top,
         };
         showTooltip(fakeEvent, false);
       } else if (!isHelpIcon) {

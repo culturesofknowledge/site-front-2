@@ -1229,8 +1229,12 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
       })
     );
 
-    _removeUrlParam(field);
+    // HOTFIX: This is just ensuring that we are removing query string only for quick search
+    if (field == "default_search_field") {
+      nq.removeQueryString();
+    }
 
+    _removeUrlParam(field);
     // Reset the search page to the start and trigger the next query
     nq.from = 0;
     this.edge.pushQuery(nq);

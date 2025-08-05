@@ -1489,6 +1489,10 @@ emlo.FacetRenderer = class extends edges.Renderer {
           document
             .querySelectorAll(`[data-key*="${name.uuid}"]`)
             .forEach((el) => {
+              // Protecting this from selected facet rendering since this is taken care there
+              if(el.dataset.field && el.dataset.field == "uuid_related") {
+                return
+              }
               el.innerHTML = `
             <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
             ${edges.util.escapeHtml(name.browse)}
@@ -1983,6 +1987,7 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
 
   // PATCH: currently we do not have anything in edges that can help us with this.
   _getDisplayValue(field, value) {
+    console.log("Call here")
     const colMap = {
       "mail_origin-location": "locations",
       "mail_destination-location": "locations",
@@ -2037,12 +2042,14 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
       }
 
       // Fetch names asynchronously
-      this._fetchNames(value, collectionName).then((names) => {
+      this._fetchNamesSelected(value, collectionName).then((names) => {
+        console.log("Calling fetch names")
         if (names) {
           // Find all matching elements dynamically and update their content
           document
             .querySelectorAll(`[data-val="${edges.util.escapeHtml(field)}"]`)
             .forEach((el) => {
+              console.log("got el" , el)
               el.innerHTML = `
                 ${edges.util.escapeHtml(names)}
               `;
@@ -2064,7 +2071,7 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
     }
   }
 
-  async _fetchNames(value, colName) {
+  async _fetchNamesSelected(value, colName) {
     let collectionName = "";
     let fl = "browse";
 

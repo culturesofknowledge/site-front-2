@@ -1987,7 +1987,6 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
 
   // PATCH: currently we do not have anything in edges that can help us with this.
   _getDisplayValue(field, value) {
-    console.log("Call here")
     const colMap = {
       "mail_origin-location": "locations",
       "mail_destination-location": "locations",
@@ -2043,13 +2042,11 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
 
       // Fetch names asynchronously
       this._fetchNamesSelected(value, collectionName).then((names) => {
-        console.log("Calling fetch names")
         if (names) {
           // Find all matching elements dynamically and update their content
           document
             .querySelectorAll(`[data-val="${edges.util.escapeHtml(field)}"]`)
             .forEach((el) => {
-              console.log("got el" , el)
               el.innerHTML = `
                 ${edges.util.escapeHtml(names)}
               `;

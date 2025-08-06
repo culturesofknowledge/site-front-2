@@ -204,6 +204,9 @@ input[type="checkbox"]:checked {
                 <li>
                     <a href="#institutions_section">Repositories and Editions</a>
                 </li>
+                <li>
+                    <a href="#collections_section">Catalogues</a>
+                </li>
 			<li>
                     <form onsubmit="return false;" style="width:200px">
                         <button onclick="advanceSearch()" style="margin-top:10px;margin-right:45px;" 
@@ -241,6 +244,10 @@ input[type="checkbox"]:checked {
                         {% include './components/advance/institutions.jinja2' %}
                     </div>
 
+                     <div id="collections_section" class="section clearfix">
+                        {% include './components/advance/collections.jinja2' %}
+                    </div>
+
                     <div class="large-10">
                         &nbsp;
                     </div>
@@ -253,6 +260,7 @@ input[type="checkbox"]:checked {
 {% block extra_js_bottom %}
 {% include "_edges_common_js.jinja2" %}
 <script type="module" src="../static/js/repository_dropdown.edges.js"></script>
+<script type="module" src="../static/js/catalogue_dropdown.edges.js"></script>
 <script type="module" src="../static/js/tooltip.js"></script>
 <script src="../static/js/clearFields.js"></script>
 
@@ -316,6 +324,7 @@ const inputs = [
     { id: "let_shel", defaultValue: "all shelfmarks", paramName: "let_shel" },
     { id: "let_pe", defaultValue: "false", paramName: "let_pe" },
     { id: "let_pe_tex", defaultValue: "all printed editions", paramName: "let_pe_tex" },
+    { id: "col_cat", defaultValue: "all catalogues", paramName: "col_cat" },
 ];
 
 function advanceSearch(event){

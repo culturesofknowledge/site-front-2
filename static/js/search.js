@@ -279,6 +279,12 @@ function advanceSearch(params) {
           { field: "manifestation-shelfmark", operator: "OR" },
         ],
       },
+      {
+        param : "col_cat",
+        queryStringFields: [
+          { field: "cito_Catalog", operator: "OR" },
+        ],
+      }
     ];
 
     const customValue = ["aut", "rec", "pla_ori_name", "pla_des_name"];

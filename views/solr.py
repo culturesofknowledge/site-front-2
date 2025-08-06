@@ -353,6 +353,47 @@ def fetch_institutions():
 
     except requests.RequestException as e:
         return jsonify({'error': str(e)}), 500
+    
+@solr_bp.route('/api/catalogues', methods=['GET'])
+def fetch_catalogues():
+    SOLR_URL = getSolrURL()
+    COLLECTION = "works"
+
+    params = {
+        "q": "*:*",
+        "rows": 0,
+        "facet": "true",
+        "facet.field": "cito_Catalog",
+        "facet.limit": -1,
+        "wt": "json"
+    }
+
+    solr_query_url = f"{SOLR_URL}{COLLECTION}/select"
+
+    try:
+        # Make Solr request
+        response = requests.get(solr_query_url, params=params)
+        response.raise_for_status()
+        solr_data = response.json()
+
+        # Extract raw facets [name1, count1, name2, count2, ...]
+        raw_facets = solr_data.get("facet_counts", {}).get("facet_fields", {}).get("cito_Catalog", [])
+        unique_values = raw_facets[::2]  # Skip counts, get only names
+
+        print(f"Got values as {unique_values}")
+
+        # Inject unique values into response.docs
+        if "response" not in solr_data:
+            solr_data["response"] = {}
+
+        solr_data["response"]["numFound"] = len(unique_values)
+        solr_data["response"]["start"] = 0
+        solr_data["response"]["docs"] = [{"name": val} for val in unique_values]
+
+        return jsonify(solr_data)
+
+    except requests.RequestException as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # Function to handle the solr url for each API call. 

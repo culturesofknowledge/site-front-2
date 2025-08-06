@@ -1,0 +1,39 @@
+<h3><img src="/static/img/icon-catalogues.png" alt="Catalogue Icon"> Catalogues</h3>
+
+<fieldset>
+
+    <legend>Catalogue</legend>
+
+    <div
+      data-delay="2.0"
+      data-tip="Confine your search to a single catalogue." 
+      class="row">
+      <div class="small-10 columns">
+        <label for="col_cat">Name</label>
+        <div id="catalogue-dropdown" style="padding: 0px 30px;"></div>
+      <div>
+        {% include 'components/common/help_icon.jinja2' %}
+      </div>
+    </div>
+</fieldset>
+
+<!-- Optional Multi-catalogue selection (currently commented out)
+<fieldset class="alignment">
+    <label for="cat_group">Catalogue</label>
+    <div class="row">
+        <div class="large-11 columns">
+            <select name="cat_group" id="cat_group" multiple size="5">
+                <option value="catalogue1">Catalogue 1</option>
+                <option value="catalogue2">Catalogue 2</option>
+                etc. 
+            </select>
+        </div>
+        <div class="large-1 columns">
+            <span class="help-icon" title="Search within multiple catalogues.">?</span>
+        </div>
+    </div>
+    
+</fieldset>
+-->
+
+<button onclick="advanceSearch()" name="submit-advanced" type="submit" class="button submit search-related">Search</button>

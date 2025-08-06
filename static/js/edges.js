@@ -378,6 +378,18 @@ emlo.DropDownRenderer = class extends edges.Renderer {
       "Please select an option"
     );
 
+    this.defaultText = edges.util.getParam(
+      params,
+      "defaultText",
+      ""
+    );
+
+    this.paramValue = edges.util.getParam(
+      params,
+      "paramValue",
+      "repository"
+    );
+
     // variables for internal state
     this.namespace = "edges-bs3-results-dropdown";
     this.isSelected = false;
@@ -399,7 +411,7 @@ emlo.DropDownRenderer = class extends edges.Renderer {
       const selected = this.isSelected ? "" : "selected";
       // Add default option at the beginning
       options =
-        `<option value="all repositories" ${selected}>all repositories</option>` +
+        `<option value="${this.defaultOptionText}" ${selected}> ${this.defaultOptionText} </option>` +
         options;
 
       const dropdownClass = edges.util.allClasses(
@@ -410,7 +422,7 @@ emlo.DropDownRenderer = class extends edges.Renderer {
 
       // Create dropdown element
       frag = `
-        <select id="repository" class="${dropdownClass} form-control">
+        <select id="${this.paramValue}" class="${dropdownClass} form-control">
           ${options}
         </select>
       `;
@@ -432,7 +444,7 @@ emlo.DropDownRenderer = class extends edges.Renderer {
     );
 
     // Triggering the combo box logic
-    const doc = document.getElementById("repository");
+    const doc = document.getElementById(this.paramValue);
 
     if (doc) {
       enhanceSelect(doc);
@@ -443,10 +455,10 @@ emlo.DropDownRenderer = class extends edges.Renderer {
 
   // This function is called when the user changes the sort option
   changeRepoValue = function (element) {
-    if (element.value == "all repositories") {
-      _removeUrlParam("repository");
+    if (element.value == this.defaultText) {
+      _removeUrlParam(this.paramValue);
     } else {
-      _addUrlParam("repository", element.value);
+      _addUrlParam(this.paramValue, element.value);
     }
   };
 

@@ -10596,3 +10596,19 @@ button.tiny {
 .capitalize-first-letter::first-letter {
   text-transform: uppercase;
 }
+
+.clear-all-button {
+  margin-top: -10px;
+  margin-right: 45px;
+  padding: 12px 22px;
+  font-size: 1.25rem;
+  font-weight: bold;
+  border: 1px solid #EFC319;
+  background: #fff;
+  color: #172854;
+}
+
+.clear-all-button:hover {
+  background: #fff;
+  color: #172854;
+}

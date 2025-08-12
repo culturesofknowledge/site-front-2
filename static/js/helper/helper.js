@@ -864,6 +864,7 @@ export function detailsOfOneObject(profile, obj, data, nested = false) {
     const uri = relation[uriFieldName];
     const url = profileFromUri(uri);
     const objectType = relation["object_type"];
+
     const mainDisplayValue = relation[displayfields[objectType].value];
 
     let fieldsToDisplay = [],
@@ -1040,7 +1041,13 @@ export function detailsOfOneObject(profile, obj, data, nested = false) {
       if (objectType == "comment") {
         frag += `<pre> ${mainDisplayValue} </pre>`;
       } else {
-        frag += `<a href="${url}">${mainDisplayValue}</a><br/>`;
+        if (objectType == "institution") {
+          const newUrl = url.replace("/institution/", "/repository/");
+          console.debug("updating URL", newUrl);
+          frag += `<a href="${newUrl}">${mainDisplayValue}</a><br/>`;
+        } else {
+          frag += `<a href="${url}">${mainDisplayValue}</a><br/>`;
+        }
       }
 
       const additional = getAddtionalFields(objectType);

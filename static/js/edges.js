@@ -24,6 +24,7 @@ import {
   _renderPeopleSidebar,
 } from "./profile/peopleFrags.js";
 import { _renderWorkProfile, _renderWorkSidebar } from "./profile/workFrag.js";
+import { searchQueryObj } from "./search.js";
 
 const emlo = {
   active: {},
@@ -1235,10 +1236,51 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
     }
 
     _removeUrlParam(field);
+
+    // PATCH: In EMLO the query when using checkboxes behaves a little different since the value that we need to search on gets changed
+    // for eg: if sender and as marked is enabled we will search of mail_authors-rdf_value but if as marked is not present we will search on person-author
+    // Now since we are using edges in that we are using the initial query that got generated and hence wrong results are shown.
+    const query = searchQueryObj();
+
+    // Forcefully updating the querystrings, querystring and must.
+    if (query && (query.openingQuery != null || query.openingQuery != {})) {
+      nq = this.syncObjects(nq, query.openingQuery);
+    }
+
     // Reset the search page to the start and trigger the next query
     nq.from = 0;
     this.edge.pushQuery(nq);
     this.edge.cycle();
+  }
+
+  deepEqual(a, b) {
+    return JSON.stringify(a) === JSON.stringify(b);
+  }
+
+  isEmpty(val) {
+    if (val == null) return true; // null or undefined
+    if (Array.isArray(val)) return val.length === 0;
+    if (typeof val === "object") return Object.keys(val).length === 0;
+    return false;
+  }
+
+  syncObjects(obj1, obj2) {
+    const fields = ["must", "queryStrings", "queryString"];
+
+    fields.forEach((field) => {
+      // Skip if obj2[field] is missing or empty
+      if (this.isEmpty(obj2[field])) return;
+
+      // If obj1[field] is empty or different, update it
+      if (
+        this.isEmpty(obj1[field]) ||
+        !this.deepEqual(obj1[field], obj2[field])
+      ) {
+        obj1[field] = JSON.parse(JSON.stringify(obj2[field])); // deep copy
+      }
+    });
+
+    return obj1;
   }
 };
 
@@ -1490,8 +1532,8 @@ emlo.FacetRenderer = class extends edges.Renderer {
             .querySelectorAll(`[data-key*="${name.uuid}"]`)
             .forEach((el) => {
               // Protecting this from selected facet rendering since this is taken care there
-              if(el.dataset.field && el.dataset.field == "uuid_related") {
-                return
+              if (el.dataset.field && el.dataset.field == "uuid_related") {
+                return;
               }
               el.innerHTML = `
             <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />

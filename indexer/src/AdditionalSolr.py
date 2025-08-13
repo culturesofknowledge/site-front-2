@@ -692,6 +692,9 @@ def AdditionalWorksData( use_staging=True ) : #{
       #=============================================
       if changed : #{
         for key, value in result.items():
+          # Do not copy solr reserved fields
+          if key.startswith("_") and key.endswith("_"):
+            continue
           # These keys are solr copy-fields and shouldn't be indexed directly.
           if key not in [ 'id', 'people', 'locations', 'comments', 'manifestations', 'resources', 'default_search_field' ] :
             updated[key] = value

@@ -6,7 +6,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: ./docker-emlo/Dockerfile-flask
+      dockerfile: ./docker/Dockerfile-flask
     env_file:
       - .env
     expose:
@@ -16,7 +16,9 @@ services:
     command: bash -c "/bin/docker-entrypoint.sh"
 
   solr:
-    build: ./docker-emlo/solr-conf
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile-solr
     restart: always
     environment:
       SOLR_LOG_LEVEL: INFO
@@ -24,8 +26,25 @@ services:
     ports:
       - "8983:8983"
     volumes:
-      - ./docker-emlo/solr-conf/solr/home:/opt/solr/server/solr/home
-      - ./docker-emlo/solr-data:/data-solr
+      - ./docker/solr:/opt/solr/server/solr/home
+      - ./docker/solr-data:/data-solr
+    ulimits:
+      nofile:
+        soft: "65536"
+        hard: "65536"
+
+  solr9:
+    image: solr:9
+    restart: always
+    environment:
+      SOLR_LOG_LEVEL: INFO
+      LD_BIND_NOW: 1
+      SOLR_SECURITY_MANAGER_ENABLED: false
+    ports:
+      - "8984:8983"
+    volumes:
+      - ./docker/solr9:/var/solr/data
+      - ./docker/solr9-data:/data-solr
     ulimits:
       nofile:
         soft: "65536"

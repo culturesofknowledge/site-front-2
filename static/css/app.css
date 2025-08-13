@@ -10596,3 +10596,7 @@ button.tiny {
 .capitalize-first-letter::first-letter {
   text-transform: uppercase;
 }
+
+.hide {
+  display: none;
+}

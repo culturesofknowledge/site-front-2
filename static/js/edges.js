@@ -4411,7 +4411,7 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
       const currentDomain = window.location.host;
       const editIdValue = GetRecordID(footerType, result);
       const currentHref = window.location.href;
-      console.debug("Current URL: ", currentHref);
+
       const shortURL = GenerateShortURL(editIdValue, footerType, currentDomain);
 
       container += `
@@ -4436,7 +4436,7 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
           ["work"].includes(this.profileType) ? "" : "margin-bottom:20px;"
         }">
           <img class="opacity50 icon-tweak" src="../../static/img/icon-send-comment.png" alt="short-url" />
-          <a> Send Comment </a>
+          <a href=/comment/index?id=${result.uuid}> Send Comment </a>
         </p>
 
 

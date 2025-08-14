@@ -368,6 +368,13 @@ function advanceSearch(params) {
       }
     });
 
+    if (params.get("col_cat")) {
+      openingQuery.queryStrings.push({
+        queryString: `"${params.get("col_cat")}"`,
+        fields: [{ field: "cito_Catalog", operator: "AND" }],
+      });
+    }
+
     if (params.get("let_ima") == "true") {
       openingQuery.queryStrings.push({
         queryString: "*",

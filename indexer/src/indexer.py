@@ -26,6 +26,8 @@ fieldmap_path = 'lib'
 sys.path.append( fieldmap_path )
 import fieldmap
 
+LOG_LEVEL = "info"
+
 # These two lines are hacks. They switch the default encoding to utf8 so that the command line will convert UTF8 + Ascii to UTF8
 # imp.reload(sys)
 # sys.setdefaultencoding("utf8")
@@ -338,8 +340,8 @@ def FillSolr( indexing, red_temp ):
                 solr_list = []
 
                 for record in csv_records :
-
-                    print(record)
+                    if LOG_LEVEL.lower() == "debug" :
+                        print(record)
                     record_count += 1
 
                     if published_flag and record["published"] != "1":
@@ -431,7 +433,8 @@ def FillSolr( indexing, red_temp ):
                             uid_related = members[i+1].decode()
                             type_related = members[i+2].decode()
 
-                            print(uri_base, type_related, uid_related)
+                            if LOG_LEVEL.lower() == "debug" :
+                                print(uri_base, type_related, uid_related)
                             # uri_relationship = uri_base + type_related.decode() + "/" + uid_related.decode()
                             uri_relationship = uri_base + type_related + "/" + uid_related
                             add( solr_item, relation , uri_relationship, relationship=type_related )

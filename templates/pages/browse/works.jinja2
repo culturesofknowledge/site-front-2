@@ -1,37 +1,51 @@
 {% extends "/base/browse_base.jinja2" %}
 
 {% block browse_content %}
-    <div class="small-12 columns">
-        <h2>Years</h2>
+    <div class="row row-with-side" style="margin-left: 20px;">
+        <div class="large-12 columns">
+            <div id="years" class="large-12 columns">
+                <br/>
+                <h2 class="main">
+                    <span class="font-18">
+                        Years
+                    </span>
 
-        <br/>
+                    <br><br>
+                </h2>
+            </div>
 
-        <div class="pagination-centered">
-            <select name="decade" id="decade" onchange="change_decade(this.value)">
-                {% for decade in range(1500, 1840, 10) %}
-                    <option value="{{ decade }}" {% if decade == current_decade %}selected="selected"{% endif %}>{{ decade }}s</option>
-                {% endfor %}
-            </select>
+            <div id="" class="large-12 columns">
+                <div class="pagination-centered">
+                    <label style="text-align:start;">Decade</label>
+                    <select name="decade" id="decade" onchange="change_decade(this.value)">
+                        {% for decade in range(1450, 1860, 10) %}
+                            <option value="{{ decade }}" {% if decade == current_decade %}selected="selected"{% endif %}>{{ decade }}s</option>
+                        {% endfor %}
+                    </select>
 
-            {# <p> {{current_decade}} - {{current_year}} </p> #}
+                    {# <p> {{current_decade}} - {{current_year}} </p> #}
 
-            <ul class="alphabet pagination">
-                <li>
-                    <a onclick="change_decade(current_decade - 10)"> << </a>
-                </li>
-                {% for year in years_range %}
-                    <li class="{% if current_year == year %}current{% endif %}">
-                        <a href="{{ base_url }}?year={{ year }}">{{ year }}</a>
-                    </li>
-                {% endfor %}
-                <li>
-                    <a onclick="change_decade(current_decade + 10)"> >> </a>
-                </li>
-            </ul>
-        </div>
+                    <ul class="alphabet pagination">
+                        <li>
+                            <a onclick="change_decade(current_decade - 10)"> << </a>
+                        </li>
+                        {% for year in years_range %}
+                            <li class="{% if current_year == year %}current{% endif %}">
+                                <a href="{{ base_url }}?year={{ year }}">{{ year }}</a>
+                            </li>
+                        {% endfor %}
+                        <li>
+                            <a onclick="change_decade(current_decade + 10)"> >> </a>
+                        </li>
+                    </ul>
+                </div>
 
-        <div class="row">
-            <div id="browse-works-results"></div>
+                <br/><br/>
+
+                <div class="row">
+                    <div id="browse-works-results"></div>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}

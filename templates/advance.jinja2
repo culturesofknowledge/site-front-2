@@ -4,6 +4,90 @@
 
 {% block extra_stylesheets %}
 <style>
+.section {
+				border-top: 1px solid #EFC319; /* Yellow */
+			}
+			.section h3 {
+				padding: 10px 0 10px 0;
+			}
+			.section:last-child {
+				border-bottom: 1px solid #EFC319; /* Yellow */
+				margin-bottom: 40px;
+			}
+@media only screen and (min-width: 64.063em) {  /* min-width 1025px, large screens */
+    .side {
+        position: fixed;
+        width: 250px; /* Not sure why is needed...*/
+    }
+}
+/* Side Navigation */
+.side-nav {
+  display: block;
+  margin: 0;
+  padding: 0.875rem 0;
+  list-style-type: none;
+  list-style-position: outside;
+  border: none;
+  font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
+  line-height: .8;
+}
+.side-nav li {
+  margin: 0 0 0.4375rem 0;
+  font-size: 0.875rem;
+  font-weight: normal;
+}
+.side-nav li a:not(.button) {
+  display: block;
+  color: #008cba;
+  margin: 0;
+  padding: 0.4375rem 0.875rem;
+}
+.side-nav li a:not(.button):hover,
+.side-nav li a:not(.button):focus {
+  background: rgba(0, 0, 0, 0.025);
+  color: #1ccaff;
+}
+.side-nav li.active > a:first-child:not(.button) {
+  color: #1ccaff;
+  font-weight: normal;
+  font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
+}
+.side-nav li.divider {
+  border-top: 1px solid;
+  height: 0;
+  padding: 0;
+  list-style: none;
+  border-top-color: #ffffff;
+}
+.side-nav li.heading {
+  color: #008cba;
+  font-size: 0.875rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.side-nav.stick {
+    margin-top: 0 !important;
+    position: fixed;
+    top: 0;
+    z-index: 10000;
+    border-radius: 0 0 0.5em 0.5em;
+}
+
+form .button {
+    float: right;
+}
+
+fieldset {
+    border: 2px solid #eee;
+    margin-left: 38px;
+}
+fieldset.alignment { /* For alignment, no need to show it */
+    border: 0;
+    padding-top: 0;
+}
+fieldset > legend {
+    color: #444;
+}
 input[type="checkbox"] > label {
   display: inline-block;
   cursor: pointer;
@@ -99,49 +183,71 @@ input[type="checkbox"]:checked {
 {% endblock %}
 
 {% block content %}
-    <div class="row row-with-side">
-        <div class="side-nav">
-            <h3>
-                Jump to:
-            </h3>
+    <div class="row">
+        <div class="small-12 large-3 columns side">
 
-            <a href="#people_section">People</a>
-            <a href="#dates_section">Dates</a>
-            <a href="#places_section">Places</a>
-            <a href="#letters_section">Content</a>
-            <a href="#institutions_section">Repositories and Editions</a>
+			<p>Jump To:</p>
+			<div class="side-nav-anchor"></div>
+			<ul class="side-nav">
+				<li>
+                    <a href="#people_section">People</a>
+                </li>
+                <li>
+                    <a href="#dates_section">Dates</a>
+                </li>   
+                <li>
+                   <a href="#places_section">Places</a>
+                </li>
+                <li>
+                    <a href="#letters_section">Content</a>
+                </li>
+                <li>
+                    <a href="#institutions_section">Repositories and Editions</a>
+                </li>
+			<li>
+                    <form onsubmit="return false;" style="width:200px">
+                        <button onclick="advanceSearch()" style="margin-top:10px;margin-right:45px;" 
+                    name="submit-advanced" type="submit" class="button submit search-related">Search</button>
+                        <button onclick="clearAllAdvanceFields()" class="clear-all-button" 
+                            style="padding: 10px 20px;margin-left: 40px;font-size:18px;">Clear All</button>
+                    </form>
+                </li>
+			</ul>
 
-            <br/> <br/>
-            <div class="search-plus-action">
-                <button onclick="advanceSearch()" name="submit-advanced" type="submit" class="button submit search-related">Search</button>
-                <button onclick="resetAll()" class="small-button">Reset All</button>
-            </div>
-        </div> 
+		</div> 
         
-        <div class="row row-with-side">
-            <div class="large-12 columns" style="padding-left:25px">
+        <div class="small-12 large-9 columns main">
+            <div class="large-12 columns" style="padding:0px">
                     <div id="about">
                         <br/>
                         <h2 class="main">Search+</h2>
                     </div>
 
-                    <div id="people_section" class="large-12 columns" style="padding-left:25px">
+                    <div id="people_section" class="section clearfix">
                         {% include './components/advance/people.jinja2' %}
                     </div>
 
-                    <div id="dates_section" class="large-12 columns" style="padding-left:25px">
+                    <div id="dates_section" class="section clearfix">
                         {% include './components/advance/dates.jinja2' %}
                     </div>
-                    <div id="places_section" class="large-12 columns" style="padding-left:25px">
+                    <div id="places_section" class="section clearfix">
                         {% include './components/advance/places.jinja2' %}
                     </div>
 
+<<<<<<< HEAD
                     <div id="letters_section" class="large-12 columns" style="padding-left:25px; transition: height 0.3s ease; overflow: hidden;">
                         {% include './components/advance/letters.jinja2' %}
                     </div>
 
 
                     <div id="institutions_section" class="large-12 columns" style="padding-left:25px">
+=======
+                    <div id="letters_section" class="section clearfix">
+                        {% include './components/advance/letters.jinja2' %}
+                    </div>
+
+                    <div id="institutions_section" class="section clearfix">
+>>>>>>> dev
                         {% include './components/advance/institutions.jinja2' %}
                     </div>
 
@@ -158,6 +264,7 @@ input[type="checkbox"]:checked {
 {% include "_edges_common_js.jinja2" %}
 <script type="module" src="../static/js/repository_dropdown.edges.js"></script>
 <script type="module" src="../static/js/tooltip.js"></script>
+<script src="../static/js/clearFields.js"></script>
 
 <script>
 const inputs = [
@@ -203,7 +310,11 @@ const inputs = [
     { id: "let_pmark", defaultValue: "false", paramName: "let_pmark" },
     { id: "let_pmark_tex", defaultValue: "all postage marks", paramName: "let_pmark_tex" },
     { id: "let_end", defaultValue: "false", paramName: "let_end" },
+<<<<<<< HEAD
     { id: "let_end_tex", defaultValue: "all endorsements", paramName: "let_pmark_tex" },
+=======
+    { id: "let_end_tex", defaultValue: "all endorsements", paramName: "let_end_tex" },
+>>>>>>> dev
     { id: "let_en", defaultValue: "false", paramName: "let_en" },
     { id: "let_with_en", defaultValue: "false", paramName: "let_with_en" },
     { id: "let_with_en_tex", defaultValue: "all enclosures", paramName: "let_with_en_tex" },
@@ -222,10 +333,16 @@ const inputs = [
 ];
 
 function advanceSearch(event){
+<<<<<<< HEAD
   
     try {
         
         const baseURL = `${window.location.origin}/forms/advance`;
+=======
+    try {
+
+        const baseURL = `${window.location.origin}/forms/advanced`;
+>>>>>>> dev
         let sendQuery = false;
         let queryString = "";
 
@@ -234,7 +351,6 @@ function advanceSearch(event){
         inputs.forEach(input => {
             if(document.getElementById(input.id)) {
                 const value = document.getElementById(input.id).value;
-
                 if (value && value !== input.defaultValue) {
                     sendQuery = true;
                     queryString += `${checkQueryOpt(queryString)}${input.paramName}=${value}`;
@@ -312,6 +428,7 @@ function updateDays(yearElementID, monthElementID, dayElementID){
     }
 }
 
+<<<<<<< HEAD
 function resetAll() {
 
     const conf = confirm("Are you sure you want to reset all values? By doing this, you will reset all the values and the URL query. This action can't be undone.")
@@ -357,5 +474,99 @@ function toggleContentSection() {
     }
 }
 
+=======
+function sticky_relocate() {
+    const window_top = $(window).scrollTop();
+    const div_top = $('.side-nav-anchor').offset().top;
+
+    if (window_top > div_top) {
+        $('.side-nav').addClass('stick');
+    } else {
+        $('.side-nav').removeClass('stick');
+    }
+}
+
+function updateInputValue(){
+   const urlParams = new URLSearchParams(window.location.search);
+
+    inputs.forEach(input => {
+        const { id, defaultValue, paramName } = input;
+
+        // Only check boolean fields (i.e., those with defaultValue === "false")
+        if (defaultValue === "false") {
+            const paramValue = urlParams.get(paramName);
+
+            // If param exists and is "true", update the input element
+            if (paramValue === "true") {
+                const element = document.getElementById(id);
+                if (element) {
+                    // If it's a checkbox or similar, mark it as checked
+                    element.checked = true;
+                    element.value = "true";
+                } else {
+                    console.warn(`Element with ID "${id}" not found.`);
+                }
+            }
+        } else {
+            const paramValue = urlParams.get(paramName);
+
+            if(paramValue && paramValue != defaultValue) {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.value = paramValue
+                } else {
+                    console.warn(`Element with ID "${id}" not found.`);
+                }
+            }
+        }
+    });
+}
+
+$(function() {
+    updateInputValue()
+    const maxWidthForScrollEffect = 1024;
+    $(window).scroll(sticky_relocate);
+    $('.side').css("position", "initial");
+    sticky_relocate();
+    stickOn = true;
+
+    $(window).resize(function() {
+        const screenWidth = $(window).width();
+        if (screenWidth > maxWidthForScrollEffect) {
+            if (!stickOn) {
+                $(window).on("scroll", sticky_relocate); // Enable scroll effect on smaller screens
+                stickOn = true;
+            }
+        } else {
+            if (stickOn) {
+                $(window).off("scroll"); // Disable scroll effect on larger screens
+                $('.side-nav').removeClass('stick');
+                stickOn = false;
+            }
+        }
+    });
+});
+
+$(document).on("keypress" , (e) => {
+    if(e.keyCode == 13 && e.key.toLowerCase() == "enter") {
+        advanceSearch()
+    }
+})
+>>>>>>> dev
 </script>
+
+<script>
+  function clearAllAdvanceFields() {
+    const container = document.querySelector('.main');
+    clearFields(container);
+
+    // Clear URL parameters without reloading the page
+    if (window.history && window.history.replaceState) {
+      const url = new URL(window.location);
+      url.search = '';
+      window.history.replaceState({}, document.title, url.toString());
+    }
+  }
+</script>
+
 {% endblock extra_js_bottom %}

@@ -1,6 +1,4 @@
-<div class="section clearfix">
-  <hr class="yellow-divider" />
-  
+
   <h3><img src="/static/img/icon-globe.png" alt="Places Icon" />Places</h3>
 
   <fieldset>
@@ -8,10 +6,9 @@
 
     <div
       data-delay="2.0"
-      data-tip="Search the places that letters were sent from or to, e.g. 'Queen's College', 'Paris', or 'Spain'. 
-      <br/><br/>Search is not case sensitive." 
+      data-tip="Search the places that letters were sent from or to, e.g. 'Queen's College', 'Paris', or 'Spain'. Search is not case sensitive." 
       class="row">
-      <div class="small-11 columns">
+      <div class="small-10 columns">
         <label for="locations">Name</label>
         <input
           id="locations"
@@ -35,10 +32,9 @@
 
     <div
       data-delay="2.0"
-      data-tip="Search the places that letters were sent from, e.g. 'Queen's College', 'Paris', or 'Spain'. 
-      <br/><br/>Search is not case sensitive." 
+      data-tip="Search the places that letters were sent from, e.g. 'Queen's College', 'Paris', or 'Spain'. Search is not case sensitive." 
       class="row">
-      <div class="small-11 columns">
+      <div class="small-10 columns">
         <label for="pla_ori_name">Name</label>
         <input
           id="pla_ori_name"
@@ -70,7 +66,7 @@
         <label for="pla_ori_mark">As marked</label>
       </div>
       <div>
-        {% include 'components/common/help_icon.jinja2' %}
+        {% include 'components/common/help_icon_nolabel.jinja2' %}
       </div>
     </div>
   </fieldset>
@@ -81,10 +77,9 @@
     
     <div
       data-delay="2.0" 
-      data-tip="Search the places that letters were sent to, e.g. 'Queen's College', 'Paris', or 'Spain'. 
-      <br/><br/>Search is not case sensitive."   
+      data-tip="Search the places that letters were sent to, e.g. 'Queen's College', 'Paris', or 'Spain'. Search is not case sensitive."   
       class="row">
-      <div class="small-11 columns">
+      <div class="small-10 columns">
         <label for="pla_des_name">Name</label>
         <input
           id="pla_des_name"
@@ -116,7 +111,7 @@
         <label for="pla_des_mark">As marked</label>
       </div>
        <div>
-        {% include 'components/common/help_icon.jinja2' %}
+        {% include 'components/common/help_icon_nolabel.jinja2' %}
       </div>
     </div>
   </fieldset>
@@ -126,10 +121,12 @@
 
     <div
       data-delay="2.0" 
-      data-tip="Search for places mentioned, e.g. 'Queen's College', 'Paris', or 'Spain'. 
-      <br/><br/>Search is not case sensitive."   
+      data-tip="Search for places mentioned, e.g. 'Queen's College', 'Paris', or 'Spain'. Search is not case sensitive. You can also browse by Place.
+      <br/>This information has not been captured systematically.
+      <br/>You can also search Content for mentions of places.
+"   
       class="row">
-      <div class="small-11 columns">
+      <div class="small-10 columns">
         <label for="pla_ment_name">Name</label>
         <input
           id="pla_ment_name"
@@ -149,4 +146,3 @@
   </fieldset>
 
   <button onclick="advanceSearch()" name="submit-advanced" type="submit" class="button submit search-related">Search</button>
-</div>

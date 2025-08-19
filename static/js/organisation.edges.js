@@ -1,9 +1,10 @@
 import emlo from "./edges.js";
 
+let current_search_letter = "a"; // Setting this as default a
+
 try {
   // Fetching URL params
   const queryString = window.location.search;
-  let current_search_letter = "a"; // Setting this as default a
 
   if (queryString) {
     const params = new URLSearchParams(queryString);
@@ -116,7 +117,15 @@ try {
         label: "",
       }),
     }),
-
+    new emlo.AlertBox({
+      id: "alert-box",
+      category: "results",
+      renderer: new emlo.AlertBoxRenderer({
+        message: ` You can select up to 10 organizations using the checkboxes below, and then display associated letters.
+		                To save your selection for later use, bookmark this page.
+				  `,
+      }),
+    }),
     new emlo.ResultTable({
       id: "results",
       category: "results",
@@ -138,7 +147,7 @@ try {
             post: "",
             type: "link",
             linkHref: "uuid",
-            linkHrefPrefix: "/profile/person",
+            linkHrefPrefix: "/profile",
             valueFunction: null,
           },
           {
@@ -189,29 +198,80 @@ try {
   console.error(error.message);
 }
 
+// function _redirectToSearch(val, res, fieldName) {
+//   if (typeof res !== "object" || res === null) {
+//     console.log("Invalid input: res is not an object");
+//     return "<div>Invalid input</div>";
+//   }
+
+//   // console.log("finalURL", finalUrl);
+//   if (val > 0) {
+//     const baseURL = `/forms/advanced`;
+//     let query = "";
+
+//     const user = res["foaf_name"];
+//     const currentPageQ = `browsing=organisations&letter=${current_search_letter}`;
+
+//     switch (fieldName) {
+//       case "ox_totalWorksByAgent":
+//         let aut = res["frbr_creatorOf-work"];
+//         aut = aut.join(",");
+
+//         query = `frbr_creator-person=${aut}`;
+
+//         break;
+//       case "ox_totalWorksAddressedToAgent":
+//         let rec = res["mail_recipientOf-work"];
+//         if (rec.length > 0) {
+//           query = `mail_recipient-person=${rec.join(",")}`;
+//         }
+//         break;
+//       case "ox_totalWorksMentioningAgent":
+//         let ment = res["dcterms_isReferencedBy-work"];
+//         if (ment.length > 0) {
+//           query = `dcterms_references-person=${ment.join(",")}`;
+//         }
+//         break;
+//     }
+
+//     query += query ? `&${currentPageQ}` : `${currentPageQ}`;
+//     const finalUrl = query ? `${baseURL}?${query}` : `${baseURL}`;
+
+//     return `<a href="${finalUrl}"> ${val} </a>`;
+//   } else {
+//     return `-`;
+//   }
+// }
+
 function _redirectToSearch(val, res, fieldName) {
   if (typeof res !== "object" || res === null) {
     console.log("Invalid input: res is not an object");
     return "<div>Invalid input</div>";
   }
 
-  // console.log("finalURL", finalUrl);
   if (val > 0) {
-    const baseURL = `/forms/advance`;
+    const baseURL = `/forms/advanced`;
     let query = "";
     const user = res["foaf_name"];
+    const uuid = res["uuid"];
+
+    console.log("current_search_letter", current_search_letter);
+
+    const currentPageQ = `browsing=organizations&letter=${current_search_letter}`;
 
     switch (fieldName) {
       case "ox_totalWorksByAgent":
-        query = `aut=${user}`;
+        query = `frbr_creator-person=${uuid}`;
         break;
       case "ox_totalWorksAddressedToAgent":
-        query = `rec=${user}`;
+        query = `mail_recipient-person=${uuid}`;
         break;
       case "ox_totalWorksMentioningAgent":
-        query = `ment=${user}`;
+        query = `dcterms_references-person=${uuid}`;
         break;
     }
+
+    query += query ? `&${currentPageQ}` : `${currentPageQ}`;
     const finalUrl = query ? `${baseURL}?${query}` : `${baseURL}`;
 
     return `<a href="${finalUrl}"> ${val} </a>`;

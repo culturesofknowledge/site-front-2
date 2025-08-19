@@ -1,12 +1,11 @@
 <fieldset>
-    <legend>Postage Marks</legend>
+    <legend>Postage marks</legend>
 
     <div
       data-delay="2.0"
-      data-tip="Search for specific types of postage marks, or for particular representations within postage marks, e.g. 'Bishop Mark'. 
-      <br/><br/>Search is not case sensitive." 
+      data-tip="Search for specific types of postage marks, or for particular representations within postage marks, e.g. 'Bishop Mark'. Search is not case sensitive." 
       class="row">
-      <div class="small-11 columns">
+      <div class="small-10 columns">
         <label for="let_pmark_tex">Search postage mark</label>
         <input
           id="let_pmark_tex"
@@ -41,7 +40,7 @@
         <label for="let_pmark">Only with postage marks</label>
       </div>
       <div>
-        {% include 'components/common/help_icon.jinja2' %}
+        {% include 'components/common/help_icon_nolabel.jinja2' %}
       </div>
     </div>
   </fieldset>

@@ -50,6 +50,10 @@ def forms():
     return redirect(url_for("forms.results", **query_params))
 
 
-@forms_bp.route('/advance')
+@forms_bp.route('/advanced')
 def results():
+    return render_template('results.jinja2', title="Results")
+
+@forms_bp.route('/quick')
+def quick():
     return render_template('results.jinja2', title="Results")

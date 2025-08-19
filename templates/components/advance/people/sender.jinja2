@@ -4,10 +4,9 @@
     <div 
         class="row"
         data-delay="2.0" 
-        data-tip="Search for authors and senders, e.g. 'Samuel Hartlib', 'John Aubrey', or 'The Royal Society'. 
-        <br/><br/>Search is not case sensitive." 
+        data-tip="Search for authors and senders, e.g. 'Samuel Hartlib', 'John Aubrey', or 'The Royal Society'. Search is not case sensitive." 
     >
-        <div class="small-11 columns">
+        <div class="small-10 columns">
             <label for="aut">Name</label>
             <input
                 id="aut"
@@ -27,10 +26,10 @@
         <div 
             data-delay="2.0"
             data-tip="Confine your search to male or female authors or senders." 
-            class="columns small-12 large-2" 
+            class="columns small-12 large-3" 
             style="padding-left: 0px;"
         >
-            <div class="large-8 columns" style="padding: 0px;">
+            <div class="large-8 columns small-10" style="padding: 0px;">
                 <label for="aut_gend">Gender</label>
 
                 <select id="aut_gend" name="aut_gend" title="" class="">
@@ -48,9 +47,9 @@
 
         <div
             data-delay="2.0"
-            data-tip="Confine your search to instances where the author, sender, recipient was an organization or corporate entity, e.g. The Royal Society." 
-            class="columns small-12 large-6">
-            <div class="large-9 columns">
+            data-tip="Confine your search to instances where the author or sender was an organization or corporate entity, e.g. The Royal Society." 
+            class="columns small-12 large-5">
+            <div class="large-10 columns small-10">
                 <label>&nbsp;<!-- for alignment--></label>
                 <input
                     type="checkbox"
@@ -61,7 +60,7 @@
                     class="checkbox"
                 />
 
-                <label for="aut_org">Only Organizations</label>
+                <label for="aut_org">Only organizations</label>
             </div>
 
             <div>
@@ -73,7 +72,7 @@
             data-delay="2.0"
             data-tip="Search authors' and senders' personal names exactly as they were expressed in the original letters." 
             class="columns small-12 large-4" style="padding-left: 0px;">
-            <div class="large-9 columns">
+            <div class="large-10 columns small-10">
                 <label>&nbsp;<!-- for alignment--></label>
                 <input
                     type="checkbox"
@@ -93,11 +92,11 @@
 
     <div
         data-delay="2.0"
-        data-tip="Search for authors and senders by title, role, or occupation, e.g. 'Bookseller' or 'Politician'. 
-            <br/><br/>Search is not case sensitive. " 
+        data-tip="Search for authors and senders by title, role, or occupation, e.g. ‘Bookseller’ or ‘Politician’. Search is not case sensitive. 
+            <br/>Note that this information has not yet been captured for all people." 
         class="row">
 
-        <div class="large-11 columns">
+        <div class="large-11 columns small-10">
             <label for="aut_roles">Titles, roles, or occupations</label>
 
             <input

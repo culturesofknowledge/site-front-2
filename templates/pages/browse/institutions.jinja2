@@ -1,18 +1,43 @@
 {% extends "/base/browse_base.jinja2" %}
 
 {% block browse_content %}
-    <div class="small-12 columns">
-        <h2>Repository</h2>
+    <div class="row row-with-side">
+    
+        <div id="side-nav" class="side-nav" style="display: none;"> 
+            <h2 class="main">Current Selection</h2>
 
-        <br/>
+            <div id="selected-items-list"></div>
 
-        <div class="pagination-centered">
-            {% include '/components/common/alphabet_pagination.jinja2' %}
+            <div>
+                <button onclick="searchLetters('repositories')">Show letters</button>
+            </div>
         </div>
 
-        <div class="row">
-             <div id="browse-institution-results"></div>
+        <div class="row row-with-side" style="margin-left: 20px;">
+         <div class="large-12 columns">
+            <div id="repositories" class="large-12 columns">
+                <br/>
+                <h2 class="main">
+                    <span class="font-18">
+                        Repositories
+                    </span>
+
+                    <br><br>
+                </h2>
+            </div>
+            <br/>
+
+            <div id="" class="large-12 columns">
+                <div class="pagination-centered">
+                    {% include '/components/common/alphabet_pagination.jinja2' %}
+                </div>
+
+                <div class="row">
+                    <div id="browse-institution-results"></div>
+                </div>
+            </div>
         </div>
+    </div>
     </div>
 {% endblock %}
 

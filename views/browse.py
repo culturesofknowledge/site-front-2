@@ -19,7 +19,7 @@ def people():
         return redirect(url_for('browse.people', **{**request.args, 'filters': 'fe,ma,un,re,wr,me'}))
     
     letter = request.args.get('letter', '').lower()
-    return render_template('/pages/browse/people.jinja2', title="Browse:People" , letter=letter , filters=filter_param)
+    return render_template('/pages/browse/people.jinja2', title="Browse: People" , letter=letter , filters=filter_param)
 
 
 @browse_bp.route('/locations')
@@ -33,10 +33,10 @@ def locations():
         return redirect(url_for('browse.locations', **{**request.args, 'filters': 'fe,ma,un,re,wr,me'}))
     
     letter = request.args.get('letter', '').lower()
-    return render_template('/pages/browse/locations.jinja2', title="Browse:Locations" , letter=letter, filters=filter_param)
+    return render_template('/pages/browse/locations.jinja2', title="Browse: Locations" , letter=letter, filters=filter_param)
 
 
-@browse_bp.route('/organisations')
+@browse_bp.route('/organizations')
 def organisations():
      # Check if 'filter' is in the query string; if not, append it automatically
     filter_param = request.args.get('filters', None)
@@ -47,12 +47,12 @@ def organisations():
         return redirect(url_for('browse.organisations', **{**request.args, 'filters': 'fe,ma,un,re,wr,me'}))
     
     letter = request.args.get('letter', '').lower()
-    return render_template('/pages/browse/organisations.jinja2', title="Browse:Organisations", letter=letter, filters=filter_param)
+    return render_template('/pages/browse/organisations.jinja2', title="Browse: Organizations", letter=letter, filters=filter_param)
 
 
-@browse_bp.route('/institutions')
+@browse_bp.route('/repositories')
 def institutions():
-    return render_template('/pages/browse/institutions.jinja2', title="Browse:Institutions")
+    return render_template('/pages/browse/institutions.jinja2', title="Browse: Repositories")
 
 
 @browse_bp.route('/works')
@@ -62,4 +62,4 @@ def works():
 
     years_range = range(current_decade, current_decade + 10)
     
-    return render_template('/pages/browse/works.jinja2', title="Browse:Works" ,current_year=current_year, current_decade=current_decade, years_range=years_range)
+    return render_template('/pages/browse/works.jinja2', title="Browse: Works" ,current_year=current_year, current_decade=current_decade, years_range=years_range)

@@ -1,7 +1,26 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
+from .solr import check_profile
 
 profile_bp = Blueprint('profile', __name__, url_prefix='/profile')
 
 @profile_bp.route('/<collection>/<id>')
 def profile(collection, id):
-    return render_template('profile.jinja2', title="Profile", collection=collection, id=id)
+    solr_core = (
+        "people" if collection == "person" 
+        else "institutions" if collection == "repository" 
+        else f"{collection}s"
+    )
+
+    pageTitle = collection.capitalize()
+
+    try:
+        is_valid , is_organisation = check_profile(solr_core , id)
+        
+        if is_valid:
+            if is_organisation:
+                pageTitle = "Organization"
+            return render_template('profile.jinja2', title=pageTitle, collection=collection, id=id)
+    except Exception as e:
+        print("Exception occurred while querying Solr:", e)
+
+    return render_template('data_not_found.jinja2', title="Data not found"), 404

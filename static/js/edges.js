@@ -1,3 +1,31 @@
+import { getCollectionTitle } from "../js/profile/collectionDetails.js";
+import PersonChart from "./chart.js";
+import { getLabel } from "./helper/getFieldLabls.js";
+import { _renderCommentProfile } from "./profile/commentFrag.js";
+import {
+  _renderImageProfile,
+  _renderImageSidebar,
+} from "./profile/imageFrag.js";
+import {
+  _renderInstitutionProfile,
+  _renderInstitutionSidebar,
+} from "./profile/institutionFrag.js";
+import {
+  _renderLocationProfile,
+  _renderLocationSidebar,
+} from "./profile/locationFrag.js";
+import {
+  _renderManifestationSection,
+  _renderManifestationSidebar,
+} from "./profile/manifestationFrag.js";
+import {
+  _renderGraphSection,
+  _renderPeopleProfile,
+  _renderPeopleSidebar,
+} from "./profile/peopleFrags.js";
+import { _renderWorkProfile, _renderWorkSidebar } from "./profile/workFrag.js";
+import { searchQueryObj } from "./search.js";
+
 const emlo = {
   active: {},
   selector: "",
@@ -97,7 +125,7 @@ emlo.ResultTemplate = class extends edges.Template {
           </div>
        
           <div id="modify_search" style="display:none;">
-              <button onclick="modifyCurrentSearch()">Modify search</button>
+              <button class="small button modifysearchbtn" onclick="modifyCurrentSearch()">Modify your search</button>
           </div>
 
          <div id="current_search">
@@ -105,7 +133,7 @@ emlo.ResultTemplate = class extends edges.Template {
             ${selected_facets}
         </div>
 
-        <div id="refine_search">
+        <div id="refine_search" style="display:none;">
             <h3 class="main">Refine your results</h3>
             ${refine_search}
         </div>
@@ -184,47 +212,65 @@ emlo.ProfileTemplate = class extends edges.Template {
       sidebarTitle += `<div id="${sidebarTitleComponents[i].id}"></div>`;
     }
 
-    let frag = `<div class="row row-with-side">
-      <div class="side-nav"> 
-        <div id="sidebar-title">
-          ${sidebarTitle}
-        </div>
-        
-        <div id="sidebar-actions">
-            <div>
-              <img src="../../static/img/icon-short-url.png" alt="short-url" />
-              Short URL:
-              <span id="shor-url-link">
-              </span>
-            </div>
+    // let frag = `<div class="row row-with-side">
+    //   <div class="side-nav">
+    //     <div id="sidebar-title">
+    //       ${sidebarTitle}
+    //     </div>
 
-            <div id="send-comment">
-              <img src="../../static/img/icon-send-comment.png" alt="short-url" />
-              <a> Send Comment </a>
-            </div>
+    //     <div id="sidebar-actions">
+    //         <div>
+    //           <img src="../../static/img/icon-short-url.png" alt="short-url" />
+    //           Short URL:
+    //           <span id="short-url-link">
+    //           </span>
+    //         </div>
+
+    //         <div id="send-comment">
+    //           <img src="../../static/img/icon-send-comment.png" alt="short-url" />
+    //           <a> Send Comment </a>
+    //         </div>
+    //     </div>
+
+    //     <div id="more-options">
+    //         ${sidebar}
+    //     </div>
+    //   </div>
+
+    //   <div id="main" class="" style="margin-left:5px;">
+    //     <div class="large-12 columns">
+    //       ${results}
+    //     </div>
+    //   </div>
+    // </div>`;
+
+    let frag = `
+      <div id="main" class="row">
+        <div class="columns large-9 large-push-3">
+
+          <div id="pagination" class="pagination">
+            <h4 id="count-heading" style="margin-top: 0.5rem;margin-bottom: 0.2rem;"></h4>
+            <button class="small button" style="display:none;" id="back-to-browse">Back to Browse</button>
+                
+            <button class="small button" style="display:none;" id="modify-search">Modify your search</button>
+            <button class="small button" style="display:none;" id="back-to-results">Back to Results</button>
+            
+            <span id="control" style="display:none;">
+              <button class="small button" id="first-entry" title="First Entry"><<</button>
+              <button class="small button" id="prev-entry" title="Previous Entry"><</button>
+              <button class="small button" id="next-entry" title="Next Entry">></button>
+              <button class="small button" id="last-entry" title="Last Entry">>></button>
+            </span>
+          </div>
+
+          ${results}
         </div>
-        
-        <div id="more-options">
-            ${sidebar}
+
+        <div class="columns large-3 large-pull-9 side">
+          ${sidebar}
         </div>
       </div>
-
-      <div class="row row-with-side">
-        <div class="large-12 columns" style="margin-left:25px">
-            <div id="profile">
-                <br/>
-                <h2 class="main">
-                    <span id="profile-header" class="font-18">
-                    </span>
-                </h2>
-            </div>
-   
-             <div id="" class="large-12 columns" style="margin-left:25px">
-              ${results}
-            </div>
-        </div>
-      </div>
-    </div>`;
+    `;
 
     this.edge.context.html(frag);
   }
@@ -252,17 +298,15 @@ emlo.HomeStatsTemplate = class extends edges.Template {
     let statsComponents = edge.category("stats");
 
     for (let i = 0; i < statsComponents.length; i++) {
-      stats += `<li class="stats-text text-center" id="${statsComponents[i].id}"></li>`;
+      stats += `<div id="${statsComponents[i].id}"></div>`;
     }
 
     let frag = `
-    <div class="row">
-      <div class="large-12 columns">
-          <ul class="stats-row small-block-grid-2 medium-block-grid-5 large-block-grid-10 home-stats">
+ 
               ${stats}
-          </ul>
-      </div>
-    </div>
+   
+   
+   
     `;
     this.edge.context.html(frag);
   }
@@ -272,8 +316,17 @@ emlo.DropDown = class extends edges.Component {
   constructor(params) {
     super(params);
     this.results = false;
-
+    this.size = edges.util.getParam(params, "size", 0);
+    this.sortOptions = edges.util.getParam(params, "sortOptions", []);
     this.hitCount = 0;
+  }
+
+  contrib(query) {
+    query.size = this.size ? this.size : 10;
+
+    if (this.sortOptions.length > 0) {
+      query.sort = this.sortOptions;
+    }
   }
 
   synchronise() {
@@ -290,6 +343,7 @@ emlo.DropDown = class extends edges.Component {
 
     // first filter the results
     var results = source.results();
+
     this._appendResults({ results: results });
 
     // record the hit count for later use
@@ -327,12 +381,13 @@ emlo.DropDownRenderer = class extends edges.Renderer {
 
     // variables for internal state
     this.namespace = "edges-bs3-results-dropdown";
+    this.isSelected = false;
   }
 
   draw() {
     let frag = this.noResultsText;
     if (this.component.results === false) {
-      frag = "";
+      frag = "Loading...";
     }
 
     const results = this.component.results;
@@ -342,14 +397,21 @@ emlo.DropDownRenderer = class extends edges.Renderer {
         .map((result) => this._renderOption(result))
         .join("");
 
+      const selected = this.isSelected ? "" : "selected";
       // Add default option at the beginning
       options =
-        `<option value="" disabled selected>${this.defaultOptionText}</option>` +
+        `<option value="all repositories" ${selected}>all repositories</option>` +
         options;
+
+      const dropdownClass = edges.util.allClasses(
+        this.namespace,
+        "repo-dropdown",
+        this
+      );
 
       // Create dropdown element
       frag = `
-        <select class="form-control">
+        <select id="repository" class="${dropdownClass} form-control">
           ${options}
         </select>
       `;
@@ -362,16 +424,44 @@ emlo.DropDownRenderer = class extends edges.Renderer {
     );
     const container = `<div class="${containerClasses}">${frag}</div>`;
     this.component.context.html(container);
+
+    // Attach the event listener for the dropdown change
+    const dropdownSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "repo-dropdown",
+      this
+    );
+
+    // Triggering the combo box logic
+    const doc = document.getElementById("repository");
+
+    if (doc) {
+      enhanceSelect(doc);
+    }
+
+    edges.on(dropdownSelector, "change", this, "changeRepoValue");
   }
+
+  // This function is called when the user changes the sort option
+  changeRepoValue = function (element) {
+    if (element.value == "all repositories") {
+      _removeUrlParam("repository");
+    } else {
+      _addUrlParam("repository", element.value);
+    }
+  };
 
   _renderOption(result) {
     if (this.field) {
       const value = this._getValue(this.field, result, "");
       const displayText = this._getValue(this.field, result, "");
 
-      return `<option value="${edges.util.escapeHtml(
-        value
-      )}">${edges.util.escapeHtml(displayText)}</option>`;
+      if (this.defaultOptionText == value) {
+        this.isSelected = true;
+        return `<option value="${value}" selected>${displayText}</option>`;
+      } else {
+        return `<option value="${value}">${displayText}</option>`;
+      }
     }
   }
 
@@ -445,6 +535,7 @@ emlo.ResultTable = class extends edges.Component {
     this.infiniteScrollQuery = false;
 
     this.hitCount = 0;
+    this.highlighting = {};
   }
 
   synchronise() {
@@ -462,6 +553,10 @@ emlo.ResultTable = class extends edges.Component {
     // result set
     if (!source) {
       return;
+    }
+
+    if (source && source.data && source.data.hasOwnProperty("highlighting")) {
+      this.highlighting = source.data["highlighting"];
     }
 
     // first filter the results
@@ -489,12 +584,19 @@ emlo.ResultTable = class extends edges.Component {
         return;
       }
 
+      if (this.hitCount > 0) {
+        let refineSearch = document.getElementById("refine_search");
+        refineSearch.style.display = "inline";
+      }
+
       // Check if results are fetched correctly
       if (this.hitCount && this.hitCount >= 0) {
         if (this.hitCount > 50) {
           currentDoc.innerHTML = `${this.hitCount} results (50 results per page)`;
         } else {
-          currentDoc.innerHTML = `${this.hitCount} results`;
+          currentDoc.innerHTML = `${this.hitCount} ${
+            this.hitCount > 1 ? "results" : "result"
+          }`;
         }
       } else {
         // Fallback message when results are not fetched
@@ -602,6 +704,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
     // New parameters for selection functionality
     this.defaultSelected = edges.util.getParam(params, "defaultSelected", []);
     this.showCheckbox = edges.util.getParam(params, "showCheckbox", false);
+    this.selectField = edges.util.getParam(params, "selectField", "uuid");
     this.checkboxLimit = edges.util.getParam(params, "checkboxLimit", 10);
     this.displayField = edges.util.getParam(params, "displayField", "");
 
@@ -630,6 +733,15 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
         "record",
         this.component.id
       );
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const shouldCall = urlParams.has("let_con"); // replace with actual param name
+
+      if (!shouldCall) {
+        this.tableDisplay = this.tableDisplay.filter(
+          (item) => item.field !== "let_con"
+        );
+      }
 
       // create table headers
       const headers = this.tableDisplay
@@ -698,20 +810,41 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       pageNumber = paginationComponent.page;
     }
 
+    // Retrieve existing query parameters from the current URL
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Initialize a query string for new or updated parameters
+    let queryParams = new URLSearchParams(urlParams);
+
     const continuousIndex = (pageNumber - 1) * pageSize + index + 1;
 
     const row = this.tableDisplay
       .map((field) => {
         let val = "";
+
         if (field.field) {
           val = this._getValue(field.field, res, val);
         }
         if (val) {
           val = edges.util.escapeHtml(val);
         }
+
         if (field.valueFunction) {
-          val = field.valueFunction(val, res, field.field, this, index);
+          val = field.valueFunction(
+            val,
+            res,
+            field.field,
+            this,
+            continuousIndex
+          );
+
+          if (field.header == "Repositories & Versions") {
+            return `<td id=repo-${continuousIndex}> </td>`;
+          } else {
+            return `<td>${val}</td>`;
+          }
         }
+
         if (!val && this.omitFieldIfEmpty) {
           return "<td></td>";
         }
@@ -731,13 +864,41 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
               : val;
             let linkText = field.linkText || val;
             let prefix = field.linkHrefPrefix || "";
-            return `<td><a href="${prefix}/${href}">${linkText}</a></td>`;
+
+            if (prefix) {
+              let subPagen = res.hasOwnProperty("object_type")
+                ? res["object_type"]
+                : "";
+
+              if (subPagen != "") {
+                if (subPagen == "institution") {
+                  return `<td><a href="${prefix}/repository/${href}">${linkText}</a></td>`;
+                }
+                return `<td><a href="${prefix}/${subPagen}/${href}">${linkText}</a></td>`;
+              }
+
+              return `<td><a href="${prefix}/${href}">${linkText}</a></td>`;
+            }
+
+            return `<td><a href="${href}">${linkText}</a></td>`;
           }
 
           if (field.type === "multiple" && field.multipleFields) {
             const multipleFieldDisplay = field.multipleFields
               .map((item) => {
-                const value = this._getValue(item.field, res, "");
+                let value = "";
+
+                if (item.isSemiColon) {
+                  if (
+                    res &&
+                    res.hasOwnProperty(item.field) &&
+                    res[item.field]
+                  ) {
+                    value = res[item.field].split("\n").join("; ");
+                  }
+                } else {
+                  value = this._getValue(item.field, res, "");
+                }
                 return value ? `<div>${item.label}: ${value}</div>` : "";
               })
               .join("");
@@ -749,15 +910,16 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       })
       .join("");
 
-    const isChecked = this.defaultSelected.includes(res.uuid) ? "checked" : "";
+    const data = this._getSelectField(res[this.selectField], this.selectField);
+    const isChecked = this.defaultSelected.includes(data) ? "checked" : "";
     if (isChecked) {
-      this.selectedRows.add(res.uuid);
+      this.selectedRows.add(data);
     }
 
     const checkboxCell = this.showCheckbox
-      ? `<td><input type="checkbox" class="select-row" data-uuid="${
-          res.uuid
-        }" data-display="${res[this.displayField]}" ${isChecked}></td>`
+      ? `<td><input type="checkbox" class="select-row" data-uuid="${data}" data-display="${
+          res[this.displayField]
+        }" ${isChecked}></td>`
       : "";
 
     return this.showIndex
@@ -765,12 +927,29 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       : `<tr class="${rowClasses}">${checkboxCell}${row}</tr>`;
   }
 
+  _getSelectField(data, selectField) {
+    if (selectField == "uuid") {
+      return data;
+    } else {
+      if (Array.isArray(data) && data.length > 0) {
+        return data.map((url) => url.split("/").pop()).join(", ");
+      }
+      return "";
+    }
+  }
+
   _renderSideNav() {
     const selectedItems = Array.from(this.selectedRows)
       .slice(0, this.checkboxLimit)
       .map((uuid) => {
         const displayName = this._getDisplayName(uuid) || uuid;
-        return `<div><input type="checkbox" class="side-nav-item" data-uuid="${uuid}" checked> ${displayName}</div>`;
+        return `
+          <input type="checkbox" class="side-nav-item" data-uuid="${uuid}" checked>
+          <label> 
+            <span> ${displayName} </span>
+          </label>
+          <br/>
+        `;
       })
       .join("");
 
@@ -930,7 +1109,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
     const month = months[date.getMonth()];
     const year = date.getFullYear();
 
-    return `${day} ${month} ${year}`;
+    return year === 9999 ? `${day} ${month}` : `${day} ${month} ${year}`;
   }
 };
 
@@ -961,6 +1140,7 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
       rec: "person-recipient",
       let_con: "Contents",
       locations: "Locations",
+      everything: "Text",
       // Add more mappings as needed
     };
 
@@ -975,7 +1155,7 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
       let translate_val = this._translate(val);
       let displayValue = val !== translate_val ? translate_val : val;
 
-      if (!keys.includes(filters[i].field)) {
+      if (!keys.includes(filters[i].field) && filters[i].field) {
         keys.push(filters[i].field);
 
         this.filters.push({
@@ -998,30 +1178,42 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
         "uuids",
         "letter",
         "rec",
+        "search_type",
+        "filters",
       ];
 
       if (fieldMapping.hasOwnProperty(key) && !keys.includes(key)) {
-        keys.push(key);
+        if (value) {
+          keys.push(key);
 
-        this.filters.push({
-          display: value,
-          term: value,
-          field: fieldMapping[key],
-        });
+          this.filters.push({
+            display: value,
+            term: value,
+            field: fieldMapping[key],
+          });
+        }
       } else if (!keys.includes(key) && !notToBeAdded.includes(key)) {
-        keys.push(key);
+        if (value) {
+          keys.push(key);
 
-        this.filters.push({
-          display: value,
-          term: value,
-          field: key,
-        });
+          this.filters.push({
+            display: value,
+            term: value,
+            field: key,
+          });
+        }
       }
     }
   }
 
   removeFilter(field, term) {
     let nq = this.edge.cloneQuery();
+
+    // Special case for handling everything
+    if (field == "Text") {
+      field = "default_search_field";
+    }
+
     // Remove the filter from the "must" clause
     nq.removeMust(
       new es.TermFilter({
@@ -1038,12 +1230,57 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
       })
     );
 
+    // HOTFIX: This is just ensuring that we are removing query string only for quick search
+    if (field == "default_search_field") {
+      nq.removeQueryString();
+    }
+
     _removeUrlParam(field);
+
+    // PATCH: In EMLO the query when using checkboxes behaves a little different since the value that we need to search on gets changed
+    // for eg: if sender and as marked is enabled we will search of mail_authors-rdf_value but if as marked is not present we will search on person-author
+    // Now since we are using edges in that we are using the initial query that got generated and hence wrong results are shown.
+    const query = searchQueryObj();
+
+    // Forcefully updating the querystrings, querystring and must.
+    if (query && (query.openingQuery != null || query.openingQuery != {})) {
+      nq = this.syncObjects(nq, query.openingQuery);
+    }
 
     // Reset the search page to the start and trigger the next query
     nq.from = 0;
     this.edge.pushQuery(nq);
     this.edge.cycle();
+  }
+
+  deepEqual(a, b) {
+    return JSON.stringify(a) === JSON.stringify(b);
+  }
+
+  isEmpty(val) {
+    if (val == null) return true; // null or undefined
+    if (Array.isArray(val)) return val.length === 0;
+    if (typeof val === "object") return Object.keys(val).length === 0;
+    return false;
+  }
+
+  syncObjects(obj1, obj2) {
+    const fields = ["must", "queryStrings", "queryString"];
+
+    fields.forEach((field) => {
+      // Skip if obj2[field] is missing or empty
+      if (this.isEmpty(obj2[field])) return;
+
+      // If obj1[field] is empty or different, update it
+      if (
+        this.isEmpty(obj1[field]) ||
+        !this.deepEqual(obj1[field], obj2[field])
+      ) {
+        obj1[field] = JSON.parse(JSON.stringify(obj2[field])); // deep copy
+      }
+    });
+
+    return obj1;
   }
 };
 
@@ -1084,17 +1321,11 @@ emlo.FacetRenderer = class extends edges.Renderer {
       return;
     }
 
-    // If there are no values for the facet, hide the entire facet
     if (!ts.values || ts.values.length === 0) {
       ts.context.html("");
       return;
     }
 
-    const valClass = edges.util.allClasses(
-      this.namespace,
-      "value",
-      this.component.id
-    );
     const filterRemoveClass = edges.util.allClasses(
       this.namespace,
       "filter-remove",
@@ -1153,22 +1384,32 @@ emlo.FacetRenderer = class extends edges.Renderer {
       "results",
       this.component.id
     );
+
+    const valClass = edges.util.allClasses(
+      this.namespace,
+      "value",
+      this.component.id
+    );
     const showMoreId = edges.util.htmlID(
       this.namespace,
       "show-more",
       this.component.id
     );
-
-    let results = "Loading...";
-    if (ts.values !== false) {
-      results = `
-        <tr>
-          <td>
-            None
-          </td>
-        </tr>
-      `;
-    }
+    const modalId = edges.util.htmlID(
+      this.namespace,
+      "facet-modal",
+      this.component.id
+    );
+    const modalCloseId = edges.util.htmlID(
+      this.namespace,
+      "facet-modal-close",
+      this.component.id
+    );
+    const modalContentId = edges.util.htmlID(
+      this.namespace,
+      "facet-modal-content",
+      this.component.id
+    );
 
     const filterTerms = ts.filters.map((filter) =>
       filter.term ? filter.term.toString() : ""
@@ -1178,102 +1419,88 @@ emlo.FacetRenderer = class extends edges.Renderer {
       filter.field ? filter.field.toString() : ""
     );
 
-    if (ts.values && ts.values.length > 0) {
-      results = "";
+    let uuidsToFetch = [];
 
-      ts.values.forEach((val, idx) => {
-        // Skip facets where count is zero
-        if (!filterTerms.includes(val.term.toString()) && val.count > 0) {
-          let count = val.count;
-          if (this.countFormat) {
-            count = this.countFormat(count);
+    let limitedResults = "";
+    ts.values.forEach((val, idx) => {
+      if (val.count > 0) {
+        const isHidden = idx >= this.displayLimit;
+        const field = this.component.field;
+
+        let displayVal = this._displayFacetValue(field, val.term);
+
+        // Collect UUIDs for async update
+        if (
+          ["frbr_creator-person", "mail_recipient-person"].includes(field) &&
+          displayVal === "Loading"
+        ) {
+          let UUID = val.term.startsWith('"')
+            ? val.term.slice(1, -1).split("/").pop()
+            : val.term.split("/").pop();
+          if (UUID && !uuidsToFetch.includes(UUID)) {
+            uuidsToFetch.push(UUID);
           }
-          const isHidden = idx >= this.displayLimit && !this.showAll;
-          results += `
-            <tr style="${isHidden ? "display:none;" : ""}">
-              <td>
-                <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
-            val.term
-          )}">
-                  <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
-                  ${edges.util.escapeHtml(val.display)}
-                </a>
-              </td>
-              <td>
-                ${count}
-              </td>
-            </tr>
-          `;
         }
-      });
-    }
 
-    // If no results were found, hide the facet altogether
-    if (results === "Loading..." || results === "" || ts.values.length === 0) {
-      ts.context.html(""); // Remove the entire facet from the DOM
-      return; // Stop execution as no content is needed
-    }
+        limitedResults += `
+      <tr style="${isHidden ? "display:none;" : ""}">
+        <td>
+          <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
+          val.term
+        )}" data-changekey="${field}${edges.util.escapeHtml(val.term)}">
+            <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
+            ${displayVal}
+          </a>
+        </td>
+        <td>${val.count}</td>
+      </tr>
+    `;
+      }
+    });
 
-    // Add "Show more" button if there are more than 10 entries
-    let showMoreFrag = "";
-    if (ts.values.length > this.displayLimit) {
-      showMoreFrag = `
+    let fullResults = "";
+    ts.values.forEach((val) => {
+      if (val.count > 0) {
+        fullResults += `
+                <tr>
+                  <td>
+                  <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
+          val.term
+        )}">
+                  <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
+                   ${this._displayFacetValue(this.component.field, val.display)}
+                  </a>
+                  </td>
+                  <td>${val.count}</td>
+                </tr>
+            `;
+      }
+    });
+
+    let showMoreFrag =
+      ts.values.length > this.displayLimit
+        ? `
         <tr>
-          <td id="${showMoreId}" class="btn btn-link">
-            ${this.showAll ? "Click to hide" : "Click to show more..."}
-          </td>
-          <td>
-          </td>
+          <td id="${showMoreId}" class="btn btn-link">Click to show more...</td>
         </tr>
-      `;
-    }
+    `
+        : "";
 
-    let tooltipFrag = "";
-    if (this.tooltipText) {
-      const tt = this._shortTooltip();
-      const tooltipClass = edges.util.styleClasses(
-        this.namespace,
-        "tooltip",
-        this.component.id
-      );
-      const tooltipId = edges.util.htmlID(
-        this.namespace,
-        "tooltip",
-        this.component.id
-      );
-      tooltipFrag = `<div id="${tooltipId}" class="${tooltipClass}" style="display:none"><div class="row"><div class="col-md-12">${tt}</div></div></div>`;
-    }
-
-    let controlFrag = "";
-    if (this.controls) {
-      controlFrag = `<div class="${controlClass}" style="display:none" id="${controlId}"><div class="row">
-                      <div class="col-md-12">
-                          <div class="btn-group">
-                              <button type="button" class="btn btn-default btn-sm" id="${sizeId}" title="List Size">0</button>
-                              <button type="button" class="btn btn-default btn-sm" id="${orderId}" title="List Order"></button>
-                          </div>
-                      </div>
-                  </div></div>`;
-    }
-
-    let filterFrag = "";
-    if (ts.filters.length > 0 && this.showSelected) {
-      ts.filters.forEach((filt) => {
-        filterFrag += `<div class="${resultClass}"><strong>${edges.util.escapeHtml(
-          filt.display
-        )}&nbsp;`;
-        filterFrag += `<a href="#" class="${filterRemoveClass}" data-key="${edges.util.escapeHtml(
-          filt.term
-        )}">`;
-        filterFrag += '<i class="fas fa-times"></i></a>';
-        filterFrag += "</strong></a></div>";
-      });
-    }
-
-    let tog = this.title;
-    if (this.togglable) {
-      tog = `<p class="main">${this.title}</p>`;
-    }
+    let modalFrag = `
+        <div id="${modalId}" class="facet-modal">
+            <div class="facet-modal-content">
+                <div class="facet-modal-header">
+                    <span>${this.title}</span>
+                    <span id="${modalCloseId}" class="facet-modal-close">&times;</span>
+                </div>
+                <div class="facet-modal-content-wrapper">
+                    <table class="facet">
+                        <tbody>${fullResults}</tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
 
     let isHideCount = false;
 
@@ -1285,34 +1512,58 @@ emlo.FacetRenderer = class extends edges.Renderer {
       isHideCount = true;
     }
 
-    let frag = `<div class="${facetClass}" style="${
-      isHideCount ? "display:none;" : ""
-    }">
-                      <div class="${headerClass}"><div class="row">
-                          <div class="col-md-12">
-                              ${tog}
-                          </div>
-                      </div></div>
-                      ${tooltipFrag}
-                      {{CONTROLS}}
-                      <div class="row" style="display:none" id="${resultsId}">
-                          <div class="col-md-12">
-                            <table class="facet">
-                              <tbody>
-                                {{RESULTS}}
-                                {{SHOWMOREFRAG}}
-                              </tbody>
-                            </table>
-                          </div>
-                      </div></div>`;
-
-    frag = frag
-      .replace(/{{RESULTS}}/g, results)
-      .replace(/{{CONTROLS}}/g, controlFrag)
-      .replace(/{{SELECTED}}/g, filterFrag)
-      .replace(/{{SHOWMOREFRAG}}/g, showMoreFrag);
+    let frag = `
+        <div class="facet"  style="${isHideCount ? "display:none;" : ""}">
+            <h4>${this.title}</h4>
+            <table class="facet">
+                <tbody>${limitedResults}${showMoreFrag}</tbody>
+            </table>
+        </div>
+        ${modalFrag}
+    `;
 
     ts.context.html(frag);
+
+    this._fetchNamesNew(uuidsToFetch, "people").then((names) => {
+      if (names && names.length > 0) {
+        for (let name of names) {
+          localStorage.setItem(name.uuid, name.browse);
+          document
+            .querySelectorAll(`[data-key*="${name.uuid}"]`)
+            .forEach((el) => {
+              // Protecting this from selected facet rendering since this is taken care there
+              if (el.dataset.field && el.dataset.field == "uuid_related") {
+                return;
+              }
+              el.innerHTML = `
+            <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
+            ${edges.util.escapeHtml(name.browse)}
+          `;
+            });
+        }
+      }
+    });
+
+    // Fetching the UUID
+    // Array.from(uuidsToFetch).forEach((UUID) => {
+    //   const collectionName = "people";
+
+    //   if (localStorage.getItem(UUID)) return; // already cached
+
+    //   this._fetchNames(UUID, collectionName).then((names) => {
+    //     if (names) {
+    //       localStorage.setItem(UUID, names);
+
+    //       // Update all matching DOM elements
+    //       document.querySelectorAll(`[data-key*="${UUID}"]`).forEach((el) => {
+    //         el.innerHTML = `
+    //         <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
+    //         ${edges.util.escapeHtml(names)}
+    //       `;
+    //       });
+    //     }
+    //   });
+    // });
 
     this.setUISize();
     this.setUISort();
@@ -1333,13 +1584,25 @@ emlo.FacetRenderer = class extends edges.Renderer {
       "toggle",
       this
     );
-    const sizeSelector = edges.util.idSelector(this.namespace, "size", this);
-    const orderSelector = edges.util.idSelector(this.namespace, "order", this);
+
     const showMoreSelector = edges.util.idSelector(
       this.namespace,
       "show-more",
-      this
+      this.component.id
     );
+    const modalSelector = edges.util.idSelector(
+      this.namespace,
+      "facet-modal",
+      this.component.id
+    );
+    const modalCloseSelector = edges.util.idSelector(
+      this.namespace,
+      "facet-modal-close",
+      this.component.id
+    );
+
+    const sizeSelector = edges.util.idSelector(this.namespace, "size", this);
+    const orderSelector = edges.util.idSelector(this.namespace, "order", this);
 
     edges.on(valueSelector, "click", this, "termSelected");
     edges.on(toggleSelector, "click", this, "toggleOpen");
@@ -1348,8 +1611,190 @@ emlo.FacetRenderer = class extends edges.Renderer {
     edges.on(orderSelector, "click", this, "changeSort");
 
     if (this.component.jq(showMoreSelector).length > 0) {
-      edges.on(showMoreSelector, "click", this, "showMoreEntries");
+      edges.on(showMoreSelector, "click", this, "openModal");
     }
+    edges.on(modalCloseSelector, "click", this, "closeModal");
+  }
+
+  // _displayFacetValue(field, val, fetch = false) {
+  //   if (field == "object_type") {
+  //     const typeMap = {
+  //       work: "Letter",
+  //       manifestation: "Document",
+  //       resource: "Related resource",
+  //       person: "Person or organization",
+  //     };
+
+  //     if (typeMap.hasOwnProperty(val)) {
+  //       return typeMap[val];
+  //     } else {
+  //       return val.charAt(0).toUpperCase() + val.slice(1);
+  //     }
+  //   } else if (
+  //     ["frbr_creator-person", "mail_recipient-person"].includes(field) &&
+  //     fetch
+  //   ) {
+  //     let value = val;
+  //     let UUID = "";
+  //     if (value && value.startsWith('"') && value.endsWith('"')) {
+  //       value = value.slice(1, -1);
+  //     }
+
+  //     if (typeof value === "string" && value.startsWith("http")) {
+  //       UUID = value.split("/").pop();
+  //     }
+
+  //     if (UUID == "") {
+  //       return "";
+  //     }
+
+  //     if (localStorage.getItem(UUID)) {
+  //       return localStorage.getItem(UUID);
+  //     }
+
+  //     let collectionName = "people";
+
+  //     this._fetchNames(UUID, collectionName).then((names) => {
+  //       if (names) {
+  //         // Find all matching elements dynamically and update their content
+  //         document
+  //           .querySelectorAll(`[data-key="${edges.util.escapeHtml(val)}"]`)
+  //           .forEach((el) => {
+  //             el.innerHTML = `
+  //               <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
+  //               ${edges.util.escapeHtml(names)}
+  //             `;
+  //           });
+  //       }
+  //     });
+
+  //     return "Loading";
+  //   } else {
+  //     return val;
+  //   }
+  // }
+
+  _displayFacetValue(field, val) {
+    if (field == "object_type") {
+      const typeMap = {
+        work: "Letter",
+        manifestation: "Document",
+        resource: "Related resource",
+        person: "Person or organization",
+      };
+      return typeMap[val] || val.charAt(0).toUpperCase() + val.slice(1);
+    } else if (
+      ["frbr_creator-person", "mail_recipient-person"].includes(field)
+    ) {
+      let value = val;
+      if (value && value.startsWith('"') && value.endsWith('"')) {
+        value = value.slice(1, -1);
+      }
+
+      let UUID = value.startsWith("http") ? value.split("/").pop() : "";
+
+      if (!UUID) return "";
+
+      const cached = localStorage.getItem(UUID);
+      return cached ? cached : "Loading";
+    } else {
+      return val;
+    }
+  }
+
+  async _fetchNamesNew(uuids, collectionName) {
+    if (collectionName == "") {
+      return [];
+    }
+
+    let payload = {};
+    if (uuids.length > 0) {
+      payload = {
+        solrCore: collectionName,
+        uuids: uuids,
+        filter: "browse,uuid",
+        objectKey: "uuid",
+      };
+    } else {
+      return [];
+    }
+
+    try {
+      const response = await fetch(`/stats-new`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        console.error(`Error fetching names: ${response.statusText}`);
+        return [];
+      }
+
+      const json = await response.json();
+      return json;
+    } catch (err) {
+      console.error("Error while fetching names", err);
+      return [];
+    }
+  }
+
+  async _fetchNames(value, colName) {
+    let collectionName = "";
+    let fl = "browse";
+
+    if (colName) {
+      collectionName = colName;
+    } else {
+      const urlParams = new URLSearchParams(window.location.search);
+      const browsing = urlParams.get("browsing");
+
+      collectionName =
+        browsing && browsing != "organizations" ? `${browsing}` : `people`;
+    }
+
+    if (!collectionName) {
+      console.error("Collection name not found in the URL.");
+      return "";
+    }
+
+    const response = await fetch(
+      `/solr/${collectionName}/select?q=uuid:${value}&fl=${fl}&wt=json`
+    );
+    const data = await response.json();
+
+    // Extract and process `browse` values
+    const browseNames = data.response.docs.map((doc) => doc[fl]);
+
+    const browseNamesString = browseNames.join(", ");
+
+    try {
+      localStorage.setItem(value, browseNamesString);
+    } catch (err) {
+      console.error(`Got err: ${err} while setting key for ${value}`);
+    }
+
+    return browseNamesString;
+  }
+
+  openModal() {
+    const modalSelector = edges.util.idSelector(
+      this.namespace,
+      "facet-modal",
+      this.component.id
+    );
+    this.component.jq(modalSelector).css("display", "block");
+  }
+
+  closeModal() {
+    const modalSelector = edges.util.idSelector(
+      this.namespace,
+      "facet-modal",
+      this.component.id
+    );
+    this.component.jq(modalSelector).css("display", "none");
   }
 
   showMoreEntries() {
@@ -1530,20 +1975,21 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
     let filterFrag = "";
     ts.filters.forEach((filt) => {
       filterFrag += `
-        <tr class="${resultClass}">
-          <td>
+        <tr class="${resultClass}" style="vertical-align: middle;">
+          <td style="width:80px" class="capitalize-first-letter">
           ${this._getSelectedFieldLabel(filt.field)}
           </td>
-          <td style="min-width: 100px;">
-            <a href="#" class="${filterRemoveClass} selected-facets" data-key="${edges.util.escapeHtml(
+
+          <td class="${filterRemoveClass} selected-facets" data-key='${
         filt.term
-      )}" data-field="${edges.util.escapeHtml(filt.field)}" >
-                   ${edges.util.escapeHtml(
-                     this._getDisplayValue(filt.field, filt.display)
-                   )}
-                  <img class="facet" src="../../static/img/minus-facet.png" style="height:15px;" />
-                </a>
-          </td>
+      }' data-field='${filt.field}' >
+              <span data-val='${filt.field}'  style="width:100px">
+              ${this._getDisplayValue(filt.field, filt.display)}
+              </span>
+              <span style="widht:50px">
+                <img class="facet" src="../../static/img/minus-facet.png" style="height:15px;" />
+              </span>
+            </td>
         </tr>
       `;
     });
@@ -1583,24 +2029,68 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
 
   // PATCH: currently we do not have anything in edges that can help us with this.
   _getDisplayValue(field, value) {
-    if (field === "uuid_related") {
+    const colMap = {
+      "mail_origin-location": "locations",
+      "mail_destination-location": "locations",
+      "dcterms_references-location": "locations",
+      "frbr_creator-person": "people",
+      "mail_recipient-person": "people",
+      "dcterms_references-person": "people",
+    };
+
+    const displayFieldMapping = {
+      work: "Letter",
+      manifestation: "Document",
+      resource: "Related resource",
+      person: "Person or organization",
+      location: "Location",
+      image: "Image",
+      institution: "Repository",
+      comment: "Comment",
+    };
+
+    const validFields = [
+      "uuid_related",
+      "dcterms_references-location",
+      "mail_destination-location",
+      "mail_origin-location",
+      "frbr_creator-person",
+      "mail_recipient-person",
+      "dcterms_references-person",
+    ];
+
+    if (validFields.includes(field)) {
       // Return a placeholder value immediately
       const placeholder = "Loading...";
 
+      if (value && value.startsWith("*") && value.endsWith("*")) {
+        value = value.slice(1, -1);
+      }
+
+      if (
+        typeof value === "string" &&
+        value.startsWith('"http') &&
+        value.endsWith('"')
+      ) {
+        value = value.split("/").filter(Boolean).pop();
+        value = value.slice(0, -1);
+      }
+
+      let collectionName = "";
+
+      if (colMap.hasOwnProperty(field)) {
+        collectionName = colMap[field];
+      }
+
       // Fetch names asynchronously
-      this._fetchNames(value).then((names) => {
+      this._fetchNamesSelected(value, collectionName).then((names) => {
         if (names) {
           // Find all matching elements dynamically and update their content
           document
-            .querySelectorAll(
-              `[data-field="${edges.util.escapeHtml(
-                field
-              )}"][data-key="${edges.util.escapeHtml(value)}"]`
-            )
+            .querySelectorAll(`[data-val="${edges.util.escapeHtml(field)}"]`)
             .forEach((el) => {
               el.innerHTML = `
                 ${edges.util.escapeHtml(names)}
-                <img class="facet" src="../../static/img/minus-facet.png" style="height:15px;" />
               `;
             });
         }
@@ -1608,17 +2098,31 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
 
       return placeholder;
     } else {
+      if (value && value.startsWith('"') && value.endsWith('"')) {
+        value = value.slice(1, -1);
+      }
+
+      if (field == "object_type" && displayFieldMapping.hasOwnProperty(value)) {
+        return displayFieldMapping[value];
+      }
+
       return value;
     }
   }
 
-  async _fetchNames(value) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const browsing = urlParams.get("browsing");
+  async _fetchNamesSelected(value, colName) {
+    let collectionName = "";
     let fl = "browse";
 
-    const collectionName =
-      browsing && browsing != "organisations" ? `${browsing}` : `people`;
+    if (colName) {
+      collectionName = colName;
+    } else {
+      const urlParams = new URLSearchParams(window.location.search);
+      const browsing = urlParams.get("browsing");
+
+      collectionName =
+        browsing && browsing != "organizations" ? `${browsing}` : `people`;
+    }
 
     if (!collectionName) {
       console.error("Collection name not found in the URL.");
@@ -1639,24 +2143,9 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
   }
 
   _getSelectedFieldLabel(field) {
-    switch (field) {
-      case "author_sort":
-        return "Author";
-      case "recipient_sort":
-        return "Recipient";
-      case "origin_sort":
-        return "Origin of letter";
-      case "destination_sort":
-        return "Destination of letter";
-      case "cito_Catalog":
-        return "Catalogue";
-      case "ox_started-ox_year":
-        return "Year";
-      case "uuid_related":
-        return "Any from list";
-      default:
-        return field;
-    }
+    const label = getLabel(field);
+
+    return label == "-" ? field : label;
   }
 };
 
@@ -1671,9 +2160,20 @@ emlo.MultiFields = class extends edges.Component {
       "fetchSecondaryData",
       false
     ); // Enable/disable secondary data fetch
-
+    this.optimizedCode = edges.util.getParam(params, "optimizedCode", false);
+    this.relationships = [];
     this.loading = true; // Track loading state
     this.errorMessage = ""; // Track error message
+    this.fetchTableData = edges.util.getParam(params, "fetchTableData", false);
+    this.tableDataFields = edges.util.getParam(params, "tableDataFields", []);
+    this.fetchImageData = edges.util.getParam(params, "fetchImageData", false);
+    this.manifestationField = edges.util.getParam(
+      params,
+      "manifestationField",
+      ""
+    );
+    this.gneratedData = {}; // this data will be used for displayig linked information
+    this.graphData;
   }
 
   async synchronise() {
@@ -1694,7 +2194,85 @@ emlo.MultiFields = class extends edges.Component {
     try {
       await this._appendResults({ results: results });
       this.hitCount = source.total();
+      if (results && results.length > 0) {
+        let relations = await this._fetchRelations(results[0]["uuid"]);
+        this.relationships = relations;
+      }
+
+      if (this.fetchTableData && this.tableDataFields.length > 0) {
+        const result = results[0];
+
+        for (const field of this.tableDataFields) {
+          if (Object.prototype.hasOwnProperty.call(result, field)) {
+            const val = result[field]; // Assuming val is an array of URIs
+            const uuids = Array.from(
+              new Set(val.map((uri) => uri.split("/").pop()))
+            );
+
+            if (uuids.length > 0) {
+              let payload = {
+                solrCore: "work",
+                uuids: uuids,
+                filter: "",
+                objectKey: "uuid",
+              };
+
+              // In case of ox_hasResource-manifestation we need manifestation, core needs to be updated
+              if (field == "ox_hasResource-manifestation") {
+                payload.objectKey = "uuid_related";
+              }
+
+              this.gneratedData[field] = await this._fetchMoreWorkData(payload);
+            }
+          }
+        }
+      }
+
+      // This will only work for manifestation since they are only fields which can have image values
+      if (this.fetchImageData && this.manifestationField !== "") {
+        const result = results[0];
+
+        if (result.hasOwnProperty(this.manifestationField)) {
+          const maniUris = result[this.manifestationField];
+
+          if (Array.isArray(maniUris) && maniUris.length > 0) {
+            for (const uri of maniUris) {
+              const uuid = uri.split("/").pop();
+
+              if (uuid) {
+                if (!this.gneratedData.hasOwnProperty("imageData")) {
+                  this.gneratedData["imageData"] = {};
+                }
+
+                const payload = {
+                  solrCore: "image",
+                  uuids: [uuid],
+                  filter: "",
+                  objectKey: "uuid_related",
+                };
+
+                this.gneratedData["imageData"][uuid] = await this._fetchImages(
+                  uuid
+                );
+
+                if (!this.gneratedData.hasOwnProperty("manifestationData")) {
+                  this.gneratedData["manifestationData"] = {};
+                }
+
+                let relationsArray = await this._fetchRelations(uuid);
+
+                this.gneratedData["manifestationData"][uuid] =
+                  relationsArray.reduce((acc, item) => {
+                    acc[item.uuid] = item;
+                    return acc;
+                  }, {});
+              }
+            }
+          }
+        }
+      }
     } catch (error) {
+      console.error("got error", error);
       this.errorMessage = "Error fetching data.";
     } finally {
       this.loading = false; // Stop loading
@@ -1705,32 +2283,159 @@ emlo.MultiFields = class extends edges.Component {
     this.hitCount = source.total();
   }
 
+  async _fetchMoreWorkData(payload) {
+    try {
+      const response = await fetch(`/stats-new`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        console.error(`Error fetching relations: ${response.statusText}`);
+        return [];
+      }
+
+      const json = await response.json();
+      return json;
+    } catch (err) {
+      console.error("Error while fetching relations", err);
+      return [];
+    }
+  }
+
+  async _fetchRelations(uuid) {
+    try {
+      const response = await fetch(
+        `/solr/all/select?q=uuid_related:${uuid}&wt=json&rows=9999`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error(`Error fetching relations: ${response.statusText}`);
+        return [];
+      }
+
+      const json = await response.json();
+      return json.response.docs;
+    } catch (err) {
+      console.error("Error while fetching relations", err);
+      return [];
+    }
+  }
+
+  async _fetchImages(uuid) {
+    try {
+      const response = await fetch(
+        `/solr/images/select?q=uuid_related:${uuid}&wt=json&rows=9999`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error(`Error fetching relations: ${response.statusText}`);
+        return [];
+      }
+
+      const json = await response.json();
+      return json.response.docs;
+    } catch (err) {
+      console.error("Error while fetching relations", err);
+      return [];
+    }
+  }
+
   async _appendResults(params) {
     const results = params.results;
 
     if (this.fetchSecondaryData) {
-      for (const result of results) {
-        const fieldData = result[this.primaryField];
-        if (fieldData && Array.isArray(fieldData)) {
-          // Fetching secondary data for each fieldData URL
-          const secondaryResults = await Promise.all(
-            fieldData.map((url) => {
-              const collection = url.split("/")[3];
-              let collectionName = "";
+      if (this.optimizedCode) {
+        console.debug("running optimized code for:", this.primaryField);
+        let objectKey = "uuid";
+        const uuidArray = [];
+        let collectionName = "work";
+        for (const result of results) {
+          const fieldData = result[this.primaryField];
+          if (fieldData && Array.isArray(fieldData)) {
+            fieldData.forEach((url) => {
+              const parts = url.split("/");
+              collectionName = parts[3] === "person" ? "people" : parts[3];
+              const id = parts[4];
+              uuidArray.push(id);
+            });
+          }
+        }
 
-              if (collection == "person") {
-                collectionName = "people";
-              } else {
-                collectionName = collection;
-              }
+        // Patch changing the collection name for specific primary key
+        if (this.primaryField === "ox_hasResource-manifestation") {
+          collectionName = "work";
+          objectKey = "uuid_related";
+        }
 
-              const id = url.split("/")[4];
+        const payload = {
+          solrCore: collectionName,
+          uuids: uuidArray,
+          objectKey: objectKey,
+          filter: "", // Adjust if a filter is required
+        };
 
-              return this._fetchAndExtractSecondaryData(collectionName, id); // Await the result
-            })
-          );
+        try {
+          const response = await fetch("/stats-new", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
 
-          result[this.primaryField] = secondaryResults; // Replace with fetched data
+          if (!response.ok) {
+            console.error(
+              `Error fetching data for ${solrCore}: ${response.statusText}`
+            );
+            return {};
+          }
+
+          results[0][this.primaryField] = await response.json();
+        } catch (err) {
+          console.error("got error while fetching details ", err);
+        }
+
+        // console.log("got uuid", uuidArray);
+      } else {
+        for (const result of results) {
+          const fieldData = result[this.primaryField];
+          if (fieldData && Array.isArray(fieldData)) {
+            // Fetching secondary data for each fieldData URL
+            const secondaryResults = await Promise.all(
+              fieldData.map((url) => {
+                const collection = url.split("/")[3];
+                let collectionName = "";
+
+                if (collection == "person") {
+                  collectionName = "people";
+                } else {
+                  collectionName = collection;
+                }
+
+                const id = url.split("/")[4];
+
+                return this._fetchAndExtractSecondaryData(collectionName, id); // Await the result
+              })
+            );
+
+            result[this.primaryField] = secondaryResults; // Replace with fetched data
+          }
         }
       }
     }
@@ -1790,6 +2495,13 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       "No results to display"
     );
     this.contentTitle = edges.util.getParam(params, "contentTitle", "");
+    this.dynamicTitle = edges.util.getParam(params, "dynamicTitle", "");
+    this.dynamicTitleField = edges.util.getParam(
+      params,
+      "dynamicTitleField",
+      ""
+    );
+    this.dynamicImage = edges.util.getParam(params, "dynamicImage", "");
     this.contentTitleImage = edges.util.getParam(
       params,
       "contentTitleImage",
@@ -1797,10 +2509,15 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     );
     this.fields = edges.util.getParam(params, "fields", []);
     this.primaryField = edges.util.getParam(params, "primaryField", "");
+    this.primaryResultKey = edges.util.getParam(params, "primaryResultKey", "");
     this.lat_field = edges.util.getParam(params, "lat_field", "");
     this.long_field = edges.util.getParam(params, "long_field", "");
     this.divider = edges.util.getParam(params, "divider", false); // Whether to include a divider
     this.message = edges.util.getParam(params, "message", "");
+    this.footerType = edges.util.getParam(params, "footerType", "");
+    this.isSide = edges.util.getParam(params, "isSide", false); // Whether to render in a sidebar
+    this.subSection = edges.util.getParam(params, "subSection", false);
+    this.isDivider = edges.util.getParam(params, "isDivider", true);
     this.namespace = "edges-custom-display";
   }
 
@@ -1818,6 +2535,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
           break;
         case "side-title":
           frag = this._sideTitle();
+          break;
+        case "shortUrl":
+          this._renderShortUrl();
           break;
         case "links":
           frag = this._renderLinks();
@@ -1846,6 +2566,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         case "dates":
           frag = this._renderDates();
           break;
+        case "date-people":
+          frag = this._renderDatesForPeople();
+          break;
         case "stats":
           frag = this._renderStats();
           break;
@@ -1870,13 +2593,23 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
         case "dummy-message":
           frag = this._renderDummyText();
           break;
+        case "repo-version":
+          frag = this._renderRepoVersion();
+          break;
+        case "footer":
+          frag = this._renderFooter();
+          break;
         default:
           frag = "<div></div>";
       }
     }
 
     const sectionTitleFrag = this._renderSectionTitle();
-    const dividerFrag = this.divider ? ' <hr class="yellow-divider" />' : "";
+    const dividerFrag = this.divider
+      ? this.isSide
+        ? '<hr class="yellow-divider"/>'
+        : '<div class="yellow-divider"></div>'
+      : "";
 
     const containerClasses = edges.util.styleClasses(
       this.namespace,
@@ -1887,10 +2620,27 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     let container = "";
 
     if (frag) {
+      // const content = this.isSide
+      //   ? `${sectionTitleFrag}${frag}`
+      //   : `<div class="" style="padding-bottom:20px;padding-left: 0.9375rem;padding-right: 0.9375rem">
+      //        ${sectionTitleFrag}
+      //        ${frag}
+      //      </div>`;
+
+      const content = this.isSide
+        ? `${sectionTitleFrag}${frag}`
+        : `<div class="" ${
+            this.subSection
+              ? 'style="padding-left:0.9375rem;padding-right:0.9375rem"'
+              : 'style="padding-bottom:20px;padding-left:0.9375rem;padding-right:0.9375rem"'
+          }>
+       ${sectionTitleFrag}
+       ${frag}
+     </div>`;
+
       container = `<div class="${containerClasses}">
-        ${dividerFrag}  
-        ${sectionTitleFrag}
-        ${frag}
+        ${dividerFrag} 
+        ${content}
       </div>`;
     }
 
@@ -1898,47 +2648,264 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   }
 
   _renderSectionTitle() {
-    if (this.component.results && this.component.results.length > 0) {
+    if (
+      this.component.results &&
+      this.component.results.length > 0 &&
+      this.sectionTitle
+    ) {
       const imageTag = this.sectionTitleImage
-        ? `<img style="float:left;height:25px;width:25px;margin-right:15px;" src="${edges.util.escapeHtml(
+        ? `<img src="${edges.util.escapeHtml(
             this.sectionTitleImage
           )}" alt="${edges.util.escapeHtml(
             this.sectionTitle
-          )}" class="title-image">`
+          )}" class="title-image" />`
         : "";
 
-      return `<${this.sectionTitleStyle} class="section-title">
-      ${imageTag} ${edges.util.escapeHtml(this.sectionTitle)}
-    </${this.sectionTitleStyle}>`;
+      return `<${this.sectionTitleStyle}>${imageTag}${this.sectionTitle}</${this.sectionTitleStyle}>`;
     } else {
       return "";
     }
   }
 
   _pageHeading() {
+    const params = new URLSearchParams(window.location.search);
+    let extraBr = "<br/>";
+
+    if (this.field == "frbr_Work-work") {
+      const workUri = this.component.relationships[0]["frbr_Work-work"][0];
+
+      const workUUID = workUri.split("/").pop();
+
+      const apiUrl = `/solr/works/select?q=uuid:${workUUID}&wt=json&fl=dcterms_description,uuid`;
+
+      fetch(apiUrl)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          // Step 3: Use the data to update the DOM
+          const element = document.getElementById("heading");
+
+          if (
+            data &&
+            data.response &&
+            data.response.docs &&
+            data.response.docs.length > 0
+          ) {
+            const result = data.response.docs[0];
+
+            if (element) {
+              element.innerHTML = `
+                <a href=/profile/work/${result.uuid}> ${result.dcterms_description} </a>
+              `;
+            }
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to fetch work info:", error);
+        });
+    }
+
+    if (params.get("type")) {
+      extraBr = "";
+    } else {
+      // Hiding pagination just to remove extra space
+      const paginationDoc = document.getElementById("pagination");
+
+      if (paginationDoc) {
+        paginationDoc.style.display = "none";
+      }
+    }
+
     return `
-      <h2 class="main">
-        <span id="result-header" class="font-18">
-          ${edges.util.escapeHtml(this.component.results[0][this.field] || "")}
-        </span>
-      </h2>`;
+      ${extraBr}
+      <h2 id="heading">
+        ${edges.util.escapeHtml(this.component.results[0][this.field] || "")}
+      </h2> 
+      <br/>
+      `;
   }
 
   _sideTitle() {
-    const imageTag = this.contentTitleImage
-      ? `<img src="${edges.util.escapeHtml(
-          this.contentTitleImage
-        )}" alt="${edges.util.escapeHtml(
-          this.contentTitle
-        )}" class="profile-icon">`
-      : "";
+    let title = "";
+    let imageTag = "";
+
+    const result = this.component.results[0];
+    if (this.dynamicTitle != "" && this.dynamicTitleField != "") {
+      let val;
+      if (result.hasOwnProperty(this.dynamicTitleField)) {
+        val = result[this.dynamicTitleField];
+      }
+
+      if (typeof val === "boolean") {
+        title = val ? this.dynamicTitle : "";
+
+        if (val && this.dynamicImage) {
+          imageTag = this.dynamicImage
+            ? `<img src="${edges.util.escapeHtml(
+                this.dynamicImage
+              )}" alt="${edges.util.escapeHtml(title)}" class="profile-icon">`
+            : "";
+        }
+      } else {
+        title = val != "" ? val : this.dynamicTitle;
+      }
+    }
+
+    if (title == "") {
+      title = this.contentTitle;
+    }
+
+    if (imageTag == "") {
+      imageTag = this.contentTitleImage
+        ? `<img src="${edges.util.escapeHtml(
+            this.contentTitleImage
+          )}" alt="${edges.util.escapeHtml(title)}" class="profile-icon">`
+        : "";
+    }
 
     return `
-    <h4 class="main">
+    <div style="padding-bottom: 21px; padding-top:5px">
       ${imageTag}
-      ${edges.util.escapeHtml(this.contentTitle)}
-    </h4>
-    <hr class="yellow-divider" />`;
+      <strong style="font-family: Helvetica Neue,Helvetica,Roboto,Arial,sans-serif;cursor: auto;">${edges.util.escapeHtml(
+        title
+      )}</strong>
+    </div>
+    <div class="yellow-divider"></div><br>`;
+  }
+
+  _renderRepoVersion() {
+    const sectionHeading = "Versions (originals, copies, digital, etc.)";
+    let frag = `<h2>${sectionHeading}</h2>`;
+    this.component.results[0][this.primaryField].forEach((item) => {
+      if (item.dcterms_type == "Letter") {
+        frag += this._getLetterReopContent(item);
+
+        if (item.hasOwnProperty("ox_resourceAt-institution")) {
+          this._getInstituteData(item["ox_resourceAt-institution"]);
+        }
+      } else if (item.dcterms_type == "Manuscript copy") {
+        frag += this.__getManuRepoContent(item);
+        if (item.hasOwnProperty("ox_resourceAt-institution")) {
+          this._getInstituteData(item["ox_resourceAt-institution"]);
+        }
+      } else {
+        frag += `
+          <h3>Version: ${item.dcterms_type}</h3>
+				  <p> ${item.ox_printedEditionDetails}</p>
+        `;
+      }
+    });
+
+    return `
+      <div style="margin-left:25px"> ${frag} </div>
+    `;
+  }
+
+  _getLetterReopContent(content) {
+    return `
+  <div class="display_details_of_one_object False">
+	  <h3>Version: Letter</h3>
+		
+    <p><span class="fieldlabel">Repository:</span></p>
+      <div id="repo-section"></div>
+		  <p>
+        <span class="fieldlabel">Shelfmark:</span> ${content["dcterms_identifier-shelf_"]} 
+      </p>
+      <p>
+        <span class="fieldlabel">Postage mark:</span>${content.mail_postageMark}
+      </p>
+	</div>
+  <br/>
+    `;
+  }
+
+  __getManuRepoContent(content) {
+    return `
+    <div class="display_details_of_one_object False">
+      <h3>Version:  Manuscript copy </h3>
+      
+      <p><span class="fieldlabel">Repository:</span></p>
+        <div id="repo-section"></div>
+        <p>
+          <span class="fieldlabel">Shelfmark:</span> ${content["dcterms_identifier-shelf_"]} 
+        </p>
+        <p>
+          <span class="fieldlabel">Paper size:</span> ${content["mail_paperSize"]} 
+        </p>
+        <p>
+          <span class="fieldlabel">Number of pages of document:</span> ${content["bibo_numPages"]} 
+        </p>
+        <p>
+          <span class="fieldlabel">Number of pages of text:</span>${content.ox_numPageText}
+        </p>
+    </div>
+    <br/>
+      `;
+  }
+
+  _getInstituteData(institutions) {
+    institutions.forEach(async (url) => {
+      const parts = url.split("/");
+      const institutionId = parts.at(-1); // Last part is the ID
+      const field =
+        "geonames_officialName,geonames_locatedIn,geonames_inCountry";
+
+      try {
+        // Fetch institution details from API
+        const response = await fetch(
+          `/solr/institutions/select?q=uuid:${institutionId}&fl=${field}&wt=json`
+        );
+        if (!response.ok)
+          throw new Error(`Failed to fetch details for ${institutionId}`);
+
+        const data = await response.json();
+        const institutionData = data?.response?.docs?.[0] || {};
+
+        // Conditionally build name, city, and country sections
+        const nameHTML = institutionData.geonames_officialName
+          ? `<a href="/profile/repository/${institutionId}">${institutionData.geonames_officialName}</a><br>`
+          : "";
+        const cityHTML = institutionData.geonames_locatedIn
+          ? `<span style="color:#172854;">City</span>:<br>&nbsp;&nbsp;&nbsp; ${institutionData.geonames_locatedIn}<br>`
+          : "";
+        const countryHTML = institutionData.geonames_inCountry
+          ? `<span style="color:#172854;">Country</span>:<br>&nbsp;&nbsp;&nbsp; ${institutionData.geonames_inCountry}<br>`
+          : "";
+
+        // Only return non-empty sections
+        if (!nameHTML && !cityHTML && !countryHTML) return;
+
+        // Return the constructed HTML for this institution
+        const frag = `
+          <div class="display_details_of_one_object True">
+            ${nameHTML}
+            ${cityHTML}
+            ${countryHTML}
+          </div>
+        `;
+
+        const repo = document.getElementById("repo-section");
+        if (repo) {
+          repo.innerHTML = frag;
+        }
+      } catch (error) {
+        console.error(`Error fetching institution details for ${url}:`, error);
+      }
+    });
+    // return `<div class="display_details_of_one_object True">
+    //     <a href="/profile/institution/id">
+    //       Institute vakue needs to be added.
+    //     </a>
+    //     <br>
+    // 	  <span style="color:#172854;">
+    //       City
+    //     </span>:<br>&nbsp;&nbsp;&nbsp; Basel<br>
+    // 	  <span style="color:#172854;">Country</span>:<br>&nbsp;&nbsp;&nbsp; Switzerland<br>
+    //   </div>`
   }
 
   _renderBarGraph() {
@@ -1969,56 +2936,91 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
               additionalInfo = field.additonalInfo
                 .map((info) => {
                   let displayValue = "";
-                  if (info.mainKey in this.component.results[0]) {
-                    const mainValue = this.component.results[0][info.mainKey];
-                    if (typeof mainValue === "boolean") {
-                      displayValue = mainValue ? info.text : "";
-                    } else if (mainValue) {
-                      displayValue = `Marked as:   ${mainValue}`;
-                    }
-                  }
 
-                  if (
-                    !displayValue &&
-                    info.secondaryKey in this.component.results[0]
-                  ) {
-                    const secondaryValue =
-                      this.component.results[0][info.secondaryKey];
-                    if (typeof secondaryValue === "boolean") {
-                      displayValue = secondaryValue ? info.text : "";
-                    } else if (secondaryValue) {
-                      displayValue = `Marked as:   ${secondaryValue}`;
+                  if (info.mainKey == "ox_locatedInAlternate") {
+                    if (
+                      this.component.results[0].hasOwnProperty(info.mainKey)
+                    ) {
+                      displayValue = this.component.results[0][info.mainKey];
+                    }
+                  } else {
+                    if (info.mainKey in this.component.results[0]) {
+                      const mainValue = this.component.results[0][info.mainKey];
+                      if (typeof mainValue === "boolean") {
+                        displayValue = mainValue ? info.text : "";
+                      } else if (mainValue) {
+                        displayValue = `Marked as:   ${mainValue}`;
+                      }
+                    }
+
+                    if (
+                      !displayValue &&
+                      info.secondaryKey in this.component.results[0]
+                    ) {
+                      const secondaryValue =
+                        this.component.results[0][info.secondaryKey];
+                      if (typeof secondaryValue === "boolean") {
+                        displayValue = secondaryValue ? info.text : "";
+                      } else if (secondaryValue) {
+                        displayValue = `Marked as:   ${secondaryValue}`;
+                      }
                     }
                   }
 
                   return edges.util.escapeHtml(displayValue || "");
                 })
-                .join("<br/>");
+                .join("");
             }
 
             if (field.type == "date") {
-              const rawDate = new Date(this.component.results[0][field.key]);
-              const formattedDate = rawDate.toLocaleDateString("en-US", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              });
+              value = this._formatDate(this.component.results[0][field.key]);
+            } else if (field.type == "work-date") {
+              value = this._getWorkDate();
+            } else if (field.key == "geonames_locatedIn") {
+              value = this.component.results[0][field.key];
 
-              value = formattedDate;
+              let html = `<div class="content">`;
+
+              if (value) {
+                html += `<span class="${field.hideClass ? "" : "fieldlabel"}">${
+                  field.title
+                }: ${value}`;
+
+                if (additionalInfo) {
+                  html += ` (${additionalInfo})</span>`;
+                } else {
+                  html += `</span>`;
+                }
+              }
+              html += `</div>`;
+
+              return html;
             } else {
               value = this.component.results[0][field.key];
             }
 
+            // Hide class is a patch code for institution location section.
             return additionalInfo || value
               ? `<div class="content">
+              ${
+                value
+                  ? `
+                  ${
+                    field.title
+                      ? `<p class="${
+                          field.hideClass ? "" : "fieldlabel"
+                        }">${edges.util.escapeHtml(field.title)}: `
+                      : ""
+                  }
+                    ${edges.util.escapeHtml(value)}</p>`
+                  : ""
+              }
+              
                  ${
-                   value
-                     ? `<span>${edges.util.escapeHtml(
-                         field.title
-                       )} </span><span>${edges.util.escapeHtml(value)}</span>`
+                   additionalInfo
+                     ? `<p style="font-size:smaller">${additionalInfo}</p>`
                      : ""
                  }
-                 ${additionalInfo ? `<span>${additionalInfo}</span>` : ""}
                </div>`
               : "";
           })
@@ -2030,29 +3032,42 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     // Render custom content
 
     if (this.field) {
-      return this.component.results[0][this.field]
-        ? ` 
-    <div class="custom-content">
-      ${edges.util.escapeHtml(this.component.results[0][this.field])}
-    </div>
-    `
-        : "";
+      const result = this.component.results[0][this.field];
+
+      if (result) {
+        if (this.field == "ox_locationAlternateName") {
+          const alt_name = result.split("\n").join("; ");
+
+          return `
+            <div class="custom-content">
+              ${edges.util.escapeHtml(alt_name)}
+            </div>`;
+        } else {
+          return `
+            <div class="custom-content">
+              ${edges.util.escapeHtml(result)}
+            </div>`;
+        }
+      } else {
+        return "";
+      }
     }
 
     if (this.fields.length > 0) {
-      return `<div class="content">
+      return `<div class="content"><dl>
       ${this.fields
-        .map(
-          (field) =>
-            `
-               <strong> ${field.title} </strong>
+        .map((field) => {
+          const value = this.component.results[0][field.key] || "";
+          if (!value.trim()) return "";
+
+          return ` 
+               <dt><strong> ${field.title} </strong></dt>
                <dd> ${edges.util.escapeHtml(
                  this.component.results[0][field.key] || ""
                )} </dd>
-              <br/>
-            `
-        )
-        .join("")}</div>
+            `;
+        })
+        .join("")}</dl></div>
       `;
     }
   }
@@ -2071,48 +3086,232 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const lat = this.component.results[0][this.lat_field];
     const lon = this.component.results[0][this.long_field];
 
-    // Generate a unique ID for the map container (to avoid clashes if multiple maps are rendered)
-    const mapContainerId = `map-${Math.random().toString(36).substr(2, 9)}`;
+    if (lat && lon) {
+      // Generate a unique ID for the map container (to avoid clashes if multiple maps are rendered)
+      const mapContainerId = `map-${Math.random().toString(36).substr(2, 9)}`;
 
-    // Render the location and include a map container
-    return `<div class="location">
-        <span>  
-            <div>
-              <dl> 
-                <strong> Latitude </strong>
-              </dl>
-              <dd>
-                ${lat}
-              </dd>
-            </div>
-            <div>
-              <dl> 
-                <strong> Longitude </strong>
-              </dl>
-              <dd>
-                ${lon}
-              </dd>
-            </div>
-        </span>
+      // Render the location and include a map container
+      return `<div class="content">
+    <div class="">
+        <dl>  
+            <dt> 
+              <strong> Latitude </strong>
+            </dt>
+            <dd>
+              ${lat}
+            </dd>
+            
+            <dt> 
+              <strong> Longitude </strong>
+            </dt>
+            <dd>
+              ${lon}
+            </dd>
+        </dl>
         <div id="location-map" data-lat="${lat}" data-long="${lon}" style="height: 300px; width: 100%; margin-top: 10px;"></div>
-    </div>
+    </div></div>
     `;
+    } else {
+      return "";
+    }
   }
 
   _renderDates() {
-    return `<div class="content">
-      ${this.fields
-        .map(
-          (field) =>
-            `
-               <strong> ${field.title} </strong>
-               <dd> ${edges.util.escapeHtml(
-                 this.component.results[0][field.key] || ""
-               )} </dd>
-            `
-        )
-        .join("")}</div>
-      `;
+    let content = "";
+    this.fields.map((field) => {
+      const val = this.component.results[0][field.key];
+
+      if (val) {
+        content += `
+          <dt>
+            <strong> ${field.title} </strong>
+          </dt>
+          <dd> 
+            ${this._formatDate(val)}
+          </dd>
+        `;
+      }
+    });
+
+    if (content) {
+      return `<div class="content"><dl> ${content} </dl></div>`;
+    } else {
+      return "";
+    }
+  }
+
+  _getWorkDate() {
+    // Data from this.component.results[0]
+    const result = this.component.results[0];
+
+    // Month names array
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    // Get the date fields
+    const startDay = result["ox_started-ox_day"] || "";
+    const startMonth = result["ox_started-ox_month"] || 13; // Default to 13 (invalid month)
+    const startYear = result["ox_started-ox_year"] || "";
+
+    const endDay = result["ox_completed-ox_day"] || "";
+    const endMonth = result["ox_completed-ox_month"] || 13; // Default to 13 (invalid month)
+    const endYear = result["ox_completed-ox_year"] || "";
+
+    // Construct the date string for the start
+    let date = `${startDay} ${months[startMonth - 1]} ${startYear}`;
+
+    // Check if the date is a range
+    const isRange = result["ox_dateIsRange"] || false;
+
+    // Construct the date string for the end
+    let dateTo = `${endDay} ${months[endMonth - 1]} ${endYear}`;
+
+    // Remove spaces from the date strings
+    const dateNoSpaces = date.replace(" ", "");
+    const dateToNoSpaces = dateTo.replace(" ", "");
+
+    // Handle cases where the date strings are empty
+    if (dateNoSpaces + dateToNoSpaces === "") {
+      date = "Unknown date";
+    }
+
+    // Output the date information
+    if (!isRange) {
+      return `${date}`;
+    } else if (dateNoSpaces > "" && dateToNoSpaces > "") {
+      return `Between ${date} and ${dateTo}`;
+    } else if (dateNoSpaces > "") {
+      return `On or after ${date}`;
+    } else {
+      return `On or before ${dateTo}`;
+    }
+  }
+
+  // Specific for people on profile
+  _renderDatesForPeople() {
+    let content = "";
+    let resultObj = this.component.results[0];
+
+    this.fields.map((field) => {
+      let displayValue = "";
+      let title = "";
+
+      if (field.keys.date) {
+        let day = field.keys.date.day
+          ? resultObj[field.keys.date.day] || ""
+          : "";
+        let month = field.keys.date.month
+          ? resultObj[field.keys.date.month]
+            ? this._getMonthName(resultObj[field.keys.date.month])
+            : ""
+          : "";
+        let year =
+          field.keys.date.year && resultObj[field.keys.date.year] !== 9999
+            ? resultObj[field.keys.date.year]
+            : "";
+
+        let dateParts = [day, month, year].filter(Boolean).join(" ");
+        if (dateParts) {
+          displayValue = dateParts;
+        }
+      }
+
+      if (field.keys.flag) {
+        Object.keys(field.keys.flag).forEach((item) => {
+          // const key = field.keys.flag[item];
+          if (resultObj[item]) {
+            displayValue += ` ${field.keys.flag[item]}`;
+          }
+        });
+      }
+
+      if (
+        resultObj.hasOwnProperty("ox_isOrganisation") &&
+        resultObj["ox_isOrganisation"]
+      ) {
+        if (field.core == "birth") {
+          title = "Date of formation";
+        } else {
+          title = "Date of disbandment";
+        }
+      }
+
+      if (displayValue) {
+        content += `
+      <dt>
+        <strong> ${title || field.title} </strong>
+      </dt>
+      <dd> 
+        ${displayValue}
+      </dd>
+    `;
+      }
+    });
+
+    if (content) {
+      return `<div class="content"><dl> ${content} </dl></div><br/>`;
+    } else {
+      return "";
+    }
+  }
+
+  _getMonthName(monthKey) {
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    return months[monthKey - 1] || "";
+  }
+
+  _formatDate(timestamp) {
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) {
+      return "";
+    }
+
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+
+    // return `${day} ${month} ${year}`;
+    return year === 9999 ? `${day} ${month}` : `${day} ${month} ${year}`;
   }
 
   _renderStats() {
@@ -2120,12 +3319,19 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const statsHtml = this.fields
       .filter((field) => field.name !== "graph") // Exclude graph fields
       .map((field) => {
-        const value = this.component.results[0][field.key] || 0;
+        // Determine the value: if it's an array, use its length; if it's a number, use it directly; otherwise, use 0
+        let value = this.component.results[0][field.key];
+
+        if (Array.isArray(value)) {
+          value = value.length; // Use the length if it's an array
+        } else if (typeof value !== "number") {
+          value = 0; // If it's neither a number nor an array, set it to 0
+        }
+
         const escapedValue = edges.util.escapeHtml(value);
         const isClickable = value > 0;
 
         return `
-            <span class="stat-item">
               ${
                 isClickable
                   ? `<a href='${
@@ -2139,7 +3345,6 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                     } </a>`
                   : `${escapedValue} ${field.title}`
               }
-            </span>
           `;
       })
       .join(" ♦ ");
@@ -2155,83 +3360,14 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
     return `
         <div class="content">
-          ${statsHtml}
+          <p class="highlight-box" style="font-family:sans-serif;">
+            ${statsHtml}
+            </span>
+          </p>
         </div>
         ${graphHtml ? `<div class="graph-section">${graphHtml}</div>` : ""}
       `;
   }
-
-  // _renderNestedTable() {
-  //   const parentField = this.primaryField;
-  //   const field = this.field;
-  //   const subFields = this.fields;
-
-  //   // Validate required fields
-  //   if (!parentField || (!field && !(subFields && subFields.length > 0))) {
-  //     return "";
-  //   }
-
-  //   // Iterate through results and build rows
-  //   const rows = this.component.results
-  //     .map((result) => {
-  //       const parentObjects = result[parentField]; // Get all objects in the primary field array
-  //       if (!parentObjects || parentObjects.length === 0) return ""; // Skip if no data in primary field
-
-  //       // Iterate over each object in the parent field array
-  //       return parentObjects
-  //         .map((parentObject) => {
-  //           if (!parentObject) return ""; // Skip if the object is invalid
-
-  //           // Generate row content
-  //           const cells = [];
-  //           if (field) {
-  //             // Handle single field
-  //             const value = parentObject[field];
-  //             cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
-  //           }
-
-  //           if (subFields) {
-  //             // Handle multiple fields
-  //             subFields.forEach((subField) => {
-  //               const value = parentObject[subField.key]; // Access value directly using the key
-
-  //               if (subField.clickable) {
-  //                 // Create clickable cell
-  //                 cells.push(`
-  //                   <td>
-  //                     <a href="/profile/${subField.collectionName}/${
-  //                   parentObject["uuid"]
-  //                 }" class="clickable-row">${edges.util.escapeHtml(
-  //                   value || ""
-  //                 )}</a>
-  //                   </td>
-  //                 `);
-  //               } else {
-  //                 // Create non-clickable cell
-  //                 cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
-  //               }
-  //             });
-  //           }
-
-  //           // Return the row
-  //           return `<tr>${cells.join("")}</tr>`;
-  //         })
-  //         .join(""); // Combine all rows for the parent objects
-  //     })
-  //     .filter((row) => row) // Remove empty rows
-  //     .join(""); // Combine all rows into a single HTML string
-
-  //   // Wrap rows into table structure
-  //   const table = `
-  //     <table class="nested-table">
-  //       <tbody>
-  //         ${rows}
-  //       </tbody>
-  //     </table>
-  //   `;
-
-  //   return rows ? table : ""; // Return table or no results
-  // }
 
   _renderNestedTable() {
     const parentField = this.primaryField;
@@ -2251,19 +3387,34 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     // Check if total parentObject count exceeds 30
     if (allParentObjects.length > 30) {
       // Summarized format for large datasets
-      let aut = "";
+      let queryVal = "";
+      let queryKey = this.field;
       const decadeSummary = allParentObjects.reduce((acc, parentObject) => {
+        // console.log("acc", acc, parentObject);
         if (!parentObject) return acc;
 
-        const year = parentObject["ox_started-ox_year"];
-        aut = parentObject["author_sort"];
+        const year =
+          parentObject["ox_started-ox_year"] ||
+          parentObject["ox_completed-ox_year"];
+
+        if (this.primaryResultKey) {
+          queryVal = this.component.results[0][this.primaryResultKey];
+        } else {
+          if (this.field == "repository") {
+            queryVal = this.component.results[0]["browse"];
+          } else {
+            queryVal = parentObject["author_sort"];
+          }
+        }
 
         if (year) {
           const decade = Math.floor(year / 10) * 10; // Calculate decade
+
           if (!acc[decade]) acc[decade] = {};
           acc[decade][year] = (acc[decade][year] || 0) + 1;
         } else {
-          console.log("Unkown year");
+          if (!acc["????"]) acc["????"] = {};
+          acc["????"]["Unknown year"] = (acc["????"]["Unknown year"] || 0) + 1;
         }
 
         return acc;
@@ -2275,84 +3426,184 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
           const yearCounts = Object.entries(years)
             .map(
               ([year, count]) =>
-                `<a href="/forms/advance?aut=${aut}&dat_sin_year=${year}"> ${year}: ${count} </a>`
+                `<a href="/forms/advanced?${queryKey}=${queryVal}&dat_sin_year=${year}"> ${year}: ${count} </a>`
             )
             .join(" ♦ ");
           return `
           <tr>
-            <td>${decade}</td>
+            <td>
+              ${decade === "????" ? `????` : `${decade}s`}
+            </td>
             <td> ${yearCounts} </td>
           </tr>`;
         })
         .join("");
 
+      let countFrag = "";
+      if (this.primaryField == "ox_hasResource-manifestation") {
+        countFrag += `${allParentObjects.length} records`;
+      }
+
       return `
-        <table class="nested-table">
-          <thead>
-            <tr>
-              <th>
-                Decade
-              </th>
-              <th>
-                Letters per year
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows}
-          </tbody>
-        </table>
+        <div style="margin-left:35px">
+          ${countFrag}
+          <table class="nested-table">
+            <thead>
+              <tr>
+                <th>
+                  Decade
+                </th>
+                <th>
+                  Letters per year
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows}
+            </tbody>
+          </table>
+        </div>
       `;
     }
 
     // Current format for datasets with parentObject count <= 30
     const rows = this.component.results
       .map((result) => {
-        const parentObjects = result[parentField];
+        let parentObjects = result[parentField];
         if (!parentObjects || parentObjects.length === 0) return "";
+
+        parentObjects.sort((a, b) => {
+          const startA = a["ox_started-ox_year"] ?? a["0x_completed-ox_year"];
+          const startB = b["ox_started-ox_year"] ?? b["0x_completed-ox_year"];
+
+          // If both values are undefined, consider them equal
+          if (startA === undefined && startB === undefined) return 0;
+
+          // If one value is undefined, treat it as larger (to push it to the end)
+          if (startA === undefined) return 1;
+          if (startB === undefined) return -1;
+
+          // Otherwise, compare the values normally
+          return startA - startB;
+        });
+
+        let lastfieldKey = 0;
+
+        // return parentObjects
+        //   .map((parentObject) => {
+        //     if (!parentObject) return "";
+
+        //     const cells = [];
+        //     // if (field) {
+        //     //   const value = parentObject[field];
+        //     //   cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
+        //     // }
+        //     if (subFields) {
+        //       subFields.forEach((subField) => {
+        //         const value = parentObject[subField.key];
+        //         if (subField.clickable) {
+        //           cells.push(`
+        //             <td>
+        //               <a href="/profile/${subField.collectionName}/${
+        //             parentObject["uuid"]
+        //           }" class="clickable-row">${edges.util.escapeHtml(
+        //             value || ""
+        //           )}</a>
+        //             </td>
+        //           `);
+        //         } else {
+        //           if (
+        //             subField.key == "ox_started-ox_year" ||
+        //             subField.key == "ox_completed-ox_year"
+        //           ) {
+        //             if (lastfieldKey !== value) {
+        //               lastfieldKey = value;
+        //               cells.push(
+        //                 `<td>${edges.util.escapeHtml(value || "")}</td>`
+        //               );
+        //             } else {
+        //               cells.push(`<td></td>`);
+        //             }
+        //           }
+        //         }
+        //       });
+        //     }
+
+        //     return `<tr>${cells.join("")}</tr>`;
+        //   })
+        //   .join("");
 
         return parentObjects
           .map((parentObject) => {
             if (!parentObject) return "";
 
             const cells = [];
-            if (field) {
-              const value = parentObject[field];
-              cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
-            }
+            let rowStyle = ""; // Variable to hold the style for the row
 
             if (subFields) {
               subFields.forEach((subField) => {
                 const value = parentObject[subField.key];
+
                 if (subField.clickable) {
                   cells.push(`
-                    <td>
-                      <a href="/profile/${subField.collectionName}/${
+            <td>
+              <a href="/profile/${subField.collectionName}/${
                     parentObject["uuid"]
                   }" class="clickable-row">${edges.util.escapeHtml(
                     value || ""
                   )}</a>
-                    </td>
-                  `);
+            </td>
+          `);
                 } else {
-                  cells.push(`<td>${edges.util.escapeHtml(value || "")}</td>`);
+                  if (
+                    subField.key == "ox_started-ox_year" ||
+                    subField.key == "ox_completed-ox_year"
+                  ) {
+                    // Add dotted separation when current year is not the same as the last year
+                    if (lastfieldKey !== value) {
+                      lastfieldKey = value;
+                      // Use "????" if value is undefined
+                      cells.push(
+                        `<td>${edges.util.escapeHtml(
+                          value !== undefined ? value : "????"
+                        )}</td>`
+                      );
+                      rowStyle =
+                        "border-top: #999 dashed 1px; padding: 5px 0px 5px 10px;"; // Apply dotted separation on the top of the row
+                    } else {
+                      cells.push(`<td></td>`);
+                    }
+                  }
                 }
               });
             }
-
-            return `<tr>${cells.join("")}</tr>`;
+            // Add row style if the condition is met
+            return `<tr style="${rowStyle}">${cells.join("")}</tr>`;
           })
           .join("");
       })
       .filter((row) => row)
       .join("");
 
+    let countFrag = "";
+    if (
+      this.primaryField == "ox_hasResource-manifestation" &&
+      allParentObjects.length > 0
+    ) {
+      countFrag += `${allParentObjects.length} ${
+        allParentObjects.length > 1 ? "records" : "record"
+      }`;
+    }
+
     const table = `
-      <table class="nested-table">
-        <tbody>
-          ${rows}
-        </tbody>
-      </table>
+      <div style="margin-left:35px">
+        ${countFrag}
+        <table class="nested-table" style="border-collapse: collapse;">
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      </div>
     `;
 
     return rows ? table : "";
@@ -2405,7 +3656,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                   `);
                 } else {
                   // Create non-clickable cell
-                  cells.push(`<li>${edges.util.escapeHtml(value || "")}</li>`);
+                  cells.push(
+                    `<li style="list-style: none;margin-left:20px">
+                      ${value}
+                    </li>`
+                  );
                 }
               });
             }
@@ -2464,7 +3719,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                 const value = parentObject[subField.key]; // Access value directly using the key
 
                 let additionalInfo = "";
+                let additionalInfoVal = "";
+                let secondaryField = false;
 
+                // Hot fix for multiple fields inside work
+                let valueAdded = false;
                 if (
                   subField.additonalInfo &&
                   subField.additonalInfo.length > 0
@@ -2472,13 +3731,15 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                   // Handle additionalInfo array
                   additionalInfo = subField.additonalInfo
                     .map((info) => {
+                      if (valueAdded != "") return;
+
                       let displayValue = "";
                       if (info.mainKey in result) {
                         const mainValue = result[info.mainKey];
                         if (typeof mainValue === "boolean") {
                           displayValue = mainValue ? info.text : "";
                         } else if (mainValue) {
-                          displayValue = `Marked as:   ${mainValue}`;
+                          displayValue = mainValue;
                         }
                       }
 
@@ -2487,33 +3748,85 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                         if (typeof secondaryValue === "boolean") {
                           displayValue = secondaryValue ? info.text : "";
                         } else if (secondaryValue) {
-                          displayValue = `Marked as:   ${secondaryValue}`;
+                          displayValue = secondaryValue;
+                          secondaryField = true;
                         }
+                      }
+
+                      if (displayValue != "") {
+                        valueAdded = true;
                       }
 
                       return edges.util.escapeHtml(displayValue || "");
                     })
-                    .join("<br/>");
+                    .join("");
+                }
+
+                if (subField.additionalInfoKey) {
+                  additionalInfoVal = parentObject[subField.additionalInfoKey];
                 }
 
                 if (subField.clickable) {
-                  // Create clickable cell
-                  cells.push(`
-                    <div>
-                      <a href="/profile/${subField.collectionName}/${
-                    parentObject["uuid"]
-                  }" class="clickable-row">${edges.util.escapeHtml(
-                    value || ""
-                  )}</a>
-                      <br/>
-                    ${additionalInfo}
-                    </div>
-                  `);
+                  if (subField.collectionName == "dcterms_relation") {
+                    if (parentObject.hasOwnProperty("dcterms_relation")) {
+                      cells.push(`
+                      <span>
+                        <a href="${
+                          parentObject.dcterms_relation
+                        }" class="clickable-row">${edges.util.escapeHtml(
+                        value || ""
+                      )}</a>
+  
+                      ${
+                        additionalInfoVal
+                          ? `- ${edges.util.escapeHtml(additionalInfoVal)}`
+                          : edges.util.escapeHtml(additionalInfo || "")
+                      }
+                      </span>
+                    `);
+                    } else {
+                      cells.push(`
+                        <span>${edges.util.escapeHtml(value || "")} - 
+    
+                        ${
+                          additionalInfoVal
+                            ? `- ${edges.util.escapeHtml(additionalInfoVal)}`
+                            : edges.util.escapeHtml(additionalInfo || "")
+                        }
+                        </span>
+                      `);
+                    }
+                  } else {
+                    cells.push(`
+                      <span>
+                        <a href="/profile/${subField.collectionName}/${
+                      parentObject["uuid"]
+                    }" class="clickable-row">${edges.util.escapeHtml(
+                      value || ""
+                    )}</a>
+  
+                      ${
+                        additionalInfoVal
+                          ? `- ${edges.util.escapeHtml(additionalInfoVal)}`
+                          : edges.util.escapeHtml(additionalInfo || "")
+                      }
+                      </span>
+                    `);
+                  }
                 } else {
                   // Create non-clickable cell
                   cells.push(
-                    `<div>${edges.util.escapeHtml(value || "")}</div>  <br/>
-                    ${additionalInfo}`
+                    `<div>${edges.util.escapeHtml(value || "")}</div>
+                     ${
+                       additionalInfo
+                         ? secondaryField
+                           ? `<span class="fieldlabel">Marked as: </span> <span class="as-marked">${edges.util.escapeHtml(
+                               additionalInfo
+                             )}</span>`
+                           : `<span style="font-size: smaller">${additionalInfo}</span>`
+                         : ""
+                     }
+                    `
                   );
                 }
               });
@@ -2571,8 +3884,15 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     // Iterate through results and build rows
     const rows = this.component.results
       .map((result) => {
-        const parentObjects = result[parentField]; // Get all objects in the primary field array
+        let parentObjects = result[parentField]; // Get all objects in the primary field array
         if (!parentObjects || parentObjects.length === 0) return ""; // Skip if no data in primary field
+
+        // Sorting list on the basis of field name
+        parentObjects = parentObjects.sort((a, b) => {
+          const nameA = a["browse"] || "";
+          const nameB = b["browse"] || "";
+          return nameA.localeCompare(nameB);
+        });
 
         // Iterate over each object in the parent field array
         return parentObjects
@@ -2594,46 +3914,58 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
                 const otherInfo = parentObject[subField.otherInfo];
 
                 const otherInfoDiv = otherInfo
-                  ? `<span>- ${edges.util.escapeHtml(otherInfo)} </span>`
+                  ? `- ${edges.util.escapeHtml(otherInfo)} `
                   : "";
                 if (subField.linkKey) {
                   if (subField.linkKey == "uuid") {
                     const collectionName = parentObject["object_type"];
 
                     cells.push(`
-                      <div>
+                      <dd><p style="font-family:sans-serif;">
                         <a  href="/profile/${collectionName}/${
                       parentObject["uuid"]
                     }" class="clickable-row">${edges.util.escapeHtml(
                       value || ""
                     )}</a>
                       ${otherInfoDiv}
-                      </div>
+                      </p></dd>
                     `);
                   } else {
-                    cells.push(`
-                      <div>
-                        <a target="_blank" href="${edges.util.escapeHtml(
-                          parentObject[subField.linkKey]
-                        )}" class="clickable-row">${edges.util.escapeHtml(
-                      value || ""
-                    )}</a>
-                      ${otherInfoDiv}
-                      </div>
-                    `);
+                    if (parentObject[subField.linkKey]) {
+                      cells.push(`
+                        <dd><p style="font-family:sans-serif;">
+                          <a target="_blank" href="${edges.util.escapeHtml(
+                            parentObject[subField.linkKey]
+                          )}" class="clickable-row">${edges.util.escapeHtml(
+                        value || ""
+                      )}</a>
+                        ${otherInfoDiv}
+                        </p></dd>
+                      `);
+                    } else {
+                      cells.push(
+                        `
+                        <dd><p style="font-family:sans-serif;">
+                        <div>${edges.util.escapeHtml(
+                          value || ""
+                        )}</div> ${otherInfoDiv} </p> </dd>`
+                      );
+                    }
                   }
                 } else {
                   // Create non-clickable cell
                   cells.push(
-                    `<div>${edges.util.escapeHtml(
+                    `
+                    <dd><p>
+                    <div>${edges.util.escapeHtml(
                       value || ""
-                    )}</div> ${otherInfoDiv}`
+                    )}</div> ${otherInfoDiv} </p> </dd>`
                   );
                 }
               });
             }
             // Return the row
-            return `<div>${cells.join("")}</div>`;
+            return `<dl>${cells.join("")}</dl>`;
           })
           .join(""); // Combine all rows for the parent objects
       })
@@ -2641,8 +3973,13 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       .join(""); // Combine all rows into a single HTML string
 
     const labelsList = `
-      <div class="content">
+      <div>
+        <dl>
+        <dt> 
+          <strong> ${this.contentTitle} </strong> 
+        </dt>
         ${rows}
+        </dl>
       </div>
     `;
     return rows ? labelsList : ""; // Return table or no results
@@ -2652,12 +3989,25 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     const value = this.component.results[0][this.field];
 
     if (this.field == "cito_Catalog") {
+      return "";
+      // return value
+      //   ? `
+      //   <p style="margin-top: 10px;font-style: oblique;">
+      //     Collection details:
+      //     <a href="http://emlo-portal.bodleian.ox.ac.uk/collections/?catalogue=${
+      //       getCollectionTitle(value).href
+      //     }"> ${getCollectionTitle(value).title} </a>
+      //   <p>
+      // `
+      //   : "";
+    }
+
+    if (this.field == "geonames_alternateName") {
       return value
         ? `
-        <em>
-          Collection details: 
-          <a href="http://emlo-portal.bodleian.ox.ac.uk/collections/?catalogue=${value}"> The Correspondence ${value} </a>
-        <em>
+        <div class="content">
+          <pre>${value}</pre>
+        </div>
       `
         : "";
     }
@@ -2674,7 +4024,10 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   _renderPlainText() {
     return this.component.results[0][this.field]
       ? `
-          <p style="margin-left:40px">
+          <dt>
+            <strong> ${this.contentTitle} </strong>
+          </dt>
+          <p>
             ${edges.util.escapeHtml(
               this.component.results[0][this.field] || ""
             )}
@@ -2797,7 +4150,411 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
   _renderDummyText() {
     return `${this.message}`;
   }
+
+  _renderFooter() {
+    if (this.footerType == "") {
+      return;
+    }
+
+    const currentDomain = window.location.host;
+    const result = this.component.results[0];
+    const editIdValue = GetRecordID(this.footerType, result);
+    const currentHref = window.location.href;
+
+    const shortURL = GenerateShortURL(
+      editIdValue,
+      this.footerType,
+      currentDomain
+    );
+    const url = this._generateURL(result, this.footerType, currentDomain);
+
+    let htmlContent = `<div class="${
+      this.isDivider ? "yellow-divider" : ""
+    }"><br/><br/><br/><br/><div class="change">`;
+
+    // Check for Source of Data
+    if (
+      result &&
+      result.hasOwnProperty("ox_sourceOfData") &&
+      result["ox_sourceOfData"]
+    ) {
+      htmlContent += `<span class="provenance">Source of data: ${result["ox_sourceOfData"]}</span><br/>`;
+    }
+
+    // Check for Changed By User
+    if (
+      result &&
+      result.hasOwnProperty("ox_internalModifiedByUser") &&
+      result["ox_internalModifiedByUser"]
+    ) {
+      let changeUser =
+        result["ox_internalModifiedByUser"] === "Initial import"
+          ? "initial import"
+          : result["ox_internalModifiedByUser"];
+
+      // Check if there's an edit ID value
+      if (editIdValue) {
+        htmlContent += `Record ID ${editIdValue}, last altered <!-- not changed --> by ${changeUser}`;
+      } else {
+        htmlContent += `Record last altered <!-- not changed --> by ${changeUser}`;
+      }
+
+      // Check for Date Changed
+      if (
+        result &&
+        result.hasOwnProperty("ox_internalModified") &&
+        result["ox_internalModified"]
+      ) {
+        let changeTimestamp = result["ox_internalModified"];
+        let changeYear = changeTimestamp.substring(0, 4);
+        let changeMonth = changeTimestamp.substring(5, 7);
+        let changeDay = changeTimestamp.substring(8, 10);
+        htmlContent += ` on ${changeDay}/${changeMonth}/${changeYear}.`;
+      }
+
+      htmlContent += `<br/><br/>Alternative urls for this record:<ul>`;
+
+      if (url) {
+        htmlContent += `<li class="footer-links"><a href="${url}">${url}</a></li>`;
+      }
+
+      if (shortURL) {
+        htmlContent += `<li class="footer-links"><a href="${currentHref}">${shortURL}</a></li>`;
+      }
+
+      htmlContent += `</ul>`;
+
+      // If there's an editing URL, show the link
+      const key = this._getKey(this.footerType);
+
+      if (key) {
+        htmlContent += `
+      <span style="font-size:smaller">
+        <a href="https://emlo-edit.bodleian.ox.ac.uk/interface/union.php?${key}=${editIdValue}" target="_blank" rel="nofollow">
+          Editing interface
+        </a> (requires login)
+      </span>`;
+      }
+    }
+
+    htmlContent += `</div></div>`;
+
+    return `${htmlContent}`;
+  }
+
+  _renderShortUrl() {
+    if (this.footerType == "") {
+      return "";
+    }
+
+    const currentDomain = window.location.host;
+    const result = this.component.results[0];
+    const editIdValue = GetRecordID(this.footerType, result);
+    const currentHref = window.location.href;
+
+    const shortURL = GenerateShortURL(
+      editIdValue,
+      this.footerType,
+      currentDomain
+    );
+
+    const doc = document.getElementById("short-url-link");
+
+    if (doc) {
+      doc.innerHTML = `<a href=${currentHref}> ${shortURL} </a>`;
+    }
+  }
+
+  _getKey(type) {
+    switch (type) {
+      case "p":
+        return "iperson_id";
+      case "l":
+        return "location_id";
+      case "r":
+        return "institution_id";
+      case "w":
+        return "iwork_id";
+      default:
+        return "";
+    }
+  }
+
+  _generateURL(result, type, currentDomain) {
+    const map = {
+      p: "person",
+      m: "manifestation",
+      w: "work",
+      r: "institution",
+      l: "location",
+      i: "image",
+      re: "resource",
+      c: "comment",
+    };
+
+    if (map.hasOwnProperty(type)) {
+      return `${currentDomain}/${result["uuid"]}`;
+    } else {
+      return "";
+    }
+  }
 };
+
+emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+    this.profileType = edges.util.getParam(params, "profileType", "");
+  }
+
+  draw() {
+    let frag = "";
+    const result = this.component.results[0];
+    let imageSrc = "/static/img/resources-icon.png",
+      theTitle = "";
+
+    let footerType = "";
+
+    let container = "";
+
+    if (this.component.loading) {
+      frag = "<div class='loading-message'>Loading...</div>"; // Show loading message
+    } else if (this.component.errorMessage) {
+      frag = `<div class='error-message'>${this.component.errorMessage}</div>`; // Show error message
+    } else if (this.component.results && this.component.results.length > 0) {
+      switch (this.profileType) {
+        case "people":
+          frag += _renderPeopleSidebar(
+            result,
+            this.component.gneratedData,
+            this.component.relationships
+          );
+
+          const isOrg = result?.["ox_isOrganisation"] === true;
+          imageSrc = isOrg
+            ? "/static/img/people_icon.png"
+            : "/static/img/person-icon.png";
+          theTitle = isOrg ? "Organization" : "Person";
+          footerType = "p";
+
+          break;
+        case "work":
+          frag += _renderWorkSidebar(
+            result,
+            this.component.relationships,
+            this.component.gneratedData
+          );
+          footerType = "w";
+          imageSrc = "/static/img/letter_icon.png";
+          theTitle = "Letter";
+          break;
+        case "location":
+          frag += _renderLocationSidebar(
+            result,
+            this.component.gneratedData,
+            this.component.relationships
+          );
+
+          footerType = "l";
+          imageSrc = "/static/img/places-icon.png";
+          theTitle = "Location";
+          break;
+        case "institution":
+          frag += _renderInstitutionSidebar(
+            result,
+            this.component.relationships
+          );
+          imageSrc = "/static/img/repository-icon.png";
+          footerType = "r";
+          theTitle = "Repository";
+          break;
+        case "comment":
+          frag += _renderCommentProfile();
+          footerType = "c";
+          theTitle = "Comment";
+          break;
+        case "image":
+          frag += _renderImageSidebar(
+            result,
+            this.component.relationships,
+            this.component.gneratedData
+          );
+          footerType = "i";
+          imageSrc = "/static/img/images-icon.png";
+          theTitle = "Image";
+          break;
+        case "manifestation":
+          frag += _renderManifestationSidebar(
+            result,
+            this.component.relationships,
+            this.component.gneratedData
+          );
+          footerType = "m";
+          imageSrc = "/static/img/resources-icon.png";
+          theTitle = "Document";
+          break;
+        default:
+          console.log("Nothing is valid");
+      }
+
+      const currentDomain = window.location.host;
+      const editIdValue = GetRecordID(footerType, result);
+      const currentHref = window.location.href;
+
+      const shortURL = GenerateShortURL(editIdValue, footerType, currentDomain);
+
+      container += `
+        <div style="border-bottom:1px solid #efc319; padding-bottom: 21px; padding-top:5px">
+          <img src="${imageSrc}" id="profile-icon" style="float:left;height:25px;width:25px;margin-right:15px;">
+            <div>
+              <strong>${theTitle}</strong>
+            </div>
+        </div>
+        <br/>
+
+        <p style="${
+          ["work"].includes(this.profileType) ? "" : "margin-bottom:20px;"
+        }">
+          <img src="../../static/img/icon-short-url.png" alt="short-url" />
+          Short URL: <span id="short-url-link" class="showLink">
+            <a href=${currentHref}> ${shortURL} </a>
+          </span>
+        <p>
+
+        <p style="${
+          ["work"].includes(this.profileType) ? "" : "margin-bottom:20px;"
+        }">
+          <img class="opacity50 icon-tweak" src="../../static/img/icon-send-comment.png" alt="short-url" />
+          <a href=/comment/index?id=${result.uuid}> Send Comment </a>
+        </p>
+
+
+        <div class="addthis_toolbox addthis_default_style " style="border-bottom:1px solid #efc319; padding-bottom: 10px; padding-top:5px">
+					<span style="text-align:center;"><a class="addthis_button_preferred_1" style="border-bottom:none;"></a>
+					<a class="addthis_button_preferred_2" style="border-bottom:none;"></a>
+					<a class="addthis_button_preferred_3" style="border-bottom:none;"></a>
+					<a class="addthis_button_preferred_4" style="border-bottom:none;"></a>
+					<a class="addthis_button_compact" style="border-bottom:none;"></a>
+					<a class="addthis_counter addthis_bubble_style" style="border-bottom:none;"></a></span>
+				</div>
+
+        <br/>
+      `;
+    }
+
+    const containerClasses = edges.util.styleClasses(
+      this.namespace,
+      "container",
+      this.component.id
+    );
+
+    if (frag) {
+      container += `${frag}`;
+    }
+
+    this.component.context.html(container);
+  }
+};
+
+emlo.ProfileRightRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+    // this.fields = edges.util.getParam(params, "fields", []);
+    // this.primaryField = edges.util.getParam(params, "primaryField", "");
+    // this.sectionTitle = edges.util.getParam(params, "sectionTitle", "");
+    // this.sectionTitleImage = edges.util.getParam(
+    //   params,
+    //   "sectionTitleImage",
+    //   ""
+    // );
+    // this.subSections = edges.util.getParam(params, "subSections", []);
+    this.profileType = edges.util.getParam(params, "profileType", "");
+    // this.divider = edges.util.getParam(params, "divider", false);
+    this.dividerFrag = ` <hr class="yellow-divider" />`;
+  }
+
+  draw() {
+    let frag = "";
+    const result = this.component.results[0];
+    if (this.component.loading) {
+      frag = "<div class='loading-message'>Loading...</div>"; // Show loading message
+    } else if (this.component.errorMessage) {
+      frag = `<div class='error-message'>${this.component.errorMessage}</div>`; // Show error message
+    } else if (this.component.results && this.component.results.length > 0) {
+      switch (this.profileType) {
+        case "people":
+          frag += _renderPeopleProfile(
+            result,
+            this.component.gneratedData,
+            this.component.relationships
+          );
+          break;
+        case "work":
+          frag += _renderWorkProfile(
+            result,
+            this.component.relationships,
+            this.component.gneratedData
+          );
+          break;
+        case "location":
+          frag += _renderLocationProfile(
+            result,
+            this.component.gneratedData,
+            this.component.relationships
+          );
+          break;
+        case "institution":
+          frag += _renderInstitutionProfile(
+            result,
+            this.component.gneratedData
+          );
+          break;
+        case "comment":
+          frag += _renderCommentProfile();
+          break;
+        case "image":
+          frag += _renderImageProfile(
+            result,
+            this.component.relationships,
+            this.component.gneratedData
+          );
+          break;
+        case "manifestation":
+          frag += _renderManifestationSection(
+            result,
+            this.component.relationships,
+            this.component.gneratedData
+          );
+          break;
+        default:
+          console.log("Nothing is valid");
+      }
+    }
+
+    const containerClasses = edges.util.styleClasses(
+      this.namespace,
+      "container",
+      this.component.id
+    );
+
+    let container = "";
+
+    let row = ["work", "location"].includes(this.profileType)
+      ? "row"
+      : "row-no-margin";
+
+    if (frag) {
+      container = `
+      <div id="details" class="${containerClasses} ${row}">
+        ${frag}
+      </div>`;
+    }
+
+    this.component.context.html(container);
+    // _renderGraphSection(this.tableData);
+    // this.draw();
+  }
+};
+
 emlo.Stats = class extends edges.Component {
   constructor(params) {
     super(params);
@@ -2805,122 +4562,115 @@ emlo.Stats = class extends edges.Component {
     this.solrCore = edges.util.getParam(params, "solrCore", "");
     this.facetFields = edges.util.getParam(params, "facetFields", []);
     this.facetField = edges.util.getParam(params, "facetField", "");
+    this.statsFields = edges.util.getParam(params, "statsFields", []);
+
+    this.statsObject = {};
   }
 
-  async synchronise() {
-    this.hitCount = 0;
-
-    // Fetch data from Solr and update the hit count
-    const hitCount = await this._fetchHitCount(this.solrCore);
-    if (hitCount !== null) {
-      this.hitCount = hitCount;
+  contrib(query) {
+    if (this.facetFields.length > 0) {
+      query.aggs = this.facetFields;
     }
-
-    this.renderer.draw();
   }
 
-  async _fetchHitCount(collectionName) {
-    // Base Solr query
-    let url = `/solr/${collectionName}/select?q=*:*&rows=0&wt=json`;
+  synchronise() {
+    const facets = this.edge.result.buckets("object_type") || [];
+    const orgBucket = this.edge.result.buckets("ox_isOrganisation") || [];
+    const citoCatalogBucket = this.edge.result.buckets("cito_Catalog") || [];
+    const orgCount =
+      orgBucket.find((item) => item.key === "true")?.doc_count || 0;
 
-    // Add facet fields to the query if they exist, in case multiple facet field support is needed
-    // if (this.facetFields.length > 0) {
-    //   const facetQuery = this.facetFields
-    //     .map((field) => ``)
-    //     .join("&");
-    //   url += `&facet=true&${facetQuery}`;
-    // }
+    // Create a map for faster lookups
+    const facetsMap = facets.reduce((acc, item) => {
+      acc[item.key] = item.doc_count || 0; // Ensure we always get a number
+      return acc;
+    }, {});
 
-    if (this.facetField) {
-      url += `&facet=true&facet.field=${encodeURIComponent(this.facetField)}`;
-    }
-
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        console.error(
-          `Error fetching data from ${url}: ${response.statusText}`
-        );
-        return null;
+    this.statsFields.forEach((field) => {
+      if (field === "person") {
+        this.statsObject[field] = (facetsMap[field] || 0) - orgCount;
+      } else if (field === "organizations") {
+        this.statsObject[field] = orgCount;
+      } else if (field == "cito_Catalog") {
+        this.statsObject[field] = citoCatalogBucket.length;
+      } else {
+        this.statsObject[field] = facetsMap[field] || 0;
       }
-
-      const data = await response.json();
-
-      // Log facet counts if available
-      if (data.facet_counts && data.facet_counts.facet_fields) {
-        if (
-          this.facetField &&
-          data.facet_counts.facet_fields[this.facetField]
-        ) {
-          if (this.facetField == "cito_Catalog") {
-            return data.facet_counts.facet_fields["cito_Catalog"].length / 2;
-          } else if (this.facetField == "ox_isOrganisation") {
-            for (
-              let i = 0;
-              i < data.facet_counts.facet_fields["ox_isOrganisation"].length;
-              i += 2
-            ) {
-              if (
-                data.facet_counts.facet_fields["ox_isOrganisation"][i] ===
-                "true"
-              ) {
-                return data.facet_counts.facet_fields["ox_isOrganisation"][
-                  i + 1
-                ];
-              }
-            }
-          }
-        }
-      }
-
-      return data.response.numFound || 0; // Return hit count
-    } catch (error) {
-      console.error(`Error fetching data from ${url}: ${error}`);
-      return null;
-    }
+    });
   }
 };
 
 emlo.StatsRenderer = class extends edges.Renderer {
   constructor(params) {
     super(params);
-    this.title = edges.util.getParam(params, "title", ""); // Title for the section
-    this.titleImage = edges.util.getParam(params, "titleImage", null); // Optional image for title
-    this.redirectURL = edges.util.getParam(params, "redirectURL", ""); // This URL will be provided in jinja format
+    this.statsEntries = edges.util.getParam(params, "statsEntries", []); // TODO: Better naming
     this.namespace = "edges-stats-display";
   }
 
   draw() {
-    let container = "";
+    let container = `
+      <div class="row">
+        <div class="large-12 columns">
+          <ul class="small-block-grid-2 medium-block-grid-6 large-block-grid-12">
+    `;
 
-    const imageTag = this.titleImage
-      ? `<img src="${edges.util.escapeHtml(
-          this.titleImage
-        )}" alt="${edges.util.escapeHtml(this.title)}" class="stats-image">`
-      : "";
+    if (this.statsEntries.length > 0) {
+      this.statsEntries.forEach((item) => {
+        const imageTag = item.titleImage
+          ? `<img src="${edges.util.escapeHtml(
+              item.titleImage
+            )}" alt="${edges.util.escapeHtml(item.title)}" class="stats-image">`
+          : "";
 
-    const redirectLink = this.redirectURL
-      ? `<a href="${edges.util.escapeHtml(this.redirectURL)}"> 
-      ${edges.util.escapeHtml(this.title)}
+        const redirectLink = item.redirectURL
+          ? `<a href="${edges.util.escapeHtml(item.redirectURL)}"> 
+      ${edges.util.escapeHtml(item.title)}
       </a>`
-      : `<p style="font-size: inherit;"> 
-      ${edges.util.escapeHtml(this.title)}
+          : `<p style="font-size: inherit;"> 
+      ${edges.util.escapeHtml(item.title)}
       </p>`;
 
-    container = `
-        ${imageTag}
-        <br />
-        
-        <span>
-          ${edges.util.escapeHtml(this.component.hitCount)}
-        </span>
-        
-        <br />
-        
-        ${redirectLink}
+        // Appending list to container
+        container += `
+        <li class="stats-text text-center">
+          ${imageTag}
+          <br />
+          
+          <span>
+            ${
+              item.dontFetch
+                ? item.hardCodedCount
+                : this._getStatCount(
+                    item.statKey,
+                    item.tweakCount,
+                    item.upperLimit
+                  )
+            }
+          </span>
+          
+          <br />
+          
+          ${redirectLink}
+        </li>
       `;
+      });
+    }
 
+    container += `
+      </ul>
+		</div> 
+	</div>
+    `;
     this.component.context.html(container);
+  }
+
+  _getStatCount(key, tweak, upperLimit) {
+    if (key && this.component.statsObject.hasOwnProperty(key)) {
+      if (this.component.statsObject[key] > upperLimit)
+        return this.component.statsObject[key] - (upperLimit - tweak);
+    } else {
+      return 0;
+    }
   }
 };
 
@@ -2934,6 +4684,7 @@ emlo.BarGraph = class extends edges.Component {
     this.graphData = {};
     this.cache = {};
     this.loading = false; // To track loading state
+    this.showUnkown = false;
   }
 
   async synchronise() {
@@ -2989,7 +4740,7 @@ emlo.BarGraph = class extends edges.Component {
       const uuidArray = Array.from(uuids);
       const fieldData = await this._fetchGraphData(solrCore, uuidArray);
 
-      for (const doc of fieldData.response.docs) {
+      for (const doc of fieldData) {
         const fieldKey = uuidToFieldKeyMap.get(doc.uuid);
         if (fieldKey) {
           if (!this.graphData[fieldKey]) {
@@ -3017,7 +4768,7 @@ emlo.BarGraph = class extends edges.Component {
     };
 
     try {
-      const response = await fetch("/stats", {
+      const response = await fetch("/stats-new", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -3052,6 +4803,7 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
     this.marginAbove = 10; // Margin above the max value
     this.margin = { top: 50, right: 20, bottom: 40, left: 40 }; // Margins for the chart
     this.graphConfig = edges.util.getParam(params, "graphConfig", {});
+    this.personChart;
   }
 
   // You can set this graphConfig object externally
@@ -3063,10 +4815,14 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
     const container = this.component.loading
       ? `<div class="loading-indicator">Loading, please wait...</div>`
       : `
-      ${this._renderControls()}
+      
         <div id="${
           this.namespace
-        }-container" class="custom-bar-graph-container">
+        }-container" class="custom-bar-graph-container content" style="padding-bottom:20px">
+          <div id="chart">
+            ${this._renderControls()}
+          </div>
+          <br/>
           <div id="${this.namespace}-chart" style="display:grid"></div>
         </div>
       `;
@@ -3102,300 +4858,170 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       "separate",
       this
     );
+    const unkownClass = edges.util.allClasses(this.namespace, "unkown", this);
 
     if (graphDataKeys.length <= 1)
-      return `<button  class="${fullscreenClass} tiny">Full Screen</button>`;
+      return `
+      <div class="button-bar">
+      <ul class="button-group screen">
+						<li>
+              <button id="fullscreen" class="${fullscreenClass} button tiny">Full Screen</button>
+            </li>
+					</ul>
+      </div> <br/>`;
 
     return `
-      <div class="graph-controls">
-        <button class="${separateClass} tiny">Separate Charts</button>
-        <button class="${stackBarClass} tiny">Stacked Bar</button>
-        <button class="${splitBarClass} tiny">Split Bar</button>
-        <button  class="${fullscreenClass} tiny">Full Screen</button>
-      </div>
+    <div class="button-bar">
+					<ul class="button-group unknown">
+						<li><button id="show_unknown" class="${unkownClass} button tiny">Show unknown</button></li>
+					</ul>
+
+
+					<ul class="button-group bars">
+						<li>
+              <button id="bars_seperate" class="${separateClass} button tiny">Separate Charts</button>
+            </li>
+						<li>
+              <button id="bars_stacked" class="${stackBarClass} button tiny">Stacked Bar</button>
+            </li>
+						<li>
+              <button id="bars_split" class="${splitBarClass} button tiny">Split Bar</button>
+            </li>
+					</ul>
+
+					<ul class="button-group screen">
+						<li>
+              <button id="fullscreen" class="${fullscreenClass} button tiny">Full Screen</button>
+            </li>
+					</ul>
+				</div><br/>
     `;
+  }
+
+  setYearCountsForGraphs(relevantWorksFieldname, data, counts) {
+    // Check if relevantWorksFieldname exists in profile
+    // if (profile.hasOwnProperty(relevantWorksFieldname)) {
+    let relationshipType;
+
+    // Determine relationship type based on the fieldname
+    if (relevantWorksFieldname === "frbr_creatorOf-work") {
+      relationshipType = "creator";
+    } else if (relevantWorksFieldname === "mail_recipientOf-work") {
+      relationshipType = "recipient";
+    } else if (relevantWorksFieldname === "dcterms_isReferencedBy-work") {
+      relationshipType = "mentioned";
+    } else {
+      // Invalid input
+      return;
+    }
+
+    const yearOfWorkFieldname = "ox_started-ox_year";
+
+    // Iterate through the data array
+    data.forEach((item) => {
+      const obj = item;
+
+      let year = "?";
+      if (obj.hasOwnProperty(yearOfWorkFieldname)) {
+        year = obj[yearOfWorkFieldname];
+      }
+
+      // Initialize year in counts if not already present
+      if (!counts.hasOwnProperty(year)) {
+        counts[year] = { creator: 0, recipient: 0, mentioned: 0 };
+      }
+
+      // Increment the value for the current type of work
+      counts[year][relationshipType] += 1;
+    });
+  }
+
+  _toLongFormat(d, p, i, z) {
+    for (i = 0, z = d.length; i < z; i++) {
+      p.push({
+        year: d[i][0],
+        mentioned: d[i][1],
+        recipient: d[i][2],
+        creator: d[i][3],
+      });
+    }
+    return p;
+  }
+
+  setFirstAndLastYearsForGraphs(counts) {
+    let maxYear = 1;
+    let minYear = 9999;
+
+    // Iterate through the keys of the counts object
+    for (let year in counts) {
+      if (counts.hasOwnProperty(year)) {
+        if (year === "?") {
+          year = 9999;
+        } else {
+          year = parseInt(year); // Convert the year to an integer (since the keys are strings)
+        }
+
+        if (year !== "?" && year !== 9999) {
+          if (year > maxYear) {
+            maxYear = year;
+          }
+          if (year < minYear) {
+            minYear = year;
+          }
+        }
+      }
+    }
+
+    return { minYear, maxYear };
+  }
+
+  setYearsWithZeroForGraphs(minYear, maxYear, counts) {
+    let year = minYear;
+
+    while (year < maxYear) {
+      if (!counts.hasOwnProperty(year)) {
+        counts[year] = { creator: 0, recipient: 0, mentioned: 0 };
+      }
+      year++;
+    }
   }
 
   _renderGraphs() {
     const graphContainer = document.getElementById(`${this.namespace}-chart`);
     graphContainer.innerHTML = ""; // Clear existing graphs
 
-    const datasets = [];
-    const labels = []; // Unified x-axis labels
-    let maxYValue = 0; // Unified y-axis max value
-
-    for (const [fieldKey, fieldData] of Object.entries(
-      this.component.graphData
-    )) {
-      const reducedData = this._reduceData(fieldData);
-      const valueCounts = this._countOccurrences(
-        reducedData,
-        this.component.xAxisField
-      );
-
-      // Get the configuration for this fieldKey, or use defaults if not found
-      const config = this.graphConfig[fieldKey] || {
-        barColor: this.barColor,
-        graphTitle: fieldKey,
-      }; // Default to fieldKey as title and default bar color
-
-      // Update x-axis labels to ensure they are uniform and sorted
-      for (const label in valueCounts) {
-        if (!labels.includes(label)) {
-          let i = 0;
-          while (i < labels.length && labels[i] < label) {
-            i++;
-          }
-          labels.splice(i, 0, label); // Insert at position i
-        }
-      }
-
-      const localMax = Math.max(...Object.values(valueCounts));
-      maxYValue = Math.max(maxYValue, localMax);
-
-      datasets.push({
-        label: fieldKey,
-        data: valueCounts,
-        config: config, // Include the config for this dataset
-      });
-
-      if (this.currentView === "separate") {
-        this._drawGraph(
-          valueCounts,
-          labels,
-          maxYValue,
-          fieldKey,
-          graphContainer,
-          config
-        );
-      }
+    const counts = {};
+    for (const key in this.component.graphData) {
+      this.setYearCountsForGraphs(key, this.component.graphData[key], counts);
     }
 
-    if (this.currentView !== "separate") {
-      this._drawCombinedGraph(datasets, labels, maxYValue, graphContainer);
-    }
-  }
+    let first_and_last = this.setFirstAndLastYearsForGraphs(counts);
 
-  _drawGraph(valueCounts, labels, maxYValue, fieldKey, container, config) {
-    // Set up SVG for the D3 chart
-    const svg = d3
-      .select(container)
-      .append("svg")
-      .attr("width", this.graphWidth + this.margin.left + this.margin.right)
-      .attr("height", this.graphHeight + this.margin.top + this.margin.bottom)
-      .append("g")
-      .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
+    this.setYearsWithZeroForGraphs(
+      first_and_last.minYear,
+      first_and_last.maxYear,
+      counts
+    );
 
-    // Define scales
-    const x = d3
-      .scaleBand()
-      .domain(labels)
-      .range([0, this.graphWidth])
-      .padding(0.1);
+    // Sort the years numerically
+    let sortedYears = Object.keys(counts).sort((yearA, yearB) => yearA - yearB);
 
-    const y = d3
-      .scaleLinear()
-      .domain([0, maxYValue])
-      .nice()
-      .range([this.graphHeight, 0]);
+    let person_data = this._toLongFormat(
+      sortedYears.map(function (year) {
+        return [
+          year === "?" ? 9999 : parseInt(year, 10),
+          counts[year].mentioned,
+          counts[year].recipient,
+          counts[year].creator,
+        ];
+      }),
+      []
+    );
 
-    // Add X-axis
-    svg
-      .append("g")
-      .attr("transform", `translate(0,${this.graphHeight})`)
-      .call(d3.axisBottom(x));
-
-    // Add Y-axis (with no decimal values)
-    svg.append("g").call(d3.axisLeft(y).ticks(Math.ceil(maxYValue / 10))); // Adjust number of ticks based on the max value
-
-    // Draw bars
-    svg
-      .selectAll(".bar")
-      .data(labels)
-      .enter()
-      .append("rect")
-      .attr("class", "bar")
-      .attr("x", (d) => x(d))
-      .attr("y", (d) => y(valueCounts[d] || 0))
-      .attr("width", x.bandwidth())
-      .attr("height", (d) => this.graphHeight - y(valueCounts[d] || 0))
-      .attr("fill", config.barColor) // Use the custom bar color (or default)
-      .on("mouseover", (event, d) => {
-        // Hover effect
-        d3.select(event.target).attr("fill", this.hoverColor);
-        this._showTooltip(
-          event,
-          `${d}: ${valueCounts[d]} ${config.graphTitle}`
-        );
-      })
-      .on("mouseout", (event) => {
-        // Reset hover effect
-        d3.select(event.target).attr("fill", config.barColor);
-        this._hideTooltip();
-      });
-
-    // Title
-    svg
-      .append("text")
-      .attr("class", "chart-title")
-      .attr("x", -10)
-      .attr("y", -20)
-      .attr("text-anchor", "left")
-      .text(config.graphTitle); // Use the custom graph title (or default to fieldKey)
-  }
-
-  _drawCombinedGraph(datasets, labels, maxYValue, container) {
-    // Clear existing content
-    container.innerHTML = "";
-
-    // Set up SVG for the D3 chart
-    const svg = d3
-      .select(container)
-      .append("svg")
-      .attr("width", this.graphWidth + this.margin.left + this.margin.right)
-      .attr("height", this.graphHeight + this.margin.top + this.margin.bottom)
-      .append("g")
-      .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
-
-    // Define scales
-    const x = d3
-      .scaleBand()
-      .domain(labels)
-      .range([0, this.graphWidth])
-      .padding(0.2);
-
-    const y = d3
-      .scaleLinear()
-      .domain([0, maxYValue])
-      .nice()
-      .range([this.graphHeight, 0]);
-
-    const colorScale = d3
-      .scaleOrdinal()
-      .domain(datasets.map((d) => d.label))
-      .range(datasets.map((d) => d.config.barColor || this.barColor));
-
-    // Add X-axis
-    svg
-      .append("g")
-      .attr("transform", `translate(0,${this.graphHeight})`)
-      .call(d3.axisBottom(x));
-
-    // Add Y-axis
-    svg.append("g").call(d3.axisLeft(y));
-
-    if (this.currentView === "stacked") {
-      // Clear existing content
-      container.innerHTML = "";
-
-      // Set up SVG for the D3 chart
-      const svg = d3
-        .select(container)
-        .append("svg")
-        .attr("width", this.graphWidth + this.margin.left + this.margin.right)
-        .attr("height", this.graphHeight + this.margin.top + this.margin.bottom)
-        .append("g")
-        .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
-
-      // Define scales
-      const x = d3
-        .scaleBand()
-        .domain(labels)
-        .range([0, this.graphWidth])
-        .padding(0.1);
-
-      const y = d3
-        .scaleLinear()
-        .domain([0, maxYValue])
-        .nice()
-        .range([this.graphHeight, 0]);
-
-      const colorScale = d3
-        .scaleOrdinal()
-        .domain(datasets.map((d) => d.label))
-        .range(datasets.map((d) => d.config.barColor || this.barColor));
-
-      // Add X-axis
-      svg
-        .append("g")
-        .attr("transform", `translate(0,${this.graphHeight})`)
-        .call(d3.axisBottom(x));
-
-      // Add Y-axis
-      svg.append("g").call(d3.axisLeft(y));
-
-      // Prepare stacked data
-      const stackedData = labels.map((label) => {
-        let cumulative = 0;
-        return datasets.map((dataset) => {
-          const value = dataset.data[label] || 0;
-          const startY = cumulative;
-          cumulative += value;
-          return {
-            label: dataset.label,
-            startY,
-            endY: cumulative,
-            value,
-            barColor: dataset.config.barColor || this.barColor,
-          };
-        });
-      });
-
-      // Draw stacked bars
-      stackedData.forEach((stack, labelIndex) => {
-        stack.forEach((segment, datasetIndex) => {
-          svg
-            .append("rect")
-            .attr("x", x(labels[labelIndex]))
-            .attr("y", y(segment.endY)) // Y position of the top of the segment
-            .attr("height", y(segment.startY) - y(segment.endY)) // Height of the segment
-            .attr("width", x.bandwidth())
-            .attr("fill", segment.barColor)
-            .on("mouseover", (event) => {
-              d3.select(event.target).attr("fill", this.hoverColor);
-              this._showTooltip(event, `${segment.label}: ${segment.value}`);
-            })
-            .on("mouseout", (event) => {
-              d3.select(event.target).attr("fill", segment.barColor);
-              this._hideTooltip();
-            });
-        });
-      });
-    } else if (this.currentView === "split") {
-      // Split (grouped) bar chart
-      const subX = d3
-        .scaleBand()
-        .domain(datasets.map((d) => d.label))
-        .range([0, x.bandwidth()])
-        .padding(0.05);
-
-      datasets.forEach((dataset, datasetIndex) => {
-        svg
-          .selectAll(`.bar-group-${datasetIndex}`)
-          .data(labels)
-          .enter()
-          .append("rect")
-          .attr("class", `bar-group-${datasetIndex}`)
-          .attr("x", (d) => x(d) + subX(dataset.label))
-          .attr("y", (d) => y(dataset.data[d] || 0))
-          .attr("width", subX.bandwidth())
-          .attr("height", (d) => this.graphHeight - y(dataset.data[d] || 0))
-          .attr("fill", dataset.config.barColor || this.barColor)
-          .on("mouseover", (event, d) => {
-            d3.select(event.target).attr("fill", this.hoverColor);
-            this._showTooltip(
-              event,
-              `${dataset.label}: ${dataset.data[d] || 0}`
-            );
-          })
-          .on("mouseout", (event) => {
-            d3.select(event.target).attr(
-              "fill",
-              dataset.config.barColor || this.barColor
-            );
-            this._hideTooltip();
-          });
-      });
+    if (person_data.length > 0) {
+      // const person_chart = new PersonChart(person_data);
+      this.personChart = new PersonChart(person_data);
+      // person_chart.updateCharts(500, 0);
     }
   }
 
@@ -3421,158 +5047,45 @@ emlo.BarGraphRenderer = class extends edges.Renderer {
       "stackBar",
       this
     );
+
+    const unknownSelector = edges.util.jsClassSelector(
+      this.namespace,
+      "unkown",
+      this
+    );
+
     edges.on(fullscreenSelector, "click", this, "toggleFullscreen");
     edges.on(stackedBarSelector, "click", this, "stackedView");
     edges.on(separateSelector, "click", this, "separateView");
     edges.on(splitBarSelector, "click", this, "splitView");
+    edges.on(unknownSelector, "click", this, "toggleUnknown");
   }
 
   separateView() {
-    this.currentView = "separate";
-    this.draw();
+    this.personChart.switchBars(3);
+  }
+
+  toggleUnknown() {
+    this.personChart.unknownShow(this.showUnkown);
+    this.showUnkown = !this.showUnkown;
   }
 
   stackedView() {
-    this.currentView = "stacked";
-    this.draw();
+    this.personChart.switchBars(1);
   }
 
   splitView() {
-    this.currentView = "split";
-    this.draw();
+    this.personChart.switchBars(2);
   }
 
-  // toggleFullscreen(containerId) {
-  //   const container = document.getElementById(`${this.namespace}-container`);
-  //   const isExpanded = container.classList.contains("fullscreen-mode");
-
-  //   if (isExpanded) {
-  //     // Shrink back to original size
-  //     container.style.width = "";
-  //     container.style.height = "";
-  //     container.style.position = "";
-  //     container.style.zIndex = "";
-  //     container.style.backgroundColor = "";
-  //     container.style.overflow = ""; // Reset overflow
-  //     container.classList.remove("fullscreen-mode");
-
-  //     // Remove close button
-  //     const closeButton = container.querySelector(".close-button");
-  //     if (closeButton) {
-  //       closeButton.remove();
-  //     }
-  //   } else {
-  //     // Expand to full screen
-  //     container.style.width = "100%";
-  //     container.style.height = "100%"; // Full height to ensure all content is visible
-  //     container.style.position = "fixed";
-  //     container.style.top = "0";
-  //     container.style.left = "0";
-  //     container.style.zIndex = "1000";
-  //     container.style.backgroundColor = "#fff"; // Optional: Set a background color
-  //     container.style.overflow = "auto"; // Ensure scrollable if content overflows
-  //     container.classList.add("fullscreen-mode");
-
-  //     // Add a close button
-  //     const closeButton = document.createElement("button");
-  //     closeButton.innerHTML = "Close";
-  //     closeButton.className = "close-button";
-  //     closeButton.style.position = "absolute";
-  //     closeButton.style.top = "10px";
-  //     closeButton.style.right = "10px";
-  //     closeButton.style.zIndex = "1100";
-  //     closeButton.style.backgroundColor = "#ff0000";
-  //     closeButton.style.color = "#fff";
-  //     closeButton.style.border = "none";
-  //     closeButton.style.padding = "10px";
-  //     closeButton.style.cursor = "pointer";
-  //     closeButton.onclick = () => this.toggleFullscreen(containerId);
-  //     container.appendChild(closeButton);
-  //   }
-  // }
-
-  toggleFullscreen(containerId) {
-    const container = document.getElementById(`${this.namespace}-container`);
-    const isExpanded = container.classList.contains("fullscreen-mode");
-
-    if (isExpanded) {
-      // Shrink back to original size
-      container.style.width = "";
-      container.style.height = "";
-      container.style.position = "";
-      container.style.zIndex = "";
-      container.style.backgroundColor = "";
-      container.style.overflow = ""; // Reset overflow
-      container.style.display = ""; // Reset display
-      container.style.alignItems = ""; // Reset alignment
-      container.style.justifyContent = ""; // Reset alignment
-      container.classList.remove("fullscreen-mode");
-
-      // Remove close button
-      const closeButton = container.querySelector(".close-button");
-      if (closeButton) {
-        closeButton.remove();
-      }
-    } else {
-      // Expand to full screen
-      container.style.width = "100%";
-      container.style.height = "100%"; // Full height to ensure all content is visible
-      container.style.maxHeight = "100%";
-      container.style.position = "fixed";
-      container.style.top = "0";
-      container.style.left = "0";
-      container.style.zIndex = "1000";
-      container.style.backgroundColor = "#fff"; // Optional: Set a background color
-      container.style.overflow = "auto"; // Ensure scrollable if content overflows
-      container.style.display = "grid"; // Set grid layout
-      container.style.alignItems = "center"; // Center content vertically
-      container.style.justifyContent = "center"; // Center content horizontally
-      container.classList.add("fullscreen-mode");
-
-      // Add a close button
-      const closeButton = document.createElement("button");
-      closeButton.innerHTML = "Close";
-      closeButton.className = "close-button";
-      closeButton.style.position = "absolute";
-      closeButton.style.top = "0"; // Position at the very top
-      closeButton.style.right = "10px";
-      closeButton.style.zIndex = "1100";
-      closeButton.style.backgroundColor = "#ff0000";
-      closeButton.style.color = "#fff";
-      closeButton.style.border = "none";
-      closeButton.style.padding = "10px";
-      closeButton.style.cursor = "pointer";
-      closeButton.onclick = () => this.toggleFullscreen(containerId);
-      container.appendChild(closeButton);
-    }
+  toggleFullscreen() {
+    this.personChart.launchFullScreen();
   }
 
   _reduceData(data) {
     if (data.length <= this.maxPoints) return data;
     const step = Math.ceil(data.length / this.maxPoints);
     return data.filter((_, index) => index % step === 0);
-  }
-
-  _countOccurrences(data, field) {
-    return data.reduce((acc, item) => {
-      const value = item[field];
-      acc[value] = (acc[value] || 0) + 1;
-      return acc;
-    }, {});
-  }
-
-  _showTooltip(event, text) {
-    const tooltip = d3
-      .select("body")
-      .append("div")
-      .attr("class", "graph-tooltip")
-      .text(text)
-      .style("left", `${event.pageX + 10}px`)
-      .style("top", `${event.pageY - 10}px`);
-  }
-
-  _hideTooltip() {
-    d3.select(".graph-tooltip").remove();
   }
 };
 
@@ -3603,10 +5116,10 @@ emlo.Pagination = class extends edges.Component {
       const start = parseInt(val);
       const from = parseInt(this.edge.currentQuery.getFrom());
 
-      if (start != from) {
-        this.from = parseInt(this.edge.currentQuery.getFrom()) + 1;
-      } else {
+      if (start && start != from) {
         this.from = start + 1;
+      } else {
+        this.from = parseInt(this.edge.currentQuery.getFrom()) + 1;
       }
 
       this.pageSize = parseInt(this.edge.currentQuery.getSize());
@@ -3645,6 +5158,7 @@ emlo.Pagination = class extends edges.Component {
   decrementPage() {
     const from = Math.max(this.from - 10 * this.pageSize, 1);
     this.setFrom(from);
+    _addUrlParam("start", from - 1);
   }
 
   incrementPage() {
@@ -3653,20 +5167,25 @@ emlo.Pagination = class extends edges.Component {
       (this.totalPages - 1) * this.pageSize + 1
     );
     this.setFrom(from);
+    _addUrlParam("start", from - 1);
   }
 
   goToPage(params) {
     const page = params.page;
     const nf = (page - 1) * this.pageSize + 1;
     this.setFrom(nf);
+    _addUrlParam("start", nf - 1);
   }
 
   goToFirst() {
     this.setFrom(1);
+    _addUrlParam("start", 0);
   }
 
   goToLast() {
-    this.setFrom((this.totalPages - 1) * this.pageSize + 1);
+    const from = (this.totalPages - 1) * this.pageSize + 1;
+    this.setFrom(from);
+    _addUrlParam("start", from - 1);
   }
 };
 
@@ -3686,7 +5205,11 @@ emlo.PaginationRenderer = class extends edges.Renderer {
 
     // Render the navigation UI with page information
     var nav = this._renderNavigation();
-    var pageInfo = `<p>Page ${this.component.page} of ${this.component.totalPages}. (The arrows will jump blocks of 10 pages.)  </p>`;
+    const jumpMessage =
+      this.component.totalPages > 10
+        ? "(The arrows will jump blocks of 10 pages.)"
+        : "";
+    var pageInfo = `<p>Page ${this.component.page} of ${this.component.totalPages}. ${jumpMessage}  </p>`;
     var container =
       this.component.totalPages > 1
         ? `
@@ -3716,11 +5239,15 @@ emlo.PaginationRenderer = class extends edges.Renderer {
     var lastClass = edges.util.allClasses(this.namespace, "last", this);
     var ellipsisClass = edges.util.allClasses(this.namespace, "ellipsis", this);
 
+    let firstActive = this.component.page == 1 ? "active" : "";
+    let lastActive =
+      this.component.totalPages == this.component.page ? "active" : "";
+
     // Generate first, prev, next, last buttons
-    var firstBtn = `<div class="button-wrapper ${firstClass}">First</div>`;
-    var prevBlockBtn = `<div class="button-wrapper ${prevBlockClass}"><<<</div>`;
-    var nextBlockBtn = `<div class="button-wrapper ${nextBlockClass}">>>></div>`;
-    var lastBtn = `<div class="button-wrapper ${lastClass}">Last</div>`;
+    var firstBtn = `<div class="button-wrapper ${firstClass} ${firstActive}">First</div>`;
+    var prevBlockBtn = `<div class="button-wrapper ${prevBlockClass}"> « </div>`;
+    var nextBlockBtn = `<div class="button-wrapper ${nextBlockClass}"> » </div>`;
+    var lastBtn = `<div class="button-wrapper ${lastClass} ${lastActive}">Last</div>`;
 
     // Ellipsis buttons for indicating more pages to the back or forward
     var prevEllipsis =
@@ -3978,6 +5505,31 @@ emlo.SortRenderer = class extends edges.Renderer {
   };
 };
 
+emlo.AlertBox = class extends edges.Component {
+  constructor(params) {
+    super(params);
+  }
+};
+
+emlo.AlertBoxRenderer = class extends edges.Renderer {
+  constructor(params) {
+    super(params);
+    this.namespace = "edges-alert-renderer";
+    this.message = edges.util.getParam(params, "message", "");
+  }
+
+  draw() {
+    let frag = `
+          <div data-alert="" class="alert-box info radius">
+            ${this.message}
+			      <a href="#" class="close">×</a>
+				  </div>
+    `;
+
+    this.component.context.html(frag);
+  }
+};
+
 emlo.Checkbox = class extends edges.Component {
   constructor(params) {
     super(params);
@@ -4169,9 +5721,75 @@ emlo.CheckboxRenderer = class extends edges.Renderer {
   }
 };
 
+function GetRecordID(type, result) {
+  const QUERY_MAP = {
+    p: { field: "dcterms_identifier-editi_", splitValue: "editi_" }, // Person query pattern
+    w: { field: "dcterms_identifier-editi_", splitValue: "editi_" }, // Work query pattern
+    r: {
+      field: "dcterms_identifier-edit_",
+      splitValue: "edit_cofk_union_institution-",
+    }, // Institution query pattern
+    l: {
+      field: "dcterms_identifier-edit_",
+      splitValue: "edit_cofk_union_location-",
+    }, // Location query pattern
+    i: {
+      field: "dcterms_identifier-edit_",
+      splitValue: "edit_cofk_union_image-",
+    }, // Image query pattern
+    c: {
+      field: "dcterms_identifier-edit_",
+      splitValue: "edit_cofk_union_comment-",
+    }, // Comment query pattern
+    re: {
+      field: "dcterms_identifier-edit_",
+      splitValue: "edit_cofk_union_resource-",
+    }, // Resource query pattern
+    m: {
+      field: "dcterms_identifier-edit_",
+      splitValue: "edit_cofk_union_manifestation-cofk_edit_interface-iwork_id:",
+    }, // Manifestation query pattern
+  };
+
+  const queryConfig = QUERY_MAP[type];
+  if (queryConfig) {
+    // Retrieve the value from the result object for the given field
+    const fieldValue = result[queryConfig.field];
+    if (fieldValue) {
+      // Split the value using the delimiter (e.g., "editi_") and get the last part
+      const splitValue = fieldValue.split(queryConfig.splitValue).pop();
+      // Return the query by combining the split value and the id
+      return `${splitValue}`;
+    } else {
+      throw new Error(`Field ${queryConfig.field} not found in result object`);
+    }
+  } else {
+    throw new Error(`Unknown query type: ${type}`);
+  }
+}
+
+function GenerateShortURL(id, type, currentDomain) {
+  if (id) {
+    return `${currentDomain}/${type}/${id}`;
+  } else {
+    return "";
+  }
+}
+
 function _addUrlParam(field, term) {
   let url_param_field = field;
   const url = new URL(window.location.href);
+
+  if (
+    ["frbr_creator-person", "mail_recipient-person"].includes(field) &&
+    term.startsWith("http")
+  ) {
+    let UUID = term.startsWith('"')
+      ? term.slice(1, -1).split("/").pop()
+      : term.split("/").pop();
+
+    term = UUID;
+  }
 
   const fieldMap = {
     author_sort: "aut",
@@ -4211,12 +5829,41 @@ function _removeUrlParam(field) {
   if (field == "uuid_related") {
     delete_field = "uuids";
   }
+
+  if (field == "Contents") {
+    delete_field = "let_con";
+  }
+
+  if (field == "Locations") {
+    delete_field = "locations";
+  }
+
+  if (field == "default_search_field") {
+    delete_field = "everything";
+  }
+
+  const validFields = [
+    "dcterms_references-location",
+    "mail_destination-location",
+    "mail_origin-location",
+    "frbr_creator-person",
+    "mail_recipient-person",
+    "dcterms_references-person",
+  ];
+
+  if (validFields.includes(field)) {
+    delete_field = field;
+  }
+
   if (fieldMap.hasOwnProperty(field)) {
     delete_field = fieldMap[field].primary;
     secondaryField = fieldMap[field].secondary;
-  } else {
+  }
+
+  if (delete_field == "") {
     delete_field = field;
   }
+
   const url = new URL(window.location.href);
 
   if (url.searchParams.has(delete_field)) {

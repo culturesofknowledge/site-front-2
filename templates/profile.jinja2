@@ -1,39 +1,79 @@
 {% extends "base.jinja2" %}
 
 {% block title %}Profile{% endblock %}
+{% block extra_stylesheets %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chart.css') }}">
+<style>
+   .content{
+    margin-left: 40px;
+   }
+   .tiny{
+        padding-top: 0.625rem;
+        padding-right: 1.25rem;
+        padding-bottom: 0.6875rem;
+        padding-left: 1.25rem;
+        font-size: 0.6875rem;
+    }
+	h3.worklegend{font-size:25px !important;margin-top: 0.5rem;margin-bottom: 0.2rem;}
+    .workspacing h4{
+        margin-top: 0.5rem;margin-bottom: 0.2rem;
+    }
+	.profilepart h4{font-size:22px !important}
+	.profilepart h5 { font-size: 20px !important; }
+	p {
+        font-family: "Arvo-sans", sans-serif;
+        font-weight: normal;
+        font-size: 1rem;
+        line-height: 1.6;
+        text-rendering: optimizeLegibility;
+    }
+	.people,.locations {
+		margin-bottom: 17px;
+		margin-left: 10px;
+	}
+	.fieldlabel { color:#172854; min-width: 120px; margin-right: 10px;display:inline-block }
+	.flags{font-size:smaller}
+	.flags:before { content:"("}
+	.flags:after { content:")"}
+	.profilepart .profilepart .content { margin-left: 6px; }
+	.workspacing .display_details_of_one_object.true {
+		border-left: 1px dashed #777;
+		padding: 5px 0 5px 20px;
+		margin-bottom: 10px;
+	}
+    h3,h4,h5,h6 {
+        font-weight: normal;
+        font-style: normal;
+        text-rendering: optimizeLegibility;
+    }
+	.comment {
+		margin-top: 10px;
+	}
+    #repo{
+        display: none;
+    }
+    .highlight-box{
+        margin-bottom: 20px;
+    }
+    #work-profile p{
+        margin-bottom: 0px;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-    
-    <div class="row row-with-side">
-    <div class="large-4"></div>
-    <div id="navigation-buttons" class="large-12 columns" style="margin-top: 15px; margin-bottom:-15px;">
-        {% if request.args.get('browsing') %}
-            <button id="back-to-browse">Back to Browse</button>
-        {% endif %}
-        
-        {% if request.args.get('type') %}
-            <button id="back-to-results">Back to Results</button>
-        {% endif %}
-        
-        {% if request.args.get('start') and request.args.get('numFound') %}
-            <button id="first-entry" title="First Entry"><<</button>
-            <button id="prev-entry" title="Previous Entry"><</button>
-            <button id="next-entry" title="Next Entry">></button>
-            <button id="last-entry" title="Last Entry">>></button>
-        {% endif %}
-    </div>
-    </div>
-
-    <div id="profile-display"></div>
+    <div id="profile-display" style="min-height: 300px;"></div>
 {% endblock %}
 
 {% block extra_js_bottom %}
     {% include "_edges_common_js.jinja2" %}
     <script type="module" src="{{ url_for('static', filename='js/profile.edges.js') }}"></script>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    {# <script src="https://d3js.org/d3.v7.min.js"></script> #}
+    <script type="text/javascript" src="{{ url_for('static', filename='libs/d3/d3.v3.min.js') }}"></script>
+    <script type="module">
+        import { searchQueryObj } from "{{ url_for('static', filename='js/search.js') }}";
 
-    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const uuid = urlParams.get('uuid');
@@ -46,9 +86,26 @@
             const uuids = urlParams.get('uuids');
             const filters = urlParams.get('filters');
 
+            let modDoc = document.getElementById("modify-search")
+            let controlDoc = document.getElementById("control")
+            let backResultDoc = document.getElementById("back-to-results")
+            let backBrowseDoc = document.getElementById("back-to-browse")
+
+            const queryObj = searchQueryObj()
+
+
+            const query = buildSolrQuery(queryObj.openingQuery)
+
             // Only make the API call if uuid, type, and start are present
             if (!isNaN(start)) {
                 let apiUrl = '/results?';
+                let qAndOp = "{!q.op=AND} "
+
+                if(queryObj.collection && queryObj.collection == "/solr/all/select") {
+                    qAndOp = ""
+                }
+
+                if(query) apiUrl += `q=${qAndOp}${query}&`
 
                 // Add parameters only if they exist
                 if (uuid) apiUrl += `uuid=${uuid}&`;
@@ -88,20 +145,58 @@
                             document.getElementById('navigation-buttons').style.display = 'none';
                         }
 
+                         // Deleting start from params after adding it's value
+                        urlParams.delete("start")
+                        
                         // Set navigation button actions
-                        document.getElementById('first-entry').onclick = () => window.location.href = `/profile/${first_entry.object_type}/${first_entry.uuid}?type=${type}&start=0&sort=${sort}&letter=${letter}&browsing=${browsing}&uuids=${uuids}&numFound=${numFound}`;
-                        document.getElementById('prev-entry').onclick = () => window.location.href = `/profile/${prev_entry.object_type}/${prev_entry.uuid}?type=${type}&start=${start - 1}&sort=${sort}&letter=${letter}&browsing=${browsing}&uuids=${uuids}&numFound=${numFound}`;
-                        document.getElementById('next-entry').onclick = () => window.location.href = `/profile/${next_entry.object_type}/${next_entry.uuid}?type=${type}&start=${start + 1}&sort=${sort}&letter=${letter}&browsing=${browsing}&uuids=${uuids}&numFound=${numFound}`;
-                        document.getElementById('last-entry').onclick = () => window.location.href = `/profile/${last_entry.object_type}/${last_entry.uuid}?type=${type}&start=${numFound}&sort=${sort}&letter=${letter}&browsing=${browsing}&uuids=${uuids}&numFound=${numFound}`;
+                        document.getElementById('first-entry').onclick = () => window.location.href = `/profile/${first_entry.object_type}/${first_entry.uuid}?${urlParams}&start=0`;
+                        document.getElementById('prev-entry').onclick = () => window.location.href = `/profile/${prev_entry.object_type}/${prev_entry.uuid}?${urlParams}&start=${start - 1}`;
+                        document.getElementById('next-entry').onclick = () => window.location.href = `/profile/${next_entry.object_type}/${next_entry.uuid}?${urlParams}&start=${start + 1}`;
+                        document.getElementById('last-entry').onclick = () => window.location.href = `/profile/${last_entry.object_type}/${last_entry.uuid}?${urlParams}&start=${numFound -1}`;
 
                         // Back to browse
                         if (browsing) {
+                            backBrowseDoc.style.display = ""
                             document.getElementById('back-to-browse').onclick = () => window.location.href = `/browse/${browsing}?letter=${letter}&uuids=${uuids}&filters=${filters}`;
                         }
 
                         // Back to results
                         if (type) {
-                            document.getElementById('back-to-results').onclick = () => window.location.href = `/forms/advance?sort=${sort}&start=${start}&letter=${letter}&browsing=${browsing}&uuids=${uuids}`;
+                            // enable divs
+                           
+                            if(!browsing) {
+                                modDoc.style.display = "inline"
+                            }
+
+                           backResultDoc.style.display = "inline"
+                           controlDoc.style.display = "inline"
+
+                            const params = new URLSearchParams(window.location.search);
+
+                            // Delete 'type' and 'numFound' if present
+                            params.delete('type');
+                            params.delete('numFound');
+
+                            let pageNumber = 0;
+                            const start = params.get("start")
+                            if (start != null) {
+                                // Calculate page number from start offset
+                                pageNumber = Math.floor(start / 50) * 50;
+                            }
+                            
+                            params.set('start' , pageNumber);
+                            const newQuery = params.toString()
+                            const href = newQuery ? `/forms/advanced?${newQuery}` : '/forms/advanced';
+                            const modSearch =  newQuery ? `/advanced?${newQuery}` : '/advanced';
+                            document.getElementById('back-to-results').onclick = () => window.location.href = href;
+                            document.getElementById('modify-search').onclick = () => window.location.href = modSearch;
+                        }
+
+                        if(numFound && start >= 0) {
+                            const count = document.getElementById("count-heading")
+                            if(count) {
+                                count.innerHTML = `Result ${start + 1} of ${numFound}`
+                            }
                         }
                     });
             }
@@ -130,6 +225,40 @@
                 }
             }, 100);
         })
+
+        function buildSolrQuery(config) {
+            const { queryStrings = [], sort = [], size = 10 , must = [] , queryString = ""} = config;
+
+            let queryParts = [];
+            
+            if(queryString) {
+                queryParts.push(`${queryString.defaultField}:"${queryString.queryString}"`);
+            }
+
+            for (const q of queryStrings) {
+                const subQueries = q.fields.map(f => `${f.field}:(${q.queryString})`);
+                const combined = subQueries.join(` ${q.fields[0].operator} `);
+                queryParts.push(`(${combined})`);
+            }
+
+            for(const m of must){
+                const query = `${m.field}:${m.value}`
+                queryParts.push(query)
+            }
+
+
+            // Combine all query parts using AND
+            const qString = queryParts.length > 0 ? queryParts.join(' AND ') : '*:*';
+
+            // 2. Handle `sort`
+            const sortString = sort.map(s => `${s.field} ${s.order}`).join(',');
+
+            // 3. Handle `size`
+            const rows = size;
+
+            // Return full Solr query
+            return qString
+        }
     </script>
 
 {% endblock extra_js_bottom %}

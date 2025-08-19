@@ -1,9 +1,9 @@
 import emlo from "./edges.js";
+let current_search_letter = "a"; // Setting this as default a
 
 try {
   // Fetching URL params
   const queryString = window.location.search;
-  let current_search_letter = "a"; // Setting this as default a
 
   if (queryString) {
     const params = new URLSearchParams(queryString);
@@ -52,6 +52,14 @@ try {
   emlo.collection = "/solr/institutions/select";
 
   emlo.components = [
+    new emlo.AlertBox({
+      id: "alert-box",
+      category: "results",
+      renderer: new emlo.AlertBoxRenderer({
+        message: `  Note: every manifestation of a letter is counted, so the number of documents in a repository may be larger than the number of letters.
+              `,
+      }),
+    }),
     new emlo.ResultTable({
       id: "results",
       category: "results",
@@ -63,6 +71,9 @@ try {
         noResultsText: "No results to display",
         serialHeader: "",
         showIndex: false,
+        showCheckbox: false,
+        selectField: "ox_hasResource-manifestation",
+        displayField: "browse",
         tableDisplay: [
           {
             header: "Name",
@@ -71,7 +82,7 @@ try {
             post: "",
             type: "link",
             linkHref: "uuid",
-            linkHrefPrefix: "/profile/institution",
+            linkHrefPrefix: "/profile",
             valueFunction: null,
           },
           {
@@ -123,15 +134,18 @@ function _redirectToSearch(val, res, fieldName) {
 
   // console.log("finalURL", finalUrl);
   if (val > 0) {
-    const baseURL = `/forms/advance`;
+    const baseURL = `/forms/advanced`;
     let query = "";
     const user = res["browse"];
+    const currentPageQ = `browsing=repositories&letter=${current_search_letter}`;
 
     switch (fieldName) {
       case "ox_totalDocsInRepository":
         query = `repository=${user}`;
         break;
     }
+
+    query += query ? `&${currentPageQ}` : `${currentPageQ}`;
     const finalUrl = query ? `${baseURL}?${query}` : `${baseURL}`;
 
     return `<a href="${finalUrl}"> ${val} </a>`;

@@ -1,6 +1,4 @@
-<div class="section clearfix" id="institutions_section">
-  <hr class="yellow-divider" />
-  
+
   <h3>
     <img
       src="/static/img/icon-repository.png"
@@ -15,7 +13,7 @@
       data-delay="2.0"
       data-tip="Confine your search to a particular library or archive."
       class="row">
-      <div class="small-11 columns">
+      <div class="small-10 columns">
         <label for="repository">Repository</label>
         <div id="repository-dropdown" style="padding: 0px 30px;"></div>
       </div>
@@ -26,10 +24,9 @@
 
     <div
       data-delay="2.0"
-      data-tip="Search for letters by their shelfmark or another repository identifier, e.g. 'Tanner', 'Rawl', or 'MS Smith'. 
-      <br/><br/>Search is not case sensitive." 
+      data-tip="Search for letters by their shelfmark or another repository identifier, e.g. 'Tanner', 'Rawl', or 'MS Smith'. Search is not case sensitive." 
       class="row">
-      <div class="small-11 columns">
+      <div class="small-10 columns">
         <label for="let_shel">Shelfmark / ID</label>
         <input
           id="let_shel"
@@ -49,15 +46,14 @@
   </fieldset>
 
   <fieldset>
-    <legend>Printed Editions</legend>
+    <legend>Printed editions</legend>
 
     <div
       data-delay="2.0"
-      data-tip="Search across the titles of books and pamphlets in which printed versions of letters appear. 
-      <br/><br/>Search is not case sensitive."
+      data-tip="Search across the titles of books and pamphlets in which printed versions of letters appear. Search is not case sensitive."
       class="row">
-      <div class="small-11 columns">
-        <label for="let_pe_tex">Printed Editions</label>
+      <div class="small-10 columns">
+        <label for="let_pe_tex">Printed editions</label>
         <input
           id="let_pe_tex"
           name="let_pe_tex"
@@ -97,4 +93,3 @@
   </fieldset>
 
   <button onclick="advanceSearch()" name="submit-advanced" type="submit" class="button submit search-related">Search</button>
-</div>

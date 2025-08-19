@@ -1,13 +1,14 @@
 
 <fieldset>
-    <legend>People Mentioned</legend>
+    <legend>People mentioned</legend>
 
     <div
         data-delay="2.0"
-        data-tip="Search for people or organizations mentioned in letters, e.g. 'Samuel Hartlib', 'John Aubrey', or 'The Royal Society'. 
-        <br/><br/>Search is not case sensitive. " 
+        data-tip="Search for people or organizations mentioned in letters, e.g. 'Samuel Hartlib', 'John Aubrey', or 'The Royal Society'. Search is not case sensitive.
+        <br/>This information has not yet been captured systematically.
+        <br/>You can also search Content for mentions of people and organizations." 
         class="row">
-        <div class="small-11 columns">
+        <div class="small-10 columns">
             <label for="ment">Name</label>
             <input
                 id="ment"
@@ -26,14 +27,13 @@
     </div>
 
     <div>
-
         <div
             data-delay="2.0"
             data-tip="Confine your search to male or female people mentioned in letters." 
-            class="columns small-12 large-4"
+            class="large-3 small-12 columns" 
             style="padding-left: 0px;"
         >
-            <div class="large-9 columns" style="padding-left: 0px;">
+            <div  class="large-8 columns small-10" style="padding: 0px;">
                 <label for="ment_gend">Gender</label>
                 <select id="ment_gend" name="ment_gend" title="" class="">
                     <option class="default" selected="selected">all</option>
@@ -51,7 +51,7 @@
             data-delay="2.0"
             data-tip="Confine your search to instances where the person mentioned was an organization or corporate entity, e.g. The Royal Society." 
             class="columns small-12 large-8 end">
-            <div class="large-10 columns">
+            <div class="large-8 columns small-10">
                 <label>&nbsp;<!-- for alignment--></label>
                 <input
                     type="checkbox"
@@ -62,7 +62,7 @@
                     class="checkbox"
                 />
 
-                <label for="ment_org">Only Organizations</label>
+                <label for="ment_org">Only organizations</label>
             </div>
             <div>
                 {% include 'components/common/help_icon.jinja2' %}
@@ -72,11 +72,11 @@
 
     <div
         data-delay="2.0"
-        data-tip="Search for people mentioned in letters by title, role, or occupation, e.g. 'Bookseller' or 'Politician'. 
-            <br/><br/>Search is not case sensitive. " 
+        data-tip="Search for people mentioned in letters by title, role, or occupation, e.g. 'Bookseller' or 'Politician'. Search is not case sensitive.
+            <br/>Note that this information has not yet been captured for all people." 
         class="row">
         <div
-            class="large-11 columns">
+            class="large-11 columns small-10">
             <label for="ment_roles">Titles, roles, or occupations</label>
             <input
                 id="ment_roles"

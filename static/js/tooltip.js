@@ -12,17 +12,47 @@ $(document).ready(function () {
 
     // Function to show tooltip
     const showTooltip = (event, applyDelay = true) => {
-      let tooltipX = event.pageX;
-      let tooltipY = event.pageY + 15; // Position tooltip 15px below pointer
+      let tooltipX, tooltipY;
+      const $target = $(event.target);
 
-      // Check if the tooltip overflows the right edge of the window
-      const windowWidth = $(window).width();
-      const tooltipWidth = tooltip.outerWidth();
-      const spaceLeft = windowWidth - tooltipX;
+      if ($target.is("img")) {
+        // For images, position at top-right corner
+        const $img = $target;
+        const imgOffset = $img.offset();
+        tooltipX = imgOffset.left + $img.outerWidth() - 30;
+        tooltipY = imgOffset.top - tooltip.outerHeight() - 5;
+      } else {
+        // Default behavior for non-image elements
+        tooltipX = event.pageX - 15;
+        tooltipY = event.pageY - tooltip.outerHeight() - 30;
 
-      if (spaceLeft < tooltipWidth) {
-        // If there's not enough space on the right, position on the left
-        tooltipX = event.pageX - tooltipWidth - 15; // 15px from the pointer
+        // Check if the tooltip goes beyond the top of the screen
+        if (tooltipY < $(window).scrollTop()) {
+          tooltipY = event.pageY + 15;
+        }
+
+        // Check if the tooltip overflows the right or left edge of the window
+        const windowWidth = $(window).width();
+        const tooltipWidth = tooltip.outerWidth();
+        const spaceLeft = windowWidth - tooltipX;
+        const leftSpace = tooltipX;
+
+        if (spaceLeft < tooltipWidth || leftSpace < tooltipWidth) {
+          console.log("Adjusting tooltip width due to limited space");
+          // Set width to 200px with !important to override CSS
+          tooltip.attr(
+            "style",
+            "width: 180px !important; white-space: normal; height: auto; max-width: none;"
+          );
+          // Force reflow
+          const reflow = tooltip[0].offsetHeight;
+          // Recalculate tooltip height and adjust Y position accordingly
+          tooltipY = event.pageY - tooltip.outerHeight() - 30;
+          if (tooltipY < $(window).scrollTop()) {
+            tooltipY = event.pageY + 15;
+          }
+          tooltipX = event.pageX - tooltip.outerWidth() - 15;
+        }
       }
 
       tooltip.css({
@@ -46,15 +76,32 @@ $(document).ready(function () {
     };
 
     // Bind events to both input and help icon
-    const targets = $this.find("input, select, #help-icon");
+    const targets = $this.find("input, select, #help-icon, .has-tip");
 
     targets.on("mouseenter", function (event) {
-      const isHelpIcon = $(this).is("#help-icon");
-      showTooltip(event, !isHelpIcon); // No delay for #help-icon
-    });
+      const $target = $(event.target);
+      const isHelpIcon =
+        $target.is("#help-icon") || $target.closest("#help-icon").length > 0;
 
-    targets.on("mousemove", (event) => {
-      showTooltip(event, false); // Update position without delay
+      // Show tooltip only if .has-tip contains an image
+      if ($target.hasClass("has-tip") && $target.find("img").length > 0) {
+        const img = $target.find("img").first();
+        const fakeEvent = {
+          target: img[0],
+          pageX: img.offset().left + img.outerWidth(),
+          pageY: img.offset().top,
+        };
+        showTooltip(fakeEvent, false);
+      } else if ($target.is("img") || $target.hasClass("help")) {
+        const fakeEvent = {
+          target: event.target,
+          pageX: $target.offset().left + $target.outerWidth(),
+          pageY: $target.offset().top,
+        };
+        showTooltip(fakeEvent, false);
+      } else if (!isHelpIcon) {
+        showTooltip(event, true);
+      }
     });
 
     targets.on("mouseleave", hideTooltip);

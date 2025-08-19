@@ -1,8 +1,8 @@
 import emlo from "./edges.js";
+let current_search_letter = "a"; // Setting this as default 'a'
 
 try {
   const queryString = window.location.search;
-  let current_search_letter = "a"; // Setting this as default 'a'
 
   if (queryString) {
     const params = new URLSearchParams(queryString);
@@ -132,6 +132,14 @@ try {
         label: "",
       }),
     }),
+    new emlo.AlertBox({
+      id: "alert-box",
+      category: "results",
+      renderer: new emlo.AlertBoxRenderer({
+        message: `You can select up to 10 people using the checkboxes below, and then display associated letters.
+        To save your selection for later use, bookmark this page.`,
+      }),
+    }),
     new emlo.ResultTable({
       id: "results",
       category: "results",
@@ -153,7 +161,7 @@ try {
             post: "",
             type: "link",
             linkHref: "uuid",
-            linkHrefPrefix: "/profile/person",
+            linkHrefPrefix: "/profile",
             valueFunction: null,
           },
           {
@@ -212,21 +220,26 @@ function _redirectToSearch(val, res, fieldName) {
   }
 
   if (val > 0) {
-    const baseURL = `/forms/advance`;
+    const baseURL = `/forms/advanced`;
     let query = "";
     const user = res["foaf_name"];
+    const uuid = res["uuid"];
+
+    const currentPageQ = `browsing=people&letter=${current_search_letter}`;
 
     switch (fieldName) {
       case "ox_totalWorksByAgent":
-        query = `aut=${user}`;
+        query = `frbr_creator-person=${uuid}`;
         break;
       case "ox_totalWorksAddressedToAgent":
-        query = `rec=${user}`;
+        query = `mail_recipient-person=${uuid}`;
         break;
       case "ox_totalWorksMentioningAgent":
-        query = `ment=${user}`;
+        query = `dcterms_references-person=${uuid}`;
         break;
     }
+
+    query += query ? `&${currentPageQ}` : `${currentPageQ}`;
     const finalUrl = query ? `${baseURL}?${query}` : `${baseURL}`;
 
     return `<a href="${finalUrl}"> ${val} </a>`;

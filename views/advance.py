@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, request
+import json
 
 advance_bp = Blueprint('advance', __name__)
 
 # Constants
-START_YEAR = 1500
-END_YEAR = 1841
+START_YEAR = 1450
+END_YEAR = 1861
 
 MONTHS_MAP = {
     "January": "01",
@@ -31,7 +32,7 @@ DOCUMENT_TYPES = [
     "Digital copy", "Draft", "Extract", "Letter", "Manuscript copy", "Printed copy", "Other"
 ]
 
-@advance_bp.route('/advance')
+@advance_bp.route('/advanced')
 def advance():
     # Default values for query parameters
     default_values = {
@@ -60,6 +61,16 @@ def advance():
         'let_pe_tex' : None,
     }
 
+    lang_data = "static/data/language.json"
+
+    try:
+        with open(lang_data, "r", encoding="utf-8") as file:
+            languages = json.load(file)
+
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        languages = []
+        print(f"Error loading JSON: {e}")
+
     # Extract query parameters with defaults
     query_params = {key: request.args.get(key, default) for key, default in default_values.items()}
 
@@ -70,7 +81,7 @@ def advance():
         'months_map': MONTHS_MAP,
         'start_year': START_YEAR,
         'end_year': END_YEAR,
-        'languages': LANGUAGES,
+        'languages': languages,
         'document_types': DOCUMENT_TYPES
     }
 

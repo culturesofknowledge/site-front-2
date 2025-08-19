@@ -19,12 +19,42 @@ export function searchQueryObj() {
 function quickSearch(params) {
   let openingQuery = {
     must: [],
+    queryStrings: [],
     size: ROWS_COUNT, // This will allow us to fetch number of rows using solr query.
     sort: [{ field: "score", order: "desc" }],
+    highlights: [
+      {
+        filter: ["*"],
+        pre: '<span class="highlight">',
+        post: "</span>",
+        hl: "on",
+        indent: "on",
+      },
+    ],
+    queryString: {},
+    from: 0,
   };
 
   if (params != null) {
-    const searchQuery = params.get("everything");
+    if (params && params.get("start")) {
+      const urlStartParam = params.get("start");
+      const urlStart = parseInt(urlStartParam, 10);
+
+      if (!isNaN(urlStart)) {
+        openingQuery.from = urlStart;
+      }
+    }
+
+    const searchQuery = params.get("everything")
+      ? params.get("everything")
+      : "*";
+
+    // if (params.get("cito_Catalog")) {
+    //   openingQuery.queryStrings.push({
+    //     queryString: `${params.get("cito_Catalog")}`,
+    //     fields: [{ field: "cito_Catalog", operator: "OR" }],
+    //   });
+    // }
 
     if (params.get("cito_Catalog")) {
       openingQuery.must.push({
@@ -40,19 +70,23 @@ function quickSearch(params) {
       });
     }
 
-    if (searchQuery != "") {
-      openingQuery.must.push({
-        term: {
-          default_search_field: searchQuery,
-        },
-      });
-    } else {
-      openingQuery.must.push({
-        term: {
-          default_search_field: "*",
-        },
-      });
-    }
+    // if (params.get("object_type")) {
+    //   console.log("jjs", params.get("object_type"));
+    //   openingQuery.queryStrings.push({
+    //     queryString: `${params.get("object_type")}`,
+    //     fields: [{ field: "object_type", operator: "OR" }],
+    //   });
+    // }
+
+    // openingQuery.queryStrings.push({
+    //   queryString: searchQuery,
+    //   fields: [{ field: "default_search_field", operator: "OR" }],
+    // });
+
+    openingQuery.queryString = {
+      queryString: searchQuery,
+      defaultField: "default_search_field",
+    };
   }
 
   return {
@@ -71,7 +105,30 @@ function advanceSearch(params) {
       { field: "started_date_sort", order: "asc" },
       { field: "score", order: "desc" },
     ],
+    highlights: [],
+    from: 0,
   };
+
+  if (params && params.get("start")) {
+    const urlStartParam = params.get("start");
+    const urlStart = parseInt(urlStartParam, 10);
+
+    if (!isNaN(urlStart)) {
+      openingQuery.from = urlStart;
+    }
+  }
+
+  const contents = getContentFields();
+
+  if (contents.length > 0) {
+    openingQuery.highlights.push({
+      filter: contents,
+      pre: '<span class="highlight">',
+      post: "</span>",
+      hl: "on",
+      indent: "on",
+    });
+  }
 
   if (params != null) {
     // Define an array of objects that map parameter names to query configurations
@@ -311,6 +368,13 @@ function advanceSearch(params) {
       }
     });
 
+    if (params.get("col_cat")) {
+      openingQuery.queryStrings.push({
+        queryString: `"${params.get("col_cat")}"`,
+        fields: [{ field: "cito_Catalog", operator: "AND" }],
+      });
+    }
+
     if (params.get("let_ima") == "true") {
       openingQuery.queryStrings.push({
         queryString: "*",
@@ -321,9 +385,7 @@ function advanceSearch(params) {
     if (params.get("let_trans") == "true") {
       openingQuery.queryStrings.push({
         queryString: "*",
-        fields: [
-          { field: "manifestation-urlOfTranscription", operator: "AND" },
-        ],
+        fields: [{ field: "ox_urlOfTranscription", operator: "AND" }],
       });
     }
 
@@ -403,7 +465,10 @@ function advanceSearch(params) {
         queryString: params.get("let_pap_typ_tex"),
         fields: [{ field: "manifestation-paper_type", operator: "OR" }],
       });
-    } else if (params.get("let_pap_type") && params.get("let_seal") == "true") {
+    } else if (
+      params.get("let_pap_typ") &&
+      params.get("let_pap_typ") == "true"
+    ) {
       openingQuery.queryStrings.push({
         queryString: "*",
         fields: [{ field: "manifestation-paper_type", operator: "OR" }],
@@ -421,24 +486,21 @@ function advanceSearch(params) {
     ) {
       openingQuery.queryStrings.push({
         queryString: "*",
-        fields: [{ field: "manifestation-paper_type", operator: "OR" }],
+        fields: [{ field: "manifestation-paper_size", operator: "OR" }],
       });
     }
 
     if (params.get("let_page_min") && params.get("let_page_min") != "") {
       openingQuery.query.range = {
-        "manifestation-paper_size": {
+        "manifestation-pages_number": {
           gte: params.get("let_page_min"),
           lte: "*",
         },
       };
-    } else if (
-      params.get("let_pap_siz") &&
-      params.get("let_pap_siz") == "true"
-    ) {
+    } else if (params.get("let_page") && params.get("let_page") == "true") {
       openingQuery.queryStrings.push({
         queryString: "*",
-        fields: [{ field: "manifestation-paper_type", operator: "OR" }],
+        fields: [{ field: "manifestation-pages_number", operator: "OR" }],
       });
     }
 
@@ -489,6 +551,48 @@ function advanceSearch(params) {
       });
     }
 
+    if (params.get("mail_origin-location")) {
+      openingQuery.must.push({
+        field: "mail_origin-location",
+        value: `*${params.get("mail_origin-location")}*`,
+      });
+    }
+
+    if (params.get("mail_destination-location")) {
+      openingQuery.must.push({
+        field: "mail_destination-location",
+        value: `*${params.get("mail_destination-location")}*`,
+      });
+    }
+
+    if (params.get("dcterms_references-location")) {
+      openingQuery.must.push({
+        field: "dcterms_references-location",
+        value: `*${params.get("dcterms_references-location")}*`,
+      });
+    }
+
+    if (params.get("frbr_creator-person")) {
+      openingQuery.must.push({
+        field: "frbr_creator-person",
+        value: `*${params.get("frbr_creator-person")}*`,
+      });
+    }
+
+    if (params.get("dcterms_references-person")) {
+      openingQuery.must.push({
+        field: "dcterms_references-person",
+        value: `*${params.get("dcterms_references-person")}*`,
+      });
+    }
+
+    if (params.get("mail_recipient-person")) {
+      openingQuery.must.push({
+        field: "mail_recipient-person",
+        value: `*${params.get("mail_recipient-person")}*`,
+      });
+    }
+
     if (params.get("ox_started-ox_year")) {
       openingQuery.must.push({
         field: "ox_started-ox_year",
@@ -516,13 +620,22 @@ function advanceSearch(params) {
     const toDay = params.get("dat_to_day");
 
     if (sinYear) {
-      openingQuery.queryStrings.push({
-        queryString: sinYear,
-        fields: [
-          { field: "ox_started-ox_year", operator: "OR" },
-          { field: "ox_completed-ox_year", operator: "OR" },
-        ],
-      });
+      if (sinYear == "Unknown year") {
+        openingQuery.query.range = {
+          started_date_sort: {
+            lte: "9999-12-31T00:00:00Z",
+            gte: "9999-1-1T00:00:00Z",
+          },
+        };
+      } else {
+        openingQuery.queryStrings.push({
+          queryString: sinYear,
+          fields: [
+            { field: "ox_started-ox_year", operator: "OR" },
+            { field: "ox_completed-ox_year", operator: "OR" },
+          ],
+        });
+      }
     }
 
     if (sinMonth) {
@@ -537,7 +650,7 @@ function advanceSearch(params) {
 
     if (sinDay) {
       openingQuery.queryStrings.push({
-        queryString: sinMonth,
+        queryString: sinDay,
         fields: [
           { field: "ox_started-ox_day", operator: "OR" },
           { field: "ox_completed-ox_day", operator: "OR" },
@@ -596,4 +709,82 @@ function generateTimestamp(year, month, day, range = "from") {
   }
 
   return date;
+}
+
+function getContentFields() {
+  let contentFields = [];
+  const multiSearchFields = getMultiSearchFields();
+  if (multiSearchFields.hasOwnProperty("let_con")) {
+    contentFields = multiSearchFields["let_con"];
+  }
+  return contentFields;
+}
+
+function getMultiSearchFields() {
+  const multiSearchFields = {};
+
+  // Letter contents
+  multiSearchFields["let_con"] = [
+    "dcterms_abstract",
+    "ox_keywords",
+    "ox_incipit",
+    "ox_excipit",
+    "mail_postScript",
+  ];
+
+  // People: authors or senders
+  multiSearchFields["people"] = [
+    "person-author",
+    "person-recipient",
+    "person-mentioned",
+  ];
+
+  multiSearchFields["people_gend"] = [
+    "person-author-gender",
+    "person-recipient-gender",
+    "person-mentioned-gender",
+  ];
+
+  multiSearchFields["people_roles"] = [
+    "person-author-roles",
+    "person-addressee-roles",
+    "person-mentioned-roles",
+  ];
+
+  multiSearchFields["agent_org"] = [
+    "person-author-organisation",
+    "person-recipient-organisation",
+    "person-mentioned-organisation",
+  ];
+
+  // Places: origins or destinations
+  multiSearchFields["locations"] = [
+    "location-origin",
+    "location-destination",
+    "location-mentioned",
+  ];
+
+  // Manifestations with enclosures (letters and non-letters)
+  multiSearchFields["let_with_en_tex"] = [
+    "manifestation-enclosure",
+    "manifestation-non_letter_enclosures",
+  ];
+
+  // Single dates - can be START or END of date range
+  multiSearchFields["dat_sin_year"] = [
+    "ox_started-ox_year",
+    "ox_completed-ox_year",
+  ];
+
+  multiSearchFields["dat_sin_month"] = [
+    "ox_started-ox_month",
+    "ox_completed-ox_month",
+  ];
+
+  multiSearchFields["dat_sin_day"] = [
+    "ox_started-ox_day",
+    "ox_completed-ox_day",
+  ];
+
+  return multiSearchFields;
 }

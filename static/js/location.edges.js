@@ -1,9 +1,10 @@
 import emlo from "./edges.js";
+let current_search_letter = "a";
 
 try {
   // Fetching URL params
   const queryString = window.location.search;
-  let current_search_letter = "a"; // Setting this as default a
+  // Setting this as default a
 
   if (queryString) {
     const params = new URLSearchParams(queryString);
@@ -116,7 +117,14 @@ try {
         label: "",
       }),
     }),
-
+    new emlo.AlertBox({
+      id: "alert-box",
+      category: "results",
+      renderer: new emlo.AlertBoxRenderer({
+        message: `You can select up to 10 locations using the checkboxes below, and then display associated letters.
+		                To save your selection for later use, bookmark this page.`,
+      }),
+    }),
     new emlo.ResultTable({
       id: "results",
       category: "results",
@@ -138,7 +146,7 @@ try {
             post: "",
             type: "link",
             linkHref: "uuid",
-            linkHrefPrefix: "/profile/location",
+            linkHrefPrefix: "/profile",
             valueFunction: null,
           },
           {
@@ -169,7 +177,11 @@ try {
             post: "",
             type: "multiple",
             multipleFields: [
-              { label: "Alternative names", field: "ox_locationAlternateName" },
+              {
+                label: "Alternative names",
+                field: "ox_locationAlternateName",
+                isSemiColon: true,
+              },
               { label: "Latitude", field: "geo_lat" },
               { label: "Longitude", field: "geo_long" },
             ],
@@ -195,21 +207,25 @@ function _redirectToSearch(val, res, fieldName) {
 
   // console.log("finalURL", finalUrl);
   if (val > 0) {
-    const baseURL = `/forms/advance`;
+    const baseURL = `/forms/advanced`;
     let query = "";
     const location = res["browse"];
-
+    const uuid = res["uuid"];
+    const currentPageQ = `browsing=locations&letter=${current_search_letter}`;
     switch (fieldName) {
       case "ox_totalWorksSentFromPlace":
-        query = `pla_ori_name=${location}`;
+        query = `mail_origin-location=${uuid}`;
         break;
       case "ox_totalWorksSentToPlace":
-        query = `pla_des_name=${location}`;
+        query = `mail_destination-location=${uuid}`;
         break;
       case "ox_totalWorksMentioningPlace":
-        query = `pla_ment_name=${location}`;
+        query = `dcterms_references-location=${uuid}`;
         break;
     }
+
+    query += query ? `&${currentPageQ}` : `${currentPageQ}`;
+
     const finalUrl = query ? `${baseURL}?${query}` : `${baseURL}`;
 
     return `<a href="${finalUrl}"> ${val} </a>`;

@@ -1,3 +1,18 @@
+{% block extra_stylesheets %}
+<style>
+.filter-select{
+  width: 200px;
+  margin-right: 10px;
+}
+.remove-field{
+  height: 24px;
+  margin-top: 5px;
+  margin-left: 10px;
+}
+</style>
+{% endblock %}
+
+
 <div class="panel" style="">
   <div class="row">
     <form id="search" action="/forms/" method="post">
@@ -6,7 +21,7 @@
         data-tip="Search letters for authors/senders, addressees/recipients, and people mentioned, e.g. ‘Samuel Hartlib’, ‘John Aubrey’, or ‘The Royal Society’. Search is not case sensitive.">
 
         <div class="large-11 small-10 columns">
-          <label for="people">Search people</label>
+          {# <label for="people">Search people</label>
           <input
             id="people"
             name="people"
@@ -17,11 +32,22 @@
             onfocus="textClear(this);"
             onblur="textFill(this);"
             title=""
-          />
+          /> #}
+          <div id="form-container">
+            <!-- Dynamic fields will be added here -->
+          </div>
         </div>
         {% include './components/common/help_icon.jinja2' %}
       </div>
       {# Search people - Ends #}
+      <div>
+        <div
+          class="large-11 small-10 columns"
+          style="justify-content: end; display: flex"
+        >
+          <a id="add-field"> Add more people </a>
+        </div>
+      </div>
 
       {# Search year - Starts #}
       <div>
@@ -177,3 +203,165 @@
     }
   </script>
 </div>
+
+{% block extra_js_bottom %} 
+<script>
+  // DOM elements
+  const formContainer = document.getElementById("form-container");
+  const addFieldButton = document.getElementById("add-field");
+  let fieldCount = 0;
+
+  // Options for the dropdown with placeholders
+  const selectOptions = [
+    { display: "People", value: "people", placeholder: "all people" },
+    { display: "Sender", value: "aut", placeholder: "all sender" },
+    { display: "Receiver", value: "rec", placeholder: "all receiver" },
+    { display: "Mentioned", value: "ment", placeholder: "all people mentioned" },
+  ];
+
+  // Create a select element with options (excluding already selected ones)
+  const createSelectElement = (name, inputElement) => {
+    const select = document.createElement("select");
+    select.setAttribute("name", name);
+    select.setAttribute("id" , name)
+    select.classList.add("filter-select");
+
+    // Collect already chosen values
+    const chosenValues = Array.from(document.querySelectorAll(".filter-select"))
+                              .map(s => s.value);
+
+    // Add options, excluding chosen ones
+    selectOptions.forEach((option) => {
+      if (!chosenValues.includes(option.value)) {
+        const optionElement = document.createElement("option");
+        optionElement.value = option.value;
+        optionElement.textContent = option.display;
+        select.appendChild(optionElement);
+      }
+    });
+
+    // Set initial placeholder for the input
+    if (inputElement && select.options.length > 0) {
+      const selectedOption = selectOptions.find(o => o.value === select.value);
+      if (selectedOption) {
+        inputElement.value = selectedOption.placeholder;
+        inputElement.dataset.default = selectedOption.placeholder;
+      }
+    }
+
+    // Add onchange event to update the input's placeholder
+    select.addEventListener("change", () => {
+      const selectedOption = selectOptions.find(
+        (option) => option.value === select.value
+      );
+      if (selectedOption) {
+        inputElement.value = selectedOption.placeholder;
+        inputElement.dataset.default = selectedOption.placeholder;
+      }
+    });
+
+    return select;
+  };
+
+  // Create an input element
+  const createInputElement = (name) => {
+    const input = document.createElement("input");
+    input.setAttribute("id", name);
+    input.setAttribute("name", name);
+    input.setAttribute("type", "text");
+    input.setAttribute("value", "");
+    input.setAttribute("data-default", "");
+    input.addEventListener("focus", () => textClear(input));
+    input.addEventListener("blur", () => textFill(input));
+    input.classList.add("text");
+    return input;
+  };
+
+  // Create remove button
+  const createRemoveButton = (fieldDiv) => {
+    const btn = document.createElement("img");
+    btn.src = "/static/img/icon-close.png"
+    btn.classList.add("remove-field");
+    btn.addEventListener("click", () => {
+      fieldDiv.remove();
+      updateSelectOptions();
+    });
+    return btn;
+  };
+
+  // Update select options after removal
+  const updateSelectOptions = () => {
+    document.querySelectorAll(".dynamic-field").forEach((field) => {
+      const select = field.querySelector("select");
+      const input = field.querySelector("input");
+      const currentValue = select.value;
+
+      // Clear and rebuild options
+      select.innerHTML = "";
+      const chosenValues = Array.from(document.querySelectorAll(".filter-select"))
+                                .map(s => s.value)
+                                .filter(v => v !== currentValue);
+
+      selectOptions.forEach((option) => {
+        if (!chosenValues.includes(option.value) || option.value === currentValue) {
+          const optionElement = document.createElement("option");
+          optionElement.value = option.value;
+          optionElement.textContent = option.display;
+          select.appendChild(optionElement);
+        }
+      });
+
+      // Restore selected value
+      select.value = currentValue;
+      
+    });
+  };
+
+  // Create a new field
+  const createField = () => {
+    // Check last field has a value before adding
+    if (fieldCount > 0) {
+      const lastInput = document.querySelector(`#filter_value_${fieldCount - 1}`);
+      if (!lastInput || lastInput.value === "" || lastInput.value === lastInput.dataset.default) {
+        alert("Please fill the previous field before adding a new one.");
+        return;
+      }
+      console.log("fieldCount" , fieldCount , document.querySelector(`#filter_type_${fieldCount - 1}`))
+      // Disable last select
+      document.querySelector(`#filter_type_${fieldCount - 1}`).disabled = true;
+    }
+
+    // Create the container div for the field
+    const fieldDiv = document.createElement("div");
+    fieldDiv.classList.add("flex", "dynamic-field");
+
+    // Create input element
+    const input = createInputElement(`filter_value_${fieldCount}`);
+
+    // Create select element and pass the input element to set its placeholder
+    const select = createSelectElement(`filter_type_${fieldCount}`, input);
+
+    // Create remove button
+    const removeBtn = createRemoveButton(fieldDiv);
+
+    // Append elements to field
+    fieldDiv.appendChild(select);
+    fieldDiv.appendChild(input);
+    fieldDiv.appendChild(removeBtn);
+
+    // Append field to container
+    formContainer.appendChild(fieldDiv);
+
+    // Increment count
+    fieldCount++;
+
+    updateSelectOptions();
+  };
+
+  // Add the initial field
+  createField();
+
+  // Event listener for adding new fields
+  addFieldButton.addEventListener("click", createField);
+</script>
+{% endblock extra_js_bottom %}

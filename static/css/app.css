@@ -10603,7 +10603,7 @@ button.tiny {
   padding: 12px 22px;
   font-size: 1.25rem;
   font-weight: bold;
-  border: 1px solid #EFC319;
+  border: 1px solid #efc319;
   background: #fff;
   color: #172854;
 }
@@ -10611,4 +10611,8 @@ button.tiny {
 .clear-all-button:hover {
   background: #fff;
   color: #172854;
+}
+
+.flex {
+  display: flex;
 }

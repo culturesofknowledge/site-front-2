@@ -1986,7 +1986,7 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
               <span data-val='${filt.field}'  style="width:100px">
               ${this._getDisplayValue(filt.field, filt.display)}
               </span>
-              <span style="widht:50px">
+              <span style="margin-left:15px;widht:50px">
                 <img class="facet" src="../../static/img/minus-facet.png" style="height:15px;" />
               </span>
             </td>

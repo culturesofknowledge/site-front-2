@@ -258,12 +258,6 @@ function advanceSearch(params) {
         ],
       },
       {
-        param: "let_type",
-        queryStringFields: [
-          { field: "manifestation-doc_type", operator: "OR" },
-        ],
-      },
-      {
         param: "let_lang",
         queryStringFields: [{ field: "dcterms_language", operator: "OR" }],
       },
@@ -372,6 +366,13 @@ function advanceSearch(params) {
       openingQuery.queryStrings.push({
         queryString: `"${params.get("col_cat")}"`,
         fields: [{ field: "cito_Catalog", operator: "AND" }],
+      });
+    }
+
+    if (params.get("let_type")) {
+      openingQuery.queryStrings.push({
+        queryString: `"${params.get("let_type")}"`,
+        fields: [{ field: "manifestation-doc_type", operator: "AND" }],
       });
     }
 

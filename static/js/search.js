@@ -682,33 +682,60 @@ function advanceSearch(params) {
   };
 }
 
-function generateTimestamp(year, month, day, range = "from") {
-  // Use year 1 if 'from' and year 9999 if 'to' when the year is not provided
-  if (!year) {
-    year = range === "from" ? 1 : 9999;
-  }
+// function generateTimestamp(year, month, day, range = "from") {
+//   // Use year 1 if 'from' and year 9999 if 'to' when the year is not provided
+//   if (!year) {
+//     year = range === "from" ? 1 : 9999;
+//   }
 
-  if (!month) {
-    month = range === "from" ? 1 : 12;
-  }
+//   if (!month) {
+//     month = range === "from" ? 1 : 12;
+//   }
+
+//   if (!day) {
+//     day = range === "from" ? 1 : 31;
+//   }
+
+//   let date;
+
+//   if (range === "from") {
+//     // Create date object for the start of the day (00:00:00)
+//     date = `${year}-${month}-${day}T00:00:00Z`;
+//   } else if (range === "to") {
+//     // Create date object for the end of the day (23:59:59)
+//     date = `${year}-${month}-${day}T23:59:59Z`;
+//   } else {
+//     throw new Error("Range must be either 'from' or 'to'");
+//   }
+
+//   return date;
+// }
+
+function generateTimestamp(year, month, day, range = "from") {
+  if (!year) year = range === "from" ? 1 : 9999;
+  if (!month) month = range === "from" ? 1 : 12;
 
   if (!day) {
-    day = range === "from" ? 1 : 31;
+    if (range === "from") {
+      day = 1;
+    } else {
+      // get last day of the month
+      day = new Date(year, month, 0).getDate();
+    }
   }
 
-  let date;
+  // zero pad year, month, day
+  const yyyy = String(year).padStart(4, "0");
+  const mm = String(month).padStart(2, "0");
+  const dd = String(day).padStart(2, "0");
 
   if (range === "from") {
-    // Create date object for the start of the day (00:00:00)
-    date = `${year}-${month}-${day}T00:00:00Z`;
+    return `${yyyy}-${mm}-${dd}T00:00:00Z`;
   } else if (range === "to") {
-    // Create date object for the end of the day (23:59:59)
-    date = `${year}-${month}-${day}T23:59:59Z`;
+    return `${yyyy}-${mm}-${dd}T23:59:59Z`;
   } else {
     throw new Error("Range must be either 'from' or 'to'");
   }
-
-  return date;
 }
 
 function getContentFields() {

@@ -1265,7 +1265,7 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
   }
 
   syncObjects(obj1, obj2) {
-    const fields = ["must", "queryStrings", "queryString"];
+    const fields = ["must", "queryStrings", "queryString", "query"];
 
     fields.forEach((field) => {
       // Skip if obj2[field] is missing or empty

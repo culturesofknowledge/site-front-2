@@ -1,5 +1,5 @@
 {
-  "people_gend" : "People gend",
+  "people_gend": "People gend",
   "people_roles": "People roles",
   "aut": "Author",
   "author_sort": "Author",
@@ -30,8 +30,8 @@
   "let_shel": "Shelfmark",
   "let_pe": "Has printed editions",
   "let_pe_tex": "Printed editions",
-  "let_with_en": "Enclosed",
-  "let_en": "Encloses",
+  "let_with_en": "Has enclosure",
+  "let_en": "Is enclosure’",
   "let_pap_siz": "Has paper size",
   "let_pap_siz_tex": "Paper size",
   "let_pap_typ": "Has paper type",

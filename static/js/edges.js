@@ -2084,16 +2084,18 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
 
       // Fetch names asynchronously
       this._fetchNamesSelected(value, collectionName).then((names) => {
-        if (names) {
-          // Find all matching elements dynamically and update their content
-          document
-            .querySelectorAll(`[data-val="${edges.util.escapeHtml(field)}"]`)
-            .forEach((el) => {
-              el.innerHTML = `
+        // Find all matching elements dynamically and update their content
+        document
+          .querySelectorAll(`[data-val="${edges.util.escapeHtml(field)}"]`)
+          .forEach((el) => {
+            el.innerHTML = `${
+              names
+                ? `
                 ${edges.util.escapeHtml(names)}
-              `;
-            });
-        }
+              `
+                : `${value}`
+            }`;
+          });
       });
 
       return placeholder;

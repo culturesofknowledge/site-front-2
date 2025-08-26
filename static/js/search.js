@@ -662,13 +662,13 @@ function advanceSearch(params) {
     let fromDate,
       toDate = "";
 
-    if (fromYear || fromMonth || fromDay) {
-      fromDate = generateTimestamp(fromYear, fromMonth, fromDay);
-    }
+    // if (fromYear || fromMonth || fromDay) {
+    fromDate = generateTimestamp(fromYear, fromMonth, fromDay);
+    // }
 
-    if (toYear || toMonth || toDay) {
-      toDate = generateTimestamp(toYear, toMonth, toDay, "to");
-    }
+    // if (toYear || toMonth || toDay) {
+    toDate = generateTimestamp(toYear, toMonth, toDay, "to");
+    // }
 
     if (fromDate && toDate) {
       openingQuery.query.range = {

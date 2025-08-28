@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, jsonify
+from flask import Blueprint, render_template, jsonify, send_from_directory
 import requests
 import json
+import os
 
 home_bp = Blueprint('home', __name__)
 
@@ -31,6 +32,7 @@ def home():
         print(f"Error loading JSON: {e}")
     return render_template('home.jinja2', title="Home" , curated = len(curated) , starter = len(starter), image_limit=image_limit)
 
+
 @home_bp.route('/catalogues')
 def load_catalogues():
     api_url = "http://emlo-portal.bodleian.ox.ac.uk/collections/?json_route=/posts&type[]=catalogue&type[]=post&filter[orderby]=data&filter[order]=DESC&filter[posts_per_page]=3"
@@ -39,3 +41,9 @@ def load_catalogues():
         return jsonify(response.json())  # Return API data as JSON
     else:
         return jsonify({"error": "Failed to fetch data"}), 500
+
+
+@home_bp.route('/img/<filename>')
+def img(filename):
+    """Serve stock images"""
+    return send_from_directory(os.path.join('static', 'img'), filename)

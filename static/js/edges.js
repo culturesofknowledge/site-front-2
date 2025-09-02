@@ -4424,7 +4424,9 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
           ["work"].includes(this.profileType) ? "" : "margin-bottom:20px;"
         }">
           <img class="opacity50 icon-tweak" src="../../static/img/icon-send-comment.png" alt="short-url" />
-          <a href=/comment/index?id=${result.uuid}> Send Comment </a>
+          <!-- <a href=/comment/index?id=${result.uuid}> Send Comment </a> -->
+          <a href=/about#contact> Send Comment </a>
+          
         </p>
 
 

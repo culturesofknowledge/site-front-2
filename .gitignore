@@ -6,8 +6,6 @@ __pycache__/
 .idea/shelf/
 .env
 .idea/*
-docker-emlo/*
-indexer/*
 
 # file for the Gradle or Maven based projects
 .idea/modules.xml

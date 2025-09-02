@@ -30,7 +30,10 @@ docker-compose start indexer
 
 It will then run the indexer.
 
-You can look at the logs in `docker-compose logs -f indexer`
+You can look at the logs in either
+
+* the docker logs `docker-compose logs -f indexer` 
+* the log file in `CSV_FOLDER_IMPORT_PATH`/`indexer.log`
 
 It may take a few hours to complete the indexing process.
 

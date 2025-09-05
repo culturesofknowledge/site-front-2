@@ -10612,3 +10612,9 @@ button.tiny {
   background: #fff;
   color: #172854;
 }
+
+#remove-message{
+  color: red;
+  font-size: 14px;
+  margin-bottom: 5px;
+}

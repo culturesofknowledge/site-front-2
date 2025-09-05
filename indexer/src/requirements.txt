@@ -1,5 +1,5 @@
 python-dotenv
-solrpy
+solrpy @ git+https://github.com/search5/solrpy@4cb8c6ea3fbd4f64b78dd300aa637e0de05aeb45
 pysolr
 redis
 feedparser

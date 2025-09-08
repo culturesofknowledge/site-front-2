@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 import smtplib
 from email.mime.text import MIMEText
+import requests
 
 comment_bp = Blueprint('comment', __name__, url_prefix='/comment')
 
@@ -18,7 +19,6 @@ EMAIL_TO_PASS = os.getenv("EMAIL_TO_PASS")
 
 @comment_bp.route('/index')
 def index():
-    print(f"Got site key as {RECAPTCHA_SITE_KEY}")
     return render_template('comment.jinja2', title="Comment" , recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
 
@@ -31,6 +31,7 @@ def send_comment():
     name = request.form.get("name", "").strip()
     email = request.form.get("email", "").strip()
     comment = request.form.get("comment", "").strip()
+    object_type = request.form.get("type", "").strip()
     g_recaptcha_response = request.form.get("g-recaptcha-response", "").strip()
 
 
@@ -53,20 +54,25 @@ def send_comment():
         "response": g_recaptcha_response,
         "remoteip": request.remote_addr
     }
+
     try:
         captcha_res = requests.post(captcha_url, data=captcha_data)
         captcha_result = captcha_res.json()
-    except Exception:
-        return jsonify(success=False, message="Captcha verification failed, please try again."), 400
+    except Exception as e:
+        return jsonify(success=False, message="Captcha verification failed, because of an error."), 500
 
     if not captcha_result.get("success"):
         return jsonify(success=False, message="Captcha validation failed, please try again."), 400
+
+    type = object_type
+    if object_type == "institution":
+        type = "repository"
 
     # Step 3: Construct email body
     email_body = (
         "Email via EMLO website\n"
         "======================\n\n"
-        f"Comment on record: http://emlo.bodleian.ox.ac.uk/profile/record/{id}\n\n"
+        f"Comment on record: http://emlo.bodleian.ox.ac.uk/profile/{type}/{id}\n\n"
         f"From: {name}\n"
         f"Email: {email}\n\n"
         f"Message:\n{comment}\n"
@@ -80,10 +86,8 @@ def send_comment():
 
     try:
         with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT) as server:
-            print(f"Hello {EMAIL_TO_PASS}")
             server.login(EMAIL_TO, EMAIL_TO_PASS)
             server.send_message(msg)
-            print("✅ Email sent successfully")
     except Exception as e:
         return jsonify(success=False, message=f"Error sending email: {e}"), 500
 

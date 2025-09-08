@@ -572,9 +572,9 @@ emlo.ResultTable = class extends edges.Component {
 
     // --- REMOVE MODAL AFTER OPERATION ---
     setTimeout(() => {
-      let doc = document.getElementById("remove-message")
-      if(doc) {
-        doc.style.display = "none"
+      let doc = document.getElementById("remove-message");
+      if (doc) {
+        doc.style.display = "none";
       }
     }, 500); // remove after 0.5s for a smooth UX
   }
@@ -1291,10 +1291,9 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
     // modalOverlay.appendChild(modal);
     // document.body.appendChild(modalOverlay);
 
-
-    let doc = document.getElementById("remove-message")
-    if(doc) {
-      doc.style.display = "block"
+    let doc = document.getElementById("remove-message");
+    if (doc) {
+      doc.style.display = "block";
     }
 
     // --- EXECUTE FILTER REMOVAL ---
@@ -4497,9 +4496,7 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
           ["work"].includes(this.profileType) ? "" : "margin-bottom:20px;"
         }">
           <img class="opacity50 icon-tweak" src="../../static/img/icon-send-comment.png" alt="short-url" />
-          <!-- <a href=/comment/index?id=${result.uuid}> Send Comment </a> -->
-          <a href=/about#contact> Send Comment </a>
-          
+          <a href=/comment/index?id=${result.uuid}> Send Comment </a>           
         </p>
 
 

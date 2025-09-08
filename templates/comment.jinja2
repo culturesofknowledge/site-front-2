@@ -2,67 +2,101 @@
 
 {% block title %}Comment{% endblock %}
 
+{% block extra_stylesheets %}
+<style>
+.grecaptcha-badge {
+    position: relative !important;  /* detach from bottom-right */
+    margin-top: 15px;               /* add some spacing */
+}
+
+</style>
+{% endblock %}
 
 {% block content %}
     <div class="row">
-        <div class="large-2 columns"><!-- dummy column -->&nbsp;</div>
+  <div class="large-2 columns"><!-- dummy column -->&nbsp;</div>
 
-        <div class="large-10 columns" style="padding-left:25px">
-            <br>
-            <div id="comment_heading">
-			    <h3>
-                    Please complete the form below if you wish to comment on any 
-                    aspect of this record. We will be sent the unique ID/URL of the record 
-                    alongside your remarks and will get back to you as soon as we can.
-                </h3>
-            </div>
-            <br>
-            
-            <div id="form-section">
-                <form id="commentForm">
-
-				    <div>
-                        <label style="width:150px;">To:</label> &nbsp; 
-                        <strong>Early Modern Letters Online</strong>
-                    </div>
-                    
-                    <br />
-
-                    <div>
-                        <label style="width:150px;">Subject:</label> &nbsp; 
-                        <span>Comment on EMLO record</span>
-                    </div>
-		
-                    <br />
-
-                    <label for="name" style="width:150px;">Your name:</label>
-                    <input type="text" name="name" id="name">
-
-                    <label for="email" style="width:150px;">Your e-mail address:</label>
-                    <input type="text" name="email" id="email">
-
-				    <label for="comment" class="floatleft" style="width:150px;">Your comment:</label>
-                    <textarea name="comment" id="comment" rows="10" cols="50" class="floatleft;" style="margin-left:3px; padding:10px; font-family: 'coustard', 'times new roman', 'times', serif;"></textarea>
-
-
-				    <input type="hidden" id="id" name="id" value="">
-                    <input type="hidden" id="object_type" name="type" value="">
-
-                    <!-- Google Captcha -->
-				    <label for="g-recaptcha-response">Captcha:</label>
-                    <!-- Google Captcha -->
-                    <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
-
-                    <!-- message placeholder -->
-                    <div id="formMessage" style="margin-top:15px; font-weight:bold;"></div>
-
-				    <br>
-
-                    <input type="submit" class="button submit" value="Send">
-			    </form>
-            </div>
-        </div>  
+  <div class="large-10 columns" style="padding-left: 25px">
+    <br />
+    <div id="comment_heading">
+      <h3>
+        Please complete the form below if you wish to comment on any aspect of
+        this record. We will be sent the unique ID/URL of the record alongside
+        your remarks and will get back to you as soon as we can.
+      </h3>
     </div>
+    <br />
+
+    <div id="form-section">
+      <form id="commentForm">
+        <div>
+          <label style="width: 150px">To:</label> &nbsp;
+          <strong>Early Modern Letters Online</strong>
+        </div>
+
+        <br />
+
+        <div>
+          <label style="width: 150px">Subject:</label> &nbsp;
+          <span>Comment on EMLO record</span>
+        </div>
+
+        <br />
+
+        <label for="name" style="width: 150px">Your name:</label>
+        <input type="text" name="name" id="name" />
+
+        <label for="email" style="width: 150px">Your e-mail address:</label>
+        <input type="text" name="email" id="email" />
+
+        <label for="comment" class="floatleft" style="width: 150px"
+          >Your comment:</label
+        >
+        <textarea
+          name="comment"
+          id="comment"
+          rows="10"
+          cols="50"
+          class="floatleft;"
+          style="
+            margin-left: 3px;
+            padding: 10px;
+            font-family: 'coustard', 'times new roman', 'times', serif;
+          "
+        ></textarea>
+
+        <input type="hidden" id="id" name="id" value="" />
+        <input type="hidden" id="object_type" name="type" value="" />
+
+        <input
+          type="hidden"
+          name="g-recaptcha-response"
+          id="g-recaptcha-response"
+        />
+
+        <p style="font-size: 12px; color: #666; margin-top: 10px">
+          This site is protected by reCAPTCHA and the Google
+          <a href="https://policies.google.com/privacy" target="_blank"
+            >Privacy Policy</a
+          >
+          and
+          <a href="https://policies.google.com/terms" target="_blank"
+            >Terms of Service</a
+          >
+          apply.
+        </p>
+
+        <br />  
+
+        <input class="g-recaptcha button submit"
+          data-sitekey="{{recaptcha_site_key}}" type="submit" value="Submit" >
+
+        <!-- message placeholder -->
+        <div id="formMessage" style="margin-top: 15px; font-weight: bold"></div>
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 

@@ -19,7 +19,7 @@
             <br>
             
             <div id="form-section">
-                <form>
+                <form id="commentForm">
 
 				    <div>
                         <label style="width:150px;">To:</label> &nbsp; 
@@ -46,15 +46,19 @@
 
 
 				    <input type="hidden" id="id" name="id" value="">
-                    <input type="hidden" name="type" value="">
+                    <input type="hidden" id="object_type" name="type" value="">
 
                     <!-- Google Captcha -->
 				    <label for="g-recaptcha-response">Captcha:</label>
-				   
+                    <!-- Google Captcha -->
+                    <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+
+                    <!-- message placeholder -->
+                    <div id="formMessage" style="margin-top:15px; font-weight:bold;"></div>
 
 				    <br>
 
-                    <input type="submit" onsubmit="submitForm" class="button submit" value="Send">
+                    <input type="submit" class="button submit" value="Send">
 			    </form>
             </div>
         </div>  
@@ -63,29 +67,93 @@
 
 
 {% block extra_js_bottom %}
+<script src="https://www.google.com/recaptcha/api.js"></script>
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+    // Get record id from URL
+    function getQueryParam(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
 
-    document.addEventListener("DOMContentLoaded", () => {
-        // Function to get query parameter by name
-        function getQueryParam(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
+    const recordId = getQueryParam("id");
+    if (recordId) {
+        document.getElementById("id").value = recordId;
+        fetchRecord(recordId)
+    }
+
+    // Handle form submit
+    const form = document.getElementById("commentForm");
+    const messageBox = document.getElementById("formMessage");
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        // Clear previous messages
+        messageBox.textContent = "";
+        const errorFields = form.querySelectorAll(".field-error");
+        errorFields.forEach(el => el.remove());
+
+        // Show sending message
+        messageBox.textContent = "Sending your request...";
+        messageBox.style.color = "blue";
+
+        const formData = new FormData(form);
+
+        if (!recordId) {
+            messageBox.textContent = `Unable to complete your request because record ID or type is missing or incorrect.`;
+            messageBox.style.color = "red"; // Usually errors are red
+            return
         }
 
-        // Replace 'yourQueryParam' with the actual query parameter name
-        const queryValue = getQueryParam('id');
-        
-        // Replace 'yourFieldId' with the actual ID of the field
-        if (queryValue) {
-            const field = document.getElementById('id');
-            if (field) {
-            field.value = queryValue;
+        try {
+            const response = await fetch("/comment/send", {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await response.json()
+
+            if (response.ok && data.success) {
+                // Success
+                messageBox.textContent = data.message;
+                messageBox.style.color = "green";
+                form.reset();
+                if (typeof grecaptcha !== "undefined") grecaptcha.reset();
+            } else {
+                // Failure
+                messageBox.textContent = data.message || "Something went wrong.";
+                messageBox.style.color = "red";
+
+                if (typeof grecaptcha !== "undefined") grecaptcha.reset();
             }
+        } catch (err) {
+            console.error(err);
+            messageBox.textContent = `Failed to send. Please try again later.`;
+            messageBox.style.color = "red";
+            if (typeof grecaptcha !== "undefined") grecaptcha.reset();
         }
+
+        // Auto-hide message after 3 seconds
+        setTimeout(() => {
+            messageBox.textContent = "";
+            const errorFields = form.querySelectorAll(".field-error");
+            errorFields.forEach(el => el.remove());
+        }, 3000);
     });
 
-    function submitForm() {
-        alert("Form functionality is pending")
+    function fetchRecord(recordID) {
+        fetch(`/solr/all/select?q=${recordId}&fl=uuid,object_type&wt=json`)
+            .then(response => response.json())
+            .then(data => {
+                let typeInput =document.getElementById("object_type")
+                if (typeInput) {
+                    typeInput.value = data.response.docs[0]["object_type"];
+                }
+        })
     }
+});
+
+
 </script>
 {% endblock extra_js_bottom %}

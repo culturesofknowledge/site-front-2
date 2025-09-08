@@ -8,7 +8,6 @@
     position: relative !important;  /* detach from bottom-right */
     margin-top: 15px;               /* add some spacing */
 }
-
 </style>
 {% endblock %}
 
@@ -74,22 +73,11 @@
           id="g-recaptcha-response"
         />
 
-        <p style="font-size: 12px; color: #666; margin-top: 10px">
-          This site is protected by reCAPTCHA and the Google
-          <a href="https://policies.google.com/privacy" target="_blank"
-            >Privacy Policy</a
-          >
-          and
-          <a href="https://policies.google.com/terms" target="_blank"
-            >Terms of Service</a
-          >
-          apply.
-        </p>
-
         <br />  
 
         <input class="g-recaptcha button submit"
-          data-sitekey="{{recaptcha_site_key}}" type="submit" value="Submit" >
+          data-sitekey="{{recaptcha_site_key}}" data-callback='onSubmit' 
+        data-action='submit' type="submit" value="Submit" >
 
         <!-- message placeholder -->
         <div id="formMessage" style="margin-top: 15px; font-weight: bold"></div>
@@ -103,6 +91,64 @@
 {% block extra_js_bottom %}
 <script src="https://www.google.com/recaptcha/api.js"></script>
 <script>
+
+window.onSubmit = async function(token) {
+    const form = document.getElementById("commentForm");
+    const messageBox = document.getElementById("formMessage");
+
+    // Clear previous messages
+    messageBox.textContent = "";
+    const errorFields = form.querySelectorAll(".field-error");
+    errorFields.forEach(el => el.remove());
+
+    // Show sending message
+    messageBox.textContent = "Sending your request...";
+    messageBox.style.color = "blue";
+
+    const formData = new FormData(form);
+
+    const recordId = document.getElementById("id").value;
+    if (!recordId) {
+        messageBox.textContent = "Unable to complete your request because record ID or type is missing or incorrect.";
+        messageBox.style.color = "red";
+        return;
+    }
+
+    try {
+        const response = await fetch("/comment/send", {
+            method: "POST",
+            body: formData,
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            messageBox.textContent = data.message;
+            messageBox.style.color = "green";
+            form.reset();
+            if (typeof grecaptcha !== "undefined") grecaptcha.reset();
+        } else {
+            messageBox.textContent = data.message || "Something went wrong.";
+            messageBox.style.color = "red";
+            if (typeof grecaptcha !== "undefined") grecaptcha.reset();
+        }
+    } catch (err) {
+        console.error(err);
+        messageBox.textContent = "Failed to send. Please try again later.";
+        messageBox.style.color = "red";
+        if (typeof grecaptcha !== "undefined") grecaptcha.reset();
+    }
+
+    // Auto-hide message after 3 seconds
+    setTimeout(() => {
+        messageBox.textContent = "";
+        const errorFields = form.querySelectorAll(".field-error");
+        errorFields.forEach(el => el.remove());
+    }, 3000);
+};
+
+
+
 document.addEventListener("DOMContentLoaded", () => {
     // Get record id from URL
     function getQueryParam(name) {
@@ -120,60 +166,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("commentForm");
     const messageBox = document.getElementById("formMessage");
 
-    form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        // Clear previous messages
-        messageBox.textContent = "";
-        const errorFields = form.querySelectorAll(".field-error");
-        errorFields.forEach(el => el.remove());
-
-        // Show sending message
-        messageBox.textContent = "Sending your request...";
-        messageBox.style.color = "blue";
-
-        const formData = new FormData(form);
-
-        if (!recordId) {
-            messageBox.textContent = `Unable to complete your request because record ID or type is missing or incorrect.`;
-            messageBox.style.color = "red"; // Usually errors are red
-            return
-        }
-
-        try {
-            const response = await fetch("/comment/send", {
-                method: "POST",
-                body: formData,
-            });
-
-            const data = await response.json()
-
-            if (response.ok && data.success) {
-                // Success
-                messageBox.textContent = data.message;
-                messageBox.style.color = "green";
-                form.reset();
-                if (typeof grecaptcha !== "undefined") grecaptcha.reset();
-            } else {
-                // Failure
-                messageBox.textContent = data.message || "Something went wrong.";
-                messageBox.style.color = "red";
-
-                if (typeof grecaptcha !== "undefined") grecaptcha.reset();
-            }
-        } catch (err) {
-            console.error(err);
-            messageBox.textContent = `Failed to send. Please try again later.`;
-            messageBox.style.color = "red";
-            if (typeof grecaptcha !== "undefined") grecaptcha.reset();
-        }
-
-        // Auto-hide message after 3 seconds
-        setTimeout(() => {
-            messageBox.textContent = "";
-            const errorFields = form.querySelectorAll(".field-error");
-            errorFields.forEach(el => el.remove());
-        }, 3000);
+    form.addEventListener("submit", function(e){
+        e.preventDefault();  // Prevent default form submission
+        onSubmit();          // Call your async handler
     });
 
     function fetchRecord(recordID) {

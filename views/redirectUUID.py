@@ -29,6 +29,10 @@ def index(id):
 
     object_type = solr_data['response']['docs'][0]['object_type']
 
+
+    if object_type == "institution":
+        object_type = "repository"
+
     return redirect(url_for("profile.profile", collection=object_type, id=id), code=301)
    
 

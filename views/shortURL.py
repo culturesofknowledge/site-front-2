@@ -48,7 +48,7 @@ def query_solr(core, solr_query):
 REDIRECT_COLLECTION_MAP = {
     "p": "person",  # Person profile
     "w": "work",     # Work profile
-    "r": "institution",  # Institution profile
+    "r": "repository",  # Institution profile
     "l": "location",  # Location profile
     "i" : "image",
     "c" : "comment",

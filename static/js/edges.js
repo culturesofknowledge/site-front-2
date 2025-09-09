@@ -1603,7 +1603,7 @@ emlo.FacetRenderer = class extends edges.Renderer {
             .querySelectorAll(`[data-key*="${name.uuid}"]`)
             .forEach((el) => {
               // Protecting this from selected facet rendering since this is taken care there
-              if (el.dataset.field && el.dataset.field == "uuid_related") {
+              if (el.dataset.render && el.dataset.render == "selected") {
                 return;
               }
               el.innerHTML = `
@@ -2053,7 +2053,7 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
 
           <td class="${filterRemoveClass} selected-facets" data-key='${
         filt.term
-      }' data-field='${filt.field}' >
+      }' data-field='${filt.field}' data-render="selected">
               <span data-val='${filt.field}'  style="width:100px">
               ${this._getDisplayValue(filt.field, filt.display)}
               </span>

@@ -4291,7 +4291,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       }
 
       if (shortURL) {
-        htmlContent += `<li class="footer-links"><a href="${currentHref}">${shortURL}</a></li>`;
+        htmlContent += `<li class="footer-links"><a href="${shortURL}">${shortURL}</a></li>`;
       }
 
       htmlContent += `</ul>`;
@@ -4488,7 +4488,7 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
         }">
           <img src="../../static/img/icon-short-url.png" alt="short-url" />
           Short URL: <span id="short-url-link" class="showLink">
-            <a href=${currentHref}> ${shortURL} </a>
+            <a href=${shortURL}> ${shortURL} </a>
           </span>
         <p>
 

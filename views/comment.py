@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for
 import os
 from dotenv import load_dotenv
 import smtplib
@@ -16,10 +16,11 @@ SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.ox.ac.uk")
 SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
 EMAIL_TO = os.getenv("EMAIL_TO")
 EMAIL_TO_PASS = os.getenv("EMAIL_TO_PASS")
+SEND_A_COPY = os.getenv("SEND_A_COPY")
 
 @comment_bp.route('/index')
 def index():
-    return render_template('comment.jinja2', title="Comment" , recaptcha_site_key=RECAPTCHA_SITE_KEY)
+    return render_template('comment.jinja2', title="Comment" , recaptcha_site_key=RECAPTCHA_SITE_KEY, send_copy=SEND_A_COPY.lower())
 
 
 @comment_bp.route('/send', methods=['POST'])
@@ -33,6 +34,7 @@ def send_comment():
     comment = request.form.get("comment", "").strip()
     object_type = request.form.get("type", "").strip()
     g_recaptcha_response = request.form.get("g-recaptcha-response", "").strip()
+    send_copy = request.form.get("send_copy") 
 
 
     # Step 1: Validate inputs
@@ -79,17 +81,37 @@ def send_comment():
     )
 
     # Step 4: Send email
-    msg = MIMEText(email_body)
-    msg["Subject"] = "A comment from EMLO record"
-    msg["From"] = email
-    msg["To"] = EMAIL_TO
-
     try:
         with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT) as server:
             server.login(EMAIL_TO, EMAIL_TO_PASS)
+
+            msg = MIMEText(email_body)
+            msg["Subject"] = "A comment from EMLO record"
+            msg["From"] = email
+            msg["To"] = EMAIL_TO
             server.send_message(msg)
+
+            if send_copy: 
+                print(f"Sending email")
+                copy_msg = MIMEText(email_body)
+                copy_msg["Subject"] = "Your comment on EMLO record"
+                copy_msg["From"] = EMAIL_TO   # better to send from system email
+                copy_msg["To"] = email
+                server.send_message(copy_msg)
+
     except Exception as e:
         return jsonify(success=False, message=f"Error sending email: {e}"), 500
 
-    # Step 5: Success
-    return jsonify(success=True, message="Your comment has been sent successfully!")
+    return jsonify(success=True, message="Your comment has been sent successfully!" , object_type=object_type , uuid=id)
+
+@comment_bp.route('/thanks')
+def thanks():
+    print(f"Got control")
+    object_type = request.args.get("object_type")
+    uuid = request.args.get("uuid")
+    return render_template(
+        "thanks.jinja2",
+        title="thanks",
+        object_type=object_type,
+        uuid=uuid
+    )

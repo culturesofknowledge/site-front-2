@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for
 import os
 from dotenv import load_dotenv
 import smtplib
@@ -92,6 +92,7 @@ def send_comment():
             server.send_message(msg)
 
             if send_copy: 
+                print(f"Sending email")
                 copy_msg = MIMEText(email_body)
                 copy_msg["Subject"] = "Your comment on EMLO record"
                 copy_msg["From"] = EMAIL_TO   # better to send from system email
@@ -101,5 +102,16 @@ def send_comment():
     except Exception as e:
         return jsonify(success=False, message=f"Error sending email: {e}"), 500
 
-    # Step 5: Success
-    return jsonify(success=True, message="Your comment has been sent successfully!")
+    return jsonify(success=True, message="Your comment has been sent successfully!" , object_type=object_type , uuid=id)
+
+@comment_bp.route('/thanks')
+def thanks():
+    print(f"Got control")
+    object_type = request.args.get("object_type")
+    uuid = request.args.get("uuid")
+    return render_template(
+        "thanks.jinja2",
+        title="thanks",
+        object_type=object_type,
+        uuid=uuid
+    )

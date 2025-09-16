@@ -1,0 +1,26 @@
+{% extends "base.jinja2" %}
+
+{% block title %}Thanks{% endblock %}
+
+
+{% block content %}
+<div class="row">
+		<div class="columns hide-for-small large-2 side">
+
+		</div>
+
+		<div class="columns small-12 large-10">
+			<br/>
+			<p>Email sent - thanks for your feedback!</p>
+
+			<br/><br/>
+
+            <form method="link" action="/profile/{{object_type}}/{{uuid}}">
+            <input type="submit"  class="button submit" value="Return to Record"/></form>
+
+			<br/><br/><br/><br/>
+
+		</div>
+		
+	</div>
+{% endblock %}

@@ -65,6 +65,16 @@
           "
         ></textarea>
 
+        {% if send_copy == "yes" %}
+          <div>
+            <label style="display:block; margin-top:10px">
+              <input type="checkbox" id="send_copy" name="send_copy" value="1" checked />
+              Send me a copy of this comment
+            </label>
+          </div>
+        {% endif %}
+
+
         <input type="hidden" id="id" name="id" value="" />
         <input type="hidden" id="object_type" name="type" value="" />
 
@@ -74,12 +84,14 @@
           id="g-recaptcha-response"
         />
 
+
+
         <br />  
 
         <input class="g-recaptcha button submit"
           data-sitekey="{{recaptcha_site_key}}" data-callback='onSubmit' 
         data-action='submit' type="submit" value="Submit" >
-
+        
         <!-- message placeholder -->
         <div id="formMessage" style="margin-top: 15px; font-weight: bold"></div>
       </form>
@@ -128,6 +140,7 @@ window.onSubmit = async function(token) {
             messageBox.style.color = "green";
             form.reset();
             if (typeof grecaptcha !== "undefined") grecaptcha.reset();
+            window.location = `/comment/thanks?object_type=${data["object_type"]}&uuid=${data.uuid}`
         } else {
             messageBox.textContent = data.message || "Something went wrong.";
             messageBox.style.color = "red";

@@ -27,7 +27,7 @@
 
 	                <br>
 	                <p style="font-size:x-small;">
-						<img src="http://emlo.bodleian.ox.ac.uk/images/EMLO_404.png" style="padding:10px; background:#fff; border:1px solid #999;"/><br>
+						<img src="{{ url_for('static', filename='img/EMLO_404.png') }}" style="padding:10px; background:#fff; border:1px solid #999;"/><br>
 	                <a href="http://www.rijksmuseum.nl/collectie/RP-P-OB-7367/de-alchemist" target="_blank">Image Source: Rijksmuseum, Amsterdam. CC BY 3.0.</a></p>
 	                <br>
 	                <p>You can try the Basic and Intermediate searches on our <a href="{{base_url}}">Homepage</a>, try an <a href="{{base_url}}advanced">Advanced Search</a>, or go to <a href="{{base_url}}browse/people">Browse</a></p>
@@ -37,10 +37,10 @@
  
 					<h5><b>Try Again?</b></h5>
 					<p>I know this didn&rsquo;t work before but you may want to try searching again, only this time keep your fingers crossed!</p>
-						<form  action="{{base_url}}/forms/quick" method="get">
+						<form id="searchQuick" action="submitForm()" method="get">
 						<div class="row collapse">
 						<div class="large-5 medium-5 small-12 columns">
-						<input type="text" value="" id="s" name="s" /> 
+						<input type="text" value="" id="s" name="everything" /> 
 						</div>
 						<input class="button" type="submit" value="Search" style="float: left;padding: 7px;font-size: 16px;" />
 						</form>
@@ -57,4 +57,14 @@
 
 
 {% block extra_js_bottom %}
+<script>
+document.getElementById("searchQuick").addEventListener("submit", function(event) {
+    event.preventDefault();
+    // Other work
+	const query = document.getElementById("s").value
+	window.location = `/forms/quick?everything=${query}&search_type=quick`
+});
+
+
+</script>
 {% endblock extra_js_bottom %}

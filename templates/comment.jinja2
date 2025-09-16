@@ -65,6 +65,16 @@
           "
         ></textarea>
 
+        {% if send_copy == "yes" %}
+          <div>
+            <label style="display:block; margin-top:10px">
+              <input type="checkbox" id="send_copy" name="send_copy" value="1" checked />
+              Send me a copy of this comment
+            </label>
+          </div>
+        {% endif %}
+
+
         <input type="hidden" id="id" name="id" value="" />
         <input type="hidden" id="object_type" name="type" value="" />
 
@@ -73,6 +83,8 @@
           name="g-recaptcha-response"
           id="g-recaptcha-response"
         />
+
+
 
         <br />  
 

@@ -23,6 +23,11 @@ import indexer
 import sourceconfig_base
 # import imp
 
+# -----------------------------------------------------------------------------
+# NOTE: The transcription text file csv should be named transcription-texts.csv
+# It is used in indexer/src/AdditionalSolr.py -> AdditionalWorksData, line 130
+# -----------------------------------------------------------------------------
+
 indexer_check_file = os.path.join(sourceconfig_base.base, "need_index")
 
 def GetSelection():

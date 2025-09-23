@@ -490,6 +490,7 @@ emlo.DropDownRenderer = class extends edges.Renderer {
 emlo.Facet = class extends edges.components.RefiningANDTermSelector {
   constructor(params) {
     super(params);
+    this.fetchedAllFacets = false;
   }
 
   synchronise() {
@@ -746,12 +747,13 @@ emlo.FacetRenderer = class extends edges.Renderer {
     this.hideCount = edges.util.getParam(params, "hideCount", 0); //  this will hide the facets after mentioned count entries are selected.
     this.tooltipState = "closed";
     this.namespace = "emlo-facet-view";
-
-    this.showAll = false; // Track whether to show all entries
+    this.additionalData = [];
   }
 
   draw() {
     let ts = this.component;
+
+    console.log("ts", ts.values);
 
     if (!ts.active && this.hideInactive) {
       ts.context.html("");
@@ -762,65 +764,6 @@ emlo.FacetRenderer = class extends edges.Renderer {
       ts.context.html("");
       return;
     }
-
-    const filterRemoveClass = edges.util.allClasses(
-      this.namespace,
-      "filter-remove",
-      this.component.id
-    );
-
-    const resultsListClass = edges.util.styleClasses(
-      this.namespace,
-      "results-list",
-      this.component.id
-    );
-    const resultClass = edges.util.styleClasses(
-      this.namespace,
-      "result",
-      this.component.id
-    );
-    const controlClass = edges.util.styleClasses(
-      this.namespace,
-      "controls",
-      this.component.id
-    );
-    const facetClass = edges.util.styleClasses(
-      this.namespace,
-      "facet",
-      this.component.id
-    );
-    const headerClass = edges.util.styleClasses(
-      this.namespace,
-      "header",
-      this.component.id
-    );
-    const selectedClass = edges.util.styleClasses(
-      this.namespace,
-      "selected",
-      this.component.id
-    );
-
-    const controlId = edges.util.htmlID(
-      this.namespace,
-      "controls",
-      this.component.id
-    );
-    const sizeId = edges.util.htmlID(this.namespace, "size", this.component.id);
-    const orderId = edges.util.htmlID(
-      this.namespace,
-      "order",
-      this.component.id
-    );
-    const toggleId = edges.util.htmlID(
-      this.namespace,
-      "toggle",
-      this.component.id
-    );
-    const resultsId = edges.util.htmlID(
-      this.namespace,
-      "results",
-      this.component.id
-    );
 
     const valClass = edges.util.allClasses(
       this.namespace,
@@ -837,78 +780,35 @@ emlo.FacetRenderer = class extends edges.Renderer {
       "facet-modal",
       this.component.id
     );
-    const modalCloseId = edges.util.htmlID(
-      this.namespace,
-      "facet-modal-close",
-      this.component.id
-    );
     const modalContentId = edges.util.htmlID(
       this.namespace,
       "facet-modal-content",
       this.component.id
     );
 
-    const filterTerms = ts.filters.map((filter) =>
-      filter.term ? filter.term.toString() : ""
-    );
-
-    const filterFields = ts.filters.map((filter) =>
-      filter.field ? filter.field.toString() : ""
-    );
-
-    let uuidsToFetch = [];
-
+    // Render limited results
     let limitedResults = "";
     ts.values.forEach((val, idx) => {
       if (val.count > 0) {
         const isHidden = idx >= this.displayLimit;
-        const field = this.component.field;
-
-        let displayVal = this._displayFacetValue(field, val.term);
-
-        // Collect UUIDs for async update
-        if (
-          ["frbr_creator-person", "mail_recipient-person"].includes(field) &&
-          displayVal === "Loading"
-        ) {
-          let UUID = val.term.startsWith('"')
-            ? val.term.slice(1, -1).split("/").pop()
-            : val.term.split("/").pop();
-          if (UUID && !uuidsToFetch.includes(UUID)) {
-            uuidsToFetch.push(UUID);
-          }
-        }
+        let displayVal = this._displayFacetValue(
+          this.component.field,
+          val.term
+        );
 
         limitedResults += `
-      <tr style="${isHidden ? "display:none;" : ""}">
-        <td>
-          <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
+                <tr style="${isHidden ? "display:none;" : ""}">
+                    <td>
+                        <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
           val.term
-        )}" data-changekey="${field}${edges.util.escapeHtml(val.term)}">
-            <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
-            ${displayVal}
-          </a>
-        </td>
-        <td>${val.count}</td>
-      </tr>
-    `;
-      }
-    });
-
-    let fullResults = "";
-    ts.values.forEach((val) => {
-      if (val.count > 0) {
-        fullResults += `
-                <tr>
-                  <td>
-                  <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
+        )}" data-changekey="${this.component.field}${edges.util.escapeHtml(
           val.term
         )}">
-                  <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
-                   ${this._displayFacetValue(this.component.field, val.display)}
-                  </a>
-                  </td>
-                  <td>${val.count}</td>
+                            <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
+                            ${displayVal}
+                        </a>
+                    </td>
+                    <td>${val.count}</td>
                 </tr>
             `;
       }
@@ -918,197 +818,181 @@ emlo.FacetRenderer = class extends edges.Renderer {
       ts.values.length > this.displayLimit
         ? `
         <tr>
-          <td id="${showMoreId}" class="btn btn-link">Click to show more...</td>
-        </tr>
-    `
+            <td id="${showMoreId}" class="btn btn-link">Click to show more...</td>
+        </tr>`
         : "";
 
+    // Modal container exists but initially empty
     let modalFrag = `
-        <div id="${modalId}" class="facet-modal">
+        <div id="${modalId}" class="facet-modal hideEle">
             <div class="facet-modal-content">
                 <div class="facet-modal-header">
                     <span>${this.title}</span>
-                    <span id="${modalCloseId}" class="facet-modal-close">&times;</span>
+                    <span id="${edges.util.htmlID(
+                      this.namespace,
+                      "facet-modal-close",
+                      this.component.id
+                    )}" class="facet-modal-close">&times;</span>
                 </div>
                 <div class="facet-modal-content-wrapper">
-                    <table class="facet">
-                        <tbody>${fullResults}</tbody>
-                    </table>
+                    <div id="${modalContentId.slice(1)}">
+                        <!-- Placeholder for fetched results -->
+                    </div>
                 </div>
             </div>
         </div>
     `;
 
-    let isHideCount = false;
-
-    const filterFieldsCount = filterFields.reduce((acc, item) => {
-      return item === this.component.field ? acc + 1 : acc;
-    }, 0);
-
-    if (filterFieldsCount >= this.hideCount && this.hideCount > 0) {
-      isHideCount = true;
-    }
-
-    let frag = `
-        <div class="facet"  style="${isHideCount ? "display:none;" : ""}">
+    ts.context.html(`
+        <div class="facet">
             <h4>${this.title}</h4>
             <table class="facet">
                 <tbody>${limitedResults}${showMoreFrag}</tbody>
             </table>
         </div>
         ${modalFrag}
-    `;
+    `);
 
-    ts.context.html(frag);
-
-    this._fetchNamesNew(uuidsToFetch, "people").then((names) => {
-      if (names && names.length > 0) {
-        for (let name of names) {
-          localStorage.setItem(name.uuid, name.browse);
-          document
-            .querySelectorAll(`[data-key*="${name.uuid}"]`)
-            .forEach((el) => {
-              // Protecting this from selected facet rendering since this is taken care there
-              if (el.dataset.render && el.dataset.render == "selected") {
-                return;
-              }
-              el.innerHTML = `
-            <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
-            ${edges.util.escapeHtml(name.browse)}
-          `;
-            });
-        }
-      }
-    });
-
-    // Fetching the UUID
-    // Array.from(uuidsToFetch).forEach((UUID) => {
-    //   const collectionName = "people";
-
-    //   if (localStorage.getItem(UUID)) return; // already cached
-
-    //   this._fetchNames(UUID, collectionName).then((names) => {
-    //     if (names) {
-    //       localStorage.setItem(UUID, names);
-
-    //       // Update all matching DOM elements
-    //       document.querySelectorAll(`[data-key*="${UUID}"]`).forEach((el) => {
-    //         el.innerHTML = `
-    //         <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
-    //         ${edges.util.escapeHtml(names)}
-    //       `;
-    //       });
-    //     }
-    //   });
-    // });
-
-    this.setUISize();
-    this.setUISort();
-    this.setUIOpen();
-
+    // Event bindings
     const valueSelector = edges.util.jsClassSelector(
       this.namespace,
       "value",
       this.component.id
     );
-    const filterRemoveSelector = edges.util.jsClassSelector(
-      this.namespace,
-      "filter-remove",
-      this
-    );
-    const toggleSelector = edges.util.idSelector(
-      this.namespace,
-      "toggle",
-      this
+    edges.on(valueSelector, "click", this, "termSelected");
+
+    if (ts.values.length > this.displayLimit) {
+      edges.on(
+        edges.util.idSelector(this.namespace, "show-more", this.component.id),
+        "click",
+        this,
+        "openModal"
+      );
+    }
+    edges.on(
+      edges.util.idSelector(
+        this.namespace,
+        "facet-modal-close",
+        this.component.id
+      ),
+      "click",
+      this,
+      "closeModal"
     );
 
-    const showMoreSelector = edges.util.idSelector(
-      this.namespace,
-      "show-more",
-      this.component.id
-    );
+    this.setUISize();
+    this.setUISort();
+    this.setUIOpen();
+  }
+
+  openModal() {
     const modalSelector = edges.util.idSelector(
       this.namespace,
       "facet-modal",
       this.component.id
     );
-    const modalCloseSelector = edges.util.idSelector(
+    const modalContentSelector = edges.util.htmlID(
       this.namespace,
-      "facet-modal-close",
+      "facet-modal-content",
       this.component.id
     );
+    const modalContentEl = document.getElementById(
+      modalContentSelector.slice(1)
+    );
 
-    const sizeSelector = edges.util.idSelector(this.namespace, "size", this);
-    const orderSelector = edges.util.idSelector(this.namespace, "order", this);
+    // Always show the modal immediately
+    this.component.jq(modalSelector).removeClass("hideEle").addClass("showEle");
 
-    edges.on(valueSelector, "click", this, "termSelected");
-    edges.on(toggleSelector, "click", this, "toggleOpen");
-    edges.on(filterRemoveSelector, "click", this, "removeFilter");
-    edges.on(sizeSelector, "click", this, "changeSize");
-    edges.on(orderSelector, "click", this, "changeSort");
+    // Show loading message first
+    modalContentEl.innerHTML = `<p>Fetching more results, please wait...</p>`;
 
-    if (this.component.jq(showMoreSelector).length > 0) {
-      edges.on(showMoreSelector, "click", this, "openModal");
+    try {
+      let dataToRender =
+        this.additionalData && this.additionalData.length > 0
+          ? this.additionalData
+          : this.component.values;
+
+      // If still empty, show no results
+      if (!dataToRender || dataToRender.length === 0) {
+        modalContentEl.innerHTML = `<p>No results available.</p>`;
+        return;
+      }
+
+      let fullResults = "";
+      dataToRender.forEach((val) => {
+        if (val.count > 0) {
+          fullResults += `
+          <tr>
+            <td>
+              <a href="#" class="${edges.util.allClasses(
+                this.namespace,
+                "value",
+                this.component.id
+              )}" data-key="${edges.util.escapeHtml(val.term)}">
+                <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
+                ${this._displayFacetValue(this.component.field, val.term)}
+              </a>
+            </td>
+            <td>${val.count}</td>
+          </tr>
+        `;
+        }
+      });
+
+      modalContentEl.innerHTML = `<table class="facet"><tbody>${fullResults}</tbody></table>`;
+    } catch (error) {
+      console.error("Error rendering modal results:", error);
+      modalContentEl.innerHTML = `<p class="error">An error occurred while fetching results. Please try again later.</p>`;
     }
-    edges.on(modalCloseSelector, "click", this, "closeModal");
   }
 
-  // _displayFacetValue(field, val, fetch = false) {
-  //   if (field == "object_type") {
-  //     const typeMap = {
-  //       work: "Letter",
-  //       manifestation: "Document",
-  //       resource: "Related resource",
-  //       person: "Person or organization",
-  //     };
+  // openModal() {
+  //   const modalSelector = edges.util.idSelector(
+  //     this.namespace,
+  //     "facet-modal",
+  //     this.component.id
+  //   );
+  //   const modalContentSelector = edges.util.htmlID(
+  //     this.namespace,
+  //     "facet-modal-content",
+  //     this.component.id
+  //   );
+  //   const modalContentEl = document.getElementById(
+  //     modalContentSelector.slice(1)
+  //   );
+  //   // Show modal immediately
+  //   this.component.jq(modalSelector).removeClass("hideEle").addClass("showEle");
 
-  //     if (typeMap.hasOwnProperty(val)) {
-  //       return typeMap[val];
-  //     } else {
-  //       return val.charAt(0).toUpperCase() + val.slice(1);
+  //   // Show temporary loading message
+  //   modalContentEl.innerHTML = `<p>Fetching more results, please wait...</p>`;
+  //   console.log("this.component.values", this.component.values);
+  //   let fullResults = "";
+  //   this.component.values.forEach((val) => {
+  //     if (val.count > 0) {
+  //       fullResults += `
+  //                       <tr>
+  //                           <td>
+  //                               <a href="#" class="${edges.util.allClasses(
+  //                                 this.namespace,
+  //                                 "value",
+  //                                 this.component.id
+  //                               )}" data-key="${edges.util.escapeHtml(
+  //         val.term
+  //       )}">
+  //                                   <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
+  //                                   ${this._displayFacetValue(
+  //                                     this.component.field,
+  //                                     val.term
+  //                                   )}
+  //                               </a>
+  //                           </td>
+  //                           <td>${val.count}</td>
+  //                       </tr>
+  //                   `;
   //     }
-  //   } else if (
-  //     ["frbr_creator-person", "mail_recipient-person"].includes(field) &&
-  //     fetch
-  //   ) {
-  //     let value = val;
-  //     let UUID = "";
-  //     if (value && value.startsWith('"') && value.endsWith('"')) {
-  //       value = value.slice(1, -1);
-  //     }
+  //   });
 
-  //     if (typeof value === "string" && value.startsWith("http")) {
-  //       UUID = value.split("/").pop();
-  //     }
-
-  //     if (UUID == "") {
-  //       return "";
-  //     }
-
-  //     if (localStorage.getItem(UUID)) {
-  //       return localStorage.getItem(UUID);
-  //     }
-
-  //     let collectionName = "people";
-
-  //     this._fetchNames(UUID, collectionName).then((names) => {
-  //       if (names) {
-  //         // Find all matching elements dynamically and update their content
-  //         document
-  //           .querySelectorAll(`[data-key="${edges.util.escapeHtml(val)}"]`)
-  //           .forEach((el) => {
-  //             el.innerHTML = `
-  //               <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
-  //               ${edges.util.escapeHtml(names)}
-  //             `;
-  //           });
-  //       }
-  //     });
-
-  //     return "Loading";
-  //   } else {
-  //     return val;
-  //   }
+  //   modalContentEl.innerHTML = `<table class="facet"><tbody>${fullResults}</tbody></table>`;
   // }
 
   _displayFacetValue(field, val) {
@@ -1216,14 +1100,27 @@ emlo.FacetRenderer = class extends edges.Renderer {
     return browseNamesString;
   }
 
-  openModal() {
-    const modalSelector = edges.util.idSelector(
-      this.namespace,
-      "facet-modal",
-      this.component.id
-    );
-    this.component.jq(modalSelector).css("display", "block");
-  }
+  // openModal() {
+  //   console.log("fetchedAllFacets", this.fetchedAllFacets);
+
+  //   if (!this.fetchedAllFacets) {
+  //     // Updating the size to get more results
+  //     this.component.size = 5000;
+  //     this.component.contrib(this.component.edge.currentQuery);
+  //     this.component.edge.cycle();
+  //   }
+  //   this.fetchedAllFacets = true;
+  //   this.showAll = true;
+  // }
+
+  // closeModal() {
+  //   const modalSelector = edges.util.idSelector(
+  //     this.namespace,
+  //     "facet-modal",
+  //     this.component.id
+  //   );
+  //   this.component.jq(modalSelector).css("display", "none");
+  // }
 
   closeModal() {
     const modalSelector = edges.util.idSelector(
@@ -1231,12 +1128,7 @@ emlo.FacetRenderer = class extends edges.Renderer {
       "facet-modal",
       this.component.id
     );
-    this.component.jq(modalSelector).css("display", "none");
-  }
-
-  showMoreEntries() {
-    this.showAll = !this.showAll;
-    this.draw(); // Re-draw the component to show all entries
+    this.component.jq(modalSelector).removeClass("showEle").addClass("hideEle");
   }
 
   setUIOpen() {

@@ -25,7 +25,7 @@ import sourceconfig_base
 
 # -----------------------------------------------------------------------------
 # NOTE: The transcription text file csv should be named transcription-texts.csv
-# It is used in indexer/src/AdditionalSolr.py -> AdditionalWorksData, line 130
+# It is used in indexer/src/AdditionalSolr.py -> AdditionalWorksData
 # -----------------------------------------------------------------------------
 
 indexer_check_file = os.path.join(sourceconfig_base.base, "need_index")

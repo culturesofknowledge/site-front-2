@@ -1,5 +1,6 @@
 import { getCollectionTitle } from "../js/profile/collectionDetails.js";
 import PersonChart from "./chart.js";
+import { buildSolrQuery } from "./helper/buildSolrQuery.js";
 
 import { _renderCommentProfile } from "./profile/commentFrag.js";
 import {
@@ -940,19 +941,19 @@ emlo.FacetRenderer = class extends edges.Renderer {
       if (this.additionalDataField && this.additionalDataField.length > 0) {
         dataToRender = this.additionalDataField;
       } else {
+        const q = buildSolrQuery(this.component.edge.currentQuery);
+
         // 2. Otherwise, fetch from Solr
-        const solrUrl = `/solr/works/select?facet=true&facet.field=${this.component.field}&facet.limit=5000&rows=0&wt=json`;
+        const solrUrl = `/solr/works/select?q=${q}&facet=true&facet.field=${this.component.field}&facet.limit=5000&rows=0&wt=json`;
 
         const response = await fetch(solrUrl);
         if (!response.ok)
           throw new Error(`Solr request failed: ${response.status}`);
 
         const solrData = await response.json();
-        const query = searchQueryObj();
+
         const facetArray =
           solrData.facet_counts.facet_fields[this.component.field] || [];
-
-        console.log("facetArray", query);
 
         // Convert alternating array into [{ term, count, display }]
         dataToRender = [];

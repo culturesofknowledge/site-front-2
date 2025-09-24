@@ -787,6 +787,10 @@ def get_transcription_url_fieldname():
   return 'ox_urlOfTranscription'
 
 # ----------------------------------------------------------------------------------------------
+def get_transcription_fieldname():
+  return 'ox_transcription'
+
+# ----------------------------------------------------------------------------------------------
 
 def get_opened_fn() :
   return 'ox_opened'

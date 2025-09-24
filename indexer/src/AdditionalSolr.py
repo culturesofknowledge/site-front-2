@@ -12,6 +12,7 @@ import solr
 # sys.setdefaultencoding("utf8")
 
 import solrconfig
+import sourceconfig_base
 
 web_lib_path = 'lib'
 sys.path.append( web_lib_path )

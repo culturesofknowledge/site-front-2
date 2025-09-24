@@ -428,18 +428,50 @@ try {
 }
 
 $(document).ready(function () {
-  // Get the current URL's search parameters
-  const queryParams = new URLSearchParams(window.location.search);
+  function checkQueryParams() {
+    // Get the current URL's search parameters
+    const queryParams = new URLSearchParams(window.location.search);
 
-  // Check if there are any query parameters
-  if (queryParams.toString()) {
-    if (queryParams.get("uuids") || queryParams.get("browsing")) {
-      $("#return_browse").show();
-    } else {
-      $("#modify_search").show();
+    // Hide first so we don't accidentally show both
+    $("#return_browse, #modify_search").hide();
+
+    // Check if there are any query parameters
+    if (queryParams.toString()) {
+      if (queryParams.get("uuids") || queryParams.get("browsing")) {
+        $("#return_browse").show();
+      } else {
+        if (queryParams.size > 1) {
+          $("#modify_search").show();
+        }
+      }
     }
   }
+
+  // Run once at startup
+  checkQueryParams();
+
+  // Watch for DOM changes
+  const observer = new MutationObserver(() => {
+    checkQueryParams();
+  });
+
+  // Observe entire document body
+  observer.observe(document.body, { childList: true, subtree: true });
 });
+
+// $(document).ready(function () {
+//   // Get the current URL's search parameters
+//   const queryParams = new URLSearchParams(window.location.search);
+
+//   // Check if there are any query parameters
+//   if (queryParams.toString()) {
+//     if (queryParams.get("uuids") || queryParams.get("browsing")) {
+//       $("#return_browse").show();
+//     } else {
+//       $("#modify_search").show();
+//     }
+//   }
+// });
 
 function _displayWhereFound(val, res, fieldName, edge) {
   const urlParams = new URLSearchParams(window.location.search);

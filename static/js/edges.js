@@ -125,7 +125,7 @@ emlo.ResultTemplate = class extends edges.Template {
           </div>
        
           <div id="modify_search" style="display:none;">
-              <button class="small button modifysearchbtn" onclick="modifyCurrentSearch()">Modify your search</button>
+              <button class="small button modifysearchbtn">Modify your search</button>
           </div>
 
          <div id="current_search">
@@ -211,38 +211,6 @@ emlo.ProfileTemplate = class extends edges.Template {
     for (let i = 0; i < sidebarTitleComponents.length; i++) {
       sidebarTitle += `<div id="${sidebarTitleComponents[i].id}"></div>`;
     }
-
-    // let frag = `<div class="row row-with-side">
-    //   <div class="side-nav">
-    //     <div id="sidebar-title">
-    //       ${sidebarTitle}
-    //     </div>
-
-    //     <div id="sidebar-actions">
-    //         <div>
-    //           <img src="../../static/img/icon-short-url.png" alt="short-url" />
-    //           Short URL:
-    //           <span id="short-url-link">
-    //           </span>
-    //         </div>
-
-    //         <div id="send-comment">
-    //           <img src="../../static/img/icon-send-comment.png" alt="short-url" />
-    //           <a> Send Comment </a>
-    //         </div>
-    //     </div>
-
-    //     <div id="more-options">
-    //         ${sidebar}
-    //     </div>
-    //   </div>
-
-    //   <div id="main" class="" style="margin-left:5px;">
-    //     <div class="large-12 columns">
-    //       ${results}
-    //     </div>
-    //   </div>
-    // </div>`;
 
     let frag = `
       <div id="main" class="row">

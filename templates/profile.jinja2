@@ -76,8 +76,10 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     {# <script src="https://d3js.org/d3.v7.min.js"></script> #}
     <script type="text/javascript" src="{{ url_for('static', filename='libs/d3/d3.v3.min.js') }}"></script>
+
     <script type="module">
         import { searchQueryObj } from "{{ url_for('static', filename='js/search.js') }}";
+        import { modifyCurrentSearch } from "{{ url_for('static', filename='js/helper/modifyCurrentSearch.js') }}";
 
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -194,7 +196,7 @@
                             const href = newQuery ? `/forms/advanced?${newQuery}` : '/forms/advanced';
                             const modSearch =  newQuery ? `/advanced?${newQuery}` : '/advanced';
                             document.getElementById('back-to-results').onclick = () => window.location.href = href;
-                            document.getElementById('modify-search').onclick = () => window.location.href = modSearch;
+                            document.getElementById('modify-search').onclick = () => modifyCurrentSearch()
                         }
 
                         if(numFound && start >= 0) {

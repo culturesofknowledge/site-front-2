@@ -7,17 +7,31 @@
       <br/> Full-text transcriptions are available currently only for certain catalogues." 
       class="row">
       <div class="small-10 columns">
-        <label for="let_con">Search content</label>
-        <input
-          id="let_con"
-          name="let_con"
-          type="text"
-          class="text"
-          value="{{ let_con if let_con else 'all content' }}" 
-          data-default="all content"
-          onfocus="textClear(this);"
-          onblur="textFill(this);"
-        />
+          <div>
+            <label for="let_con">Search content</label>
+            <input
+              id="let_con"
+              name="let_con"
+              type="text"
+              class="text"
+              value="{{ let_con if let_con else 'all content' }}" 
+              data-default="all content"
+              onfocus="textClear(this);"
+              onblur="textFill(this);"
+            />
+          </div>
+          <div style="margin-bottom: 10px;">
+            <input
+              type="checkbox"
+              id="let_con_trans"
+              name="let_con_trans"
+              value="false"
+              onchange="changeCheckboxValue(this)"
+              class="checkbox"
+              style="margin-left: 10px;"
+            />
+            <label for="let_con_trans" style="margin: 0;">On transcription</label>
+          </div>
       </div>
       <div>
         {% include 'components/common/help_icon.jinja2' %}

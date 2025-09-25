@@ -248,16 +248,6 @@ function advanceSearch(params) {
         queryStringFields: [{ field: "location-mentioned", operator: "OR" }],
       },
       {
-        param: "let_con",
-        queryStringFields: [
-          { field: "dcterms_abstract", operator: "OR" },
-          { field: "ox_keywords", operator: "OR" },
-          { field: "ox_incipit", operator: "OR" },
-          { field: "ox_excipit", operator: "OR" },
-          { field: "mail_postScript", operator: "OR" },
-        ],
-      },
-      {
         param: "let_lang",
         queryStringFields: [{ field: "dcterms_language", operator: "OR" }],
       },
@@ -374,6 +364,31 @@ function advanceSearch(params) {
         queryString: `"${params.get("let_type")}"`,
         fields: [{ field: "manifestation-doc_type", operator: "AND" }],
       });
+    }
+
+    if (params.get("let_con")) {
+      const paramValue = params.get("let_con");
+      const trans = params.get("let_con_trans");
+
+      if (paramValue) {
+        if (trans == "true") {
+          openingQuery.queryStrings.push({
+            queryString: `"${paramValue}"`,
+            fields: [{ field: "ox_transcription", operator: "AND" }],
+          });
+        } else {
+          openingQuery.queryStrings.push({
+            queryString: paramValue,
+            fields: [
+              { field: "dcterms_abstract", operator: "OR" },
+              { field: "ox_keywords", operator: "OR" },
+              { field: "ox_incipit", operator: "OR" },
+              { field: "ox_excipit", operator: "OR" },
+              { field: "mail_postScript", operator: "OR" },
+            ],
+          });
+        }
+      }
     }
 
     if (params.get("let_ima") == "true") {
@@ -731,6 +746,7 @@ function getMultiSearchFields() {
     "ox_incipit",
     "ox_excipit",
     "mail_postScript",
+    "ox_transcription",
   ];
 
   // People: authors or senders

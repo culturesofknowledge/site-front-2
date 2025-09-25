@@ -10,6 +10,7 @@ def forms():
     dat_to_year = request.form.get('dat_to_year')
     locations = request.form.get('locations')
     let_con = request.form.get('let_con')
+    let_con_trans = request.form.get('let_con_trans')
 
     # Construct the query parameters
     query_params = {}
@@ -24,6 +25,9 @@ def forms():
     if let_con and let_con != "all content":
         query_params['let_con'] = let_con
 
+    if let_con_trans and let_con_trans != "false":
+        query_params['let_con_trans'] = let_con_trans
+        
     # Redirect to the new URL with query parameters
     return redirect(url_for('forms.results', **query_params))
 

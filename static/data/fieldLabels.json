@@ -26,6 +26,7 @@
   "pla_ment_name": "Place mentioned",
   "let_ima": "Has images",
   "let_trans": "Has transcription",
+  "let_con_trans": "Transcription",
   "let_abst": "Has abstract",
   "let_shel": "Shelfmark",
   "let_pe": "Has printed editions",

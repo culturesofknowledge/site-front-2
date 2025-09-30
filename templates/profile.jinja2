@@ -100,6 +100,8 @@
 
             const queryObj = searchQueryObj()
 
+            console.log("queryObj", queryObj)
+
 
             const query = buildSolrQuery(queryObj.openingQuery)
 
@@ -234,7 +236,7 @@
         })
 
         function buildSolrQuery(config) {
-            const { queryStrings = [], sort = [], size = 10 , must = [] , queryString = ""} = config;
+            const { queryStrings = [], sort = [], size = 10 , must = [] , queryString = "" , query = {} } = config;
 
             let queryParts = [];
             
@@ -251,6 +253,19 @@
             for(const m of must){
                 const query = `${m.field}:${m.value}`
                 queryParts.push(query)
+            }
+
+            if(query && query.hasOwnProperty('range')) {
+
+                const fields = Object.keys(query.range);
+                const rangeQueries = fields.map((field) => {
+                    const range = query.range[field];
+                    return `${field}:[${range.gte || "*"} TO ${range.lte || "*"}]`;
+                });
+
+                if(rangeQueries) {
+                    queryParts.push(rangeQueries)
+                }
             }
 
 

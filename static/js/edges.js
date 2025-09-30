@@ -3248,11 +3248,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       htmlContent += `<br/><br/>Alternative urls for this record:<ul>`;
 
       if (url) {
-        htmlContent += `<li class="footer-links"><a href="${url}">${url}</a></li>`;
+        htmlContent += `<li class="footer-links"><a href="${url}" onclick="redirectShortURL(event)">${url}</a></li>`;
       }
 
       if (shortURL) {
-        htmlContent += `<li class="footer-links"><a href="${shortURL}">${shortURL}</a></li>`;
+        htmlContent += `<li class="footer-links"><a href="${shortURL}" onclick="redirectShortURL(event)">${shortURL}</a></li>`;
       }
 
       htmlContent += `</ul>`;
@@ -3449,7 +3449,7 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
         }">
           <img src="../../static/img/icon-short-url.png" alt="short-url" />
           Short URL: <span id="short-url-link" class="showLink">
-            <a href=${shortURL}> ${shortURL} </a>
+            <a href=${shortURL} onclick="redirectShortURL(event)"> ${shortURL} </a>
           </span>
         <p>
 

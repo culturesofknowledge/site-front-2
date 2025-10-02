@@ -10,9 +10,6 @@
 {% block extra_js_bottom %}
 
 {% include "_edges_common_js.jinja2" %}
-<script type="module" src="../static/js/edges/components/resultTable.js"></script>
-<script type="module" src="../static/js/edges/renderer/resultTable.js"></script>
-<script type="module" src="../static/js/edges/renderer/selectedFacet.js"></script>
 <script type="module" src="../static/js/result.edges.js"></script>
 <script type="module">
   import { modifyCurrentSearch } from "{{ url_for('static', filename='js/helper/modifyCurrentSearch.js') }}";

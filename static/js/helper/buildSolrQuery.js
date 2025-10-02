@@ -5,6 +5,7 @@ export function buildSolrQuery(config) {
     size = 10,
     must = [],
     queryString = "",
+    query = {},
   } = config;
 
   let queryParts = [];
@@ -22,6 +23,18 @@ export function buildSolrQuery(config) {
   for (const m of must) {
     const query = `${m.field}:${m.value}`;
     queryParts.push(query);
+  }
+
+  if (query && query.hasOwnProperty("range")) {
+    const fields = Object.keys(query.range);
+    const rangeQueries = fields.map((field) => {
+      const range = query.range[field];
+      return `${field}:[${range.gte || "*"} TO ${range.lte || "*"}]`;
+    });
+
+    if (rangeQueries) {
+      queryParts.push(rangeQueries);
+    }
   }
 
   // Combine all query parts using AND

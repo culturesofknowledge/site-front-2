@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import smtplib
 from email.mime.text import MIMEText
 import requests
+import ssl
 
 comment_bp = Blueprint('comment', __name__, url_prefix='/comment')
 
@@ -33,7 +34,7 @@ def send_comment():
     email = request.form.get("email", "").strip()
     comment = request.form.get("comment", "").strip()
     object_type = request.form.get("type", "").strip()
-    g_recaptcha_response = request.form.get("g-recaptcha-response", "").strip()
+    # g_recaptcha_response = request.form.get("g-recaptcha-response", "").strip()
     send_copy = request.form.get("send_copy") 
 
 
@@ -50,25 +51,25 @@ def send_comment():
         return jsonify(success=False, message=error), 400
     
     # Step 2: Validate captcha
-    captcha_url = "https://www.google.com/recaptcha/api/siteverify"
-    captcha_data = {
-        "secret": RECAPTCHA_SECRET_KEY,
-        "response": g_recaptcha_response,
-        "remoteip": request.remote_addr
-    }
+    # captcha_url = "https://www.google.com/recaptcha/api/siteverify"
+    # captcha_data = {
+    #     "secret": RECAPTCHA_SECRET_KEY,
+    #     "response": g_recaptcha_response,
+    #     "remoteip": request.remote_addr
+    # }
 
-    try:
-        captcha_res = requests.post(captcha_url, data=captcha_data)
-        captcha_result = captcha_res.json()
-    except Exception as e:
-        return jsonify(success=False, message="Captcha verification failed, because of an error."), 500
+    # try:
+    #     captcha_res = requests.post(captcha_url, data=captcha_data)
+    #     captcha_result = captcha_res.json()
+    # except Exception as e:
+    #     return jsonify(success=False, message="Captcha verification failed, because of an error."), 500
 
-    if not captcha_result.get("success"):
-        return jsonify(success=False, message="Captcha validation failed, please try again."), 400
+    # if not captcha_result.get("success"):
+    #     return jsonify(success=False, message="Captcha validation failed, please try again."), 400
 
-    type = object_type
-    if object_type == "institution":
-        type = "repository"
+    # type = object_type
+    # if object_type == "institution":
+    #     type = "repository"
 
     # Step 3: Construct email body
     email_body = (
@@ -80,24 +81,48 @@ def send_comment():
         f"Message:\n{comment}\n"
     )
 
+    def send_message(server, subject, sender, recipient, body):
+        """Helper function to create and send an email message."""
+        msg = MIMEText(body)
+        msg["Subject"] = subject
+        msg["From"] = sender
+        msg["To"] = recipient
+        server.send_message(msg)
+
     # Step 4: Send email
     try:
-        with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT) as server:
-            server.login(EMAIL_TO, EMAIL_TO_PASS)
+        if SMTP_PORT == 465:
+            with smtplib.SMTP_SSL(SMTP_SERVER , SMTP_PORT) as server:
+                server.login(EMAIL_TO, EMAIL_TO_PASS)
+                send_message(server, "A comment from EMLO record" , email , EMAIL_TO , email_body)
+                if send_copy:
+                    send_message(server,
+                                 "Your comment on EMLO record",
+                                 EMAIL_TO,
+                                 email,
+                                 email_body)
+        else:
+            with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+                print(f"Using TLS on port {SMTP_PORT}")
+                context = ssl.create_default_context()
+                
+                server.starttls(context=context)
+                server.login(EMAIL_TO, EMAIL_TO_PASS)
 
-            msg = MIMEText(email_body)
-            msg["Subject"] = "A comment from EMLO record"
-            msg["From"] = email
-            msg["To"] = EMAIL_TO
-            server.send_message(msg)
+                # Main email
+                send_message(server,
+                             "A comment from EMLO record",
+                             email,
+                             EMAIL_TO,
+                             email_body)
 
-            if send_copy: 
-                print(f"Sending email")
-                copy_msg = MIMEText(email_body)
-                copy_msg["Subject"] = "Your comment on EMLO record"
-                copy_msg["From"] = EMAIL_TO   # better to send from system email
-                copy_msg["To"] = email
-                server.send_message(copy_msg)
+                # Optional copy
+                if send_copy:
+                    send_message(server,
+                                 "Your comment on EMLO record",
+                                 EMAIL_TO,
+                                 email,
+                                 email_body)
 
     except Exception as e:
         return jsonify(success=False, message=f"Error sending email: {e}"), 500

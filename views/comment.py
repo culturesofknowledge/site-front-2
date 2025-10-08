@@ -34,7 +34,7 @@ def send_comment():
     email = request.form.get("email", "").strip()
     comment = request.form.get("comment", "").strip()
     object_type = request.form.get("type", "").strip()
-    # g_recaptcha_response = request.form.get("g-recaptcha-response", "").strip()
+    g_recaptcha_response = request.form.get("g-recaptcha-response", "").strip()
     send_copy = request.form.get("send_copy") 
 
 
@@ -51,25 +51,25 @@ def send_comment():
         return jsonify(success=False, message=error), 400
     
     # Step 2: Validate captcha
-    # captcha_url = "https://www.google.com/recaptcha/api/siteverify"
-    # captcha_data = {
-    #     "secret": RECAPTCHA_SECRET_KEY,
-    #     "response": g_recaptcha_response,
-    #     "remoteip": request.remote_addr
-    # }
+    captcha_url = "https://www.google.com/recaptcha/api/siteverify"
+    captcha_data = {
+        "secret": RECAPTCHA_SECRET_KEY,
+        "response": g_recaptcha_response,
+        "remoteip": request.remote_addr
+    }
 
-    # try:
-    #     captcha_res = requests.post(captcha_url, data=captcha_data)
-    #     captcha_result = captcha_res.json()
-    # except Exception as e:
-    #     return jsonify(success=False, message="Captcha verification failed, because of an error."), 500
+    try:
+        captcha_res = requests.post(captcha_url, data=captcha_data)
+        captcha_result = captcha_res.json()
+    except Exception as e:
+        return jsonify(success=False, message="Captcha verification failed, because of an error."), 500
 
-    # if not captcha_result.get("success"):
-    #     return jsonify(success=False, message="Captcha validation failed, please try again."), 400
+    if not captcha_result.get("success"):
+        return jsonify(success=False, message="Captcha validation failed, please try again."), 400
 
-    # type = object_type
-    # if object_type == "institution":
-    #     type = "repository"
+    type = object_type
+    if object_type == "institution":
+        type = "repository"
 
     # Step 3: Construct email body
     email_body = (
@@ -94,7 +94,7 @@ def send_comment():
         if SMTP_PORT == 465:
             with smtplib.SMTP_SSL(SMTP_SERVER , SMTP_PORT) as server:
                 server.login(EMAIL_TO, EMAIL_TO_PASS)
-                send_message(server, "A comment from EMLO record" , email , EMAIL_TO , email_body)
+                send_message(server, "A comment from EMLO record" , EMAIL_TO , EMAIL_TO , email_body)
                 if send_copy:
                     send_message(server,
                                  "Your comment on EMLO record",
@@ -112,7 +112,7 @@ def send_comment():
                 # Main email
                 send_message(server,
                              "A comment from EMLO record",
-                             email,
+                             EMAIL_TO,
                              EMAIL_TO,
                              email_body)
 

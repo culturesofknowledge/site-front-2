@@ -442,9 +442,9 @@ export function resourceRelation(profile, relations, field) {
             resourceFurtherDetail = relation["ox_detailsOfResource"];
           }
 
-          if (profile.hasOwnProperty("ox_transcription")) {
-            transcription = profile["ox_transcription"];
-          }
+          // if (profile.hasOwnProperty("ox_transcription")) {
+          //   transcription = profile["ox_transcription"];
+          // }
 
           if (resourceUrl !== "" && resourceTitle === "") {
             resourceTitle = resourceUrl;

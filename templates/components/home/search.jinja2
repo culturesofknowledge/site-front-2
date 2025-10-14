@@ -89,40 +89,27 @@
 
       {# Search content - Starts #}
       <div
-  data-delay="2.0"
-  data-tip="Search across abstracts, keywords, incipits, explicits, transcriptions, and enclosures, e.g. 'Spider' or 'Mathematics'. Search is not case sensitive.<br/>Full-text transcriptions are available currently only for certain catalogues."
->
-  <div class="large-11 small-10 columns" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-    <div style="width: 84%;">
-      <label for="let_con" style="margin: 0;">Search content</label>
-      <input
-        id="let_con"
-        name="let_con"
-        type="text"
-        class="text"
-        value="all content"
-        data-default="all content"
-        onfocus="textClear(this);"
-        onblur="textFill(this);"
-      />
-    </div>
-    <div>
-      <input
-        type="checkbox"
-        id="let_con_trans"
-        name="let_con_trans"
-        value="false"
-        onchange="changeCheckboxValue(this)"
-        class="checkbox"
-        style="margin-left: 10px;"
-      />
-      <label for="let_con_trans" style="margin: 0;">On transcription</label>
-    </div>
-  </div>
+        data-delay="2.0"
+        data-tip="Search across abstracts, keywords, incipits, explicits, transcriptions, and enclosures, e.g. 'Spider' or 'Mathematics'. Search is not case sensitive.
+        <br/>Full-text transcriptions are available currently only for certain catalogues."
+      >
+        <div class="large-11 small-10 columns">
+          <label>Search content</label>
 
-  {% include './components/common/help_icon.jinja2' %}
-</div>
-
+          <input
+            id="let_con"
+            name="let_con"
+            type="text"
+            class="text"
+            value="all content"
+            data-default="all content"
+            onfocus="textClear(this);"
+            onblur="textFill(this);"
+          />
+        </div>
+        
+        {% include './components/common/help_icon.jinja2' %}
+      </div>
       {# Search content - Ends #}
 
       <div class="large-12">
@@ -188,10 +175,5 @@
         window.history.replaceState({}, document.title, url.toString());
       }
     }
-
-    function changeCheckboxValue(checkbox) {
-    checkbox.value = checkbox.checked
-}
-
   </script>
 </div>

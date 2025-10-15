@@ -93,36 +93,44 @@ def send_comment():
     # Step 4: Send email
     try:
         if SMTP_PORT == 465:
-            # SSL connection
+            # Implicit SSL
             with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT) as server:
                 if SMTP_PASS:
                     server.login(SMTP_LOGIN, SMTP_PASS)
-
                 send_message(server, "A comment from EMLO record", EMAIL_TO, EMAIL_TO, email_body)
-
                 if send_copy:
                     send_message(server, "Your comment on EMLO record", EMAIL_TO, email, email_body)
 
-        elif SMTP_PORT in [587, 25]:
-            # Plain or STARTTLS
-            with smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=20) as server:
+        elif SMTP_PORT == 587:
+            # Explicit TLS (STARTTLS)
+            with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
                 print(f"Connecting via port {SMTP_PORT}")
+                context = ssl.create_default_context()
+                server.starttls(context=context)
 
-                # Use STARTTLS only for 587, or if you know port 25 supports it
-                if SMTP_PORT == 587:
-                    context = ssl.create_default_context()
-                    server.starttls(context=context)
-
-                # Optional login if password exists
                 if SMTP_PASS:
                     server.login(SMTP_LOGIN, SMTP_PASS)
-                else:
-                    print("No password provided — skipping SMTP login")
-
-                # Send main email
                 send_message(server, "A comment from EMLO record", EMAIL_TO, EMAIL_TO, email_body)
+                if send_copy:
+                    send_message(server, "Your comment on EMLO record", EMAIL_TO, email, email_body)
 
-                # Optional copy
+        elif SMTP_PORT == 25:
+            # Plain SMTP or opportunistic TLS
+            with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+                print("Connecting via port 25 (plain SMTP)")
+
+                if SMTP_PASS:
+                    try:
+                        server.starttls()
+                        print("TLS upgraded successfully on port 25")
+                    except smtplib.SMTPException:
+                        print("TLS not supported or skipped on port 25")
+
+                    server.login(SMTP_LOGIN, SMTP_PASS)
+                else:
+                    print("No password provided — using unauthenticated plain SMTP")
+
+                send_message(server, "A comment from EMLO record", EMAIL_TO, EMAIL_TO, email_body)
                 if send_copy:
                     send_message(server, "Your comment on EMLO record", EMAIL_TO, email, email_body)
 

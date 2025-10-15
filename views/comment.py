@@ -98,7 +98,7 @@ def send_comment():
                 if SMTP_PASS:
                     server.login(SMTP_LOGIN, SMTP_PASS)
 
-                send_message(server, "A comment from EMLO record", SMTP_LOGIN, EMAIL_TO, email_body)
+                send_message(server, "A comment from EMLO record", EMAIL_TO, EMAIL_TO, email_body)
 
                 if send_copy:
                     send_message(server, "Your comment on EMLO record", EMAIL_TO, email, email_body)
@@ -120,7 +120,7 @@ def send_comment():
                     print("No password provided — skipping SMTP login")
 
                 # Send main email
-                send_message(server, "A comment from EMLO record", SMTP_LOGIN, EMAIL_TO, email_body)
+                send_message(server, "A comment from EMLO record", EMAIL_TO, EMAIL_TO, email_body)
 
                 # Optional copy
                 if send_copy:

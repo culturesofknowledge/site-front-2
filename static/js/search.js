@@ -255,6 +255,7 @@ function advanceSearch(params) {
           { field: "ox_incipit", operator: "OR" },
           { field: "ox_excipit", operator: "OR" },
           { field: "mail_postScript", operator: "OR" },
+          { field: "ox_transcription", operator: "OR" },
         ],
       },
       {

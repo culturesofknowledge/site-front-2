@@ -204,6 +204,9 @@ input[type="checkbox"]:checked {
                 <li>
                     <a href="#institutions_section">Repositories and Editions</a>
                 </li>
+                <li>
+                    <a href="#resources_emlo">Resources within EMLO</a>
+                </li>
 			<li>
                     <form onsubmit="return false;" style="width:200px">
                         <button onclick="advanceSearch()" style="margin-top:10px;margin-right:45px;" 
@@ -240,6 +243,10 @@ input[type="checkbox"]:checked {
 
                     <div id="institutions_section" class="section clearfix">
                         {% include './components/advance/institutions.jinja2' %}
+                    </div>
+
+                    <div id="resources_emlo" class="section clearfix">
+                        {% include './components/advance/resources_emlo.jinja2' %}
                     </div>
 
                     <div class="large-10">

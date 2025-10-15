@@ -732,6 +732,7 @@ function getMultiSearchFields() {
     "ox_incipit",
     "ox_excipit",
     "mail_postScript",
+    "ox_transcription"
   ];
 
   // People: authors or senders

@@ -15,8 +15,9 @@ RECAPTCHA_SECRET_KEY = os.getenv("RECAPTCHA_SECRET_KEY")
 RECAPTCHA_SITE_KEY = os.getenv("RECAPTCHA_SITE_KEY")
 SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.ox.ac.uk")
 SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+SMTP_LOGIN = os.getenv("SMTP_LOGIN")
+SMTP_PASS = os.getenv("SMTP_PASS")
 EMAIL_TO = os.getenv("EMAIL_TO")
-EMAIL_TO_PASS = os.getenv("EMAIL_TO_PASS")
 SEND_A_COPY = os.getenv("SEND_A_COPY")
 
 @comment_bp.route('/index')
@@ -92,37 +93,52 @@ def send_comment():
     # Step 4: Send email
     try:
         if SMTP_PORT == 465:
-            with smtplib.SMTP_SSL(SMTP_SERVER , SMTP_PORT) as server:
-                server.login(EMAIL_TO, EMAIL_TO_PASS)
-                send_message(server, "A comment from EMLO record" , EMAIL_TO , EMAIL_TO , email_body)
+            # Implicit SSL
+            with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT) as server:
+                if SMTP_PASS:
+                    server.login(SMTP_LOGIN, SMTP_PASS)
+                send_message(server, "A comment from EMLO record", EMAIL_TO, EMAIL_TO, email_body)
                 if send_copy:
-                    send_message(server,
-                                 "Your comment on EMLO record",
-                                 EMAIL_TO,
-                                 email,
-                                 email_body)
-        else:
+                    send_message(server, "Your comment on EMLO record", EMAIL_TO, email, email_body)
+
+        elif SMTP_PORT == 587:
+            # Explicit TLS (STARTTLS)
             with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
-                print(f"Using TLS on port {SMTP_PORT}")
+                print(f"Connecting via port {SMTP_PORT}")
                 context = ssl.create_default_context()
-                
                 server.starttls(context=context)
-                server.login(EMAIL_TO, EMAIL_TO_PASS)
 
-                # Main email
-                send_message(server,
-                             "A comment from EMLO record",
-                             EMAIL_TO,
-                             EMAIL_TO,
-                             email_body)
-
-                # Optional copy
+                if SMTP_PASS:
+                    server.login(SMTP_LOGIN, SMTP_PASS)
+                send_message(server, "A comment from EMLO record", EMAIL_TO, EMAIL_TO, email_body)
                 if send_copy:
-                    send_message(server,
-                                 "Your comment on EMLO record",
-                                 EMAIL_TO,
-                                 email,
-                                 email_body)
+                    send_message(server, "Your comment on EMLO record", EMAIL_TO, email, email_body)
+
+        elif SMTP_PORT == 25:
+            # Plain SMTP or opportunistic TLS
+            with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+                print("Connecting via port 25 (plain SMTP)")
+
+                if SMTP_PASS:
+                    try:
+                        server.starttls()
+                        print("TLS upgraded successfully on port 25")
+                    except smtplib.SMTPException:
+                        print("TLS not supported or skipped on port 25")
+
+                    server.login(SMTP_LOGIN, SMTP_PASS)
+                else:
+                    print("No password provided — using unauthenticated plain SMTP")
+
+                send_message(server, "A comment from EMLO record", EMAIL_TO, EMAIL_TO, email_body)
+                if send_copy:
+                    send_message(server, "Your comment on EMLO record", EMAIL_TO, email, email_body)
+
+        else:
+            print(f"Unsupported port: {SMTP_PORT}")
+
+    except smtplib.SMTPException as e:
+        print(f"SMTP error occurred: {e}")
 
     except Exception as e:
         return jsonify(success=False, message=f"Error sending email: {e}"), 500

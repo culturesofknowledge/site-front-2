@@ -265,6 +265,17 @@ function advanceSearch(params) {
         queryStringFields: [{ field: "location-mentioned", operator: "OR" }],
       },
       {
+        param: "let_con",
+        queryStringFields: [
+          { field: "dcterms_abstract", operator: "OR" },
+          { field: "ox_keywords", operator: "OR" },
+          { field: "ox_incipit", operator: "OR" },
+          { field: "ox_excipit", operator: "OR" },
+          { field: "mail_postScript", operator: "OR" },
+          { field: "ox_transcription", operator: "OR" },
+        ],
+      },
+      {
         param: "let_lang",
         queryStringFields: [{ field: "dcterms_language", operator: "OR" }],
       },
@@ -282,7 +293,13 @@ function advanceSearch(params) {
       },
     ];
 
-    const customValue = ["aut", "rec", "pla_ori_name", "pla_des_name"];
+    const customValue = [
+      "aut",
+      "rec",
+      "pla_ori_name",
+      "pla_des_name",
+      "let_con",
+    ];
     // Loop through paramConfigs to generate query strings
     paramConfigs.forEach((config) => {
       const paramValue = params.get(config.param);
@@ -361,6 +378,43 @@ function advanceSearch(params) {
         }
       }
 
+      if (config.param == "let_con" && paramValue) {
+        // Content specific search starts here
+        const contentSpecificSearch = [
+          "transcriptions",
+          "abstracts",
+          "incipits",
+        ];
+
+        if (contentSpecificSearch.some((key) => params.get(key) === "true")) {
+          let fields = [];
+
+          // For each key, handle individually if its value is true
+          if (params.get("transcriptions") === "true") {
+            fields.push({ field: "ox_transcription", operator: "OR" });
+          }
+
+          if (params.get("abstracts") === "true") {
+            fields.push({ field: "dcterms_abstract", operator: "OR" });
+          }
+
+          if (params.get("incipits") === "true") {
+            fields.push({ field: "ox_incipit", operator: "OR" });
+          }
+
+          openingQuery.queryStrings.push({
+            queryString: paramValue,
+            fields: fields,
+          });
+        } else {
+          openingQuery.queryStrings.push({
+            queryString: paramValue,
+            fields: config.queryStringFields,
+          });
+        }
+        // Content specific search ends here
+      }
+
       if (paramValue && !customValue.includes(config.param)) {
         openingQuery.queryStrings.push({
           queryString: paramValue,
@@ -381,31 +435,6 @@ function advanceSearch(params) {
         queryString: `"${params.get("let_type")}"`,
         fields: [{ field: "manifestation-doc_type", operator: "AND" }],
       });
-    }
-
-    if (params.get("let_con")) {
-      const paramValue = params.get("let_con");
-      const trans = params.get("let_con_trans");
-
-      if (paramValue) {
-        if (trans == "true") {
-          openingQuery.queryStrings.push({
-            queryString: `"${paramValue}"`,
-            fields: [{ field: "ox_transcription", operator: "AND" }],
-          });
-        } else {
-          openingQuery.queryStrings.push({
-            queryString: paramValue,
-            fields: [
-              { field: "dcterms_abstract", operator: "OR" },
-              { field: "ox_keywords", operator: "OR" },
-              { field: "ox_incipit", operator: "OR" },
-              { field: "ox_excipit", operator: "OR" },
-              { field: "mail_postScript", operator: "OR" },
-            ],
-          });
-        }
-      }
     }
 
     if (params.get("let_ima") == "true") {

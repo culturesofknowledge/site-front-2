@@ -69,22 +69,22 @@
 
     <div
       data-delay="2.0"
-      data-tip="Confine your search to letters for which we have images." 
+      data-tip="Confine your search to letters for which we have incipits." 
       class="row">
       <div class="columns small-12 large-4">
-        <label>Only with</label>
+        <label>In</label>
         <div class="row">
           <div class="small-9 columns">
             <input
               type="checkbox"
-              id="let_ima"
-              name="let_ima"
+              id="incipits"
+              name="incipits"
               value="false"
               onchange="changeCheckboxValue(this)"
               class="checkbox"
             />
 
-            <label for="let_ima">images</label>
+            <label for="incipitss">Incipits</label>
           </div>
           <div>
             {% include 'components/common/help_icon_nolabel.jinja2' %}
@@ -96,18 +96,18 @@
         data-delay="2.0"
         data-tip="Confine your search to letters for which we have abstracts."  
         class="columns small-12 large-4">
-        <label>Only with</label>
+        <label>In</label>
         <div class="row">
           <div class="small-9 columns">
             <input
               type="checkbox"
-              id="let_abst"
-              name="let_abst"
+              id="abstracts"
+              name="abstracts"
               value="false"
               onchange="changeCheckboxValue(this)"
             />
 
-            <label for="let_abst">abstracts</label>
+            <label for="abstracts">Abstracts</label>
           </div>
           <div>
             {% include 'components/common/help_icon_nolabel.jinja2' %}
@@ -119,19 +119,19 @@
         data-delay="2.0"
         data-tip="Confine your search to letters for which we have full-text transcriptions."
         class="columns small-12 large-4">
-        <label>Only with</label>
+        <label>In</label>
         <div class="row">
           <div class="small-9 columns">
             <input
               type="checkbox"
-              id="let_trans"
-              name="let_trans"
+              id="transcriptions"
+              name="transcriptions"
               value="false"
               onchange="changeCheckboxValue(this)"
               class="checkbox"
             />
 
-            <label for="let_trans">transcriptions</label>
+            <label for="transcriptions">Transcriptions or Translations</label>
           </div>
           <div>
             {% include 'components/common/help_icon_nolabel.jinja2' %}

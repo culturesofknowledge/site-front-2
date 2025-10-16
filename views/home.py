@@ -7,6 +7,7 @@ home_bp = Blueprint('home', __name__)
 
 
 @home_bp.route('/')
+@home_bp.route('/home')
 def home():
     catalogue_data = "static/data/catalogue.json"
     variables = "static/data/variable.json"
@@ -44,6 +45,7 @@ def load_catalogues():
 
 
 @home_bp.route('/img/<filename>')
+@home_bp.route('/images/<filename>')
 def img(filename):
     """Serve stock images"""
     return send_from_directory(os.path.join('static', 'img'), filename)

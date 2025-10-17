@@ -125,7 +125,7 @@ emlo.ResultTemplate = class extends edges.Template {
           </div>
        
           <div id="modify_search" style="display:none;">
-              <button class="small button modifysearchbtn" onclick="modifyCurrentSearch()">Modify your search</button>
+              <button class="small button modifysearchbtn">Modify your search</button>
           </div>
 
          <div id="current_search">
@@ -211,38 +211,6 @@ emlo.ProfileTemplate = class extends edges.Template {
     for (let i = 0; i < sidebarTitleComponents.length; i++) {
       sidebarTitle += `<div id="${sidebarTitleComponents[i].id}"></div>`;
     }
-
-    // let frag = `<div class="row row-with-side">
-    //   <div class="side-nav">
-    //     <div id="sidebar-title">
-    //       ${sidebarTitle}
-    //     </div>
-
-    //     <div id="sidebar-actions">
-    //         <div>
-    //           <img src="../../static/img/icon-short-url.png" alt="short-url" />
-    //           Short URL:
-    //           <span id="short-url-link">
-    //           </span>
-    //         </div>
-
-    //         <div id="send-comment">
-    //           <img src="../../static/img/icon-send-comment.png" alt="short-url" />
-    //           <a> Send Comment </a>
-    //         </div>
-    //     </div>
-
-    //     <div id="more-options">
-    //         ${sidebar}
-    //     </div>
-    //   </div>
-
-    //   <div id="main" class="" style="margin-left:5px;">
-    //     <div class="large-12 columns">
-    //       ${results}
-    //     </div>
-    //   </div>
-    // </div>`;
 
     let frag = `
       <div id="main" class="row">
@@ -569,6 +537,14 @@ emlo.ResultTable = class extends edges.Component {
     if (this.updateHeader) {
       this._updateHeader();
     }
+
+    // --- REMOVE MODAL AFTER OPERATION ---
+    setTimeout(() => {
+      let doc = document.getElementById("remove-message");
+      if (doc) {
+        doc.style.display = "none";
+      }
+    }, 500); // remove after 0.5s for a smooth UX
   }
 
   _updateHeader() {
@@ -1206,48 +1182,111 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
     }
   }
 
+  // removeFilter(field, term) {
+  //   let nq = this.edge.cloneQuery();
+
+  //   // Special case for handling everything
+  //   if (field == "Text") {
+  //     field = "default_search_field";
+  //   }
+
+  //   // Remove the filter from the "must" clause
+  //   nq.removeMust(
+  //     new es.TermFilter({
+  //       field: field,
+  //       value: term,
+  //     })
+  //   );
+
+  //   // Remove matching query strings
+  //   nq.removeQueryStrings(
+  //     new es.TermFilter({
+  //       field: field,
+  //       value: term,
+  //     })
+  //   );
+
+  //   // HOTFIX: This is just ensuring that we are removing query string only for quick search
+  //   if (field == "default_search_field") {
+  //     nq.removeQueryString();
+  //   }
+
+  //   _removeUrlParam(field);
+
+  //   // PATCH: In EMLO the query when using checkboxes behaves a little different since the value that we need to search on gets changed
+  //   // for eg: if sender and as marked is enabled we will search of mail_authors-rdf_value but if as marked is not present we will search on person-author
+  //   // Now since we are using edges in that we are using the initial query that got generated and hence wrong results are shown.
+  //   const query = searchQueryObj();
+
+  //   // Forcefully updating the querystrings, querystring and must.
+  //   if (query && (query.openingQuery != null || query.openingQuery != {})) {
+  //     nq = this.syncObjects(nq, query.openingQuery);
+  //   }
+
+  //   // Reset the search page to the start and trigger the next query
+  //   nq.from = 0;
+  //   this.edge.pushQuery(nq);
+  //   this.edge.cycle();
+  // }
+
   removeFilter(field, term) {
+    // --- CREATE AND SHOW MODAL ---
+    // const modalOverlay = document.createElement("div");
+    // modalOverlay.id = "removing-alert";
+    // modalOverlay.style.position = "fixed";
+    // modalOverlay.style.top = 0;
+    // modalOverlay.style.left = 0;
+    // modalOverlay.style.width = "100%";
+    // modalOverlay.style.height = "100%";
+    // modalOverlay.style.background = "rgba(0,0,0,0.5)";
+    // modalOverlay.style.display = "flex";
+    // modalOverlay.style.justifyContent = "center";
+    // modalOverlay.style.alignItems = "center";
+    // modalOverlay.style.zIndex = 1000;
+
+    // const modal = document.createElement("div");
+    // modal.style.background = "white";
+    // modal.style.padding = "20px";
+    // modal.style.borderRadius = "8px";
+    // modal.style.minWidth = "250px";
+    // modal.style.textAlign = "center";
+
+    // const label = getLabel(field);
+
+    // modal.innerHTML = `<div>
+    //   <p> Removing current search <strong> ${label} - ${term} </strong></p>
+    // </div>`;
+    // modalOverlay.appendChild(modal);
+    // document.body.appendChild(modalOverlay);
+
+    let doc = document.getElementById("remove-message");
+    if (doc) {
+      doc.style.display = "block";
+    }
+
+    // --- EXECUTE FILTER REMOVAL ---
     let nq = this.edge.cloneQuery();
 
-    // Special case for handling everything
     if (field == "Text") {
       field = "default_search_field";
     }
 
-    // Remove the filter from the "must" clause
-    nq.removeMust(
-      new es.TermFilter({
-        field: field,
-        value: term,
-      })
-    );
+    nq.removeMust(new es.TermFilter({ field: field, value: term }));
 
-    // Remove matching query strings
-    nq.removeQueryStrings(
-      new es.TermFilter({
-        field: field,
-        value: term,
-      })
-    );
+    nq.removeQueryStrings(new es.TermFilter({ field: field, value: term }));
 
-    // HOTFIX: This is just ensuring that we are removing query string only for quick search
     if (field == "default_search_field") {
       nq.removeQueryString();
     }
 
     _removeUrlParam(field);
 
-    // PATCH: In EMLO the query when using checkboxes behaves a little different since the value that we need to search on gets changed
-    // for eg: if sender and as marked is enabled we will search of mail_authors-rdf_value but if as marked is not present we will search on person-author
-    // Now since we are using edges in that we are using the initial query that got generated and hence wrong results are shown.
     const query = searchQueryObj();
 
-    // Forcefully updating the querystrings, querystring and must.
     if (query && (query.openingQuery != null || query.openingQuery != {})) {
       nq = this.syncObjects(nq, query.openingQuery);
     }
 
-    // Reset the search page to the start and trigger the next query
     nq.from = 0;
     this.edge.pushQuery(nq);
     this.edge.cycle();
@@ -1532,7 +1571,7 @@ emlo.FacetRenderer = class extends edges.Renderer {
             .querySelectorAll(`[data-key*="${name.uuid}"]`)
             .forEach((el) => {
               // Protecting this from selected facet rendering since this is taken care there
-              if (el.dataset.field && el.dataset.field == "uuid_related") {
+              if (el.dataset.render && el.dataset.render == "selected") {
                 return;
               }
               el.innerHTML = `
@@ -1982,7 +2021,7 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
 
           <td class="${filterRemoveClass} selected-facets" data-key='${
         filt.term
-      }' data-field='${filt.field}' >
+      }' data-field='${filt.field}' data-render="selected">
               <span data-val='${filt.field}'  style="width:100px">
               ${this._getDisplayValue(filt.field, filt.display)}
               </span>
@@ -1997,6 +2036,7 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
     let frag = `<div class="${facetClass}">
                   <div class="${headerClass}">
                     <h4>${this.title}</h4>
+                    <p id="remove-message"> Please wait, we are updating the results. </p>
                   </div>
                   <div class="${selectedClass}">
                   <table class="facet">
@@ -4215,11 +4255,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       htmlContent += `<br/><br/>Alternative urls for this record:<ul>`;
 
       if (url) {
-        htmlContent += `<li class="footer-links"><a href="${url}">${url}</a></li>`;
+        htmlContent += `<li class="footer-links"><a href="${url}" onclick="redirectShortURL(event)">${url}</a></li>`;
       }
 
       if (shortURL) {
-        htmlContent += `<li class="footer-links"><a href="${currentHref}">${shortURL}</a></li>`;
+        htmlContent += `<li class="footer-links"><a href="${shortURL}" onclick="redirectShortURL(event)">${shortURL}</a></li>`;
       }
 
       htmlContent += `</ul>`;
@@ -4416,7 +4456,7 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
         }">
           <img src="../../static/img/icon-short-url.png" alt="short-url" />
           Short URL: <span id="short-url-link" class="showLink">
-            <a href=${currentHref}> ${shortURL} </a>
+            <a href=${shortURL} onclick="redirectShortURL(event)"> ${shortURL} </a>
           </span>
         <p>
 
@@ -4424,9 +4464,7 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
           ["work"].includes(this.profileType) ? "" : "margin-bottom:20px;"
         }">
           <img class="opacity50 icon-tweak" src="../../static/img/icon-send-comment.png" alt="short-url" />
-          <!-- <a href=/comment/index?id=${result.uuid}> Send Comment </a> -->
-          <a href=/about#contact> Send Comment </a>
-          
+          <a href=/comment/index?id=${result.uuid}> Send Comment </a>           
         </p>
 
 

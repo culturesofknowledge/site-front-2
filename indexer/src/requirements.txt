@@ -1,5 +1,5 @@
-python-dotenv
-solrpy
-pysolr
-redis
-feedparser
+python-dotenv==1.1.1
+solrpy @ git+https://github.com/search5/solrpy@4cb8c6ea3fbd4f64b78dd300aa637e0de05aeb45
+pysolr==3.10.0
+redis==6.4.0
+feedparser==6.0.1

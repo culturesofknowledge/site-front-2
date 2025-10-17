@@ -347,6 +347,7 @@
   <field name="location-destination"  type="text"  indexed="true"  stored="false"  multiValued="true"  />
   <field name="location-mentioned"  type="text"  indexed="true"  stored="false"  multiValued="true"  />
   <field name="ox_urlOfTranscription"  type="string"  indexed="true"  stored="true"  multiValued="true"  />
+  <field name="ox_transcription"  type="text"  indexed="true"  stored="true"  multiValued="true"  />
 
 
 <!--            -->

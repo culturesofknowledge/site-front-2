@@ -22,6 +22,18 @@
             } 
         }
 
+        function redirectShortURL(event) {
+            event.preventDefault(); // stop the default wrong navigation
+            let href = event.currentTarget.getAttribute("href");
+
+            // if no protocol is present, add http://
+            if (!/^https?:\/\//i.test(href)) {
+                href = "http://" + href;
+            }
+
+            window.location.href = href; // navigate
+        }
+
         // Controlling the search letters centrally for browse page
         function searchLetters(browsePage) {
             const baseURL = `${window.location.origin}/forms/advanced`;

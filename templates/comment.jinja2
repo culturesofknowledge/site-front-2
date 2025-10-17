@@ -2,90 +2,201 @@
 
 {% block title %}Comment{% endblock %}
 
+{% block extra_stylesheets %}
+<style>
+.grecaptcha-badge {
+    position: relative !important;  /* detach from bottom-right */
+    margin-top: 15px;  
+    left: 0;             /* add some spacing */
+}
+</style>
+{% endblock %}
 
 {% block content %}
     <div class="row">
-        <div class="large-2 columns"><!-- dummy column -->&nbsp;</div>
+  <div class="large-2 columns"><!-- dummy column -->&nbsp;</div>
 
-        <div class="large-10 columns" style="padding-left:25px">
-            <br>
-            <div id="comment_heading">
-			    <h3>
-                    Please complete the form below if you wish to comment on any 
-                    aspect of this record. We will be sent the unique ID/URL of the record 
-                    alongside your remarks and will get back to you as soon as we can.
-                </h3>
-            </div>
-            <br>
-            
-            <div id="form-section">
-                <form>
-
-				    <div>
-                        <label style="width:150px;">To:</label> &nbsp; 
-                        <strong>Early Modern Letters Online</strong>
-                    </div>
-                    
-                    <br />
-
-                    <div>
-                        <label style="width:150px;">Subject:</label> &nbsp; 
-                        <span>Comment on EMLO record</span>
-                    </div>
-		
-                    <br />
-
-                    <label for="name" style="width:150px;">Your name:</label>
-                    <input type="text" name="name" id="name">
-
-                    <label for="email" style="width:150px;">Your e-mail address:</label>
-                    <input type="text" name="email" id="email">
-
-				    <label for="comment" class="floatleft" style="width:150px;">Your comment:</label>
-                    <textarea name="comment" id="comment" rows="10" cols="50" class="floatleft;" style="margin-left:3px; padding:10px; font-family: 'coustard', 'times new roman', 'times', serif;"></textarea>
-
-
-				    <input type="hidden" id="id" name="id" value="">
-                    <input type="hidden" name="type" value="">
-
-                    <!-- Google Captcha -->
-				    <label for="g-recaptcha-response">Captcha:</label>
-				   
-
-				    <br>
-
-                    <input type="submit" onsubmit="submitForm" class="button submit" value="Send">
-			    </form>
-            </div>
-        </div>  
+  <div class="large-10 columns" style="padding-left: 25px">
+    <br />
+    <div id="comment_heading">
+      <h3>
+        Please complete the form below if you wish to comment on any aspect of
+        this record. We will be sent the unique ID/URL of the record alongside
+        your remarks and will get back to you as soon as we can.
+      </h3>
     </div>
+    <br />
+
+    <div id="form-section">
+      <form id="commentForm">
+        <div>
+          <label style="width: 150px">To:</label> &nbsp;
+          <strong>Early Modern Letters Online</strong>
+        </div>
+
+        <br />
+
+        <div>
+          <label style="width: 150px">Subject:</label> &nbsp;
+          <span>Comment on EMLO record</span>
+        </div>
+
+        <br />
+
+        <label for="name" style="width: 150px">Your name:</label>
+        <input type="text" name="name" id="name" />
+
+        <label for="email" style="width: 150px">Your e-mail address:</label>
+        <input type="text" name="email" id="email" />
+
+        <label for="comment" class="floatleft" style="width: 150px"
+          >Your comment:</label
+        >
+        <textarea
+          name="comment"
+          id="comment"
+          rows="10"
+          cols="50"
+          class="floatleft;"
+          style="
+            margin-left: 3px;
+            padding: 10px;
+            font-family: 'coustard', 'times new roman', 'times', serif;
+          "
+        ></textarea>
+
+        {% if send_copy == "yes" %}
+          <div>
+            <label style="display:block; margin-top:10px">
+              <input type="checkbox" id="send_copy" name="send_copy" value="1" checked />
+              Send me a copy of this comment
+            </label>
+          </div>
+        {% endif %}
+
+
+        <input type="hidden" id="id" name="id" value="" />
+        <input type="hidden" id="object_type" name="type" value="" />
+
+        <input
+          type="hidden"
+          name="g-recaptcha-response"
+          id="g-recaptcha-response"
+        />
+
+
+
+        <br />  
+
+        <input class="g-recaptcha button submit"
+          data-sitekey="{{recaptcha_site_key}}" data-callback='onSubmit' 
+        data-action='submit' type="submit" value="Submit" >
+        
+        <!-- message placeholder -->
+        <div id="formMessage" style="margin-top: 15px; font-weight: bold"></div>
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 
 {% block extra_js_bottom %}
+<script src="https://www.google.com/recaptcha/api.js"></script>
 <script>
 
-    document.addEventListener("DOMContentLoaded", () => {
-        // Function to get query parameter by name
-        function getQueryParam(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
-        }
+window.onSubmit = async function(token) {
+    const form = document.getElementById("commentForm");
+    const messageBox = document.getElementById("formMessage");
 
-        // Replace 'yourQueryParam' with the actual query parameter name
-        const queryValue = getQueryParam('id');
-        
-        // Replace 'yourFieldId' with the actual ID of the field
-        if (queryValue) {
-            const field = document.getElementById('id');
-            if (field) {
-            field.value = queryValue;
-            }
+    // Clear previous messages
+    messageBox.textContent = "";
+    const errorFields = form.querySelectorAll(".field-error");
+    errorFields.forEach(el => el.remove());
+
+    // Show sending message
+    messageBox.textContent = "Sending your request...";
+    messageBox.style.color = "blue";
+
+    const formData = new FormData(form);
+
+    const recordId = document.getElementById("id").value;
+    if (!recordId) {
+        messageBox.textContent = "Unable to complete your request because record ID or type is missing or incorrect.";
+        messageBox.style.color = "red";
+        return;
+    }
+
+    try {
+        const response = await fetch("/comment/send", {
+            method: "POST",
+            body: formData,
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            messageBox.textContent = data.message;
+            messageBox.style.color = "green";
+            form.reset();
+            if (typeof grecaptcha !== "undefined") grecaptcha.reset();
+            window.location = `/comment/thanks?object_type=${data["object_type"]}&uuid=${data.uuid}`
+        } else {
+            messageBox.textContent = data.message || "Something went wrong.";
+            messageBox.style.color = "red";
+            if (typeof grecaptcha !== "undefined") grecaptcha.reset();
         }
+    } catch (err) {
+        console.error(err);
+        messageBox.textContent = "Failed to send. Please try again later.";
+        messageBox.style.color = "red";
+        if (typeof grecaptcha !== "undefined") grecaptcha.reset();
+    }
+
+    // Auto-hide message after 3 seconds
+    setTimeout(() => {
+        messageBox.textContent = "";
+        const errorFields = form.querySelectorAll(".field-error");
+        errorFields.forEach(el => el.remove());
+    }, 3000);
+};
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Get record id from URL
+    function getQueryParam(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+
+    const recordId = getQueryParam("id");
+    if (recordId) {
+        document.getElementById("id").value = recordId;
+        fetchRecord(recordId)
+    }
+
+    // Handle form submit
+    const form = document.getElementById("commentForm");
+    const messageBox = document.getElementById("formMessage");
+
+    form.addEventListener("submit", function(e){
+        e.preventDefault();  // Prevent default form submission
+        onSubmit();          // Call your async handler
     });
 
-    function submitForm() {
-        alert("Form functionality is pending")
+    function fetchRecord(recordID) {
+        fetch(`/solr/all/select?q=${recordId}&fl=uuid,object_type&wt=json`)
+            .then(response => response.json())
+            .then(data => {
+                let typeInput =document.getElementById("object_type")
+                if (typeInput) {
+                    typeInput.value = data.response.docs[0]["object_type"];
+                }
+        })
     }
+});
+
+
 </script>
 {% endblock extra_js_bottom %}

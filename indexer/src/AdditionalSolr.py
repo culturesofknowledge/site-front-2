@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import sys
 import time
+import csv
+import os
 
 import solr
 # import imp
@@ -10,6 +12,7 @@ import solr
 # sys.setdefaultencoding("utf8")
 
 import solrconfig
+import sourceconfig_base
 
 web_lib_path = 'lib'
 sys.path.append( web_lib_path )
@@ -126,6 +129,14 @@ def AdditionalWorksData( use_staging=True ) : #{
   
   resource_additional = [ f.get_resource_url_fieldname(),
                           f.get_resource_title_fieldname() ]
+
+  transcriptions_file = os.path.join(sourceconfig_base.base, "transcription-texts.csv")
+  transcriptions = {}
+  if os.path.isfile(transcriptions_file):
+    with open(transcriptions_file, 'r') as tr_file:
+      tr_reader = csv.DictReader(tr_file, restval="")
+      for row in tr_reader:
+        transcriptions[row['url']] = row['content']
 
   start = 0
   batch = 100
@@ -680,6 +691,9 @@ def AdditionalWorksData( use_staging=True ) : #{
 
             if resource_title.startswith( 'Transcript' ) and resource_url.startswith( 'http' ): #{
               add_additional( updated, f.get_transcription_url_fieldname(), resource_url )
+              if resource_url in transcriptions:
+                txt = transcriptions[resource_url]
+                add_additional(updated, f.get_transcription_fieldname(), txt)
               changed = True
 
 

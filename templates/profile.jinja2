@@ -58,6 +58,11 @@
     #work-profile p{
         margin-bottom: 0px;
     }
+    .large-9 {
+        margin-left: 25px;
+        width: 70%;
+    }
+
 </style>
 {% endblock %}
 
@@ -71,8 +76,10 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     {# <script src="https://d3js.org/d3.v7.min.js"></script> #}
     <script type="text/javascript" src="{{ url_for('static', filename='libs/d3/d3.v3.min.js') }}"></script>
+
     <script type="module">
         import { searchQueryObj } from "{{ url_for('static', filename='js/search.js') }}";
+        import { modifyCurrentSearch } from "{{ url_for('static', filename='js/helper/modifyCurrentSearch.js') }}";
 
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -92,6 +99,8 @@
             let backBrowseDoc = document.getElementById("back-to-browse")
 
             const queryObj = searchQueryObj()
+
+            console.log("queryObj", queryObj)
 
 
             const query = buildSolrQuery(queryObj.openingQuery)
@@ -189,7 +198,7 @@
                             const href = newQuery ? `/forms/advanced?${newQuery}` : '/forms/advanced';
                             const modSearch =  newQuery ? `/advanced?${newQuery}` : '/advanced';
                             document.getElementById('back-to-results').onclick = () => window.location.href = href;
-                            document.getElementById('modify-search').onclick = () => window.location.href = modSearch;
+                            document.getElementById('modify-search').onclick = () => modifyCurrentSearch()
                         }
 
                         if(numFound && start >= 0) {
@@ -227,7 +236,7 @@
         })
 
         function buildSolrQuery(config) {
-            const { queryStrings = [], sort = [], size = 10 , must = [] , queryString = ""} = config;
+            const { queryStrings = [], sort = [], size = 10 , must = [] , queryString = "" , query = {} } = config;
 
             let queryParts = [];
             
@@ -244,6 +253,19 @@
             for(const m of must){
                 const query = `${m.field}:${m.value}`
                 queryParts.push(query)
+            }
+
+            if(query && query.hasOwnProperty('range')) {
+
+                const fields = Object.keys(query.range);
+                const rangeQueries = fields.map((field) => {
+                    const range = query.range[field];
+                    return `${field}:[${range.gte || "*"} TO ${range.lte || "*"}]`;
+                });
+
+                if(rangeQueries) {
+                    queryParts.push(rangeQueries)
+                }
             }
 
 

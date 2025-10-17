@@ -1,22 +1,70 @@
-{% extends "base.jinja2" %}
+    {% extends "base.jinja2" %}
 
 {% block title %}Home{% endblock %}
 
 {% block content %}
     <div class="row">
+         <div class="content_container">
+    
+            <section class="content_wrap row" role="document">
 
-        <div class="large-2 columns"><!-- dummy column -->&nbsp;</div>
+		<!-- 404 intro -->
+	      <div class="large-3 columns">
+	        <br>
+	      </div>
+	      <div  id="content"class="large-9 columns" role="main">
+	      <br>
+	     
+        
+        
+			<article id="post-0" class="post error404 no-results not-found">
+				<header class="entry-header">
+					<h1 class="entry-title">This is somewhat embarrassing, isn&rsquo;t it?</h1>
+				</header>
 
-        <div class="large-10 columns" style="padding-left:25px">
-            <br/>
-            <h2>Missing</h2>
-            <p>Sorry, that record has not been found, it may have been merged with another record. Sorry about that.</p>
-            <a href="{{ url_for('home.home') }}">Go to Home</a>
-            <br/><br/><br/>
-        </div>
+				<div class="entry-content">
+					<p>The page you were looking for might not be here. It could have been moved, deleted or maybe the URL you typed or the link you clicked was incorrect in some way.</p>
+
+	                <br>
+	                <p style="font-size:x-small;">
+						<img src="{{ url_for('static', filename='img/EMLO_404.png') }}" style="padding:10px; background:#fff; border:1px solid #999;"/><br>
+	                <a href="http://www.rijksmuseum.nl/collectie/RP-P-OB-7367/de-alchemist" target="_blank">Image Source: Rijksmuseum, Amsterdam. CC BY 3.0.</a></p>
+	                <br>
+	                <p>You can try the Basic and Intermediate searches on our <a href="{{base_url}}">Homepage</a>, try an <a href="{{base_url}}advanced">Advanced Search</a>, or go to <a href="{{base_url}}browse/people">Browse</a></p>
+	                <br>
+	                <p>You can also check our <a href="/about" target="_blank">about</a> to discover who participated in this project!</p>
+	                <br>
+ 
+					<h5><b>Try Again?</b></h5>
+					<p>I know this didn&rsquo;t work before but you may want to try searching again, only this time keep your fingers crossed!</p>
+						<form id="searchQuick" action="submitForm()" method="get">
+						<div class="row collapse">
+						<div class="large-5 medium-5 small-12 columns">
+						<input type="text" value="" id="s" name="everything" /> 
+						</div>
+						<input class="button" type="submit" value="Search" style="float: left;padding: 7px;font-size: 16px;" />
+						</form>
+					
+				</div><!-- .entry-content -->
+			</article><!-- #post-0 -->
+
+		</div><!-- #content -->
+
+	</section><!-- end .content-wrap -->
+    </div><!-- end .content_container -->
     </div>
 {% endblock %}
 
 
 {% block extra_js_bottom %}
+<script>
+document.getElementById("searchQuick").addEventListener("submit", function(event) {
+    event.preventDefault();
+    // Other work
+	const query = document.getElementById("s").value
+	window.location = `/forms/quick?everything=${query}&search_type=quick`
+});
+
+
+</script>
 {% endblock extra_js_bottom %}

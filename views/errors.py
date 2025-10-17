@@ -1,11 +1,11 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 
 errors_bp = Blueprint('errors', __name__)
 
 
 @errors_bp.app_errorhandler(404)
 def route_not_found(err):
-    return render_template('page_not_found.jinja2', title="Page not found"), 404
+    return render_template('page_not_found.jinja2', title="Page not found" , base_url=request.host_url), 404
 
 
 @errors_bp.app_errorhandler(500)

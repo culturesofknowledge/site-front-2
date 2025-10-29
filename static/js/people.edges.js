@@ -62,6 +62,7 @@ try {
       "foaf_gender",
       "skos_altLabel",
       "ox_titlesRolesOccupations",
+      "object_type",
     ],
   };
 

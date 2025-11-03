@@ -14,7 +14,9 @@
 <script type="module">
   import { modifyCurrentSearch } from "{{ url_for('static', filename='js/helper/modifyCurrentSearch.js') }}";
   $(document).on("click", "#modify_search", function () {
-    console.log("New logic")
+    modifyCurrentSearch()
+  });
+   $(document).on("click", "#modify_search_result", function () {
     modifyCurrentSearch()
   });
 </script>

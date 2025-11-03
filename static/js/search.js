@@ -1,4 +1,17 @@
 const ROWS_COUNT = 50;
+const DEFAULT_SORT_OPTION = { field: "started_date_sort", order: "asc" };
+const SORT_OPTIONS = {
+  "date-a": { field: "started_date_sort", order: "asc" },
+  "date-d": { field: "started_date_sort", order: "desc" },
+  "author-a": { field: "author_sort", order: "asc" },
+  "author-d": { field: "author_sort", order: "desc" },
+  "recipient-a": { field: "recipient_sort", order: "asc" },
+  "recipient-d": { field: "recipient_sort", order: "desc" },
+  "origin-a": { field: "origin_sort", order: "asc" },
+  "origin-d": { field: "origin_sort", order: "desc" },
+  "destination-a": { field: "destination_sort", order: "asc" },
+  "destination-d": { field: "destination_sort", order: "desc" },
+};
 
 export function searchQueryObj() {
   // Fetching URL params
@@ -101,13 +114,19 @@ function advanceSearch(params) {
     query: {},
     queryStrings: [],
     size: ROWS_COUNT, // This will allow us to fetch number of rows using solr query.
-    sort: [
-      { field: "started_date_sort", order: "asc" },
-      { field: "score", order: "desc" },
-    ],
+    sort: [],
     highlights: [],
     from: 0,
   };
+
+  if (params && params.get("sort")) {
+    const sortOption = params.get("sort");
+    if (SORT_OPTIONS.hasOwnProperty(sortOption)) {
+      openingQuery.sort.push(SORT_OPTIONS[sortOption]);
+    }
+  } else {
+    openingQuery.sort.push(DEFAULT_SORT_OPTION);
+  }
 
   if (params && params.get("start")) {
     const urlStartParam = params.get("start");

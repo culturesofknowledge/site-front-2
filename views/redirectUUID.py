@@ -1,4 +1,4 @@
-from flask import Blueprint, url_for, abort, redirect
+from flask import Blueprint, url_for, request, redirect, render_template
 import requests
 from views.solr import getSolrURL
 
@@ -25,7 +25,7 @@ def index(id):
     solr_data = query_solr(solr_query)
 
     if solr_data is None or solr_data['response']['numFound'] == 0:
-        abort(404)
+        return render_template('page_not_found.jinja2', title="Page not found" , base_url=request.host_url), 404
 
     object_type = solr_data['response']['docs'][0]['object_type']
 
@@ -34,5 +34,3 @@ def index(id):
         object_type = "repository"
 
     return redirect(url_for("profile.profile", collection=object_type, id=id), code=301)
-   
-

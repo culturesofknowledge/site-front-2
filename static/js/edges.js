@@ -125,7 +125,7 @@ emlo.ResultTemplate = class extends edges.Template {
           </div>
        
           <div id="modify_search" style="display:none;">
-              <button class="small button modifysearchbtn" onclick="modifyCurrentSearch()">Modify your search</button>
+              <button class="small button modifysearchbtn">Modify your search</button>
           </div>
 
          <div id="current_search">
@@ -211,38 +211,6 @@ emlo.ProfileTemplate = class extends edges.Template {
     for (let i = 0; i < sidebarTitleComponents.length; i++) {
       sidebarTitle += `<div id="${sidebarTitleComponents[i].id}"></div>`;
     }
-
-    // let frag = `<div class="row row-with-side">
-    //   <div class="side-nav">
-    //     <div id="sidebar-title">
-    //       ${sidebarTitle}
-    //     </div>
-
-    //     <div id="sidebar-actions">
-    //         <div>
-    //           <img src="../../static/img/icon-short-url.png" alt="short-url" />
-    //           Short URL:
-    //           <span id="short-url-link">
-    //           </span>
-    //         </div>
-
-    //         <div id="send-comment">
-    //           <img src="../../static/img/icon-send-comment.png" alt="short-url" />
-    //           <a> Send Comment </a>
-    //         </div>
-    //     </div>
-
-    //     <div id="more-options">
-    //         ${sidebar}
-    //     </div>
-    //   </div>
-
-    //   <div id="main" class="" style="margin-left:5px;">
-    //     <div class="large-12 columns">
-    //       ${results}
-    //     </div>
-    //   </div>
-    // </div>`;
 
     let frag = `
       <div id="main" class="row">
@@ -4228,10 +4196,10 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       return;
     }
 
-    const currentDomain = window.location.host;
+    const currentDomain = window.location.origin;
     const result = this.component.results[0];
     const editIdValue = GetRecordID(this.footerType, result);
-    const currentHref = window.location.href;
+    const protocol = window.location.href;
 
     const shortURL = GenerateShortURL(
       editIdValue,
@@ -4287,11 +4255,11 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       htmlContent += `<br/><br/>Alternative urls for this record:<ul>`;
 
       if (url) {
-        htmlContent += `<li class="footer-links"><a href="${url}">${url}</a></li>`;
+        htmlContent += `<li class="footer-links"><a href="${url}" onclick="redirectShortURL(event)">${url}</a></li>`;
       }
 
       if (shortURL) {
-        htmlContent += `<li class="footer-links"><a href="${shortURL}">${shortURL}</a></li>`;
+        htmlContent += `<li class="footer-links"><a href="${shortURL}" onclick="redirectShortURL(event)">${shortURL}</a></li>`;
       }
 
       htmlContent += `</ul>`;
@@ -4319,7 +4287,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       return "";
     }
 
-    const currentDomain = window.location.host;
+    const currentDomain = window.location.origin;
     const result = this.component.results[0];
     const editIdValue = GetRecordID(this.footerType, result);
     const currentHref = window.location.href;
@@ -4468,7 +4436,7 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
           console.log("Nothing is valid");
       }
 
-      const currentDomain = window.location.host;
+      const currentDomain = window.location.origin;
       const editIdValue = GetRecordID(footerType, result);
       const currentHref = window.location.href;
 
@@ -4488,7 +4456,7 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
         }">
           <img src="../../static/img/icon-short-url.png" alt="short-url" />
           Short URL: <span id="short-url-link" class="showLink">
-            <a href=${shortURL}> ${shortURL} </a>
+            <a href=${shortURL} onclick="redirectShortURL(event)"> ${shortURL} </a>
           </span>
         <p>
 

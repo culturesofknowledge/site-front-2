@@ -60,7 +60,7 @@ REDIRECT_COLLECTION_MAP = {
 def index(type, id):
     # Check if the type exists in the core map
     if type not in CORE_MAP:
-        return render_template('data_not_found.jinja2', title="Data not found"), 404
+        abort(404)
     
     # Special case for type 'm'
     if type == 'm' and 2 <= len(id) <= 10:
@@ -80,7 +80,7 @@ def redirect_function(type, id, core):
     solr_data = query_solr(core, solr_query)
 
     if solr_data is None or solr_data['response']['numFound'] == 0:
-        return f"{type.capitalize()} not found", 404
+        abort(404)
 
     uuid = solr_data['response']['docs'][0]['uuid']
 
@@ -89,4 +89,4 @@ def redirect_function(type, id, core):
     if collection:
         return redirect(url_for("profile.profile", collection=collection, id=uuid), code=301)
     else:
-        return render_template('data_not_found.jinja2', title="Data not found"), 404
+        abort(404)

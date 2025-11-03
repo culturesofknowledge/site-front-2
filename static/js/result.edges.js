@@ -351,7 +351,7 @@ try {
 
             <p>
                 No results found. We suggest that you...
-                <button class="small button modifysearchbtn" onclick="modifyCurrentSearch()">Modify your search</button>
+                <button id="modify_search_result" class="small button modifysearchbtn">Modify your search</button>
             </p>
           </div>`,
           serialHeader: "",

@@ -4237,10 +4237,10 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       return;
     }
 
-    const currentDomain = window.location.host;
+    const currentDomain = window.location.origin;
     const result = this.component.results[0];
     const editIdValue = GetRecordID(this.footerType, result);
-    const currentHref = window.location.href;
+    const protocol = window.location.href;
 
     const shortURL = GenerateShortURL(
       editIdValue,
@@ -4328,7 +4328,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
       return "";
     }
 
-    const currentDomain = window.location.host;
+    const currentDomain = window.location.origin;
     const result = this.component.results[0];
     const editIdValue = GetRecordID(this.footerType, result);
     const currentHref = window.location.href;
@@ -4477,7 +4477,7 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
           console.log("Nothing is valid");
       }
 
-      const currentDomain = window.location.host;
+      const currentDomain = window.location.origin;
       const editIdValue = GetRecordID(footerType, result);
       const currentHref = window.location.href;
 

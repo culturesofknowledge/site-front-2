@@ -274,6 +274,7 @@ function advanceSearch(params) {
           { field: "ox_incipit", operator: "OR" },
           { field: "ox_excipit", operator: "OR" },
           { field: "mail_postScript", operator: "OR" },
+          { field: "ox_transcription", operator: "OR" },
         ],
       },
       {
@@ -294,7 +295,13 @@ function advanceSearch(params) {
       },
     ];
 
-    const customValue = ["aut", "rec", "pla_ori_name", "pla_des_name"];
+    const customValue = [
+      "aut",
+      "rec",
+      "pla_ori_name",
+      "pla_des_name",
+      "let_con",
+    ];
     // Loop through paramConfigs to generate query strings
     paramConfigs.forEach((config) => {
       const paramValue = params.get(config.param);
@@ -371,6 +378,43 @@ function advanceSearch(params) {
             });
           }
         }
+      }
+
+      if (config.param == "let_con" && paramValue) {
+        // Content specific search starts here
+        const contentSpecificSearch = [
+          "transcriptions",
+          "abstracts",
+          "incipits",
+        ];
+
+        if (contentSpecificSearch.some((key) => params.get(key) === "true")) {
+          let fields = [];
+
+          // For each key, handle individually if its value is true
+          if (params.get("transcriptions") === "true") {
+            fields.push({ field: "ox_transcription", operator: "OR" });
+          }
+
+          if (params.get("abstracts") === "true") {
+            fields.push({ field: "dcterms_abstract", operator: "OR" });
+          }
+
+          if (params.get("incipits") === "true") {
+            fields.push({ field: "ox_incipit", operator: "OR" });
+          }
+
+          openingQuery.queryStrings.push({
+            queryString: paramValue,
+            fields: fields,
+          });
+        } else {
+          openingQuery.queryStrings.push({
+            queryString: paramValue,
+            fields: config.queryStringFields,
+          });
+        }
+        // Content specific search ends here
       }
 
       if (paramValue && !customValue.includes(config.param)) {
@@ -750,6 +794,7 @@ function getMultiSearchFields() {
     "ox_incipit",
     "ox_excipit",
     "mail_postScript",
+    "ox_transcription",
   ];
 
   // People: authors or senders

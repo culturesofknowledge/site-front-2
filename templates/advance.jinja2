@@ -204,6 +204,9 @@ input[type="checkbox"]:checked {
                 <li>
                     <a href="#institutions_section">Repositories and Editions</a>
                 </li>
+                <li>
+                    <a href="#resources_emlo">Resources within EMLO</a>
+                </li>
 			<li>
                     <form onsubmit="return false;" style="width:200px">
                         <button onclick="advanceSearch()" style="margin-top:10px;margin-right:45px;" 
@@ -240,6 +243,10 @@ input[type="checkbox"]:checked {
 
                     <div id="institutions_section" class="section clearfix">
                         {% include './components/advance/institutions.jinja2' %}
+                    </div>
+
+                    <div id="resources_emlo" class="section clearfix">
+                        {% include './components/advance/resources_emlo.jinja2' %}
                     </div>
 
                     <div class="large-10">
@@ -317,6 +324,9 @@ const inputs = [
     { id: "let_shel", defaultValue: "all shelfmarks", paramName: "let_shel" },
     { id: "let_pe", defaultValue: "false", paramName: "let_pe" },
     { id: "let_pe_tex", defaultValue: "all printed editions", paramName: "let_pe_tex" },
+    { id: "transcriptions", defaultValue: "false", paramName: "transcriptions" },
+    { id: "abstracts", defaultValue: "false", paramName: "abstracts" },
+    { id: "incipits", defaultValue: "false", paramName: "incipits" },
 ];
 
 function advanceSearch(event){

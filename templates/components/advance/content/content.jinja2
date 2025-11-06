@@ -24,6 +24,80 @@
       </div>
     </div>
 
+
+    <div
+      data-delay="2.0"
+      data-tip="Search within incipits (where available)." 
+      class="row">
+      <div class="columns small-12 large-4">
+        <label>Only in</label>
+        <div class="row">
+          <div class="small-9 columns">
+            <input
+              type="checkbox"
+              id="incipits"
+              name="incipits"
+              value="false"
+              onchange="changeCheckboxValue(this)"
+              class="checkbox"
+            />
+
+            <label for="incipits">incipits</label>
+          </div>
+          <div>
+            {% include 'components/common/help_icon_nolabel.jinja2' %}
+          </div>
+        </div>
+      </div>
+
+      <div
+        data-delay="2.0"
+        data-tip="Search within abstracts (where available)."  
+        class="columns small-12 large-4">
+        <label>Only in</label>
+        <div class="row">
+          <div class="small-9 columns">
+            <input
+              type="checkbox"
+              id="abstracts"
+              name="abstracts"
+              value="false"
+              onchange="changeCheckboxValue(this)"
+            />
+
+            <label for="abstracts">abstracts</label>
+          </div>
+          <div>
+            {% include 'components/common/help_icon_nolabel.jinja2' %}
+          </div>
+        </div>
+      </div>
+
+      <div 
+        data-delay="2.0"
+        data-tip="Search within transcriptions/translations (where available)."
+        class="columns small-12 large-4">
+        <label>Only in</label>
+        <div class="row">
+          <div class="small-9 columns">
+            <input
+              type="checkbox"
+              id="transcriptions"
+              name="transcriptions"
+              value="false"
+              onchange="changeCheckboxValue(this)"
+              class="checkbox"
+            />
+
+            <label for="transcriptions">transcriptions / translations</label>
+          </div>
+          <div>
+            {% include 'components/common/help_icon_nolabel.jinja2' %}
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div
       data-delay="2.0" 
       data-tip="Confine your search to a particular document type."
@@ -64,79 +138,6 @@
       </div>
       <div>
         {% include 'components/common/help_icon.jinja2' %}
-      </div>
-    </div>
-
-    <div
-      data-delay="2.0"
-      data-tip="Confine your search to letters for which we have images." 
-      class="row">
-      <div class="columns small-12 large-4">
-        <label>Only with</label>
-        <div class="row">
-          <div class="small-9 columns">
-            <input
-              type="checkbox"
-              id="let_ima"
-              name="let_ima"
-              value="false"
-              onchange="changeCheckboxValue(this)"
-              class="checkbox"
-            />
-
-            <label for="let_ima">images</label>
-          </div>
-          <div>
-            {% include 'components/common/help_icon_nolabel.jinja2' %}
-          </div>
-        </div>
-      </div>
-
-      <div
-        data-delay="2.0"
-        data-tip="Confine your search to letters for which we have abstracts."  
-        class="columns small-12 large-4">
-        <label>Only with</label>
-        <div class="row">
-          <div class="small-9 columns">
-            <input
-              type="checkbox"
-              id="let_abst"
-              name="let_abst"
-              value="false"
-              onchange="changeCheckboxValue(this)"
-            />
-
-            <label for="let_abst">abstracts</label>
-          </div>
-          <div>
-            {% include 'components/common/help_icon_nolabel.jinja2' %}
-          </div>
-        </div>
-      </div>
-
-      <div 
-        data-delay="2.0"
-        data-tip="Confine your search to letters for which we have full-text transcriptions."
-        class="columns small-12 large-4">
-        <label>Only with</label>
-        <div class="row">
-          <div class="small-9 columns">
-            <input
-              type="checkbox"
-              id="let_trans"
-              name="let_trans"
-              value="false"
-              onchange="changeCheckboxValue(this)"
-              class="checkbox"
-            />
-
-            <label for="let_trans">transcriptions</label>
-          </div>
-          <div>
-            {% include 'components/common/help_icon_nolabel.jinja2' %}
-          </div>
-        </div>
       </div>
     </div>
   </fieldset>

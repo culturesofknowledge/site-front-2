@@ -1,4 +1,17 @@
 const ROWS_COUNT = 50;
+const DEFAULT_SORT_OPTION = { field: "started_date_sort", order: "asc" };
+const SORT_OPTIONS = {
+  "date-a": { field: "started_date_sort", order: "asc" },
+  "date-d": { field: "started_date_sort", order: "desc" },
+  "author-a": { field: "author_sort", order: "asc" },
+  "author-d": { field: "author_sort", order: "desc" },
+  "recipient-a": { field: "recipient_sort", order: "asc" },
+  "recipient-d": { field: "recipient_sort", order: "desc" },
+  "origin-a": { field: "origin_sort", order: "asc" },
+  "origin-d": { field: "origin_sort", order: "desc" },
+  "destination-a": { field: "destination_sort", order: "asc" },
+  "destination-d": { field: "destination_sort", order: "desc" },
+};
 
 export function searchQueryObj() {
   // Fetching URL params
@@ -101,13 +114,19 @@ function advanceSearch(params) {
     query: {},
     queryStrings: [],
     size: ROWS_COUNT, // This will allow us to fetch number of rows using solr query.
-    sort: [
-      { field: "started_date_sort", order: "asc" },
-      { field: "score", order: "desc" },
-    ],
+    sort: [],
     highlights: [],
     from: 0,
   };
+
+  if (params && params.get("sort")) {
+    const sortOption = params.get("sort");
+    if (SORT_OPTIONS.hasOwnProperty(sortOption)) {
+      openingQuery.sort.push(SORT_OPTIONS[sortOption]);
+    }
+  } else {
+    openingQuery.sort.push(DEFAULT_SORT_OPTION);
+  }
 
   if (params && params.get("start")) {
     const urlStartParam = params.get("start");
@@ -255,6 +274,7 @@ function advanceSearch(params) {
           { field: "ox_incipit", operator: "OR" },
           { field: "ox_excipit", operator: "OR" },
           { field: "mail_postScript", operator: "OR" },
+          { field: "ox_transcription", operator: "OR" },
         ],
       },
       {
@@ -275,7 +295,13 @@ function advanceSearch(params) {
       },
     ];
 
-    const customValue = ["aut", "rec", "pla_ori_name", "pla_des_name"];
+    const customValue = [
+      "aut",
+      "rec",
+      "pla_ori_name",
+      "pla_des_name",
+      "let_con",
+    ];
     // Loop through paramConfigs to generate query strings
     paramConfigs.forEach((config) => {
       const paramValue = params.get(config.param);
@@ -352,6 +378,43 @@ function advanceSearch(params) {
             });
           }
         }
+      }
+
+      if (config.param == "let_con" && paramValue) {
+        // Content specific search starts here
+        const contentSpecificSearch = [
+          "transcriptions",
+          "abstracts",
+          "incipits",
+        ];
+
+        if (contentSpecificSearch.some((key) => params.get(key) === "true")) {
+          let fields = [];
+
+          // For each key, handle individually if its value is true
+          if (params.get("transcriptions") === "true") {
+            fields.push({ field: "ox_transcription", operator: "OR" });
+          }
+
+          if (params.get("abstracts") === "true") {
+            fields.push({ field: "dcterms_abstract", operator: "OR" });
+          }
+
+          if (params.get("incipits") === "true") {
+            fields.push({ field: "ox_incipit", operator: "OR" });
+          }
+
+          openingQuery.queryStrings.push({
+            queryString: paramValue,
+            fields: fields,
+          });
+        } else {
+          openingQuery.queryStrings.push({
+            queryString: paramValue,
+            fields: config.queryStringFields,
+          });
+        }
+        // Content specific search ends here
       }
 
       if (paramValue && !customValue.includes(config.param)) {
@@ -731,6 +794,7 @@ function getMultiSearchFields() {
     "ox_incipit",
     "ox_excipit",
     "mail_postScript",
+    "ox_transcription",
   ];
 
   // People: authors or senders

@@ -8,7 +8,7 @@
         <br/>This information has not yet been captured systematically.
         <br/>You can also search Content for mentions of people and organizations." 
         class="row">
-        <div class="small-10 columns">
+        <div class="small-11 columns">
             <label for="ment">Name</label>
             <input
                 id="ment"
@@ -30,7 +30,7 @@
         <div
             data-delay="2.0"
             data-tip="Confine your search to male or female people mentioned in letters." 
-            class="large-3 small-12 columns" 
+            class="large-4 small-12 columns" 
             style="padding-left: 0px;"
         >
             <div  class="large-8 columns small-10" style="padding: 0px;">
@@ -50,22 +50,24 @@
         <div
             data-delay="2.0"
             data-tip="Confine your search to instances where the person mentioned was an organization or corporate entity, e.g. The Royal Society." 
-            class="columns small-12 large-8 end">
-            <div class="large-8 columns small-10">
-                <label>&nbsp;<!-- for alignment--></label>
-                <input
-                    type="checkbox"
-                    id="ment_org"
-                    name="ment_org"
-                    value="false"
-                    onchange="changeCheckboxValue(this)"
-                    class="checkbox"
-                />
+            class="columns small-12 large-4 end">
+            <div class="row">
+                <div class="large-9 columns small-10">
+                    <label>&nbsp;<!-- for alignment--></label>
+                    <input
+                        type="checkbox"
+                        id="ment_org"
+                        name="ment_org"
+                        value="false"
+                        onchange="changeCheckboxValue(this)"
+                        class="checkbox"
+                    />
 
-                <label for="ment_org">Only organizations</label>
-            </div>
-            <div>
-                {% include 'components/common/help_icon.jinja2' %}
+                    <label for="ment_org">Only organizations</label>
+                </div>
+                <div>
+                    {% include 'components/common/help_icon.jinja2' %}
+                </div>
             </div>
         </div>
     </div>

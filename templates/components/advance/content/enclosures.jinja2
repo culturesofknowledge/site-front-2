@@ -5,7 +5,7 @@
       data-delay="2.0"
       data-tip="Search for specific enclosed items, e.g. 'Letter'. Search is not case sensitive."  
       class="row">
-      <div class="small-10 columns">
+      <div class="small-11 columns">
         <label for="let_with_en_tex">Search enclosures</label>
         <input
           id="let_with_en_tex"
@@ -28,20 +28,22 @@
         data-delay="2.0"
         data-tip="Confine your search to letters that were sent with an enclosed item." 
         class="small-12 large-6 columns" style="padding-left: 0px;">
-          <div class="small-10 columns">
-            <input
-              type="checkbox"
-              id="let_with_en"
-              name="let_with_en"
-              value="false"
-              onchange="changeCheckboxValue(this)"
-              class="checkbox"
-            />
+          <div class="row">
+            <div class="large-10 small-10 columns">
+              <input
+                type="checkbox"
+                id="let_with_en"
+                name="let_with_en"
+                value="false"
+                onchange="changeCheckboxValue(this)"
+                class="checkbox"
+              />
 
-            <label for="let_with_en">Only with enclosures</label>
-          </div>
-          <div>
-            {% include 'components/common/help_icon_nolabel.jinja2' %}
+              <label for="let_with_en">Only with enclosures</label>
+            </div>
+            <div>
+              {% include 'components/common/help_icon_nolabel.jinja2' %}
+            </div>
           </div>
       </div>
 
@@ -49,20 +51,22 @@
         data-delay="2.0"
         data-tip="Confine your search to letters that were themselves enclosed with another letter."
         class="small-12 large-6 columns">
-          <div class="small-10 columns">
-            <input
-              type="checkbox"
-              id="let_en"
-              name="let_en"
-              value="false"
-              onchange="changeCheckboxValue(this)"
-              class="checkbox"
-            />
+          <div class="row">
+            <div class="large-10 small-10 columns">
+              <input
+                type="checkbox"
+                id="let_en"
+                name="let_en"
+                value="false"
+                onchange="changeCheckboxValue(this)"
+                class="checkbox"
+              />
 
-            <label for="let_en">Only enclosed</label>
-          </div>
-          <div>
-            {% include 'components/common/help_icon_nolabel.jinja2' %}
+              <label for="let_en">Only enclosed</label>
+            </div>
+            <div>
+              {% include 'components/common/help_icon_nolabel.jinja2' %}
+            </div>
           </div>
       </div>
     </div>

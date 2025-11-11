@@ -25,6 +25,16 @@ try {
     size: 999999999,
     queryStrings: [],
     sort: [{ field: "browse", order: "asc" }],
+    filters: [
+      "ox_hasResource-manifestation",
+      "uuid",
+      "browse",
+      "object_type",
+      "ox_totalDocsInRepository",
+      "geonames_alternateName",
+      "geonames_locatedIn",
+      "geonames_inCountry",
+    ],
   };
 
   emlo.openingQuery.must.push({

@@ -47,6 +47,17 @@ try {
     size: 999999999,
     queryStrings: [],
     sort: [{ field: "browse", order: "asc" }],
+    filters: [
+      "browse",
+      "uuid",
+      "object_type",
+      "ox_totalWorksSentFromPlace",
+      "ox_totalWorksSentToPlace",
+      "ox_totalWorksMentioningPlace",
+      "ox_locationAlternateName",
+      "geo_lat",
+      "geo_long",
+    ],
   };
 
   // Process filters from URL parameters

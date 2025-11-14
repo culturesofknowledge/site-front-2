@@ -5,7 +5,7 @@
       data-delay="2.0"
       data-tip="Search for specific paper types and watermarks, e.g. 'Pearl', 'Crown', or 'Bird'. Search is not case sensitive." 
       class="row">
-      <div class="small-11 columns">
+      <div class="large-11 small-11 columns">
         <label for="let_pap_typ_tex">Paper type</label>
         <input
           id="let_pap_typ_tex"
@@ -27,7 +27,7 @@
       data-delay="2.0"
       data-tip="Confine your search to letters for which we have information about paper type or watermark." 
       class="row">
-      <div class="small-6 columns">
+      <div class="large-5 small-10 columns">
         <input
           type="checkbox"
           id="let_pap_typ"
@@ -53,7 +53,7 @@
       data-tip="Search for specific paper sizes, e.g. '209X160'. Please note that search must follow this format." 
       class="row"
     >
-      <div class="small-11 columns">
+      <div class="large-11 small-11 columns">
         <label for="let_pap_siz_tex">Paper sizes</label>
         <input
           id="let_pap_siz_tex"
@@ -75,31 +75,32 @@
     <div
       data-delay="2.0"
       data-tip="Confine your search to letters for which we have information about paper size." 
-      class="row">
-        <div class="small-6 columns">
-          <input
-            type="checkbox"
-            id="let_pap_siz"
-            name="let_pap_siz"
-            value="false"
-            onchange="changeCheckboxValue(this)"
-            class="checkbox"
-          />
+      class="large-12 columns" style="padding-left: 0px;margin-bottom: 15px;">
+        <div class="row">
+          <div class="large-5 small-10 columns">
+            <input
+              type="checkbox"
+              id="let_pap_siz"
+              name="let_pap_siz"
+              value="false"
+              onchange="changeCheckboxValue(this)"
+              class="checkbox"
+            />
 
-          <label for="let_pap_siz">Only with paper sizes</label>
-        </div>
-        <div>
-          {% include 'components/common/help_icon_nolabel.jinja2' %}
+            <label for="let_pap_siz">Only with paper sizes</label>
+          </div>
+          <div>
+            {% include 'components/common/help_icon_nolabel.jinja2' %}
+          </div>
         </div>
     </div>
-
-    <div class="row">
-      <div
-        data-delay="2.0"
-        data-tip="Confine your search to letters for which we have information about the number of pages."
-        style="margin-top:15px;padding-left:0px;">
-        <div class="small-6 columns">
-          <label style="margin-top:15px;">Page count</label>
+  
+    <div
+      data-delay="2.0"
+      data-tip="Confine your search to letters for which we have information about the number of pages." 
+      class="row">
+        <div class="large-5 small-10 columns">
+          <label>Page count</label>
           <input
             type="checkbox"
             id="let_page"
@@ -114,44 +115,45 @@
         <div>
           {% include 'components/common/help_icon.jinja2' %}
         </div>
-      </div>
+    </div>
+
+   
 
       <div 
         data-delay="2.0"
-        data-tip="Confine your search to letters above a certain number of pages." >
-        <div
-          class="small-11 columns">
-          <label style="margin-top:15px;" for="let_page_min">Minimum number of pages</label>
-          <select
-            id="let_page_min"
-            name="let_page_min"
-            title=""
-            class="numbers"
-          >
-            <option class="default" value="0" selected="selected">
-              any number
-            </option>
+        data-tip="Confine your search to letters above a certain number of pages." 
+       class="row">
+          <div class="large-11 small-11 columns">
+            <label style="margin-top:15px;" for="let_page_min">Minimum number of pages</label>
+            <select
+              id="let_page_min"
+              name="let_page_min"
+              title=""
+              class="numbers"
+            >
+              <option class="default" value="0" selected="selected">
+                any number
+              </option>
 
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-            <option>5</option>
-            <option>6</option>
-            <option>7</option>
-            <option>8</option>
-            <option>9</option>
-            <option>10</option>
-            <option>20</option>
-            <option>30</option>
-            <option>40</option>
-            <option>50</option>
-            <option>100</option>
-          </select>
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option>
+              <option>6</option>
+              <option>7</option>
+              <option>8</option>
+              <option>9</option>
+              <option>10</option>
+              <option>20</option>
+              <option>30</option>
+              <option>40</option>
+              <option>50</option>
+              <option>100</option>
+            </select> 
         </div>
         <div>
           {% include 'components/common/help_icon.jinja2' %}
-        </div>
+          </div>
       </div>
-    </div>
   </fieldset>

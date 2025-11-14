@@ -33,6 +33,7 @@ export function _renderWorkSidebar(profile, relations, data) {
 
   sideFrag += _renderSideSection(profile, relations);
   sideFrag += _renderImageSidebar(profile, relations, data);
+  sideFrag += _renderAlternateSidebar(profile, relations, data);
 
   return sideFrag;
 }
@@ -614,6 +615,23 @@ function _renderImageSidebar(profile, relations, data) {
         frag += displayImage(profile, imageData[uuid], maniObj);
       }
     }
+
+    return frag;
+  } else {
+    return "";
+  }
+}
+
+function _renderAlternateSidebar(profile, relations, data) {
+  if (profile.hasOwnProperty("owl_sameAs-work")) {
+    let frag = `
+      <div class="" style="border-top: 1px solid #efc319;">
+        <h3 class="worklegend">Alternative records</h3>
+        <div class="">
+          ${relationshipList(relations, profile, "owl_sameAs-work")}
+        </div>
+      </div>
+    `;
 
     return frag;
   } else {

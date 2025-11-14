@@ -4493,7 +4493,9 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
         <br/>
 
         <p style="${
-          ["work"].includes(this.profileType) ? "" : "margin-bottom:20px;"
+          ["work"].includes(this.profileType)
+            ? "overflow-wrap: anywhere;"
+            : "overflow-wrap: anywhere;margin-bottom:20px;"
         }">
           <img src="../../static/img/icon-short-url.png" alt="short-url" />
           Short URL: <span id="short-url-link" class="showLink">

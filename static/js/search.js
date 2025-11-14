@@ -117,23 +117,7 @@ function advanceSearch(params) {
     sort: [],
     highlights: [],
     from: 0,
-    filters: [
-      "frbr_Manifestation-manifestation",
-      "let_con",
-      "destination_sort",
-      "recipient_sort",
-      "origin_sort",
-      "author_sort",
-      "started_date_sort",
-      "object_type",
-      "uuid",
-      "ox_started-ox_day",
-      "ox_started-ox_month",
-      "ox_started-ox_year",
-      "ox_completed-ox_day",
-      "ox_completed-ox-month",
-      "ox_completed-ox_year",
-    ],
+    filters: [],
   };
 
   if (params && params.get("sort")) {

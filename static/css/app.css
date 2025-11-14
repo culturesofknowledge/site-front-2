@@ -10600,10 +10600,10 @@ button.tiny {
 .clear-all-button {
   margin-top: -10px;
   margin-right: 45px;
-  padding: 11px 24px;
+  padding: 11px 15px;
   font-size: 1.25rem;
   font-weight: bold;
-  border: 1px solid #EFC319;
+  border: 1px solid #efc319;
   background: #fff;
   color: #172854;
 }
@@ -10613,13 +10613,13 @@ button.tiny {
   color: #172854;
 }
 
-#remove-message{
+#remove-message {
   color: red;
   font-size: 14px;
   margin-bottom: 5px;
 }
 
-.hideEle{
+.hideEle {
   display: none;
 }
 

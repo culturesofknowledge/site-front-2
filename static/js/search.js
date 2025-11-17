@@ -146,6 +146,7 @@ function advanceSearch(params) {
       pre: '<span class="highlight">',
       post: "</span>",
       hl: "on",
+      requireFieldMatch: true,
       indent: "on",
     });
   }

@@ -1,6 +1,7 @@
 import { getCollectionTitle } from "../js/profile/collectionDetails.js";
 import PersonChart from "./chart.js";
-import { getLabel } from "./helper/getFieldLabls.js";
+import { buildSolrQuery } from "./helper/buildSolrQuery.js";
+
 import { _renderCommentProfile } from "./profile/commentFrag.js";
 import {
   _renderImageProfile,
@@ -25,8 +26,9 @@ import {
 } from "./profile/peopleFrags.js";
 import { _renderWorkProfile, _renderWorkSidebar } from "./profile/workFrag.js";
 import { searchQueryObj } from "./search.js";
+import { getLabel } from "./helper/getFieldLabls.js";
 
-const emlo = {
+let emlo = {
   active: {},
   selector: "",
   solrURL: "",
@@ -697,6 +699,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
 
   draw() {
     let frag = this.noResultsText;
+
     if (this.component.results === false) {
       frag = "Loading results... Please wait";
     }
@@ -760,7 +763,9 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
       "container",
       this.component.id
     );
+
     const container = `<div class="${containerClasses}">${frag}</div>`;
+
     this.component.context.html(container);
 
     // Attach event handlers for row selection
@@ -1092,6 +1097,7 @@ emlo.ResultTableRenderer = class extends edges.Renderer {
 emlo.Facet = class extends edges.components.RefiningANDTermSelector {
   constructor(params) {
     super(params);
+    this.fetchedAllFacets = false;
   }
 
   synchronise() {
@@ -1182,83 +1188,7 @@ emlo.Facet = class extends edges.components.RefiningANDTermSelector {
     }
   }
 
-  // removeFilter(field, term) {
-  //   let nq = this.edge.cloneQuery();
-
-  //   // Special case for handling everything
-  //   if (field == "Text") {
-  //     field = "default_search_field";
-  //   }
-
-  //   // Remove the filter from the "must" clause
-  //   nq.removeMust(
-  //     new es.TermFilter({
-  //       field: field,
-  //       value: term,
-  //     })
-  //   );
-
-  //   // Remove matching query strings
-  //   nq.removeQueryStrings(
-  //     new es.TermFilter({
-  //       field: field,
-  //       value: term,
-  //     })
-  //   );
-
-  //   // HOTFIX: This is just ensuring that we are removing query string only for quick search
-  //   if (field == "default_search_field") {
-  //     nq.removeQueryString();
-  //   }
-
-  //   _removeUrlParam(field);
-
-  //   // PATCH: In EMLO the query when using checkboxes behaves a little different since the value that we need to search on gets changed
-  //   // for eg: if sender and as marked is enabled we will search of mail_authors-rdf_value but if as marked is not present we will search on person-author
-  //   // Now since we are using edges in that we are using the initial query that got generated and hence wrong results are shown.
-  //   const query = searchQueryObj();
-
-  //   // Forcefully updating the querystrings, querystring and must.
-  //   if (query && (query.openingQuery != null || query.openingQuery != {})) {
-  //     nq = this.syncObjects(nq, query.openingQuery);
-  //   }
-
-  //   // Reset the search page to the start and trigger the next query
-  //   nq.from = 0;
-  //   this.edge.pushQuery(nq);
-  //   this.edge.cycle();
-  // }
-
   removeFilter(field, term) {
-    // --- CREATE AND SHOW MODAL ---
-    // const modalOverlay = document.createElement("div");
-    // modalOverlay.id = "removing-alert";
-    // modalOverlay.style.position = "fixed";
-    // modalOverlay.style.top = 0;
-    // modalOverlay.style.left = 0;
-    // modalOverlay.style.width = "100%";
-    // modalOverlay.style.height = "100%";
-    // modalOverlay.style.background = "rgba(0,0,0,0.5)";
-    // modalOverlay.style.display = "flex";
-    // modalOverlay.style.justifyContent = "center";
-    // modalOverlay.style.alignItems = "center";
-    // modalOverlay.style.zIndex = 1000;
-
-    // const modal = document.createElement("div");
-    // modal.style.background = "white";
-    // modal.style.padding = "20px";
-    // modal.style.borderRadius = "8px";
-    // modal.style.minWidth = "250px";
-    // modal.style.textAlign = "center";
-
-    // const label = getLabel(field);
-
-    // modal.innerHTML = `<div>
-    //   <p> Removing current search <strong> ${label} - ${term} </strong></p>
-    // </div>`;
-    // modalOverlay.appendChild(modal);
-    // document.body.appendChild(modalOverlay);
-
     let doc = document.getElementById("remove-message");
     if (doc) {
       doc.style.display = "block";
@@ -1348,9 +1278,141 @@ emlo.FacetRenderer = class extends edges.Renderer {
     this.hideCount = edges.util.getParam(params, "hideCount", 0); //  this will hide the facets after mentioned count entries are selected.
     this.tooltipState = "closed";
     this.namespace = "emlo-facet-view";
-
-    this.showAll = false; // Track whether to show all entries
+    this.additionalDataField = [];
   }
+
+  // draw() {
+  //   let ts = this.component;
+
+  //   if (!ts.active && this.hideInactive) {
+  //     ts.context.html("");
+  //     return;
+  //   }
+
+  //   if (!ts.values || ts.values.length === 0) {
+  //     ts.context.html("");
+  //     return;
+  //   }
+
+  //   const valClass = edges.util.allClasses(
+  //     this.namespace,
+  //     "value",
+  //     this.component.id
+  //   );
+  //   const showMoreId = edges.util.htmlID(
+  //     this.namespace,
+  //     "show-more",
+  //     this.component.id
+  //   );
+  //   const modalId = edges.util.htmlID(
+  //     this.namespace,
+  //     "facet-modal",
+  //     this.component.id
+  //   );
+  //   const modalContentId = edges.util.htmlID(
+  //     this.namespace,
+  //     "facet-modal-content",
+  //     this.component.id
+  //   );
+
+  //   // Render limited results
+  //   let limitedResults = "";
+  //   ts.values.forEach((val, idx) => {
+  //     if (val.count > 0) {
+  //       const isHidden = idx >= this.displayLimit;
+  //       let displayVal = this._displayFacetValue(
+  //         this.component.field,
+  //         val.term
+  //       );
+
+  //       limitedResults += `
+  //               <tr style="${isHidden ? "display:none;" : ""}">
+  //                   <td>
+  //                       <a href="#" class="${valClass}" data-key="${edges.util.escapeHtml(
+  //         val.term
+  //       )}" data-changekey="${this.component.field}${edges.util.escapeHtml(
+  //         val.term
+  //       )}">
+  //                           <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
+  //                           ${displayVal}
+  //                       </a>
+  //                   </td>
+  //                   <td>${val.count}</td>
+  //               </tr>
+  //           `;
+  //     }
+  //   });
+
+  //   let showMoreFrag =
+  //     ts.values.length > this.displayLimit
+  //       ? `
+  //       <tr>
+  //           <td id="${showMoreId}" class="btn btn-link">Click to show more...</td>
+  //       </tr>`
+  //       : "";
+
+  //   // Modal container exists but initially empty
+  //   let modalFrag = `
+  //       <div id="${modalId}" class="facet-modal hideEle">
+  //           <div class="facet-modal-content">
+  //               <div class="facet-modal-header">
+  //                   <span>${this.title}</span>
+  //                   <span id="${edges.util.htmlID(
+  //                     this.namespace,
+  //                     "facet-modal-close",
+  //                     this.component.id
+  //                   )}" class="facet-modal-close">&times;</span>
+  //               </div>
+  //               <div class="facet-modal-content-wrapper">
+  //                   <div id="${modalContentId.slice(1)}">
+  //                       <!-- Placeholder for fetched results -->
+  //                   </div>
+  //               </div>
+  //           </div>
+  //       </div>
+  //   `;
+
+  //   ts.context.html(`
+  //       <div class="facet">
+  //           <h4>${this.title}</h4>
+  //           <table class="facet">
+  //               <tbody>${limitedResults}${showMoreFrag}</tbody>
+  //           </table>
+  //       </div>
+  //       ${modalFrag}
+  //   `);
+
+  //   // Event bindings
+  //   const valueSelector = edges.util.jsClassSelector(
+  //     this.namespace,
+  //     "value",
+  //     this.component.id
+  //   );
+  //   edges.on(valueSelector, "click", this, "termSelected");
+
+  //   if (ts.values.length > this.displayLimit) {
+  //     edges.on(
+  //       edges.util.idSelector(this.namespace, "show-more", this.component.id),
+  //       "click",
+  //       this,
+  //       "openModal"
+  //     );
+  //   }
+  //   edges.on(
+  //     edges.util.idSelector(
+  //       this.namespace,
+  //       "facet-modal-close",
+  //       this.component.id
+  //     ),
+  //     "click",
+  //     this,
+  //     "closeModal"
+  //   );
+
+  //   this.setUISize();
+  //   this.setUISort();
+  //   this.setUIOpen();
+  // }
 
   draw() {
     let ts = this.component;
@@ -1526,16 +1588,20 @@ emlo.FacetRenderer = class extends edges.Renderer {
         : "";
 
     let modalFrag = `
-        <div id="${modalId}" class="facet-modal">
+        <div id="${modalId}" class="facet-modal hideEle">
             <div class="facet-modal-content">
                 <div class="facet-modal-header">
                     <span>${this.title}</span>
-                    <span id="${modalCloseId}" class="facet-modal-close">&times;</span>
+                    <span id="${edges.util.htmlID(
+                      this.namespace,
+                      "facet-modal-close",
+                      this.component.id
+                    )}" class="facet-modal-close">&times;</span>
                 </div>
                 <div class="facet-modal-content-wrapper">
-                    <table class="facet">
-                        <tbody>${fullResults}</tbody>
-                    </table>
+                    <div id="${modalContentId.slice(1)}">
+                        <!-- Placeholder for fetched results -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -1582,27 +1648,6 @@ emlo.FacetRenderer = class extends edges.Renderer {
         }
       }
     });
-
-    // Fetching the UUID
-    // Array.from(uuidsToFetch).forEach((UUID) => {
-    //   const collectionName = "people";
-
-    //   if (localStorage.getItem(UUID)) return; // already cached
-
-    //   this._fetchNames(UUID, collectionName).then((names) => {
-    //     if (names) {
-    //       localStorage.setItem(UUID, names);
-
-    //       // Update all matching DOM elements
-    //       document.querySelectorAll(`[data-key*="${UUID}"]`).forEach((el) => {
-    //         el.innerHTML = `
-    //         <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
-    //         ${edges.util.escapeHtml(names)}
-    //       `;
-    //       });
-    //     }
-    //   });
-    // });
 
     this.setUISize();
     this.setUISort();
@@ -1654,64 +1699,6 @@ emlo.FacetRenderer = class extends edges.Renderer {
     }
     edges.on(modalCloseSelector, "click", this, "closeModal");
   }
-
-  // _displayFacetValue(field, val, fetch = false) {
-  //   if (field == "object_type") {
-  //     const typeMap = {
-  //       work: "Letter",
-  //       manifestation: "Document",
-  //       resource: "Related resource",
-  //       person: "Person or organization",
-  //     };
-
-  //     if (typeMap.hasOwnProperty(val)) {
-  //       return typeMap[val];
-  //     } else {
-  //       return val.charAt(0).toUpperCase() + val.slice(1);
-  //     }
-  //   } else if (
-  //     ["frbr_creator-person", "mail_recipient-person"].includes(field) &&
-  //     fetch
-  //   ) {
-  //     let value = val;
-  //     let UUID = "";
-  //     if (value && value.startsWith('"') && value.endsWith('"')) {
-  //       value = value.slice(1, -1);
-  //     }
-
-  //     if (typeof value === "string" && value.startsWith("http")) {
-  //       UUID = value.split("/").pop();
-  //     }
-
-  //     if (UUID == "") {
-  //       return "";
-  //     }
-
-  //     if (localStorage.getItem(UUID)) {
-  //       return localStorage.getItem(UUID);
-  //     }
-
-  //     let collectionName = "people";
-
-  //     this._fetchNames(UUID, collectionName).then((names) => {
-  //       if (names) {
-  //         // Find all matching elements dynamically and update their content
-  //         document
-  //           .querySelectorAll(`[data-key="${edges.util.escapeHtml(val)}"]`)
-  //           .forEach((el) => {
-  //             el.innerHTML = `
-  //               <img class="facet" src="../../static/img/plus-facet.png" height="15px" width="15px" />
-  //               ${edges.util.escapeHtml(names)}
-  //             `;
-  //           });
-  //       }
-  //     });
-
-  //     return "Loading";
-  //   } else {
-  //     return val;
-  //   }
-  // }
 
   _displayFacetValue(field, val) {
     if (field == "object_type") {
@@ -1780,51 +1767,110 @@ emlo.FacetRenderer = class extends edges.Renderer {
     }
   }
 
-  async _fetchNames(value, colName) {
-    let collectionName = "";
-    let fl = "browse";
-
-    if (colName) {
-      collectionName = colName;
-    } else {
-      const urlParams = new URLSearchParams(window.location.search);
-      const browsing = urlParams.get("browsing");
-
-      collectionName =
-        browsing && browsing != "organizations" ? `${browsing}` : `people`;
-    }
-
-    if (!collectionName) {
-      console.error("Collection name not found in the URL.");
-      return "";
-    }
-
-    const response = await fetch(
-      `/solr/${collectionName}/select?q=uuid:${value}&fl=${fl}&wt=json`
-    );
-    const data = await response.json();
-
-    // Extract and process `browse` values
-    const browseNames = data.response.docs.map((doc) => doc[fl]);
-
-    const browseNamesString = browseNames.join(", ");
-
-    try {
-      localStorage.setItem(value, browseNamesString);
-    } catch (err) {
-      console.error(`Got err: ${err} while setting key for ${value}`);
-    }
-
-    return browseNamesString;
-  }
-
-  openModal() {
+  async openModal() {
     const modalSelector = edges.util.idSelector(
       this.namespace,
       "facet-modal",
       this.component.id
     );
-    this.component.jq(modalSelector).css("display", "block");
+    const modalContentSelector = edges.util.htmlID(
+      this.namespace,
+      "facet-modal-content",
+      this.component.id
+    );
+
+    console.log("modalContentSelector", modalContentSelector);
+    const modalContentEl = document.getElementById(
+      modalContentSelector.slice(1)
+    );
+
+    // Always show modal immediately
+    this.component.jq(modalSelector).removeClass("hideEle").addClass("showEle");
+
+    // Show loading message
+    modalContentEl.innerHTML = `<p>Fetching more results, please wait...</p>`;
+
+    try {
+      let dataToRender = [];
+
+      const q = buildSolrQuery(this.component.edge.currentQuery);
+
+      // 2. Otherwise, fetch from Solr
+      const solrUrl = `/solr/works/select?q=${q}&facet=true&facet.field=${this.component.field}&facet.limit=5000&rows=0&wt=json`;
+
+      const response = await fetch(solrUrl);
+      if (!response.ok)
+        throw new Error(`Solr request failed: ${response.status}`);
+
+      const solrData = await response.json();
+
+      const facetArray =
+        solrData.facet_counts.facet_fields[this.component.field] || [];
+
+      // Convert alternating array into [{ term, count, display }]
+      dataToRender = [];
+      for (let i = 0; i < facetArray.length; i += 2) {
+        const term = facetArray[i];
+        const count = facetArray[i + 1];
+        dataToRender.push({
+          term,
+          display: term, // fallback: display == term
+          count,
+        });
+      }
+
+      // Cache the result for next time
+      this.additionalDataField = dataToRender;
+      // }
+
+      // 3. Handle empty results
+      if (!dataToRender || dataToRender.length === 0) {
+        modalContentEl.innerHTML = `<p>No results available.</p>`;
+        return;
+      }
+
+      const valClass = edges.util.allClasses(
+        this.namespace,
+        "value",
+        this.component.id
+      );
+
+      // 4. Build results table
+      const fullResults = dataToRender
+        .filter((val) => val.count > 0)
+        .map(
+          (val) => `
+        <tr>
+          <td>
+            <a href="#"
+               class="${valClass}"
+               data-key="${edges.util.escapeHtml(val.term)}">
+              <img class="facet" src="../../static/img/plus-facet.png" height="15" width="15" />
+              ${this._displayFacetValue(this.component.field, val.display)}
+            </a>
+          </td>
+          <td>${val.count}</td>
+        </tr>
+      `
+        )
+        .join("");
+
+      if (fullResults) {
+        modalContentEl.innerHTML = `<table class="facet"><tbody>${fullResults}</tbody></table>`;
+      } else {
+        modalContentEl.innerHTML = `<p class="info">No more results to display.</p>`;
+      }
+
+      const valueSelector = edges.util.jsClassSelector(
+        this.namespace,
+        "value",
+        this.component.id
+      );
+      edges.on(valueSelector, "click", this, "termSelected");
+    } catch (error) {
+      console.error("Error rendering modal results:", error);
+      modalContentEl.innerHTML = `<p class="error">An error occurred while fetching results. Please try again later.</p>`;
+    }
   }
 
   closeModal() {
@@ -1833,12 +1879,7 @@ emlo.FacetRenderer = class extends edges.Renderer {
       "facet-modal",
       this.component.id
     );
-    this.component.jq(modalSelector).css("display", "none");
-  }
-
-  showMoreEntries() {
-    this.showAll = !this.showAll;
-    this.draw(); // Re-draw the component to show all entries
+    this.component.jq(modalSelector).removeClass("showEle").addClass("hideEle");
   }
 
   setUIOpen() {
@@ -4452,7 +4493,9 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
         <br/>
 
         <p style="${
-          ["work"].includes(this.profileType) ? "" : "margin-bottom:20px;"
+          ["work"].includes(this.profileType)
+            ? "overflow-wrap: anywhere;"
+            : "overflow-wrap: anywhere;margin-bottom:20px;"
         }">
           <img src="../../static/img/icon-short-url.png" alt="short-url" />
           Short URL: <span id="short-url-link" class="showLink">
@@ -5851,7 +5894,7 @@ function _addUrlParam(field, term) {
   }
 }
 
-function _removeUrlParam(field) {
+export function _removeUrlParam(field) {
   let delete_field = "";
   let secondaryField = "";
 

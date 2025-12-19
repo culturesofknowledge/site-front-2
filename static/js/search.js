@@ -117,6 +117,7 @@ function advanceSearch(params) {
     sort: [],
     highlights: [],
     from: 0,
+    filters: [],
   };
 
   if (params && params.get("sort")) {
@@ -145,6 +146,7 @@ function advanceSearch(params) {
       pre: '<span class="highlight">',
       post: "</span>",
       hl: "on",
+      requireFieldMatch: true,
       indent: "on",
     });
   }

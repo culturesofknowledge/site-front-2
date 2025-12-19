@@ -427,7 +427,8 @@ export function resourceRelation(profile, relations, field) {
         if (relation.id == uuid) {
           let resourceTitle = "",
             resourceUrl = "",
-            resourceFurtherDetail = "";
+            resourceFurtherDetail = "",
+            transcription = "";
 
           if (relation.hasOwnProperty("ox_titleOfResource")) {
             resourceTitle = relation["ox_titleOfResource"];
@@ -440,6 +441,10 @@ export function resourceRelation(profile, relations, field) {
           if (relation.hasOwnProperty("ox_detailsOfResource")) {
             resourceFurtherDetail = relation["ox_detailsOfResource"];
           }
+
+          // if (profile.hasOwnProperty("ox_transcription")) {
+          //   transcription = profile["ox_transcription"];
+          // }
 
           if (resourceUrl !== "" && resourceTitle === "") {
             resourceTitle = resourceUrl;
@@ -458,6 +463,13 @@ export function resourceRelation(profile, relations, field) {
           if (resourceFurtherDetail != "") {
             frag += `<br/>
             ${resourceFurtherDetail}`;
+          }
+
+          if (transcription != "") {
+            frag += `
+              <br/>
+              ${transcription}
+            `;
           }
 
           frag += "</p>";

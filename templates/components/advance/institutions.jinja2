@@ -13,7 +13,7 @@
       data-delay="2.0"
       data-tip="Confine your search to a particular library or archive."
       class="row">
-      <div class="small-10 columns">
+      <div class="small-11 columns">
         <label for="repository">Repository</label>
         <div id="repository-dropdown" style="padding: 0px 30px;"></div>
       </div>
@@ -26,7 +26,7 @@
       data-delay="2.0"
       data-tip="Search for letters by their shelfmark or another repository identifier, e.g. 'Tanner', 'Rawl', or 'MS Smith'. Search is not case sensitive." 
       class="row">
-      <div class="small-10 columns">
+      <div class="small-11 columns">
         <label for="let_shel">Shelfmark / ID</label>
         <input
           id="let_shel"
@@ -52,7 +52,7 @@
       data-delay="2.0"
       data-tip="Search across the titles of books and pamphlets in which printed versions of letters appear. Search is not case sensitive."
       class="row">
-      <div class="small-10 columns">
+      <div class="small-11 columns">
         <label for="let_pe_tex">Printed editions</label>
         <input
           id="let_pe_tex"
@@ -73,8 +73,8 @@
     <div
       data-delay="2.0"
       data-tip="Confine your search to letters that exist in printed versions." 
-      class="row" style="padding-left: 0px;"> 
-      <div class="small-5 columns">
+      class="row"> 
+      <div class="large-5 small-10 columns">
         <input
           type="checkbox"
           id="let_pe"
@@ -86,7 +86,7 @@
 
         <label for="let_pe">Only with printed editions</label>
       </div>
-      <div class="small-7 columns">
+      <div>
         {% include 'components/common/help_icon_nolabel.jinja2' %}
       </div>
     </div>

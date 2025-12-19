@@ -244,7 +244,6 @@ try {
         category: "refine_search",
         field: "frbr_creator-person",
         display: "Author",
-        size: 5000,
         renderer: new emlo.FacetRenderer({
           open: true,
           title: "Author",
@@ -260,7 +259,6 @@ try {
         category: "refine_search",
         field: "mail_recipient-person",
         display: "Recipient",
-        size: 5000,
         renderer: new emlo.FacetRenderer({
           open: true,
           title: "Recipient",
@@ -276,7 +274,6 @@ try {
         category: "refine_search",
         field: "origin_sort",
         display: "Origin of letter",
-        size: 5000,
         renderer: new emlo.FacetRenderer({
           open: true,
           title: "Origin of letter",
@@ -292,7 +289,6 @@ try {
         category: "refine_search",
         field: "destination_sort",
         display: "Destination of letter ",
-        size: 5000,
         renderer: new emlo.FacetRenderer({
           open: true,
           title: "Destination of letter ",
@@ -308,7 +304,6 @@ try {
         category: "refine_search",
         field: "cito_Catalog",
         display: "Catalogue ",
-        size: 5000,
         renderer: new emlo.FacetRenderer({
           open: true,
           title: "Catalogue ",
@@ -324,7 +319,6 @@ try {
         category: "refine_search",
         field: "ox_started-ox_year",
         display: " Year ",
-        size: 5000,
         renderer: new emlo.FacetRenderer({
           open: true,
           title: " Year ",

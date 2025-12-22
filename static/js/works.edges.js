@@ -18,6 +18,14 @@ try {
     size: 999999999,
     queryStrings: [],
     sort: [{ field: "started_date_sort", order: "asc" }],
+    filters: [
+      "started_date_sort",
+      "ox_started-ox_year",
+      "ox_completed-ox_year",
+      "uuid",
+      "object_type",
+      "dcterms_description",
+    ],
   };
 
   emlo.openingQuery.queryStrings.push({

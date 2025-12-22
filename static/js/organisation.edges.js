@@ -47,6 +47,17 @@ try {
     size: 999999999,
     queryStrings: [],
     sort: [{ field: "browse", order: "asc" }],
+    filters: [
+      "foaf_name",
+      "uuid",
+      "object_type",
+      "ox_totalWorksByAgent",
+      "ox_totalWorksAddressedToAgent",
+      "ox_totalWorksMentioningAgent",
+      "foaf_gender",
+      "skos_altLabel",
+      "ox_titlesRolesOccupations",
+    ],
   };
 
   emlo.openingQuery.must.push({ term: { ox_isOrganisation: true } }); // ox_isOrganisation is false

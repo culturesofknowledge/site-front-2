@@ -53,6 +53,17 @@ try {
     size: 999999999,
     queryStrings: [],
     sort: [{ field: "browse", order: "asc" }],
+    filters: [
+      "foaf_name",
+      "uuid",
+      "ox_totalWorksByAgent",
+      "ox_totalWorksAddressedToAgent",
+      "ox_totalWorksMentioningAgent",
+      "foaf_gender",
+      "skos_altLabel",
+      "ox_titlesRolesOccupations",
+      "object_type",
+    ],
   };
 
   // Add default must query

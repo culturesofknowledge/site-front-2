@@ -28,6 +28,8 @@ import { _renderWorkProfile, _renderWorkSidebar } from "./profile/workFrag.js";
 import { searchQueryObj } from "./search.js";
 import { getLabel } from "./helper/getFieldLabls.js";
 
+const _relationsPromiseMap = new Map();
+
 let emlo = {
   active: {},
   selector: "",
@@ -2294,7 +2296,8 @@ emlo.MultiFields = class extends edges.Component {
               let payload = {
                 solrCore: "work",
                 uuids: uuids,
-                filter: "",
+                filter:
+                  "ox_started-ox_year,started_date_sort,dcterms_description,id,uuid",
                 objectKey: "uuid",
               };
 
@@ -2388,28 +2391,45 @@ emlo.MultiFields = class extends edges.Component {
   }
 
   async _fetchRelations(uuid) {
-    try {
-      const response = await fetch(
-        `/solr/all/select?q=uuid_related:${uuid}&wt=json&rows=9999`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+    console.log("New code");
+    // reuse in-flight or resolved promise
+    if (_relationsPromiseMap.has(uuid)) {
+      return _relationsPromiseMap.get(uuid);
+    }
 
-      if (!response.ok) {
-        console.error(`Error fetching relations: ${response.statusText}`);
+    const promise = (async () => {
+      try {
+        const response = await fetch(
+          `/solr/all/select?q=uuid_related:${uuid}&wt=json&rows=9999`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          console.error(`Error fetching relations: ${response.statusText}`);
+          return [];
+        }
+
+        const json = await response.json();
+        return json.response.docs; // ✅ SAME AS ORIGINAL
+      } catch (err) {
+        console.error("Error while fetching relations", err);
         return [];
       }
+    })();
 
-      const json = await response.json();
-      return json.response.docs;
-    } catch (err) {
-      console.error("Error while fetching relations", err);
-      return [];
-    }
+    _relationsPromiseMap.set(uuid, promise);
+
+    // if this call failed, allow retry next time
+    promise.catch(() => {
+      _relationsPromiseMap.delete(uuid);
+    });
+
+    return promise;
   }
 
   async _fetchImages(uuid) {

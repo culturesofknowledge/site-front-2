@@ -101,13 +101,11 @@
 
             const queryObj = searchQueryObj()
 
-            console.log("queryObj", queryObj)
-
 
             const query = buildSolrQuery(queryObj.openingQuery)
 
             // Only make the API call if uuid, type, and start are present
-            if (!isNaN(start)) {
+            if (!isNaN(start) && (!isNaN(numFound) && numFound > 0  )) {
                 let apiUrl = '/results?';
                 let qAndOp = "{!q.op=AND} "
 

@@ -61,7 +61,7 @@
         }
     </script>
     <script src="{{ url_for('static', filename='js/top.js') }}"> </script>
-    <script src="{{ url_for('static', filename='js/combo_box.js') }}"> </script>
+    {% include "_edges_common_js.jinja2" %}
 </head>
 <body>
     <div id="back-top" style="display:block;"><a href="#top"><span>Top</span></a></div>

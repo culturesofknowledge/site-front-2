@@ -45,7 +45,7 @@
 
 {% block extra_js_bottom %}
 
-{% include "_edges_common_js.jinja2" %}
+<script src="{{ url_for('static', filename='js/combo_box.js') }}"> </script>
 <script type="module" src="../static/js/home.edges.js"></script>
 <script type="module" src="../static/js/tooltip.js"></script>
 

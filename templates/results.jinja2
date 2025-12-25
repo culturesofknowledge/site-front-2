@@ -9,8 +9,8 @@
 
 {% block extra_js_bottom %}
 
-{% include "_edges_common_js.jinja2" %}
-<script type="module" src="../static/js/result.edges.js"></script>
+{% include "imports/results.jinja2" %}
+
 <script type="module">
   import { modifyCurrentSearch } from "{{ url_for('static', filename='js/helper/modifyCurrentSearch.js') }}";
   $(document).on("click", "#modify_search", function () {

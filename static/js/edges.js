@@ -1,26 +1,7 @@
-import { _renderCommentProfile } from "./profile/commentFrag.js";
 import {
-  _renderImageProfile,
-  _renderImageSidebar,
-} from "./profile/imageFrag.js";
-import {
-  _renderInstitutionProfile,
-  _renderInstitutionSidebar,
-} from "./profile/institutionFrag.js";
-import {
-  _renderLocationProfile,
-  _renderLocationSidebar,
-} from "./profile/locationFrag.js";
-import {
-  _renderManifestationSection,
-  _renderManifestationSidebar,
-} from "./profile/manifestationFrag.js";
-import {
-  _renderGraphSection,
-  _renderPeopleProfile,
-  _renderPeopleSidebar,
-} from "./profile/peopleFrags.js";
-import { _renderWorkProfile, _renderWorkSidebar } from "./profile/workFrag.js";
+  PROFILE_DESCRIPTOR,
+  loadFragment,
+} from "./profile/profileFragLoader.js";
 
 const _relationsPromiseMap = new Map();
 
@@ -2629,7 +2610,7 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
     this.profileType = edges.util.getParam(params, "profileType", "");
   }
 
-  draw() {
+  async draw() {
     let frag = "";
     const result = this.component.results[0];
     let imageSrc = "/static/img/resources-icon.png",
@@ -2644,79 +2625,31 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
     } else if (this.component.errorMessage) {
       frag = `<div class='error-message'>${this.component.errorMessage}</div>`; // Show error message
     } else if (this.component.results && this.component.results.length > 0) {
-      switch (this.profileType) {
-        case "people":
-          frag += _renderPeopleSidebar(
-            result,
-            this.component.gneratedData,
-            this.component.relationships
-          );
+      if (this.profileType != "") {
+        const sidebarFn = await loadFragment(this.profileType, "sidebar");
+        const desc = PROFILE_DESCRIPTOR[this.profileType];
 
+        console.log("desc", desc, PROFILE_DESCRIPTOR, this.profileType);
+
+        if (this.profileType == "people") {
           const isOrg = result?.["ox_isOrganisation"] === true;
           imageSrc = isOrg
             ? "/static/img/people_icon.png"
             : "/static/img/person-icon.png";
           theTitle = isOrg ? "Organization" : "Person";
           footerType = "p";
+        } else {
+          // Metadata
+          footerType = desc.footerType;
+          imageSrc = desc.icon;
+          theTitle = desc.title;
+        }
 
-          break;
-        case "work":
-          frag += _renderWorkSidebar(
-            result,
-            this.component.relationships,
-            this.component.gneratedData
-          );
-          footerType = "w";
-          imageSrc = "/static/img/letter_icon.png";
-          theTitle = "Letter";
-          break;
-        case "location":
-          frag += _renderLocationSidebar(
-            result,
-            this.component.gneratedData,
-            this.component.relationships
-          );
-
-          footerType = "l";
-          imageSrc = "/static/img/places-icon.png";
-          theTitle = "Location";
-          break;
-        case "institution":
-          frag += _renderInstitutionSidebar(
-            result,
-            this.component.relationships
-          );
-          imageSrc = "/static/img/repository-icon.png";
-          footerType = "r";
-          theTitle = "Repository";
-          break;
-        case "comment":
-          frag += _renderCommentProfile();
-          footerType = "c";
-          theTitle = "Comment";
-          break;
-        case "image":
-          frag += _renderImageSidebar(
-            result,
-            this.component.relationships,
-            this.component.gneratedData
-          );
-          footerType = "i";
-          imageSrc = "/static/img/images-icon.png";
-          theTitle = "Image";
-          break;
-        case "manifestation":
-          frag += _renderManifestationSidebar(
-            result,
-            this.component.relationships,
-            this.component.gneratedData
-          );
-          footerType = "m";
-          imageSrc = "/static/img/resources-icon.png";
-          theTitle = "Document";
-          break;
-        default:
-          console.log("Nothing is valid");
+        frag += sidebarFn(
+          result,
+          this.component.gneratedData,
+          this.component.relationships
+        );
       }
 
       const currentDomain = window.location.origin;
@@ -2797,7 +2730,7 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
     this.dividerFrag = ` <hr class="yellow-divider" />`;
   }
 
-  draw() {
+  async draw() {
     let frag = "";
     const result = this.component.results[0];
     if (this.component.loading) {
@@ -2805,54 +2738,60 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
     } else if (this.component.errorMessage) {
       frag = `<div class='error-message'>${this.component.errorMessage}</div>`; // Show error message
     } else if (this.component.results && this.component.results.length > 0) {
-      switch (this.profileType) {
-        case "people":
-          frag += _renderPeopleProfile(
-            result,
-            this.component.gneratedData,
-            this.component.relationships
-          );
-          break;
-        case "work":
-          frag += _renderWorkProfile(
-            result,
-            this.component.relationships,
-            this.component.gneratedData
-          );
-          break;
-        case "location":
-          frag += _renderLocationProfile(
-            result,
-            this.component.gneratedData,
-            this.component.relationships
-          );
-          break;
-        case "institution":
-          frag += _renderInstitutionProfile(
-            result,
-            this.component.gneratedData
-          );
-          break;
-        case "comment":
-          frag += _renderCommentProfile();
-          break;
-        case "image":
-          frag += _renderImageProfile(
-            result,
-            this.component.relationships,
-            this.component.gneratedData
-          );
-          break;
-        case "manifestation":
-          frag += _renderManifestationSection(
-            result,
-            this.component.relationships,
-            this.component.gneratedData
-          );
-          break;
-        default:
-          console.log("Nothing is valid");
+      const renderFn = await loadFragment(this.profileType, "profile");
+
+      if (this.profileType != "") {
+        frag += renderFn(
+          result,
+          this.component.gneratedData,
+          this.component.relationships
+        );
       }
+
+      // switch (this.profileType) {
+      //   case "people":
+      //     frag += _renderPeopleProfile();
+      //     break;
+      //   case "work":
+      //     frag += _renderWorkProfile(
+      //       result,
+      //       this.component.relationships,
+      //       this.component.gneratedData
+      //     );
+      //     break;
+      //   case "location":
+      //     frag += _renderLocationProfile(
+      //       result,
+      //       this.component.gneratedData,
+      //       this.component.relationships
+      //     );
+      //     break;
+      //   case "institution":
+      //     frag += _renderInstitutionProfile(
+      //       result,
+      //       this.component.gneratedData
+      //     );
+      //     break;
+      //   case "comment":
+      //     frag += _renderCommentProfile();
+      //     break;
+      //   case "image":
+      //     frag += _renderImageProfile(
+      //       result,
+      //       this.component.relationships,
+      //       this.component.gneratedData
+      //     );
+      //     break;
+      //   case "manifestation":
+      //     frag += _renderManifestationSection(
+      //       result,
+      //       this.component.relationships,
+      //       this.component.gneratedData
+      //     );
+      //     break;
+      //   default:
+      //     console.log("Nothing is valid");
+      // }
     }
 
     const containerClasses = edges.util.styleClasses(
@@ -2875,8 +2814,6 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
     }
 
     this.component.context.html(container);
-    // _renderGraphSection(this.tableData);
-    // this.draw();
   }
 };
 

@@ -7,7 +7,7 @@ import {
   uuidFromUri,
 } from "../../js/helper/helper.js";
 
-export function _renderImageSidebar(profile, relations, data) {
+export function _renderImageSidebar(profile, data, relations) {
   let sideFrag = "";
 
   sideFrag += _renderSidebar(profile, relations, data);
@@ -15,7 +15,7 @@ export function _renderImageSidebar(profile, relations, data) {
   return sideFrag;
 }
 
-export function _renderImageProfile(profile, relations, data) {
+export function _renderImageProfile(profile, data, relations) {
   let frag = "";
 
   frag += _renderImageSection(profile, relations);

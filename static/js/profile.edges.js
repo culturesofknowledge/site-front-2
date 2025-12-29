@@ -1,5 +1,6 @@
 import emlo from "./edges.js";
 import { getComponents } from "./profile.js";
+
 const collectionMap = {
   person: "people",
   location: "locations",
@@ -44,7 +45,7 @@ try {
     ],
   };
 
-  emlo.components = getComponents(collectioName, emlo);
+  emlo.components = await getComponents(collectioName, emlo);
 
   emlo.init();
 } catch (err) {
@@ -54,10 +55,6 @@ try {
 // TODO: Complete tiny URL
 function genrateShortURL(elementID) {
   let ele = document.getElementById(elementID);
-}
-
-function handleStatClick(key) {
-  console.log("hei");
 }
 
 window.onload = () => {

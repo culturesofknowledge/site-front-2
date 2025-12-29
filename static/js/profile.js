@@ -1,7 +1,3 @@
-import { getLocationComponents } from "../js/profile/location.js";
-import { getPeopleComponents } from "../js/profile/people.js";
-import { getWorkComponents } from "../js/profile/work.js";
-
 const validCollections = [
   "people",
   "locations",
@@ -13,42 +9,91 @@ const validCollections = [
   "comments",
 ];
 
-export function getComponents(collectionName, emlo) {
-  try {
-    let components = [];
+// export function getComponents(collectionName, emlo) {
+//   try {
+//     let components = [];
 
-    if (validCollections.includes(collectionName)) {
-      switch (collectionName) {
-        case "people":
-          components = getPeopleComponents(emlo);
-          break;
-        case "locations":
-          components = getLocationComponents(emlo);
-          break;
-        case "institutions":
-          components = _getInstitutionComponents(emlo);
-          break;
-        case "manifestations":
-          components = _getManifestation(emlo);
-          break;
-        case "images":
-          components = _getImageComponents(emlo);
-          break;
-        case "resources":
-          components = _getResourcesComponents(emlo);
-          break;
-        case "comments":
-          components = _getCommentsComponents(emlo);
-          break;
-        default:
-          components = getWorkComponents(emlo);
-      }
-      return components;
-    } else {
-      return components;
+//     if (validCollections.includes(collectionName)) {
+//       switch (collectionName) {
+//         case "people":
+//           components = getPeopleComponents(emlo);
+//           break;
+//         case "locations":
+//           components = getLocationComponents(emlo);
+//           break;
+//         case "institutions":
+//           components = _getInstitutionComponents(emlo);
+//           break;
+//         case "manifestations":
+//           components = _getManifestation(emlo);
+//           break;
+//         case "images":
+//           components = _getImageComponents(emlo);
+//           break;
+//         case "resources":
+//           components = _getResourcesComponents(emlo);
+//           break;
+//         case "comments":
+//           components = _getCommentsComponents(emlo);
+//           break;
+//         default:
+//           components = getWorkComponents(emlo);
+//       }
+//       return components;
+//     } else {
+//       return components;
+//     }
+//   } catch (err) {
+//     console.error(err);
+//   }
+// }
+
+export async function getComponents(collectionName, emlo) {
+  try {
+    if (!validCollections.includes(collectionName)) {
+      return [];
     }
+
+    const loaders = {
+      people: async () => {
+        const { getPeopleComponents } = await import("../js/profile/people.js");
+        return getPeopleComponents(emlo);
+      },
+
+      locations: async () => {
+        const { getLocationComponents } = await import(
+          "../js/profile/location.js"
+        );
+        return getLocationComponents(emlo);
+      },
+
+      works: async () => {
+        const { getWorkComponents } = await import("../js/profile/work.js");
+        return getWorkComponents(emlo);
+      },
+
+      institutions: async () => _getInstitutionComponents(emlo),
+
+      manifestations: async () => _getManifestation(emlo),
+
+      images: async () => _getImageComponents(emlo),
+
+      resources: async () => _getResourcesComponents(emlo),
+
+      comments: async () => _getCommentsComponents(emlo),
+    };
+
+    const loader = loaders[collectionName];
+
+    if (!loader) {
+      console.warn(`No components loader for: ${collectionName}`);
+      return [];
+    }
+
+    return await loader();
   } catch (err) {
     console.error(err);
+    return [];
   }
 }
 

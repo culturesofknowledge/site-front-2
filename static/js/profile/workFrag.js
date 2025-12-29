@@ -14,7 +14,7 @@ import {
 import { getLabel } from "../helper/getFieldLabls.js";
 import { getCollectionTitle } from "../../js/profile/collectionDetails.js";
 
-export function _renderWorkProfile(profile, relations, data) {
+export function _renderWorkProfile(profile, data, relations) {
   let frag = "";
 
   frag += renderDates(profile, relations);
@@ -28,7 +28,7 @@ export function _renderWorkProfile(profile, relations, data) {
   return frag;
 }
 
-export function _renderWorkSidebar(profile, relations, data) {
+export function _renderWorkSidebar(profile, data, relations) {
   let sideFrag = "";
 
   sideFrag += _renderSideSection(profile, relations);

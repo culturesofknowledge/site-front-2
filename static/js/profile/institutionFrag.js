@@ -1,7 +1,7 @@
 import { h4WorkList, resourceRelation } from "../../js/helper/helper.js";
 import { getLabel } from "../helper/getFieldLabls.js";
 
-export function _renderInstitutionProfile(profile, tableData) {
+export function _renderInstitutionProfile(profile, tableData, relations) {
   let frag = "";
 
   frag += _renderAlternateSection(profile);
@@ -10,7 +10,7 @@ export function _renderInstitutionProfile(profile, tableData) {
   return frag;
 }
 
-export function _renderInstitutionSidebar(profile, relations) {
+export function _renderInstitutionSidebar(profile, data, relations) {
   let frag = "";
 
   if (profile.hasOwnProperty("rdfs_seeAlso-resource")) {

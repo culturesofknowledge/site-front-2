@@ -23,8 +23,8 @@ load_dotenv(PROJECT_ROOT / ".env")
 CL_BASE_URL = os.getenv("CL_BASE_URL")
 OX_BASE_URL = os.getenv("OX_BASE_URL")
 
-AUTH_USER = os.getenv("SITEA_USER")
-AUTH_PASS = os.getenv("SITEA_PASS")
+AUTH_USER = os.getenv("CL_TESTSERVER_USER")
+AUTH_PASS = os.getenv("CL_TESTSERVER_PASS")
 
 VIEWPORT = {"width": 1440, "height": 900}
 DIFF_THRESHOLD = 0.1
@@ -32,6 +32,7 @@ MAX_DIFF_PIXELS = 0
 
 FAIL_FAST = False            # Stop immediately on first failure
 CLEAN_OLD_RESULTS = True     # 🔥 Delete old screenshots/reports before run
+CAPTURE_ALL_SCREENSHOTS = False # This will capture and store each and every screenshot available. 
 
 SCREENSHOT_DIR = PROJECT_ROOT / "screenshots"
 TESTS_FILE = BASE_DIR / "test_cases.json"
@@ -70,8 +71,8 @@ if not TESTS:
 
 # ===================== HELPERS =====================
 
-def capture_viewport(page):
-    """Capture viewport screenshot as bytes (no file written)."""
+def capture_viewport(page) -> bytes:
+    """Capture viewport screenshot as bytes (no file written by default)."""
     return page.screenshot(
         full_page=False,
         clip={
@@ -81,6 +82,10 @@ def capture_viewport(page):
             "height": VIEWPORT["height"],
         },
     )
+
+
+def save_image(bytes_data: bytes, path: Path):
+    Image.open(BytesIO(bytes_data)).save(path)
 
 
 # ===================== MAIN RUNNER =====================
@@ -97,7 +102,6 @@ def main():
         browser = p.chromium.launch()
 
         context_args = {"viewport": VIEWPORT}
-
         if AUTH_USER and AUTH_PASS:
             context_args["http_credentials"] = {
                 "username": AUTH_USER,
@@ -121,14 +125,22 @@ def main():
             diff_image = None
 
             try:
+                # ---- CL ----
                 print("  → Loading Cottagelabs")
                 page.goto(CL_BASE_URL + uri, wait_until="networkidle")
                 img_a_bytes = capture_viewport(page)
 
+                # ---- OX ----
                 print("  → Loading Bodleian")
                 page.goto(OX_BASE_URL + uri, wait_until="networkidle")
                 img_b_bytes = capture_viewport(page)
 
+                # Save per-site screenshots if enabled
+                if CAPTURE_ALL_SCREENSHOTS:
+                    save_image(img_a_bytes, SCREENSHOT_DIR / f"{test_name}_cl.png")
+                    save_image(img_b_bytes, SCREENSHOT_DIR / f"{test_name}_ox.png")
+
+                # ---- Compare ----
                 img_a = Image.open(BytesIO(img_a_bytes))
                 img_b = Image.open(BytesIO(img_b_bytes))
 
@@ -148,6 +160,9 @@ def main():
                     print(f"  ❌ FAILED ({diff_pixels} pixels differ)")
                 else:
                     print("  ✅ PASSED")
+                    if CAPTURE_ALL_SCREENSHOTS:
+                        diff_image = f"diff_{test_name}.png"
+                        diff_img.save(SCREENSHOT_DIR / diff_image)
 
             except Exception as e:
                 status = "failed"
@@ -186,7 +201,6 @@ def main():
     }
 
     report_path = SCREENSHOT_DIR / f"reports_{run_id}.json"
-
     with open(report_path, "w") as f:
         json.dump(report, f, indent=2)
 
@@ -204,3 +218,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

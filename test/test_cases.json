@@ -1,0 +1,12 @@
+{
+  "homePage": {
+    "uri": "/",
+    "test_name": "Home page",
+    "desc": "Homepage layout should match across environments"
+  },
+  "allResults": {
+    "uri": "/forms/advance",
+    "test_name": "All results",
+    "desc": "Searching all results for work"
+  }
+}

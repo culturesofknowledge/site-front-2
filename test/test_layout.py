@@ -4,7 +4,7 @@ import json
 import time
 import shutil
 from io import BytesIO
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
@@ -14,6 +14,8 @@ from dotenv import load_dotenv
 
 
 # ===================== CONFIG =====================
+
+SCHEMA_VERSION = "1.1"
 
 BASE_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = BASE_DIR.parent
@@ -30,11 +32,11 @@ VIEWPORT = {"width": 1440, "height": 900}
 DIFF_THRESHOLD = 0.1
 MAX_DIFF_PIXELS = 0
 
-FAIL_FAST = False            # Stop immediately on first failure
-CLEAN_OLD_RESULTS = True     # 🔥 Delete old screenshots/reports before run
-CAPTURE_ALL_SCREENSHOTS = False # This will capture and store each and every screenshot available. 
+FAIL_FAST = False
+CLEAN_OLD_RESULTS = True
+CAPTURE_ALL_SCREENSHOTS = True
 
-SCREENSHOT_DIR = PROJECT_ROOT / "screenshots"
+SCREENSHOT_DIR = PROJECT_ROOT / "results"
 TESTS_FILE = BASE_DIR / "test_cases.json"
 
 
@@ -46,13 +48,13 @@ def fatal(msg: str):
 
 
 if not CL_BASE_URL or not OX_BASE_URL:
-    fatal("Missing CL_BASE_URL or OX_BASE_URL in environment")
+    fatal("Missing CL_BASE_URL or OX_BASE_URL")
 
 if not TESTS_FILE.exists():
     fatal(f"test_cases.json not found at {TESTS_FILE}")
 
 
-# ===================== SETUP STORAGE =====================
+# ===================== STORAGE SETUP =====================
 
 if CLEAN_OLD_RESULTS and SCREENSHOT_DIR.exists():
     shutil.rmtree(SCREENSHOT_DIR)
@@ -72,7 +74,6 @@ if not TESTS:
 # ===================== HELPERS =====================
 
 def capture_viewport(page) -> bytes:
-    """Capture viewport screenshot as bytes (no file written by default)."""
     return page.screenshot(
         full_page=False,
         clip={
@@ -88,10 +89,16 @@ def save_image(bytes_data: bytes, path: Path):
     Image.open(BytesIO(bytes_data)).save(path)
 
 
+def normalize_id(value: str) -> str:
+    return value.strip().lower().replace(" ", "_").replace("/", "_")
+
+
 # ===================== MAIN RUNNER =====================
 
 def main():
     run_id = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    run_started_at = datetime.now(timezone.utc)
+
     results = []
     failed_count = 0
 
@@ -111,91 +118,482 @@ def main():
         context = browser.new_context(**context_args)
         page = context.new_page()
 
+        # ✅ FIX: browser_info captured while browser/page are alive
+        browser_info = {
+            "name": browser.browser_type.name,
+            "version": browser.version,
+            "headless": True,
+            "viewport": VIEWPORT,
+            "user_agent": page.evaluate("() => navigator.userAgent"),
+        }
+
         for _, test in TESTS.items():
             uri = test["uri"]
             test_name = test["test_name"]
+            test_id = test.get("id") or normalize_id(test_name)
             desc = test.get("desc", "")
+
+            cl_site_url = CL_BASE_URL.rstrip("/") + uri
+            ox_site_url = OX_BASE_URL.rstrip("/") + uri
 
             print(f"\n▶ Executing test: {test_name}")
             if desc:
                 print(f"  ↳ {desc}")
 
             start_time = time.time()
+
             status = "passed"
-            diff_image = None
+            execution_error = None
+            matching_percentage = None
+
+            artifacts = {
+                "cl_site_image": None,
+                "ox_site_image": None,
+                "diff_image": None,
+            }
 
             try:
-                # ---- CL ----
                 print("  → Loading Cottagelabs")
-                page.goto(CL_BASE_URL + uri, wait_until="networkidle")
-                img_a_bytes = capture_viewport(page)
+                page.goto(cl_site_url, wait_until="networkidle")
+                cl_img_bytes = capture_viewport(page)
 
-                # ---- OX ----
                 print("  → Loading Bodleian")
-                page.goto(OX_BASE_URL + uri, wait_until="networkidle")
-                img_b_bytes = capture_viewport(page)
+                page.goto(ox_site_url, wait_until="networkidle")
+                ox_img_bytes = capture_viewport(page)
 
-                # Save per-site screenshots if enabled
                 if CAPTURE_ALL_SCREENSHOTS:
-                    save_image(img_a_bytes, SCREENSHOT_DIR / f"{test_name}_cl.png")
-                    save_image(img_b_bytes, SCREENSHOT_DIR / f"{test_name}_ox.png")
+                    cl_name = f"{test_id}_cl_site.png"
+                    ox_name = f"{test_id}_ox_site.png"
+                    save_image(cl_img_bytes, SCREENSHOT_DIR / cl_name)
+                    save_image(ox_img_bytes, SCREENSHOT_DIR / ox_name)
+                    artifacts["cl_site_image"] = cl_name
+                    artifacts["ox_site_image"] = ox_name
 
-                # ---- Compare ----
-                img_a = Image.open(BytesIO(img_a_bytes))
-                img_b = Image.open(BytesIO(img_b_bytes))
+                img_cl = Image.open(BytesIO(cl_img_bytes))
+                img_ox = Image.open(BytesIO(ox_img_bytes))
 
-                diff_img = Image.new("RGBA", img_a.size)
+                diff_img = Image.new("RGBA", img_cl.size)
                 diff_pixels = pixelmatch(
-                    img_a,
-                    img_b,
+                    img_cl,
+                    img_ox,
                     diff_img,
                     threshold=DIFF_THRESHOLD,
                 )
 
+                total_pixels = img_cl.size[0] * img_cl.size[1]
+                matching_percentage = round(
+                    ((total_pixels - diff_pixels) / total_pixels) * 100, 2
+                )
+
+                diff_name = f"diff_{test_id}.png"
+                diff_img.save(SCREENSHOT_DIR / diff_name)
+                artifacts["diff_image"] = diff_name
+
                 if diff_pixels > MAX_DIFF_PIXELS:
                     status = "failed"
                     failed_count += 1
-                    diff_image = f"diff_{test_name}.png"
-                    diff_img.save(SCREENSHOT_DIR / diff_image)
-                    print(f"  ❌ FAILED ({diff_pixels} pixels differ)")
+                    print(f"  ❌ FAILED ({matching_percentage}% match)")
                 else:
                     print("  ✅ PASSED")
-                    if CAPTURE_ALL_SCREENSHOTS:
-                        diff_image = f"diff_{test_name}.png"
-                        diff_img.save(SCREENSHOT_DIR / diff_image)
 
             except Exception as e:
-                status = "failed"
+                status = "execution-error"
+                execution_error = str(e)
                 failed_count += 1
-                print(f"  ❌ ERROR: {e}")
+                print(f"  ❌ EXECUTION ERROR: {e}")
 
                 if FAIL_FAST:
                     raise
 
+            # ✅ FIX: duration_ms is numeric
             duration_ms = int((time.time() - start_time) * 1000)
 
             results.append({
+                "id": test_id,
                 "test_name": test_name,
                 "uri": uri,
                 "desc": desc,
+                "cl_site_url": cl_site_url,
+                "ox_site_url": ox_site_url,
                 "status": status,
+                "execution_error": execution_error,
+                "matching_percentage": matching_percentage,
                 "duration_ms": duration_ms,
-                "diff_image": diff_image,
+                "artifacts": artifacts,
             })
 
-            if status == "failed" and FAIL_FAST:
+            if status != "passed" and FAIL_FAST:
                 break
 
         browser.close()
 
-    # ===================== REPORT =====================
+    run_completed_at = datetime.now(timezone.utc)
+    run_duration = int(
+        (run_completed_at - run_started_at).total_seconds() * 1000
+    )
+
+
+     # ===================== HTML CODE  ======================
+    DASHBOARD_TEMPLATE = """<!DOCTYPE html>
+            <html lang="en">
+            <head>
+            <meta charset="UTF-8" />
+            <title>Visual Regression Report</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+            <style>
+            * { box-sizing: border-box; }
+            body {
+            margin: 0;
+            font-family: system-ui, sans-serif;
+            background: #0f172a;
+            color: #e5e7eb;
+            }
+            header {
+            padding: 14px 20px;
+            background: #020617;
+            border-bottom: 1px solid #1e293b;
+            }
+            .summary {
+            font-size: 13px;
+            color: #94a3b8;
+            display: flex;
+            gap: 16px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+            }
+            main {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            height: calc(100vh - 110px);
+            }
+            .left {
+            border-right: 1px solid #1e293b;
+            display: flex;
+            flex-direction: column;
+            }
+            .controls {
+            padding: 10px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid #1e293b;
+            }
+            .controls input, .controls select {
+            background: #020617;
+            color: #e5e7eb;
+            border: 1px solid #1e293b;
+            padding: 6px;
+            }
+            .table-container {
+            flex: 1;
+            overflow-y: auto;
+            }
+            table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            }
+            thead {
+            position: sticky;
+            top: 0;
+            background: #020617;
+            }
+            th, td {
+            padding: 8px;
+            border-bottom: 1px solid #1e293b;
+            white-space: nowrap;
+            text-align: left;
+            }
+            tbody tr:hover {
+            background: #020617;
+            cursor: pointer;
+            }
+            .passed { color: #22c55e; font-weight: 600; }
+            .failed { color: #ef4444; font-weight: 600; }
+            .execution-error { color: #f97316; font-weight: 600; }
+
+            .pagination {
+            padding: 8px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #94a3b8;
+            border-top: 1px solid #1e293b;
+            }
+            .right {
+            padding: 16px;
+            overflow-y: auto;
+            }
+            .image-box {
+            border: 1px solid #1e293b;
+            background: #020617;
+            padding: 8px;
+            margin-bottom: 16px;
+            }
+            .image-box img {
+            width: 100%;
+            border: 1px solid #1e293b;
+            }
+            .url {
+            font-size: 12px;
+            color: #94a3b8;
+            word-break: break-all;
+            }
+            .note {
+            font-size: 14px;
+            color: #fff;
+            margin-top: 20px;
+            }
+            .error-box {
+            border: 1px solid #7c2d12;
+            background: #2a0f0f;
+            color: #fecaca;
+            padding: 10px;
+            margin-top: 12px;
+            font-size: 13px;
+            white-space: pre-wrap;
+            }
+            a {
+            color: #fff;
+            }
+            </style>
+            </head>
+
+            <body>
+
+            <header>
+            <h2>EMLO Visual Regression Report</h2>
+            <div class="summary" id="summary"></div>
+            <div class="summary" id="runMeta"></div>
+            </header>
+
+            <main>
+            <div class="left">
+                <div class="controls">
+                <input id="search" placeholder="Search test…" />
+                <select id="statusFilter">
+                    <option value="all">All</option>
+                    <option value="passed">Passed</option>
+                    <option value="failed">Failed</option>
+                    <option value="execution-error">Execution Error</option>
+                </select>
+                </div>
+
+                <div class="table-container">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Test</th>
+                        <th>Status</th>
+                        <th>Match %</th>
+                        <th>URI</th>
+                        <th>Time (ms)</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+                </div>
+
+                <div class="pagination">
+                <button id="prev">Prev</button>
+                <span id="pageInfo"></span>
+                <button id="next">Next</button>
+                </div>
+            </div>
+
+            <div class="right" id="details">
+                <div class="note">Select a test to view details</div>
+            </div>
+            </main>
+
+            <script id="report-data" type="application/json">
+            __REPORT_JSON__
+            </script>
+
+            <script>
+            const PAGE_SIZE = 25;
+            const report = JSON.parse(
+            document.getElementById("report-data").textContent
+            );
+
+            let filtered = report.tests;
+            let page = 1;
+
+            const tbody = document.getElementById("tableBody");
+            const details = document.getElementById("details");
+
+            document.getElementById("summary").innerHTML = `
+            <span><strong>Run:</strong> ${report.run_id}</span>
+            <span><strong>Total:</strong> ${report.summary.total}</span>
+            <span class="passed"><strong>Passed:</strong> ${report.summary.passed} (${report.summary.pass_percentage}%)</span>
+            <span class="failed"><strong>Failed:</strong> ${report.summary.failed} (${report.summary.fail_percentage}%)</span>
+            <span class="execution-error">
+                <strong>Exec Errors:</strong> ${report.summary.execution_error}
+                (${report.summary.execution_error_percentage}%)
+            </span>
+            `;
+
+            const durationSeconds = Math.round(report.run_duration);
+
+            document.getElementById("runMeta").innerHTML = `
+            <span><strong>Started:</strong> ${report.run_started_at}</span>
+            <span><strong>Completed:</strong> ${report.run_completed_at}</span>
+            <span><strong>Duration:</strong> ${durationSeconds}s</span>
+            <span>
+                <strong>Browser:</strong>
+                ${report.config.browser.name} ${report.config.browser.version}
+                (${report.config.browser.headless ? "headless" : "headed"})
+            </span>
+            <span>
+                <strong>Viewport:</strong>
+                ${report.config.browser.viewport.width}×${report.config.browser.viewport.height}
+            </span>
+            `;
+
+            function applyFilters() {
+            const q = document.getElementById("search").value.toLowerCase();
+            const status = document.getElementById("statusFilter").value;
+
+            filtered = report.tests.filter(t => {
+                if (status !== "all" && t.status !== status) return false;
+                if (q && !t.test_name.toLowerCase().includes(q)) return false;
+                return true;
+            });
+
+            page = 1;
+            renderTable();
+            }
+
+            function renderTable() {
+            tbody.innerHTML = "";
+            const start = (page - 1) * PAGE_SIZE;
+            const rows = filtered.slice(start, start + PAGE_SIZE);
+
+            rows.forEach(t => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                <td>${t.test_name}</td>
+                <td class="${t.status}">${t.status}</td>
+                <td>${t.matching_percentage !== null ? t.matching_percentage + "%" : "-"}</td>
+                <td style="max-width:200px;overflow:hidden;">${t.uri}</td>
+                <td>${t.duration_ms}</td>
+                `;
+                tr.onclick = () => showDetails(t);
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById("pageInfo").innerText =
+                `Page ${page} of ${Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))}`;
+            }
+
+            function showDetails(t) {
+            let html = `<h3>${t.test_name}</h3><p>${t.desc || ""}</p>`;
+
+            if (t.status === "execution-error") {
+                html += `
+                <div class="error-box">
+                    <strong>Execution Error</strong><br/>
+                    ${t.execution_error || "Unknown error"}
+                </div>
+                `;
+                details.innerHTML = html;
+                return;
+            }
+
+            html += `
+                <div>
+                <h3>Sites compared:</h3>
+                <div>Cottage Labs: <a href="${t.cl_site_url}" target="_blank">${t.cl_site_url}</a></div>
+                <div>Oxford: <a href="${t.ox_site_url}" target="_blank">${t.ox_site_url}</a></div>
+                <div class="note">
+                    Matching: <span class="${t.status}">${t.matching_percentage}%</span>
+                    | Status: <span class="${t.status}">${t.status}</span>
+                </div>
+                </div>
+            `;
+
+            const captureAll = report.config.capture_all_screenshots;
+
+            if (captureAll) {
+                html += image("Screenshot captured on the Cottagelabs site.", t.cl_site_url, t.artifacts.cl_site_image);
+                html += image("Screenshot captured on the Bodleian site.", t.ox_site_url, t.artifacts.ox_site_image);
+                if (t.artifacts.diff_image) {
+                html += image("Diff comparison image.", null, t.artifacts.diff_image);
+                }
+            } else {
+                if (t.status === "failed") {
+                html += image("Overlap comparison image.", null, t.artifacts.diff_image);
+                html += `<div class="note">NOTE: CL and OX images were not captured due to configuration.</div>`;
+                } else {
+                html += `<div class="note">Overlap comparison passed. Images not captured.</div>`;
+                }
+            }
+
+            details.innerHTML = html;
+            }
+
+            function image(title, url, file) {
+            if (!file) return "";
+            return `
+                <br/>
+                <div class="image-box">
+                <strong>${title}</strong>
+                ${url ? `<div class="url">${url}</div>` : ""}
+                <img src="${file}">
+                </div>
+            `;
+            }
+
+            document.getElementById("search").oninput = applyFilters;
+            document.getElementById("statusFilter").onchange = applyFilters;
+            document.getElementById("prev").onclick = () => { if (page > 1) page--; renderTable(); };
+            document.getElementById("next").onclick = () => {
+            if (page * PAGE_SIZE < filtered.length) page++;
+            renderTable();
+            };
+
+            renderTable();
+            </script>
+
+            </body>
+            </html>
+            """
+
+
+    # ===================== FINAL REPORT =====================
+
+    total = len(results)
+    passed = len([r for r in results if r["status"] == "passed"])
+    failed = len([r for r in results if r["status"] == "failed"])
+    exec_err = len([r for r in results if r["status"] == "execution-error"])
+
+    pass_percentage = round((passed / total) * 100, 2) if total else 0.0
+    fail_percentage = round((failed / total) * 100, 2) if total else 0.0
+    execution_error_percentage = round((exec_err / total) * 100, 2) if total else 0.0
 
     report = {
+        "schema_version": SCHEMA_VERSION,
         "run_id": run_id,
+        "run_started_at": run_started_at.isoformat(),
+        "run_completed_at": run_completed_at.isoformat(),
+        "run_duration": run_duration,
+        "config": {
+            "fail_fast": FAIL_FAST,
+            "clean_old_results": CLEAN_OLD_RESULTS,
+            "capture_all_screenshots": CAPTURE_ALL_SCREENSHOTS,
+            "viewport": VIEWPORT,
+            "diff_threshold": DIFF_THRESHOLD,
+            "max_diff_pixels": MAX_DIFF_PIXELS,
+            "browser": browser_info,
+        },
         "summary": {
-            "total": len(results),
-            "passed": len([r for r in results if r["status"] == "passed"]),
-            "failed": len([r for r in results if r["status"] == "failed"]),
+            "total": total,
+            "passed": passed,
+            "failed": failed,
+            "execution_error": exec_err,
+            "pass_percentage": pass_percentage,
+            "fail_percentage": fail_percentage,
+            "execution_error_percentage": execution_error_percentage,
         },
         "tests": results,
     }
@@ -206,16 +604,21 @@ def main():
 
     print(f"\n📄 Report generated: {report_path}")
 
-    if failed_count > 0:
-        print(f"❌ Test run completed with {failed_count} failures")
-        sys.exit(1)
+    html_path = SCREENSHOT_DIR / "report.html"
+    with open(html_path, "w", encoding="utf-8") as f:
+        f.write(
+            DASHBOARD_TEMPLATE.replace(
+                "__REPORT_JSON__",
+                json.dumps(report, indent=2)
+            )
+        )
 
-    print("\n✅ All tests passed successfully")
-    sys.exit(0)
+    print(f"📄 HTML report generated: {html_path}")
+
+    sys.exit(1 if failed_count > 0 else 0)
 
 
 # ===================== ENTRY POINT =====================
 
 if __name__ == "__main__":
     main()
-

@@ -34,7 +34,7 @@ MAX_DIFF_PIXELS = 0
 
 FAIL_FAST = False
 CLEAN_OLD_RESULTS = True
-CAPTURE_ALL_SCREENSHOTS = True
+CAPTURE_ALL_SCREENSHOTS = False
 
 SCREENSHOT_DIR = PROJECT_ROOT / "results"
 TESTS_FILE = BASE_DIR / "test_cases.json"
@@ -83,6 +83,19 @@ def capture_viewport(page) -> bytes:
             "height": VIEWPORT["height"],
         },
     )
+
+def get_page_load_time(page) -> int:
+    try:
+        nav = page.evaluate("""
+        () => {
+            const nav = performance.getEntriesByType('navigation')[0];
+            if (!nav) return null;
+            return Math.round(nav.loadEventEnd);
+        }
+        """)
+        return int(nav) if nav else None
+    except Exception:
+        return None
 
 
 def save_image(bytes_data: bytes, path: Path):
@@ -151,14 +164,19 @@ def main():
                 "ox_site_image": None,
                 "diff_image": None,
             }
+            
+            cl_load_time = None
+            ox_load_time = None
 
             try:
                 print("  → Loading Cottagelabs")
                 page.goto(cl_site_url, wait_until="networkidle")
+                cl_load_time = get_page_load_time(page)
                 cl_img_bytes = capture_viewport(page)
 
                 print("  → Loading Bodleian")
                 page.goto(ox_site_url, wait_until="networkidle")
+                ox_load_time = get_page_load_time(page)
                 ox_img_bytes = capture_viewport(page)
 
                 if CAPTURE_ALL_SCREENSHOTS:
@@ -215,6 +233,8 @@ def main():
                 "desc": desc,
                 "cl_site_url": cl_site_url,
                 "ox_site_url": ox_site_url,
+                "cl_load_time_ms": cl_load_time,
+                "ox_load_time_ms": ox_load_time,
                 "status": status,
                 "execution_error": execution_error,
                 "matching_percentage": matching_percentage,
@@ -387,6 +407,8 @@ def main():
                         <th>Status</th>
                         <th>Match %</th>
                         <th>URI</th>
+                        <th>CL Load</th>
+                        <th>OX Load</th>
                         <th>Time (ms)</th>
                     </tr>
                     </thead>
@@ -438,7 +460,7 @@ def main():
             document.getElementById("runMeta").innerHTML = `
             <span><strong>Started:</strong> ${report.run_started_at}</span>
             <span><strong>Completed:</strong> ${report.run_completed_at}</span>
-            <span><strong>Duration:</strong> ${durationSeconds}s</span>
+            <span><strong>Duration:</strong> ${human(durationSeconds)}s</span>
             <span>
                 <strong>Browser:</strong>
                 ${report.config.browser.name} ${report.config.browser.version}
@@ -476,7 +498,9 @@ def main():
                 <td class="${t.status}">${t.status}</td>
                 <td>${t.matching_percentage !== null ? t.matching_percentage + "%" : "-"}</td>
                 <td style="max-width:200px;overflow:hidden;">${t.uri}</td>
-                <td>${t.duration_ms}</td>
+                <td>${human(t.cl_load_time_ms) ?? "-"}</td>
+                <td>${human(t.ox_load_time_ms) ?? "-"}</td>
+                <td>${human(t.duration_ms)}</td>
                 `;
                 tr.onclick = () => showDetails(t);
                 tbody.appendChild(tr);
@@ -553,6 +577,12 @@ def main():
             };
 
             renderTable();
+
+            function human(ms) {
+  if (ms === null || ms === undefined) return "-";
+  if (ms < 1000) return ms + " ms";
+  return (ms / 1000).toFixed(2) + " s";
+}
             </script>
 
             </body>

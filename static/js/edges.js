@@ -2340,13 +2340,9 @@ emlo.MultiFields = class extends edges.Component {
                   this.gneratedData["manifestationData"] = {};
                 }
 
-                let relationsArray = await this._fetchRelations(uuid);
+                // let relationsArray = await this._fetchManifestationData(uuid);
 
-                this.gneratedData["manifestationData"][uuid] =
-                  relationsArray.reduce((acc, item) => {
-                    acc[item.uuid] = item;
-                    return acc;
-                  }, {});
+                this.gneratedData["manifestationData"][uuid] = await this._fetchManifestationData(uuid);
               }
             }
           }
@@ -2362,6 +2358,27 @@ emlo.MultiFields = class extends edges.Component {
     this.renderer.draw();
 
     this.hitCount = source.total();
+  }
+
+  async _fetchManifestationData(uuid) {
+    try {
+      const response = await fetch(`/manifestation-data/${uuid}`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        console.error(`Error fetching relations: ${response.statusText}`);
+        return [];
+      }
+
+      const json = await response.json();
+      return json;
+    } catch (err) {
+      console.error("Error while fetching relations", err);
+      return {};
+    }
   }
 
   async _fetchMoreWorkData(payload) {

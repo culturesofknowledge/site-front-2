@@ -3594,19 +3594,38 @@ function GetRecordID(type, result) {
     }, // Resource query pattern
     m: {
       field: "dcterms_identifier-edit_",
-      splitValue: "edit_cofk_union_manifestation-cofk_edit_interface-iwork_id:",
-    }, // Manifestation query pattern
+      splitValues: [
+        ":",
+        "edit_cofk_union_manifestation-",
+      ],
+    },
+    // m: {
+    //   field: "dcterms_identifier-edit_",
+    //   splitValue: "edit_cofk_union_manifestation-cofk_edit_interface-iwork_id:",
+    // }, // Manifestation query pattern
   };
+
+  console.log("result" , result["id"] , result["dcterms_identifier-edit_"])
 
   const queryConfig = QUERY_MAP[type];
   if (queryConfig) {
     // Retrieve the value from the result object for the given field
     const fieldValue = result[queryConfig.field];
     if (fieldValue) {
-      // Split the value using the delimiter (e.g., "editi_") and get the last part
-      const splitValue = fieldValue.split(queryConfig.splitValue).pop();
-      // Return the query by combining the split value and the id
-      return `${splitValue}`;
+
+       if (queryConfig.splitValues) {
+        for (const splitter of queryConfig.splitValues) {
+          if (fieldValue.includes(splitter)) {
+            return fieldValue.split(splitter).pop();
+          }
+        }
+        throw new Error(`No valid splitter found in value: ${fieldValue}`);
+      } else {
+        // Split the value using the delimiter (e.g., "editi_") and get the last part
+        const splitValue = fieldValue.split(queryConfig.splitValue).pop();
+        // Return the query by combining the split value and the id
+        return `${splitValue}`;
+      }
     } else {
       throw new Error(`Field ${queryConfig.field} not found in result object`);
     }

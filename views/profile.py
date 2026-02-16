@@ -1,10 +1,14 @@
-from flask import Blueprint, render_template, abort
+from flask import Blueprint, render_template, abort, redirect , url_for
 from .solr import check_profile
 
 profile_bp = Blueprint('profile', __name__, url_prefix='/profile')
 
 @profile_bp.route('/<collection>/<id>')
 def profile(collection, id):
+
+    if collection == "institution":
+        return redirect(url_for("profile.profile", collection="repository", id=id))
+
     solr_core = (
         "people" if collection == "person" 
         else "institutions" if collection == "repository" 
@@ -15,7 +19,7 @@ def profile(collection, id):
 
     try:
         is_valid , is_organisation = check_profile(solr_core , id)
-        
+
         if is_valid:
             if is_organisation:
                 pageTitle = "Organization"

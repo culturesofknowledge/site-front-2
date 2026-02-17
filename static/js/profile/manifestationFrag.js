@@ -24,7 +24,6 @@ export function _renderManifestationSection(profile, data, relations) {
       );
 
       if (firstWork && firstWork.hasOwnProperty("dcterms_description")) {
-        console.log("Found work object and heading element");
         headingDiv.innerHTML = firstWork["dcterms_description"];
       }
 
@@ -36,11 +35,7 @@ export function _renderManifestationSection(profile, data, relations) {
 }
 
 export function _renderManifestationSidebar(profile) {
-  let frag = "";
-
-  // frag +=
-
-  return frag;
+  return "";
 }
 
 function _renderDetailSection(profile) {

@@ -2646,7 +2646,6 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
         const sidebarFn = await loadFragment(this.profileType, "sidebar");
         const desc = PROFILE_DESCRIPTOR[this.profileType];
 
-        console.log("desc", desc, PROFILE_DESCRIPTOR, this.profileType);
 
         if (this.profileType == "people") {
           const isOrg = result?.["ox_isOrganisation"] === true;

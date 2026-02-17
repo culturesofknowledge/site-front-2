@@ -43,7 +43,7 @@ const registry = {
   },
 
   manifestation: {
-    section: () =>
+    profile: () =>
       import("../profile/manifestationFrag.js").then(
         (m) => m._renderManifestationSection
       ),

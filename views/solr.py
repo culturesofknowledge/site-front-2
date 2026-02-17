@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 import requests
 import os
 from dotenv import load_dotenv
-from urllib.parse import urlencode
+from urllib.parse import urlparse
 
 load_dotenv()
 
@@ -354,6 +354,55 @@ def fetch_institutions():
     except requests.RequestException as e:
         return jsonify({'error': str(e)}), 500
 
+@solr_bp.route("/manifestation-data/<uuid>", methods=['GET'])
+def get_manifestation_data(uuid):
+    result = {}
+
+    # Step 1: Query solr/all for all related objects by uuid
+    all_data = solr_get("all", f"uuid_related:{uuid}")
+    docs = all_data.get("response", {}).get("docs", [])
+
+    for doc in docs:
+        doc_uuid = doc.get("uuid")
+        doc_type = doc.get("object_type")
+
+        if not doc_uuid:
+            continue
+
+        # Step 2: If object is a manifestation, check for frbr_Work-work field
+        if doc_type == "manifestation" and doc.get("frbr_Work-work"):
+            work_uris = doc.get("frbr_Work-work", [])
+
+            for work_uri in work_uris:
+                work_uuid = uuid_from_uri(work_uri)
+
+                # Fetch the work object from the work core
+                work_data = solr_get("works", f"uuid:{work_uuid}")
+                work_docs = work_data.get("response", {}).get("docs", [])
+
+                if work_docs:
+                    result[work_uuid] = work_docs[0]
+
+        # Always add the doc itself to the result
+        result[doc_uuid] = doc
+
+    return jsonify(result)
+
+def uuid_from_uri(uri):
+    # Extracts UUID from e.g. "http://localhost/work/d1f33b3c-22a5-4d02-a511-1a140e570590"
+    return urlparse(uri).path.rstrip("/").split("/")[-1]
+
+def solr_get(core, query, rows=9999):
+    SOLR_URL = getSolrURL()
+    url = f"{SOLR_URL}{core}/select"
+    params = {
+        "q": query,
+        "wt": "json",
+        "rows": rows
+    }
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+    return response.json()
 
 # Function to handle the solr url for each API call. 
 # Todo: we can store solr URL in global variable instead of making call to multiple times to env file.

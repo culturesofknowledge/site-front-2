@@ -23,7 +23,7 @@ solr_reindexing/*
 node_modules/
 site_front_2/flaskapp/static/dist/
 results/
-
+.test_run/
 # py
 site_front_2/_playground/
 

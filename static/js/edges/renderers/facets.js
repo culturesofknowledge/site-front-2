@@ -1,5 +1,5 @@
 import emlo from "/static/js/edges.js";
-
+import {buildSolrQuery} from "/static/js/helper/buildSolrQuery"
 emlo.FacetRenderer = class extends edges.Renderer {
   constructor(params) {
     super(params);

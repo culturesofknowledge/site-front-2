@@ -865,6 +865,10 @@ export function detailsOfOneObject(profile, obj, data, nested = false) {
     }
   }
 
+  if(data.hasOwnProperty(relation.uuid) && nested) {
+    manifestationData = data
+  }
+
   let frag = ` <div class="display_details_of_one_object ${nested}">`;
 
   const uriFieldName = "dcterms_identifier-uri_";
@@ -1095,7 +1099,7 @@ export function detailsOfOneObject(profile, obj, data, nested = false) {
             if (label) {
               frag += `<p><span class="fieldlabel">${label}:</span></p>`;
             }
-            frag += detailsOfOneObject({}, relatedObj, {}, true); // Assumes it returns a string
+            frag += detailsOfOneObject({}, relatedObj, manifestationData, true); // Assumes it returns a string
           } else {
             if (displayValue) {
               if (label) {

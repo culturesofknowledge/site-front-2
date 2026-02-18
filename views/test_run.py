@@ -265,12 +265,28 @@ def run_tests():
                     try:
                         json_part = line[line.index("##RESULT##") + len("##RESULT##"):].strip()
                         result = json.loads(json_part)
-                        tid = result.get("id")
-                        if tid:
+                        normalized_id = result.get("id")
+                        result_name = result.get("test_name")
+                        if normalized_id or result_name:
                             status = result.get("status", "unknown")
-                            logger.info("  ##RESULT## %s => %s  match=%s", tid, status, result.get("matching_percentage"))
-                            run_state["tests"][tid] = {
-                                **run_state["tests"].get(tid, {}),
+
+                            # Resolve back to the test_cases.json key.
+                            # test_layout.py uses normalize_id(test_name) as id,
+                            # but run_state["tests"] is keyed by test_cases.json keys.
+                            state_key = next(
+                                (k for k, v in run_state["tests"].items()
+                                 if v.get("test_name") == result_name
+                                 or k == normalized_id),
+                                normalized_id,
+                            )
+                            logger.info(
+                                "  ##RESULT## %s (key=%s) => %s  match=%s",
+                                result_name, state_key, status,
+                                result.get("matching_percentage"),
+                            )
+                            # Update using the correct key so state file stays consistent
+                            run_state["tests"][state_key] = {
+                                **run_state["tests"].get(state_key, {}),
                                 "status": status,
                                 "matching_percentage": result.get("matching_percentage"),
                                 "cl_load_time_ms": result.get("cl_load_time_ms"),
@@ -287,15 +303,15 @@ def run_tests():
                             }
                             _write_state(run_state)
                             _broadcast("test_result", {
-                                "id": tid,
+                                "id": state_key,   # always send the correct key to UI
                                 "status": status,
                                 "pct": result.get("matching_percentage"),
                                 "error": result.get("execution_error"),
-                                "result": result,
+                                "result": {**result, "id": state_key},
                             })
                             current_test = None
                         else:
-                            logger.warning("##RESULT## line missing id: %s", line)
+                            logger.warning("##RESULT## line missing id/test_name: %s", line)
                     except Exception as exc:
                         logger.error("Failed to parse ##RESULT## line: %s | error: %s", line, exc)
 

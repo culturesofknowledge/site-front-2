@@ -113,7 +113,7 @@ def emit_result(result: dict):
     Prefixed with ##RESULT## so it is unambiguous in stdout.
     flush=True ensures it is not buffered — the parent process sees it immediately.
     """
-    print(f"##RESULT## {json.dumps(result)}", flush=True)
+    print(f"##RESULT## {json.dumps(result)}", flush=False)
 
 
 # ===================== MAIN RUNNER =====================

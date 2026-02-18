@@ -20,8 +20,8 @@
     "desc": "Searching all results for work"
   },
   "nameSearch": {
-    "uri": "/forms/advanced?people=Aa%2C+Anthony+Willemsz.%2C+1582-1638",
-    "test_name": "Looking for Aa Anthony Willemsz",
-    "desc": "Comparing layout for Aa anthony willemz on results page."
+    "uri": "/forms/advanced?people=newton",
+    "test_name": "Looking for Newton",
+    "desc": "Comparing layout for Newton on results page."
   }
 }

@@ -272,7 +272,7 @@ nav {
 <body>
 
 <nav>
-  <div class="nav-brand"><div class="nav-brand-dot"></div>EMLO Tests</div>
+  <div class="nav-brand"><div class="nav-brand-dot"></div>EMLO Front Test</div>
   <div class="nav-tabs">
     <button class="nav-tab active" data-page="run">Run</button>
     <button class="nav-tab" data-page="tests">Test Cases</button>
@@ -322,6 +322,9 @@ nav {
       <button class="btn btn-primary" id="save-tests-btn">Save All</button>
     </div>
   </div>
+  <div id="tests-run-warning" style="display:none;background:var(--warn-bg);border:1px solid var(--warn);border-radius:var(--radius);padding:12px 18px;margin-bottom:16px;font-size:13px;color:var(--warn);">
+    ⚠ A run is in progress — test cases are read-only until it finishes.
+  </div>
   <div class="card">
     <table class="tests-table">
       <thead><tr>
@@ -337,30 +340,102 @@ nav {
 <!-- SETTINGS -->
 <div class="page" id="page-settings">
   <div class="page-header">
-    <div><h1>Settings</h1><p>Configure server URLs and authentication for your test runs.</p></div>
+    <div><h1>Settings</h1><p>Configure sites, authentication and runner behaviour. Saved to <code>runner_config.json</code>.</p></div>
   </div>
-  <div class="card" style="max-width:700px;">
-    <div class="settings-grid">
-      <div class="settings-section">
-        <h3>Server URLs</h3>
-        <div class="field">
-          <label>Cottagelabs (CL) Base URL</label>
-          <input type="text" id="set-CL_BASE_URL" placeholder="https://cottagelabs.com"/>
-          <small>Base URL for the Cottagelabs site</small>
+
+  <div id="settings-run-warning" style="display:none;background:var(--warn-bg);border:1px solid var(--warn);border-radius:var(--radius);padding:12px 18px;margin-bottom:16px;font-size:13px;color:var(--warn);max-width:900px;">
+    ⚠ A run is in progress — settings are read-only until it finishes.
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:16px;max-width:900px;">
+
+    <!-- Sites -->
+    <div class="card">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);">Sites</div>
+      <div class="settings-grid">
+        <div class="settings-section">
+          <h3>Site A</h3>
+          <div class="field"><label>Name</label><input type="text" id="set-cl-name" placeholder="Cottagelabs"/></div>
+          <div class="field"><label>Base URL</label><input type="text" id="set-cl-url" placeholder="https://example.com"/></div>
         </div>
-        <div class="field">
-          <label>Bodleian (OX) Base URL</label>
-          <input type="text" id="set-OX_BASE_URL" placeholder="https://bodleian.ox.ac.uk"/>
-          <small>Base URL for the Bodleian site</small>
+        <div class="settings-section">
+          <h3>Site B</h3>
+          <div class="field"><label>Name</label><input type="text" id="set-ox-name" placeholder="Bodleian"/></div>
+          <div class="field"><label>Base URL</label><input type="text" id="set-ox-url" placeholder="https://example.com"/></div>
         </div>
-      </div>
-      <div class="settings-section">
-        <h3>Authentication</h3>
-        <div class="field"><label>Username</label><input type="text" id="set-CL_TESTSERVER_USER" placeholder="username"/></div>
-        <div class="field"><label>Password</label><input type="password" id="set-CL_TESTSERVER_PASS" placeholder="••••••••"/></div>
       </div>
     </div>
-    <div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;align-items:center;">
+
+    <!-- Auth -->
+    <div class="card">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);">Authentication</div>
+      <div class="settings-grid">
+        <div class="settings-section">
+          <h3>Site A Auth</h3>
+          <div class="field" style="display:flex;align-items:center;gap:10px;">
+            <input type="checkbox" id="set-cl-auth-required" style="width:auto;"/>
+            <label for="set-cl-auth-required" style="margin:0;">Requires authentication</label>
+          </div>
+          <div class="field"><label>Username</label><input type="text" id="set-cl-auth-user" placeholder="username"/></div>
+          <div class="field"><label>Password</label><input type="password" id="set-cl-auth-pass" placeholder="••••••••"/></div>
+        </div>
+        <div class="settings-section">
+          <h3>Site B Auth</h3>
+          <div class="field" style="display:flex;align-items:center;gap:10px;">
+            <input type="checkbox" id="set-ox-auth-required" style="width:auto;"/>
+            <label for="set-ox-auth-required" style="margin:0;">Requires authentication</label>
+          </div>
+          <div class="field"><label>Username</label><input type="text" id="set-ox-auth-user" placeholder="username"/></div>
+          <div class="field"><label>Password</label><input type="password" id="set-ox-auth-pass" placeholder="••••••••"/></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Runner config -->
+    <div class="card">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);">Runner Configuration</div>
+      <div class="settings-grid">
+        <div class="settings-section">
+          <h3>Behaviour</h3>
+          <div class="field" style="display:flex;align-items:center;gap:10px;">
+            <input type="checkbox" id="set-capture-screenshots" style="width:auto;"/>
+            <label for="set-capture-screenshots" style="margin:0;">Capture all screenshots</label>
+          </div>
+          <div class="field" style="display:flex;align-items:center;gap:10px;">
+            <input type="checkbox" id="set-fail-fast" style="width:auto;"/>
+            <label for="set-fail-fast" style="margin:0;">Fail fast (stop on first failure)</label>
+          </div>
+          <div class="field" style="display:flex;align-items:center;gap:10px;">
+            <input type="checkbox" id="set-clean-results" style="width:auto;"/>
+            <label for="set-clean-results" style="margin:0;">Clean old results before each run</label>
+          </div>
+        </div>
+        <div class="settings-section">
+          <h3>Comparison</h3>
+          <div class="field">
+            <label>Diff Threshold <small style="font-weight:400;">(0.0 – 1.0)</small></label>
+            <input type="number" id="set-diff-threshold" min="0" max="1" step="0.01" placeholder="0.1"/>
+            <small>Per-pixel colour tolerance</small>
+          </div>
+          <div class="field">
+            <label>Max Diff Pixels</label>
+            <input type="number" id="set-max-diff-pixels" min="0" step="1" placeholder="0"/>
+            <small>Allowed differing pixels before marking as failed</small>
+          </div>
+          <div class="field">
+            <label>Viewport</label>
+            <div style="display:flex;gap:8px;">
+              <input type="number" id="set-viewport-w" placeholder="1440" style="width:90px;"/>
+              <span style="line-height:36px;color:var(--text3);">×</span>
+              <input type="number" id="set-viewport-h" placeholder="900" style="width:90px;"/>
+            </div>
+            <small>Width × Height in pixels</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;">
       <button class="btn btn-primary" id="save-settings-btn">Save Settings</button>
       <span class="save-feedback" id="save-feedback">✓ Saved</span>
     </div>
@@ -548,8 +623,7 @@ function renderSummary() {
     <div class="sum-stat p"><div class="sum-label">Passed</div><span>${s.passed} (${s.pass_percentage}%)</span></div>
     <div class="sum-stat f"><div class="sum-label">Failed</div><span>${s.failed} (${s.fail_percentage}%)</span></div>
     <div class="sum-stat e"><div class="sum-label">Errors</div><span>${s.execution_error}</span></div>
-    <div class="sum-stat"><div class="sum-label">Duration</div><span>${human(rs.report.run_duration)}</span></div>
-    <a class="sum-report-link" href="/results/report.html" target="_blank">Open Full Report ↗</a>`;
+    <div class="sum-stat"><div class="sum-label">Duration</div><span>${human(rs.report.run_duration)}</span></div>`
 }
 
 // ═══════════════════════════════════════════════════
@@ -620,6 +694,7 @@ function connectSSE() {
     $('progress-wrap').classList.add('visible');
     $('progress-bar').style.width = '0%';
     $('summary-strip').classList.remove('visible');
+    setRunLock(true);
     renderSidebar(); renderDetail();
   });
 
@@ -660,13 +735,7 @@ function connectSSE() {
   es.addEventListener('run_end', e => {
     const d = JSON.parse(e.data);
     state.running = false;
-
-    // Server run_state now uses test_cases.json keys (fixed in backend)
-    // so we can safely use it directly — it has the final authoritative data
-    if (d.run_state) {
-      state.runState = d.run_state;
-    }
-
+    if (d.run_state) state.runState = d.run_state;
     saveLS();
     $('execute-btn').disabled = false;
     $('execute-btn').textContent = '▶ Execute Tests';
@@ -675,6 +744,7 @@ function connectSSE() {
     const ok = d.exit_code === 0;
     $('run-status-badge').className = ok ? 'done-pass' : 'done-fail';
     $('run-status-badge').textContent = ok ? '✓ All passed' : '✗ Some failed';
+    setRunLock(false);
     renderSidebar(); renderDetail(); renderSummary();
   });
 
@@ -683,13 +753,26 @@ function connectSSE() {
     $('execute-btn').disabled = false;
     $('execute-btn').textContent = '▶ Execute Tests';
     appendLog('ERROR: ' + JSON.parse(e.data).error);
+    setRunLock(false);
     saveLS();
   });
 }
 
 // ═══════════════════════════════════════════════════
-// EXECUTE
+// UI LOCK — disable edits during a run
 // ═══════════════════════════════════════════════════
+function setRunLock(locked) {
+  // Tests page
+  $('add-test-btn').disabled  = locked;
+  $('save-tests-btn').disabled = locked;
+  $('tests-run-warning').style.display = locked ? 'block' : 'none';
+  $('tests-tbody').querySelectorAll('input,button').forEach(el => el.disabled = locked);
+
+  // Settings page
+  $('save-settings-btn').disabled = locked;
+  $('settings-run-warning').style.display = locked ? 'block' : 'none';
+  document.querySelectorAll('#page-settings input').forEach(el => el.disabled = locked);
+}
 $('execute-btn').addEventListener('click', async () => {
   if (state.running) return;
   try {
@@ -745,11 +828,34 @@ $('save-tests-btn').addEventListener('click', async () => {
 // SETTINGS
 // ═══════════════════════════════════════════════════
 $('save-settings-btn').addEventListener('click', async () => {
-  const payload = {};
-  ['CL_BASE_URL','OX_BASE_URL','CL_TESTSERVER_USER','CL_TESTSERVER_PASS'].forEach(k => { const el = $(`set-${k}`); if (el) payload[k] = el.value; });
-  await fetch('/api/settings', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
-  const fb = $('save-feedback'); fb.classList.add('show');
-  setTimeout(() => fb.classList.remove('show'), 2000);
+  if (state.running) return;
+  const payload = {
+    sites: {
+      cl: { name: $('set-cl-name').value.trim(), base_url: $('set-cl-url').value.trim() },
+      ox: { name: $('set-ox-name').value.trim(), base_url: $('set-ox-url').value.trim() },
+    },
+    auth: {
+      cl: { required: $('set-cl-auth-required').checked, username: $('set-cl-auth-user').value, password: $('set-cl-auth-pass').value },
+      ox: { required: $('set-ox-auth-required').checked, username: $('set-ox-auth-user').value, password: $('set-ox-auth-pass').value },
+    },
+    config: {
+      capture_all_screenshots: $('set-capture-screenshots').checked,
+      fail_fast:               $('set-fail-fast').checked,
+      clean_old_results:       $('set-clean-results').checked,
+      diff_threshold:          parseFloat($('set-diff-threshold').value) || 0.1,
+      max_diff_pixels:         parseInt($('set-max-diff-pixels').value)  || 0,
+      viewport_width:          parseInt($('set-viewport-w').value)        || 1440,
+      viewport_height:         parseInt($('set-viewport-h').value)        || 900,
+    },
+  };
+  const r = await fetch('/api/settings', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+  if (r.ok) {
+    const fb = $('save-feedback'); fb.classList.add('show');
+    setTimeout(() => fb.classList.remove('show'), 2000);
+  } else {
+    const d = await r.json();
+    alert(d.error || 'Failed to save settings');
+  }
 });
 
 // ═══════════════════════════════════════════════════
@@ -786,9 +892,36 @@ async function fetchTests() {
 }
 async function fetchSettings() {
   try {
-    const s = await (await fetch('/api/settings')).json();
-    for (const [k,v] of Object.entries(s)) { const el = $(`set-${k}`); if (el) el.value = v; }
-  } catch {}
+    const cfg = await (await fetch('/api/settings')).json();
+
+    // Sites
+    const sites = cfg.sites || {};
+    const cl = sites.cl || {}; const ox = sites.ox || {};
+    $('set-cl-name').value = cl.name    || '';
+    $('set-cl-url').value  = cl.base_url || '';
+    $('set-ox-name').value = ox.name    || '';
+    $('set-ox-url').value  = ox.base_url || '';
+
+    // Auth
+    const auth = cfg.auth || {};
+    const cla = auth.cl || {}; const oxa = auth.ox || {};
+    $('set-cl-auth-required').checked = !!cla.required;
+    $('set-cl-auth-user').value = cla.username || '';
+    $('set-cl-auth-pass').value = cla.password || '';
+    $('set-ox-auth-required').checked = !!oxa.required;
+    $('set-ox-auth-user').value = oxa.username || '';
+    $('set-ox-auth-pass').value = oxa.password || '';
+
+    // Runner config
+    const rc = cfg.config || {};
+    $('set-capture-screenshots').checked = !!rc.capture_all_screenshots;
+    $('set-fail-fast').checked           = !!rc.fail_fast;
+    $('set-clean-results').checked       = rc.clean_old_results !== false;
+    $('set-diff-threshold').value        = rc.diff_threshold   ?? 0.1;
+    $('set-max-diff-pixels').value       = rc.max_diff_pixels  ?? 0;
+    $('set-viewport-w').value            = rc.viewport_width   || 1440;
+    $('set-viewport-h').value            = rc.viewport_height  || 900;
+  } catch(e) { console.warn('fetchSettings failed', e); }
 }
 async function fetchLastReport() {
   try {

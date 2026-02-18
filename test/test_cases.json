@@ -8,5 +8,10 @@
     "test_name": "Date section is not aligned properly",
     "uri": "/advanced#dates_section",
     "desc": "On search+ page the date section is not aligned properly."
+  },
+  "test_1771425339578": {
+    "test_name": "Home page",
+    "uri": "/",
+    "desc": "Checking home page"
   }
 }

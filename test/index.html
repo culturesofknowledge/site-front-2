@@ -629,8 +629,14 @@ function connectSSE() {
   });
 
   es.addEventListener('test_start', e => {
-    const { id } = JSON.parse(e.data);
-    if (state.runState?.tests?.[id]) state.runState.tests[id].status = 'running';
+    const { id, name } = JSON.parse(e.data);
+    if (state.runState?.tests) {
+      // Try direct key match, then match by test_name
+      const key = state.runState.tests[id]
+        ? id
+        : Object.keys(state.runState.tests).find(k => state.runState.tests[k].test_name === name);
+      if (key) state.runState.tests[key].status = 'running';
+    }
     saveLS(); renderSidebar();
     if (state.selectedTestId === id) renderDetail();
     updateProgress();
@@ -638,11 +644,34 @@ function connectSSE() {
 
   es.addEventListener('test_result', e => {
     const d = JSON.parse(e.data);
-    if (state.runState?.tests?.[d.id]) {
-      Object.assign(state.runState.tests[d.id], { status: d.status, matching_percentage: d.pct ?? null, execution_error: d.error ?? null });
+    if (!state.runState?.tests) { saveLS(); return; }
+
+    // The id from ##RESULT## is a normalized name (e.g. "all_results").
+    // The runState keys are from test_cases.json (e.g. "test_homepage").
+    // Try direct match first, then fall back to matching by test_name.
+    let key = null;
+    if (state.runState.tests[d.id]) {
+      key = d.id;
+    } else if (d.result?.test_name) {
+      key = Object.keys(state.runState.tests).find(k =>
+        state.runState.tests[k].test_name === d.result.test_name
+      );
     }
+
+    if (key) {
+      // Merge the full result object so we get artifacts, load times etc. immediately
+      const update = d.result ? { ...d.result, status: d.status } : {
+        status: d.status,
+        matching_percentage: d.pct ?? null,
+        execution_error: d.error ?? null,
+      };
+      Object.assign(state.runState.tests[key], update);
+    } else {
+      console.warn('test_result: no matching key for id=', d.id, 'name=', d.result?.test_name);
+    }
+
     saveLS(); renderSidebar();
-    if (state.selectedTestId === d.id) renderDetail();
+    if (state.selectedTestId === key || state.selectedTestId === d.id) renderDetail();
     updateProgress();
   });
 
@@ -651,8 +680,29 @@ function connectSSE() {
   es.addEventListener('run_end', e => {
     const d = JSON.parse(e.data);
     state.running = false;
-    // run_state from server has the full merged data (screenshots, load times etc.)
-    if (d.run_state) state.runState = d.run_state;
+
+    // Merge server run_state into our local state carefully.
+    // DO NOT wholesale replace — the server uses normalized IDs (e.g. "all_results")
+    // but our runState uses test_cases.json keys. Match by test_name instead.
+    if (d.run_state) {
+      if (!state.runState) state.runState = { tests: {} };
+      state.runState.status = d.run_state.status;
+      state.runState.finished_at = d.run_state.finished_at;
+      state.runState.exit_code = d.run_state.exit_code;
+      state.runState.report = d.run_state.report;
+
+      // Merge each server test result into the correct local key by test_name
+      const serverTests = d.run_state.tests || {};
+      Object.values(serverTests).forEach(serverTest => {
+        const localKey = Object.keys(state.runState.tests || {}).find(k =>
+          state.runState.tests[k].test_name === serverTest.test_name
+        ) || serverTest.id;
+        if (state.runState.tests[localKey]) {
+          Object.assign(state.runState.tests[localKey], serverTest);
+        }
+      });
+    }
+
     saveLS();
     $('execute-btn').disabled = false;
     $('execute-btn').textContent = '▶ Execute Tests';
@@ -779,21 +829,43 @@ async function fetchSettings() {
 async function fetchLastReport() {
   try {
     const data = await (await fetch('/api/last-report')).json();
-    if (!data) return;
+    if (!data || !data.tests || typeof data.tests !== 'object') return;
 
-    // Server returns _run_state.json which has { status, tests: {id: {...}}, report, logs }
-    if (data.tests && typeof data.tests === 'object') {
+    // On a fresh page load with no localStorage, just use the server state directly
+    const localTests = state.runState?.tests;
+    const hasLocalTests = localTests && Object.keys(localTests).length > 0;
+
+    if (!hasLocalTests) {
+      // No local state — use server state as-is (first load after a run)
       state.runState = data;
-      // Restore logs from the state file if we have none in localStorage
-      if (data.logs?.length && !state.logs.length) {
-        state.logs = data.logs.map(l => ({ line: l, cls: classifyLog(l) }));
-        restoreLogs();
-      }
-      saveLS();
-      renderSidebar();
-      renderSummary();
-      if (state.selectedTestId) renderDetail();
+    } else {
+      // Merge server test data into local keys by matching test_name
+      // This preserves correct key mapping built up during the live run
+      state.runState.status = data.status;
+      state.runState.finished_at = data.finished_at;
+      state.runState.exit_code = data.exit_code;
+      state.runState.report = data.report;
+
+      Object.values(data.tests).forEach(serverTest => {
+        const localKey = Object.keys(localTests).find(k =>
+          localTests[k].test_name === serverTest.test_name
+        );
+        if (localKey) {
+          Object.assign(localTests[localKey], serverTest);
+        }
+      });
     }
+
+    // Restore logs from disk if we have none locally
+    if (data.logs?.length && !state.logs.length) {
+      state.logs = data.logs.map(l => ({ line: l, cls: classifyLog(l) }));
+      restoreLogs();
+    }
+
+    saveLS();
+    renderSidebar();
+    renderSummary();
+    if (state.selectedTestId) renderDetail();
   } catch(e) { console.warn('fetchLastReport failed', e); }
 }
 

@@ -26,7 +26,7 @@ TEST_DIR      = BASE_DIR / "test"
 TESTS_FILE    = TEST_DIR / "test_cases.json"
 RESULTS_DIR   = BASE_DIR / "results"
 ENV_FILE      = BASE_DIR / ".env"
-RUNNER_SCRIPT = TEST_DIR / "test_layout.py"
+RUNNER_SCRIPT = TEST_DIR / "runner.py"
 
 # State file lives OUTSIDE results/ so CLEAN_OLD_RESULTS in test_layout.py
 # never wipes it.
@@ -259,23 +259,16 @@ def run_tests():
 
                 _broadcast("log", {"line": line})
 
-                # ── ##RESULT## — rich per-test result emitted by test_layout.py ──
-                # This fires immediately after each test completes, giving the UI
-                # all data (match %, load times, artifact paths) without waiting
-                # for the whole run to finish.
-                if line.startswith("##RESULT## "):
+                # ── ##RESULT## — rich per-test result from test_layout.py ────────
+                # Emitted immediately after each test with full data.
+                if "##RESULT##" in line:
                     try:
-                        result = json.loads(line[len("##RESULT## "):])
+                        json_part = line[line.index("##RESULT##") + len("##RESULT##"):].strip()
+                        result = json.loads(json_part)
                         tid = result.get("id")
                         if tid:
                             status = result.get("status", "unknown")
-                            logger.info(
-                                "  %s %s  match=%s%%",
-                                "✅" if status == "passed" else "❌",
-                                tid,
-                                result.get("matching_percentage"),
-                            )
-                            # Merge full result into live state immediately
+                            logger.info("  ##RESULT## %s => %s  match=%s", tid, status, result.get("matching_percentage"))
                             run_state["tests"][tid] = {
                                 **run_state["tests"].get(tid, {}),
                                 "status": status,
@@ -301,11 +294,16 @@ def run_tests():
                                 "result": result,
                             })
                             current_test = None
+                        else:
+                            logger.warning("##RESULT## line missing id: %s", line)
                     except Exception as exc:
-                        logger.error("Failed to parse ##RESULT## line: %s — %s", line, exc)
+                        logger.error("Failed to parse ##RESULT## line: %s | error: %s", line, exc)
 
                 # ── Test start marker ──────────────────────────────────────────
-                elif line.startswith("▶ Executing test:"):
+                # NOTE: No fallback pass/fail handlers — ##RESULT## is the only
+                # place we set final status. Fallbacks caused double-fires and
+                # left current_test=None before ##RESULT## could merge full data.
+                elif "Executing test:" in line:
                     name = line.split("▶ Executing test:", 1)[1].strip()
                     tid = next(
                         (k for k, v in tests.items() if v.get("test_name") == name),

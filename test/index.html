@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Visual Regression — Test Runner</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #f5f4f0;
+  --surface: #ffffff;
+  --surface2: #f0ede8;
+  --border: #e2ddd8;
+  --border2: #d0cbc4;
+  --text: #1a1814;
+  --text2: #6b6560;
+  --text3: #9e9890;
+  --accent: #2563eb;
+  --accent-bg: #eff6ff;
+  --pass: #16a34a;
+  --pass-bg: #f0fdf4;
+  --fail: #dc2626;
+  --fail-bg: #fef2f2;
+  --warn: #d97706;
+  --warn-bg: #fffbeb;
+  --queue: #7c3aed;
+  --queue-bg: #f5f3ff;
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ── Nav ── */
+nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  height: 56px;
+  gap: 32px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
+}
+
+.nav-brand {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text);
+  letter-spacing: -0.3px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-brand-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent);
+}
+
+.nav-tabs {
+  display: flex;
+  gap: 2px;
+  flex: 1;
+}
+
+.nav-tab {
+  background: none;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.nav-tab:hover { background: var(--surface2); color: var(--text); }
+.nav-tab.active { background: var(--accent-bg); color: var(--accent); }
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
+#run-status-badge {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+  background: var(--surface2);
+  color: var(--text2);
+  display: none;
+}
+
+#run-status-badge.running {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+#run-status-badge.done-pass { display: inline-block; background: var(--pass-bg); color: var(--pass); }
+#run-status-badge.done-fail { display: inline-block; background: var(--fail-bg); color: var(--fail); }
+
+.spinner {
+  width: 10px; height: 10px;
+  border: 2px solid rgba(37,99,235,0.2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Layout ── */
+.page { display: none; padding: 32px; max-width: 1100px; margin: 0 auto; }
+.page.active { display: block; }
+
+/* ── Page headers ── */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.page-header h1 {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  color: var(--text);
+}
+
+.page-header p {
+  font-size: 13px;
+  color: var(--text2);
+  margin-top: 3px;
+}
+
+/* ── Buttons ── */
+.btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.btn:hover { border-color: var(--border2); background: var(--surface2); }
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+.btn-primary:hover { background: #1d4ed8; border-color: #1d4ed8; }
+
+.btn-danger { color: var(--fail); }
+.btn-danger:hover { background: var(--fail-bg); border-color: var(--fail); }
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn-execute {
+  font-size: 14px;
+  padding: 10px 24px;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+}
+.btn-execute:hover { background: #1d4ed8; box-shadow: 0 4px 12px rgba(37,99,235,0.4); }
+
+/* ── Cards ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* ── Progress bar ── */
+#progress-wrap {
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  display: none;
+}
+#progress-wrap.visible { display: block; }
+#progress-bar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.4s ease;
+}
+
+/* ── Summary strip ── */
+#summary-strip {
+  display: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+}
+#summary-strip.visible { display: flex; }
+
+.sum-stat { font-size: 13px; }
+.sum-stat span { font-weight: 600; }
+.sum-stat.p span { color: var(--pass); }
+.sum-stat.f span { color: var(--fail); }
+.sum-stat.e span { color: var(--warn); }
+.sum-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); }
+
+.sum-report-link {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+  border: 1px solid rgba(37,99,235,0.2);
+  padding: 4px 10px;
+  border-radius: 5px;
+  background: var(--accent-bg);
+}
+.sum-report-link:hover { background: #dbeafe; }
+
+/* ── Run page layout ── */
+.run-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* ── Test list sidebar ── */
+.test-sidebar { position: sticky; top: 80px; }
+
+.test-sidebar-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.test-sidebar-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text2);
+}
+
+.test-sidebar-count {
+  font-size: 11px;
+  background: var(--surface2);
+  color: var(--text2);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-family: 'DM Mono', monospace;
+}
+
+.test-sidebar-list { padding: 6px 0; max-height: calc(100vh - 220px); overflow-y: auto; }
+
+.test-sidebar-list::-webkit-scrollbar { width: 3px; }
+.test-sidebar-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.test-row-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.12s;
+}
+.test-row-item:hover { background: var(--surface2); }
+.test-row-item.selected { background: var(--accent-bg); border-left-color: var(--accent); }
+.test-row-item.status-passed { border-left-color: var(--pass); }
+.test-row-item.status-failed { border-left-color: var(--fail); }
+.test-row-item.status-execution-error { border-left-color: var(--warn); }
+.test-row-item.status-running { border-left-color: var(--accent); background: var(--accent-bg); }
+.test-row-item.status-queued { border-left-color: var(--queue); }
+
+.test-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--border2);
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+.status-passed .test-dot { background: var(--pass); }
+.status-failed .test-dot { background: var(--fail); }
+.status-execution-error .test-dot { background: var(--warn); }
+.status-running .test-dot { background: var(--accent); animation: pulse-dot 1s ease-in-out infinite; }
+.status-queued .test-dot { background: var(--queue); opacity: 0.5; }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+.test-row-info { flex: 1; min-width: 0; }
+.test-row-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.test-row-uri { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.test-row-badge { font-size: 10px; font-weight: 600; font-family: 'DM Mono', monospace; flex-shrink: 0; }
+.status-passed .test-row-badge { color: var(--pass); }
+.status-failed .test-row-badge { color: var(--fail); }
+
+/* ── Detail panel ── */
+.detail-panel { display: flex; flex-direction: column; gap: 16px; }
+
+.detail-empty {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 48px 32px;
+  text-align: center;
+  color: var(--text3);
+  font-size: 13px;
+}
+
+.detail-card { padding: 20px 24px; }
+
+.detail-title { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; margin-bottom: 4px; }
+.detail-uri { font-size: 12px; font-family: 'DM Mono', monospace; color: var(--text2); margin-bottom: 16px; }
+
+.detail-links { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.detail-link {
+  font-size: 12px; color: var(--accent); font-weight: 500;
+  border: 1px solid rgba(37,99,235,0.2); padding: 4px 10px;
+  border-radius: 5px; text-decoration: none; background: var(--accent-bg);
+}
+.detail-link:hover { background: #dbeafe; }
+
+.detail-status {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 600; padding: 6px 12px;
+  border-radius: 20px;
+}
+.detail-status.passed { background: var(--pass-bg); color: var(--pass); }
+.detail-status.failed { background: var(--fail-bg); color: var(--fail); }
+.detail-status.execution-error { background: var(--warn-bg); color: var(--warn); }
+.detail-status.running { background: var(--accent-bg); color: var(--accent); }
+.detail-status.queued { background: var(--queue-bg); color: var(--queue); }
+
+.detail-meta {
+  margin-top: 12px; display: flex; gap: 20px; flex-wrap: wrap;
+  font-size: 12px; color: var(--text2);
+}
+.detail-meta span b { font-weight: 600; color: var(--text); }
+
+.error-box {
+  background: var(--fail-bg); border: 1px solid rgba(220,38,38,0.15);
+  border-radius: 7px; padding: 12px 14px;
+  font-size: 12px; color: var(--fail); font-family: 'DM Mono', monospace;
+  white-space: pre-wrap; word-break: break-all; margin-top: 12px;
+}
+
+.diff-card { overflow: hidden; }
+.diff-label {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px; color: var(--text2);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.diff-card img { width: 100%; display: block; }
+
+/* ── Run controls ── */
+.run-controls {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: var(--shadow);
+  flex-wrap: wrap;
+}
+
+.run-controls-left h2 { font-size: 15px; font-weight: 600; }
+.run-controls-left p { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+/* ── Console log ── */
+.log-card { margin-top: 16px; }
+.log-header {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.log-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text2); }
+#log-body {
+  padding: 12px 16px; font-family: 'DM Mono', monospace;
+  font-size: 11px; line-height: 1.8; color: var(--text2);
+  max-height: 200px; overflow-y: auto;
+  background: #fafaf8;
+}
+#log-body::-webkit-scrollbar { width: 3px; }
+#log-body::-webkit-scrollbar-thumb { background: var(--border2); }
+.log-line { white-space: pre-wrap; word-break: break-all; }
+.log-line.lpass { color: var(--pass); }
+.log-line.lfail { color: var(--fail); }
+.log-line.lerror { color: var(--warn); }
+.log-line.linfo { color: var(--accent); }
+
+/* ── Tests page ── */
+.tests-table {
+  width: 100%; border-collapse: collapse;
+}
+.tests-table th {
+  text-align: left; padding: 10px 16px;
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  color: var(--text2);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+.tests-table th:first-child { border-radius: 9px 0 0 0; }
+.tests-table th:last-child { border-radius: 0 9px 0 0; }
+.tests-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.tests-table tr:last-child td { border-bottom: none; }
+.tests-table tr:hover td { background: var(--surface2); }
+
+.tests-table input {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text);
+  width: 100%;
+  transition: all 0.15s;
+}
+.tests-table input:hover { border-color: var(--border2); background: var(--surface2); }
+.tests-table input:focus { outline: none; border-color: var(--accent); background: var(--surface); box-shadow: 0 0 0 3px rgba(37,99,235,0.08); }
+
+.tests-table input.mono { font-family: 'DM Mono', monospace; font-size: 12px; }
+
+.empty-state {
+  text-align: center; padding: 48px; color: var(--text3); font-size: 13px;
+}
+
+/* ── Settings page ── */
+.settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 700px; }
+.settings-section { padding: 20px; }
+.settings-section h3 {
+  font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  color: var(--text2); margin-bottom: 16px;
+  padding-bottom: 10px; border-bottom: 1px solid var(--border);
+}
+.field { margin-bottom: 14px; }
+.field:last-child { margin-bottom: 0; }
+.field label { display: block; font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 5px; }
+.field input {
+  width: 100%; padding: 8px 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
+  border: 1px solid var(--border); border-radius: 7px;
+  background: var(--surface); color: var(--text);
+  transition: all 0.15s;
+}
+.field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.08); }
+.field small { font-size: 11px; color: var(--text3); margin-top: 4px; display: block; }
+
+.save-feedback {
+  font-size: 12px; color: var(--pass); font-weight: 500;
+  opacity: 0; transition: opacity 0.3s; margin-left: 8px;
+}
+.save-feedback.show { opacity: 1; }
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .run-layout { grid-template-columns: 1fr; }
+  .settings-grid { grid-template-columns: 1fr; }
+  .page { padding: 16px; }
+  nav { padding: 0 16px; gap: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <div class="nav-brand-dot"></div>
+    EMLO Tests
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-page="run">Run</button>
+    <button class="nav-tab" data-page="tests">Test Cases</button>
+    <button class="nav-tab" data-page="settings">Settings</button>
+  </div>
+  <div class="nav-right">
+    <span id="run-status-badge"></span>
+  </div>
+</nav>
+
+<!-- ════════════════════ RUN PAGE ════════════════════ -->
+<div class="page active" id="page-run">
+
+  <!-- Controls -->
+  <div class="run-controls">
+    <div class="run-controls-left">
+      <h2>Visual Regression Tests</h2>
+      <p id="run-subtitle">Compare Cottagelabs and Bodleian layouts side by side.</p>
+    </div>
+    <button class="btn btn-execute" id="execute-btn">▶ Execute Tests</button>
+  </div>
+
+  <!-- Progress -->
+  <div id="progress-wrap"><div id="progress-bar"></div></div>
+
+  <!-- Summary -->
+  <div id="summary-strip"></div>
+
+  <!-- Main run layout -->
+  <div class="run-layout">
+
+    <!-- Sidebar: test list -->
+    <div class="card test-sidebar">
+      <div class="test-sidebar-header">
+        <span class="test-sidebar-title">Tests</span>
+        <span class="test-sidebar-count" id="sidebar-count">0</span>
+      </div>
+      <div class="test-sidebar-list" id="sidebar-list">
+        <div class="empty-state">No tests loaded</div>
+      </div>
+    </div>
+
+    <!-- Detail panel -->
+    <div class="detail-panel" id="detail-panel">
+      <div class="detail-empty">
+        Select a test from the list to see details, or click <strong>Execute Tests</strong> to run all.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Console log -->
+  <div class="card log-card" id="log-card" style="display:none; margin-top:20px;">
+    <div class="log-header">
+      <span class="log-title">Console Output</span>
+      <button class="btn" style="padding:3px 10px;font-size:11px;" id="log-clear-btn">Clear</button>
+    </div>
+    <div id="log-body"></div>
+  </div>
+
+</div>
+
+<!-- ════════════════════ TESTS PAGE ════════════════════ -->
+<div class="page" id="page-tests">
+  <div class="page-header">
+    <div>
+      <h1>Test Cases</h1>
+      <p>Add, edit or remove the URLs you want to compare.</p>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn" id="add-test-btn">+ Add Test</button>
+      <button class="btn btn-primary" id="save-tests-btn">Save All</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <table class="tests-table" id="tests-table">
+      <thead>
+        <tr>
+          <th style="width:130px">ID</th>
+          <th>Test Name</th>
+          <th style="width:160px">URI</th>
+          <th>Description</th>
+          <th style="width:60px"></th>
+        </tr>
+      </thead>
+      <tbody id="tests-tbody">
+        <tr><td colspan="5" class="empty-state">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════ SETTINGS PAGE ════════════════════ -->
+<div class="page" id="page-settings">
+  <div class="page-header">
+    <div>
+      <h1>Settings</h1>
+      <p>Configure the server URLs and authentication for your test runs.</p>
+    </div>
+  </div>
+
+  <div class="card" style="max-width:700px;">
+    <div class="settings-grid">
+      <div class="settings-section">
+        <h3>Server URLs</h3>
+        <div class="field">
+          <label>Cottagelabs (CL) Base URL</label>
+          <input type="text" id="set-CL_BASE_URL" placeholder="https://cottagelabs.com"/>
+          <small>The base URL for the Cottagelabs site</small>
+        </div>
+        <div class="field">
+          <label>Bodleian (OX) Base URL</label>
+          <input type="text" id="set-OX_BASE_URL" placeholder="https://bodleian.ox.ac.uk"/>
+          <small>The base URL for the Bodleian site</small>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h3>Authentication</h3>
+        <div class="field">
+          <label>Username</label>
+          <input type="text" id="set-CL_TESTSERVER_USER" placeholder="username"/>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="set-CL_TESTSERVER_PASS" placeholder="••••••••"/>
+        </div>
+      </div>
+    </div>
+    <div style="padding:16px 20px;border-top:1px solid var(--border);display:flex;align-items:center;">
+      <button class="btn btn-primary" id="save-settings-btn">Save Settings</button>
+      <span class="save-feedback" id="save-feedback">✓ Settings saved</span>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ═══════════════════════════════════════════════════════
+// STATE — persisted to localStorage
+// ═══════════════════════════════════════════════════════
+const LS_KEY = 'emlo_test_runner_state';
+
+const defaultState = {
+  activePage: 'run',
+  selectedTestId: null,
+  statuses: {},      // id → { status, pct, error }
+  lastReport: null,  // full report JSON from last run
+  logs: [],          // array of { line, cls }
+  running: false,
+  tests: {},
+};
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return { ...defaultState };
+    const saved = JSON.parse(raw);
+    // never restore "running" as true — if page was refreshed mid-run, it's gone
+    saved.running = false;
+    saved.statuses = saved.statuses || {};
+    // if a test was "running" or "queued", reset to idle
+    for (const id of Object.keys(saved.statuses)) {
+      if (['running','queued'].includes(saved.statuses[id]?.status)) {
+        delete saved.statuses[id];
+      }
+    }
+    return { ...defaultState, ...saved };
+  } catch { return { ...defaultState }; }
+}
+
+function saveState() {
+  try {
+    const toSave = {
+      activePage: state.activePage,
+      selectedTestId: state.selectedTestId,
+      statuses: state.statuses,
+      lastReport: state.lastReport,
+      logs: state.logs.slice(-200), // keep last 200 lines
+      tests: state.tests,
+    };
+    localStorage.setItem(LS_KEY, JSON.stringify(toSave));
+  } catch {}
+}
+
+const state = loadState();
+
+// ═══════════════════════════════════════════════════════
+// DOM HELPERS
+// ═══════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  $(`page-${name}`).classList.add('active');
+  document.querySelector(`[data-page="${name}"]`).classList.add('active');
+  state.activePage = name;
+  saveState();
+}
+
+document.querySelectorAll('.nav-tab').forEach(btn => {
+  btn.addEventListener('click', () => showPage(btn.dataset.page));
+});
+
+// ═══════════════════════════════════════════════════════
+// FETCH TESTS FROM SERVER
+// ═══════════════════════════════════════════════════════
+async function fetchTests() {
+  try {
+    const r = await fetch('/api/tests');
+    state.tests = await r.json();
+    saveState();
+    renderSidebar();
+    renderTestsTable();
+  } catch(e) {
+    console.error('Could not load tests', e);
+  }
+}
+
+async function fetchSettings() {
+  try {
+    const r = await fetch('/api/settings');
+    const s = await r.json();
+    for (const [k, v] of Object.entries(s)) {
+      const el = $(`set-${k}`);
+      if (el) el.value = v;
+    }
+  } catch {}
+}
+
+// ═══════════════════════════════════════════════════════
+// SIDEBAR RENDER
+// ═══════════════════════════════════════════════════════
+function renderSidebar() {
+  const ids = Object.keys(state.tests);
+  $('sidebar-count').textContent = ids.length;
+  const list = $('sidebar-list');
+
+  if (!ids.length) {
+    list.innerHTML = '<div class="empty-state">No tests. Add them in Test Cases.</div>';
+    return;
+  }
+
+  // Only show test list if a run has happened or is in progress
+  const hasRun = state.running || state.lastReport || Object.values(state.statuses).some(s => s?.status);
+  if (!hasRun) {
+    list.innerHTML = '<div class="empty-state" style="padding:24px 16px;line-height:1.6;">Run your tests first.<br/><span style="font-size:11px;color:var(--text3);">Click Execute Tests to begin.</span></div>';
+    return;
+  }
+
+  list.innerHTML = '';
+  ids.forEach(id => {
+    const t = state.tests[id];
+    const s = state.statuses[id];
+    const status = s?.status || 'idle';
+
+    const div = document.createElement('div');
+    div.className = `test-row-item status-${status}${state.selectedTestId === id ? ' selected' : ''}`;
+    div.dataset.id = id;
+
+    let badge = '';
+    if (s?.pct != null) badge = `<span class="test-row-badge">${s.pct}%</span>`;
+    else if (status === 'running') badge = `<div class="spinner"></div>`;
+    else if (status === 'queued') badge = `<span class="test-row-badge" style="color:var(--queue);opacity:.6">queue</span>`;
+
+    div.innerHTML = `
+      <div class="test-dot"></div>
+      <div class="test-row-info">
+        <div class="test-row-name">${escHtml(t.test_name || id)}</div>
+        <div class="test-row-uri">${escHtml(t.uri || '')}</div>
+      </div>
+      ${badge}
+    `;
+    div.addEventListener('click', () => selectTest(id));
+    list.appendChild(div);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// DETAIL PANEL
+// ═══════════════════════════════════════════════════════
+function selectTest(id) {
+  state.selectedTestId = id;
+  saveState();
+  renderSidebar();
+  renderDetail();
+  // switch to run tab
+  showPage('run');
+}
+
+function renderDetail() {
+  const panel = $('detail-panel');
+  const id = state.selectedTestId;
+  const hasRun = state.running || state.lastReport || Object.values(state.statuses).some(s => s?.status);
+
+  if (!hasRun) {
+    panel.innerHTML = `<div class="detail-empty">Click <strong>Execute Tests</strong> to run your tests. Results will appear here.</div>`;
+    return;
+  }
+
+  if (!id || !state.tests[id]) {
+    panel.innerHTML = `<div class="detail-empty">Select a test from the list to see details.</div>`;
+    return;
+  }
+
+  const t = state.tests[id];
+  const s = state.statuses[id];
+  const status = s?.status || 'idle';
+
+  // Find result in last report
+  let result = null;
+  if (state.lastReport?.tests) {
+    result = state.lastReport.tests.find(r => r.id === id);
+  }
+
+  const cl_url = result?.cl_site_url || '#';
+  const ox_url = result?.ox_site_url || '#';
+
+  let statusHtml = '';
+  const statusLabels = {
+    passed: '✓ Passed',
+    failed: '✗ Failed',
+    'execution-error': '⚠ Execution Error',
+    running: '⟳ Running…',
+    queued: '⏳ In Queue',
+    idle: '',
+  };
+  if (status !== 'idle') {
+    statusHtml = `<div style="margin-top:12px;"><span class="detail-status ${status}">${statusLabels[status] || status}${s?.pct != null ? ` — ${s.pct}%` : ''}</span></div>`;
+  }
+
+  let metaHtml = '';
+  if (result) {
+    metaHtml = `
+      <div class="detail-meta">
+        <span><b>CL Load:</b> ${human(result.cl_load_time_ms)}</span>
+        <span><b>OX Load:</b> ${human(result.ox_load_time_ms)}</span>
+        <span><b>Duration:</b> ${human(result.duration_ms)}</span>
+      </div>`;
+  }
+
+  let errorHtml = '';
+  if (s?.error) {
+    errorHtml = `<div class="error-box">${escHtml(s.error)}</div>`;
+  }
+
+  panel.innerHTML = `
+    <div class="card detail-card">
+      <div class="detail-title">${escHtml(t.test_name || id)}</div>
+      <div class="detail-uri">${escHtml(t.uri || '')}</div>
+      ${result ? `<div class="detail-links">
+        <a class="detail-link" href="${cl_url}" target="_blank">↗ Cottagelabs</a>
+        <a class="detail-link" href="${ox_url}" target="_blank">↗ Bodleian</a>
+      </div>` : ''}
+      ${statusHtml}
+      ${metaHtml}
+      ${t.desc ? `<div style="margin-top:10px;font-size:12px;color:var(--text2);">${escHtml(t.desc)}</div>` : ''}
+      ${errorHtml}
+    </div>
+    ${result?.artifacts?.diff_image ? `
+    <div class="card diff-card">
+      <div class="diff-label">
+        <span>Pixel Diff</span>
+        <span style="font-weight:400;color:var(--text3)">${result.artifacts.diff_image}</span>
+      </div>
+      <img src="/results/${result.artifacts.diff_image}" alt="diff image"/>
+    </div>` : (status !== 'idle' && status !== 'queued' && status !== 'running' ? `
+    <div class="detail-empty" style="font-size:12px;padding:24px;">
+      No diff image available for this test.
+    </div>` : '')}
+  `;
+}
+
+// ═══════════════════════════════════════════════════════
+// SUMMARY STRIP
+// ═══════════════════════════════════════════════════════
+function renderSummary() {
+  const strip = $('summary-strip');
+  const r = state.lastReport;
+  if (!r) { strip.classList.remove('visible'); return; }
+  const s = r.summary;
+  strip.classList.add('visible');
+  strip.innerHTML = `
+    <div>
+      <div class="sum-label">Run completed</div>
+      <div style="font-size:12px;font-weight:500;">${r.run_id}</div>
+    </div>
+    <div class="sum-stat p"><div class="sum-label">Passed</div><span>${s.passed} (${s.pass_percentage}%)</span></div>
+    <div class="sum-stat f"><div class="sum-label">Failed</div><span>${s.failed} (${s.fail_percentage}%)</span></div>
+    <div class="sum-stat e"><div class="sum-label">Errors</div><span>${s.execution_error}</span></div>
+    <div class="sum-stat"><div class="sum-label">Duration</div><span>${human(r.run_duration)}</span></div>
+    <a class="sum-report-link" href="/results/report.html" target="_blank">Open Full Report ↗</a>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════
+// PROGRESS BAR
+// ═══════════════════════════════════════════════════════
+function updateProgress() {
+  const ids = Object.keys(state.tests);
+  if (!ids.length) return;
+  const done = ids.filter(id => {
+    const s = state.statuses[id]?.status;
+    return s && !['running','queued'].includes(s);
+  }).length;
+  const pct = Math.round((done / ids.length) * 95);
+  $('progress-bar').style.width = pct + '%';
+}
+
+// ═══════════════════════════════════════════════════════
+// LOG
+// ═══════════════════════════════════════════════════════
+function appendLog(line, cls) {
+  $('log-card').style.display = 'block';
+  const body = $('log-body');
+  const div = document.createElement('div');
+  div.className = 'log-line';
+  if (cls) div.classList.add(cls);
+  else if (/✅|PASSED/.test(line)) div.classList.add('lpass');
+  else if (/❌|FAILED/.test(line)) div.classList.add('lfail');
+  else if (/ERROR|⚠/.test(line)) div.classList.add('lerror');
+  else if (/▶|→|🚀/.test(line)) div.classList.add('linfo');
+  div.textContent = line;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+
+  state.logs.push({ line, cls: div.className });
+  saveState();
+}
+
+function restoreLogs() {
+  if (!state.logs.length) return;
+  $('log-card').style.display = 'block';
+  const body = $('log-body');
+  body.innerHTML = '';
+  state.logs.forEach(({ line, cls }) => {
+    const div = document.createElement('div');
+    div.className = cls || 'log-line';
+    div.textContent = line;
+    body.appendChild(div);
+  });
+  body.scrollTop = body.scrollHeight;
+}
+
+$('log-clear-btn').addEventListener('click', () => {
+  $('log-body').innerHTML = '';
+  state.logs = [];
+  saveState();
+});
+
+// ═══════════════════════════════════════════════════════
+// SSE — Server Sent Events
+// ═══════════════════════════════════════════════════════
+function connectSSE() {
+  const es = new EventSource('/api/events');
+
+  es.addEventListener('run_start', () => {
+    state.running = true;
+    state.statuses = {};
+    // mark all as queued
+    Object.keys(state.tests).forEach(id => {
+      state.statuses[id] = { status: 'queued' };
+    });
+    $('execute-btn').disabled = true;
+    $('execute-btn').textContent = '⟳ Running…';
+    $('run-subtitle').textContent = 'Tests are running — results will appear below.';
+    $('run-status-badge').className = 'run-status-badge running';
+    $('run-status-badge').innerHTML = '<div class="spinner"></div> Running';
+    $('progress-wrap').classList.add('visible');
+    $('progress-bar').style.width = '0%';
+    $('summary-strip').classList.remove('visible');
+    saveState();
+    renderSidebar();
+    renderDetail();
+  });
+
+  es.addEventListener('test_list', e => {
+    const d = JSON.parse(e.data);
+    state.tests = d.tests;
+    saveState();
+    renderSidebar();
+    renderTestsTable();
+  });
+
+  es.addEventListener('test_start', e => {
+    const { id } = JSON.parse(e.data);
+    state.statuses[id] = { status: 'running' };
+    saveState();
+    renderSidebar();
+    if (state.selectedTestId === id) renderDetail();
+    updateProgress();
+  });
+
+  es.addEventListener('test_result', e => {
+    const d = JSON.parse(e.data);
+    state.statuses[d.id] = { status: d.status, pct: d.pct, error: d.error };
+    saveState();
+    renderSidebar();
+    if (state.selectedTestId === d.id) renderDetail();
+    updateProgress();
+  });
+
+  es.addEventListener('log', e => {
+    const { line } = JSON.parse(e.data);
+    appendLog(line);
+  });
+
+  es.addEventListener('run_end', e => {
+    const d = JSON.parse(e.data);
+    state.running = false;
+    state.lastReport = d.report;
+    $('execute-btn').disabled = false;
+    $('execute-btn').textContent = '▶ Execute Tests';
+    $('run-subtitle').textContent = 'Compare Cottagelabs and Bodleian layouts side by side.';
+    $('progress-bar').style.width = '100%';
+    setTimeout(() => $('progress-wrap').classList.remove('visible'), 1500);
+    const ok = d.exit_code === 0;
+    $('run-status-badge').className = `run-status-badge ${ok ? 'done-pass' : 'done-fail'}`;
+    $('run-status-badge').textContent = ok ? '✓ All passed' : '✗ Some failed';
+    saveState();
+    renderSidebar();
+    renderDetail();
+    renderSummary();
+  });
+
+  es.addEventListener('run_error', e => {
+    const d = JSON.parse(e.data);
+    state.running = false;
+    $('execute-btn').disabled = false;
+    $('execute-btn').textContent = '▶ Execute Tests';
+    appendLog('ERROR: ' + d.error, 'log-line lerror');
+    saveState();
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// EXECUTE BUTTON
+// ═══════════════════════════════════════════════════════
+$('execute-btn').addEventListener('click', async () => {
+  if (state.running) return;
+  state.logs = [];
+  $('log-body').innerHTML = '';
+  try {
+    const r = await fetch('/api/run', { method: 'POST' });
+    if (!r.ok) {
+      const d = await r.json();
+      alert(d.error || 'Failed to start. Is the server running?');
+    }
+  } catch(e) {
+    alert('Could not connect to server: ' + e.message);
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// TESTS TABLE
+// ═══════════════════════════════════════════════════════
+function renderTestsTable() {
+  const tbody = $('tests-tbody');
+  const ids = Object.keys(state.tests);
+
+  if (!ids.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No tests yet. Click "+ Add Test" to add one.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = '';
+  ids.forEach(id => {
+    const t = state.tests[id];
+    const tr = document.createElement('tr');
+    tr.dataset.id = id;
+    tr.innerHTML = `
+      <td><input class="mono f-id" value="${escHtml(id)}" placeholder="test_id"/></td>
+      <td><input class="f-name" value="${escHtml(t.test_name || '')}" placeholder="Homepage layout"/></td>
+      <td><input class="mono f-uri" value="${escHtml(t.uri || '')}" placeholder="/about"/></td>
+      <td><input class="f-desc" value="${escHtml(t.desc || '')}" placeholder="Optional description"/></td>
+      <td><button class="btn btn-danger remove-btn" title="Remove">✕</button></td>
+    `;
+    tr.querySelector('.remove-btn').addEventListener('click', () => {
+      delete state.tests[id];
+      tr.remove();
+      renderSidebar();
+      saveState();
+    });
+    tbody.appendChild(tr);
+  });
+}
+
+$('add-test-btn').addEventListener('click', () => {
+  const id = 'test_' + Date.now();
+  state.tests[id] = { test_name: '', uri: '', desc: '' };
+  renderTestsTable();
+  // focus the new row's name field
+  const lastRow = $('tests-tbody').lastElementChild;
+  if (lastRow) lastRow.querySelector('.f-name')?.focus();
+});
+
+$('save-tests-btn').addEventListener('click', async () => {
+  // collect from DOM
+  const updated = {};
+  $('tests-tbody').querySelectorAll('tr[data-id]').forEach(tr => {
+    const newId = tr.querySelector('.f-id').value.trim();
+    if (!newId) return;
+    updated[newId] = {
+      test_name: tr.querySelector('.f-name').value.trim(),
+      uri: tr.querySelector('.f-uri').value.trim(),
+      desc: tr.querySelector('.f-desc').value.trim(),
+    };
+  });
+  state.tests = updated;
+  saveState();
+  renderSidebar();
+  await fetch('/api/tests', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updated),
+  });
+  // brief visual feedback
+  $('save-tests-btn').textContent = '✓ Saved';
+  setTimeout(() => { $('save-tests-btn').textContent = 'Save All'; }, 1500);
+});
+
+// ═══════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════
+$('save-settings-btn').addEventListener('click', async () => {
+  const keys = ['CL_BASE_URL', 'OX_BASE_URL', 'CL_TESTSERVER_USER', 'CL_TESTSERVER_PASS'];
+  const payload = {};
+  keys.forEach(k => {
+    const el = $(`set-${k}`);
+    if (el) payload[k] = el.value;
+  });
+  await fetch('/api/settings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const fb = $('save-feedback');
+  fb.classList.add('show');
+  setTimeout(() => fb.classList.remove('show'), 2000);
+});
+
+// ═══════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════
+function human(ms) {
+  if (ms === null || ms === undefined) return '—';
+  if (ms < 1000) return ms + ' ms';
+  return (ms / 1000).toFixed(2) + ' s';
+}
+
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT — restore state from localStorage + server report
+// ═══════════════════════════════════════════════════════
+async function init() {
+  // restore active page
+  showPage(state.activePage || 'run');
+
+  // restore tests from state (instant, before server response)
+  if (Object.keys(state.tests).length) {
+    renderSidebar();
+    renderTestsTable();
+  }
+
+  // restore logs
+  restoreLogs();
+
+  // restore selected test detail
+  if (state.selectedTestId) renderDetail();
+
+  // fetch fresh tests + settings from server
+  await fetchTests();
+  fetchSettings();
+
+  // ALWAYS fetch the latest report from server on load
+  // This means even after a refresh, results are restored from disk
+  try {
+    const r = await fetch('/api/last-report');
+    const report = await r.json();
+    if (report) {
+      state.lastReport = report;
+      // rebuild statuses from the report so sidebar shows correct colours
+      state.statuses = {};
+      (report.tests || []).forEach(t => {
+        state.statuses[t.id] = {
+          status: t.status,
+          pct: t.matching_percentage,
+          error: t.execution_error,
+        };
+      });
+      saveState();
+      renderSidebar();
+      renderSummary();
+      // re-render detail with fresh result data
+      if (state.selectedTestId) renderDetail();
+    }
+  } catch(e) {
+    console.warn('Could not fetch last report', e);
+  }
+
+  // connect SSE for live updates
+  connectSSE();
+}
+
+init();
+</script>
+</body>
+</html>

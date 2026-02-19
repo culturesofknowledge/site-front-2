@@ -1,17 +1,102 @@
 {
-  "allResults": {
-    "test_name": "All results",
-    "uri": "/forms/advanced",
-    "desc": "Searching all results for work"
-  },
-  "dateSectionAlignment+": {
-    "test_name": "Date section is not aligned properly",
-    "uri": "/advanced#dates_section",
-    "desc": "On search+ page the date section is not aligned properly."
-  },
-  "test_1771425339578": {
-    "test_name": "Home page",
+  "test_1": {
     "uri": "/",
-    "desc": "Checking home page"
+    "test_name": "Home page",
+    "desc": "Testing home page layout"
+  },
+  "test_2": {
+    "uri": "/forms/advance",
+    "test_name": "Search+",
+    "desc": "Testing search+ page."
+  },
+  "test_3": {
+    "uri": "/forms/advance#letters_section",
+    "test_name": "Search+ specific section",
+    "desc": "Checking layout if we directly go on specific section."
+  },
+  "test_4": {
+    "uri": "/about",
+    "test_name": "About page",
+    "desc": "Checking layout for about page"
+  },
+  "test_5": {
+    "uri": "/contribute",
+    "test_name": "Contribute",
+    "desc": "Checking layout for contribute page."
+  },
+  "test_6": {
+    "uri": "/browse/people?filters=fe%2Cma%2Cun%2Cre%2Cwr%2Cme",
+    "test_name": "Browse people",
+    "desc": "Layout checking for peoples"
+  },
+  "test_7": {
+    "uri": "/browse/locations?filters=fe,ma,un,re,wr,me",
+    "test_name": "Browse locations",
+    "desc": "Layout checking for locations"
+  },
+  "test_8": {
+    "uri": "/browse/organizations?filters=fe,ma,un,re,wr,me",
+    "test_name": "Browse organizations",
+    "desc": "Layout checking for organizations"
+  },
+  "test_9": {
+    "uri": "/browse/repositories?letter=o",
+    "test_name": "Browse repos with letter O",
+    "desc": "Layout checking for repositories"
+  },
+  "test_10": {
+    "uri": "/browse/works?year=1611",
+    "test_name": "Browse works for year 1611",
+    "desc": ""
+  },
+  "test_11": {
+    "uri": "/forms/quick?everything=ms tanner&search_type=quick",
+    "test_name": "Quick search",
+    "desc": "Quick search ms tanner"
+  },
+  "test_12": {
+    "uri": "/forms/advanced?people=newton",
+    "test_name": "Search for Newton",
+    "desc": "Searching for newton in all people"
+  },
+  "test_13": {
+    "uri": "/profile/work/8a0b8091-ea30-444d-a9b3-d45029b56d3c",
+    "test_name": "Work profile",
+    "desc": "Work profile template check"
+  },
+  "test_14": {
+    "uri": "/profile/person/6bd60310-988c-47b3-9a91-17af575047f4",
+    "test_name": "Person profile",
+    "desc": "Person profile layout check"
+  },
+  "test_15": {
+    "uri": "/profile/location/8d126056-cd1b-44e6-ac87-b59cbeb718b6",
+    "test_name": "Location profile",
+    "desc": "Location profile layout check"
+  },
+  "test_16": {
+    "uri": "/profile/person/476425ae-34b3-421f-b1c7-e9e7fd990241",
+    "test_name": "Organizations profile",
+    "desc": "Organizations profile layout check"
+  },
+  "test_17": {
+    "uri": "/profile/repository/44e4cc09-01f3-463a-9057-0e7dd35955be",
+    "test_name": "Repository profile",
+    "desc": "Repository profile layout check"
+  },
+  "test_18": {
+    "uri": "/profile/manifestation/88f96ebc-7395-457e-987f-3b329b0de20a",
+    "test_name": "Manifestation Profile",
+    "desc": "Manifestation profile layout check"
+  },
+  "test_19": {
+    "uri": "/profile/image/a6053013-0a8f-4c6d-96d1-c2e218edd853",
+    "test_name": "Image profile",
+    "desc": "Image profile layout check"
+  },
+  "test_20": {
+    "uri": "/broken-url",
+    "test_name": "Broken URL",
+    "desc": "Broken layout page check"
   }
 }

@@ -8,271 +8,184 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 :root {
-  --bg: #f5f4f0;
-  --surface: #ffffff;
-  --surface2: #f0ede8;
-  --border: #e2ddd8;
-  --border2: #d0cbc4;
-  --text: #1a1814;
-  --text2: #6b6560;
-  --text3: #9e9890;
-  --accent: #2563eb;
-  --accent-bg: #eff6ff;
-  --pass: #16a34a;
-  --pass-bg: #f0fdf4;
-  --fail: #dc2626;
-  --fail-bg: #fef2f2;
-  --warn: #d97706;
-  --warn-bg: #fffbeb;
-  --queue: #7c3aed;
-  --queue-bg: #f5f3ff;
-  --radius: 10px;
-  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --bg: #f5f4f0; --surface: #ffffff; --surface2: #f0ede8;
+  --border: #e2ddd8; --border2: #d0cbc4;
+  --text: #1a1814; --text2: #6b6560; --text3: #9e9890;
+  --accent: #2563eb; --accent-bg: #eff6ff;
+  --pass: #16a34a; --pass-bg: #f0fdf4;
+  --fail: #dc2626; --fail-bg: #fef2f2;
+  --warn: #d97706; --warn-bg: #fffbeb;
+  --queue: #7c3aed; --queue-bg: #f5f3ff;
+  --radius: 10px; --shadow: 0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; min-height: 100vh; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh}
 
-nav {
-  background: var(--surface); border-bottom: 1px solid var(--border);
-  padding: 0 32px; display: flex; align-items: center; height: 56px; gap: 32px;
-  position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow);
-}
-.nav-brand { font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 8px; }
-.nav-brand-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
-.nav-tabs { display: flex; gap: 2px; }
-.nav-tab {
-  background: none; border: none; padding: 6px 14px; border-radius: 6px;
-  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
-  color: var(--text2); cursor: pointer; transition: all 0.15s;
-}
-.nav-tab:hover { background: var(--surface2); color: var(--text); }
-.nav-tab.active { background: var(--accent-bg); color: var(--accent); }
-.nav-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
-#run-status-badge {
-  font-size: 12px; padding: 4px 10px; border-radius: 20px; font-weight: 500;
-  display: none; align-items: center; gap: 6px;
-}
-#run-status-badge.running { display: inline-flex; background: var(--accent-bg); color: var(--accent); }
-#run-status-badge.done-pass { display: inline-flex; background: var(--pass-bg); color: var(--pass); }
-#run-status-badge.done-fail { display: inline-flex; background: var(--fail-bg); color: var(--fail); }
-.spinner {
-  width: 10px; height: 10px; border: 2px solid rgba(37,99,235,0.2);
-  border-top-color: var(--accent); border-radius: 50%;
-  animation: spin 0.7s linear infinite; flex-shrink: 0;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;height:56px;gap:32px;position:sticky;top:0;z-index:100;box-shadow:var(--shadow)}
+.nav-brand{font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px}
+.nav-brand-dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.nav-tabs{display:flex;gap:2px}
+.nav-tab{background:none;border:none;padding:6px 14px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
+.nav-tab:hover{background:var(--surface2);color:var(--text)}
+.nav-tab.active{background:var(--accent-bg);color:var(--accent)}
+.nav-right{display:flex;align-items:center;gap:12px;margin-left:auto}
+#run-status-badge{font-size:12px;padding:4px 10px;border-radius:20px;font-weight:500;display:none;align-items:center;gap:6px}
+#run-status-badge.running{display:inline-flex;background:var(--accent-bg);color:var(--accent)}
+#run-status-badge.done-pass{display:inline-flex;background:var(--pass-bg);color:var(--pass)}
+#run-status-badge.done-fail{display:inline-flex;background:var(--fail-bg);color:var(--fail)}
+.spinner{width:10px;height:10px;border:2px solid rgba(37,99,235,.2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-.page { display: none; padding: 28px 32px; max-width: 1200px; margin: 0 auto; }
-.page.active { display: block; }
-.page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; gap: 16px; flex-wrap: wrap; }
-.page-header h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.5px; }
-.page-header p { font-size: 13px; color: var(--text2); margin-top: 3px; }
+.page{display:none;padding:28px 32px;max-width:1200px;margin:0 auto}
+.page.active{display:block}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
+.page-header h1{font-size:20px;font-weight:600;letter-spacing:-.5px}
+.page-header p{font-size:13px;color:var(--text2);margin-top:3px}
 
-.btn {
-  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
-  padding: 7px 14px; border-radius: 7px; border: 1px solid var(--border);
-  background: var(--surface); color: var(--text); cursor: pointer;
-  transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
-}
-.btn:hover { border-color: var(--border2); background: var(--surface2); }
-.btn-primary { background: var(--accent); border-color: var(--accent); color: white; }
-.btn-primary:hover { background: #1d4ed8; border-color: #1d4ed8; }
-.btn-danger { color: var(--fail); }
-.btn-danger:hover { background: var(--fail-bg); border-color: var(--fail); }
-.btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
-.btn-execute {
-  font-size: 14px; padding: 10px 24px; background: var(--accent); border-color: var(--accent);
-  color: white; border-radius: 8px; font-weight: 600; box-shadow: 0 2px 8px rgba(37,99,235,0.25);
-}
-.btn-execute:hover { background: #1d4ed8; box-shadow: 0 4px 12px rgba(37,99,235,0.35); }
+.btn{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:7px 14px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:var(--border2);background:var(--surface2)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:white}
+.btn-primary:hover{background:#1d4ed8;border-color:#1d4ed8}
+.btn-danger{color:var(--fail)}
+.btn-danger:hover{background:var(--fail-bg);border-color:var(--fail)}
+.btn:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
+.btn-execute{font-size:14px;padding:10px 24px;background:var(--accent);border-color:var(--accent);color:white;border-radius:8px;font-weight:600;box-shadow:0 2px 8px rgba(37,99,235,.25)}
+.btn-execute:hover{background:#1d4ed8;box-shadow:0 4px 12px rgba(37,99,235,.35)}
 
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
 
-#progress-wrap { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 20px; display: none; }
-#progress-wrap.visible { display: block; }
-#progress-bar { height: 100%; background: var(--accent); border-radius: 2px; width: 0%; transition: width 0.4s ease; }
+#progress-wrap{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:20px;display:none}
+#progress-wrap.visible{display:block}
+#progress-bar{height:100%;background:var(--accent);border-radius:2px;width:0%;transition:width .4s ease}
 
-#summary-strip {
-  display: none; background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 14px 20px; margin-bottom: 20px;
-  box-shadow: var(--shadow); flex-wrap: wrap; gap: 20px; align-items: center;
-}
-#summary-strip.visible { display: flex; }
-.sum-stat { font-size: 13px; }
-.sum-stat span { font-weight: 600; }
-.sum-stat.p span { color: var(--pass); }
-.sum-stat.f span { color: var(--fail); }
-.sum-stat.e span { color: var(--warn); }
-.sum-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 1px; }
-.sum-report-link {
-  margin-left: auto; font-size: 12px; color: var(--accent); text-decoration: none; font-weight: 500;
-  border: 1px solid rgba(37,99,235,0.2); padding: 5px 12px; border-radius: 6px; background: var(--accent-bg);
-}
-.sum-report-link:hover { background: #dbeafe; }
+#summary-strip{display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 20px;margin-bottom:20px;box-shadow:var(--shadow);flex-wrap:wrap;gap:20px;align-items:center}
+#summary-strip.visible{display:flex}
+.sum-stat{font-size:13px}.sum-stat span{font-weight:600}
+.sum-stat.p span{color:var(--pass)}.sum-stat.f span{color:var(--fail)}.sum-stat.e span{color:var(--warn)}
+.sum-label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:1px}
+.sum-report-link{margin-left:auto;font-size:12px;color:var(--accent);text-decoration:none;font-weight:500;border:1px solid rgba(37,99,235,.2);padding:5px 12px;border-radius:6px;background:var(--accent-bg)}
+.sum-report-link:hover{background:#dbeafe}
 
-.run-controls {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 18px 22px; margin-bottom: 20px; display: flex; align-items: center;
-  justify-content: space-between; gap: 16px; box-shadow: var(--shadow); flex-wrap: wrap;
-}
-.run-controls-left h2 { font-size: 15px; font-weight: 600; }
-.run-controls-left p { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.run-controls{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:16px;box-shadow:var(--shadow);flex-wrap:wrap}
+.run-controls-left h2{font-size:15px;font-weight:600}
+.run-controls-left p{font-size:12px;color:var(--text2);margin-top:2px}
 
-.run-layout { display: grid; grid-template-columns: 290px 1fr; gap: 18px; align-items: start; }
+.run-layout{display:grid;grid-template-columns:290px 1fr;gap:18px;align-items:start}
+.test-sidebar{position:sticky;top:74px}
+.test-sidebar-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.test-sidebar-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--text2)}
+.test-sidebar-count{font-size:11px;background:var(--surface2);color:var(--text2);padding:2px 8px;border-radius:10px;font-family:'DM Mono',monospace}
+.test-sidebar-list{padding:4px 0;max-height:calc(100vh - 240px);overflow-y:auto}
+.test-sidebar-list::-webkit-scrollbar{width:3px}
+.test-sidebar-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 
-.test-sidebar { position: sticky; top: 74px; }
-.test-sidebar-header {
-  padding: 12px 16px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.test-sidebar-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text2); }
-.test-sidebar-count { font-size: 11px; background: var(--surface2); color: var(--text2); padding: 2px 8px; border-radius: 10px; font-family: 'DM Mono', monospace; }
-.test-sidebar-list { padding: 4px 0; max-height: calc(100vh - 240px); overflow-y: auto; }
-.test-sidebar-list::-webkit-scrollbar { width: 3px; }
-.test-sidebar-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+.test-row-item{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border-left:3px solid transparent;transition:all .12s}
+.test-row-item:hover{background:var(--surface2)}
+.test-row-item.selected{background:var(--accent-bg);border-left-color:var(--accent)}
+.test-row-item.st-passed{border-left-color:var(--pass)}
+.test-row-item.st-failed{border-left-color:var(--fail)}
+.test-row-item.st-execution-error{border-left-color:var(--warn)}
+.test-row-item.st-running{border-left-color:var(--accent);background:var(--accent-bg)}
+.test-row-item.st-queued{border-left-color:var(--queue)}
 
-.test-row-item {
-  display: flex; align-items: center; gap: 10px; padding: 9px 14px;
-  cursor: pointer; border-left: 3px solid transparent; transition: all 0.12s;
-}
-.test-row-item:hover { background: var(--surface2); }
-.test-row-item.selected { background: var(--accent-bg); border-left-color: var(--accent); }
-.test-row-item.st-passed { border-left-color: var(--pass); }
-.test-row-item.st-failed { border-left-color: var(--fail); }
-.test-row-item.st-execution-error { border-left-color: var(--warn); }
-.test-row-item.st-running { border-left-color: var(--accent); background: var(--accent-bg); }
-.test-row-item.st-queued { border-left-color: var(--queue); }
+.test-dot{width:7px;height:7px;border-radius:50%;background:var(--border2);flex-shrink:0;transition:background .2s}
+.st-passed .test-dot{background:var(--pass)}
+.st-failed .test-dot{background:var(--fail)}
+.st-execution-error .test-dot{background:var(--warn)}
+.st-running .test-dot{background:var(--accent);animation:pulse-dot 1s ease-in-out infinite}
+.st-queued .test-dot{background:var(--queue);opacity:.45}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.3}}
 
-.test-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border2); flex-shrink: 0; transition: background 0.2s; }
-.st-passed .test-dot { background: var(--pass); }
-.st-failed .test-dot { background: var(--fail); }
-.st-execution-error .test-dot { background: var(--warn); }
-.st-running .test-dot { background: var(--accent); animation: pulse-dot 1s ease-in-out infinite; }
-.st-queued .test-dot { background: var(--queue); opacity: 0.45; }
-@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+.test-row-info{flex:1;min-width:0}
+.test-row-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.test-row-uri{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.test-row-pct{font-size:10px;font-weight:600;font-family:'DM Mono',monospace;flex-shrink:0}
+.st-passed .test-row-pct{color:var(--pass)}
+.st-failed .test-row-pct{color:var(--fail)}
 
-.test-row-info { flex: 1; min-width: 0; }
-.test-row-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.test-row-uri { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.test-row-pct { font-size: 10px; font-weight: 600; font-family: 'DM Mono', monospace; flex-shrink: 0; }
-.st-passed .test-row-pct { color: var(--pass); }
-.st-failed .test-row-pct { color: var(--fail); }
+.detail-panel{display:flex;flex-direction:column;gap:14px}
+.detail-empty{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:48px 32px;text-align:center;color:var(--text3);font-size:13px;line-height:1.8}
+.detail-card{padding:20px 22px}
+.detail-title{font-size:16px;font-weight:600;letter-spacing:-.3px;margin-bottom:3px}
+.detail-uri{font-size:12px;font-family:'DM Mono',monospace;color:var(--text2);margin-bottom:14px}
+.detail-links{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.detail-link{font-size:12px;color:var(--accent);font-weight:500;border:1px solid rgba(37,99,235,.2);padding:4px 10px;border-radius:5px;text-decoration:none;background:var(--accent-bg)}
+.detail-link:hover{background:#dbeafe}
+.detail-status{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:5px 12px;border-radius:20px}
+.detail-status.passed{background:var(--pass-bg);color:var(--pass)}
+.detail-status.failed{background:var(--fail-bg);color:var(--fail)}
+.detail-status.execution-error{background:var(--warn-bg);color:var(--warn)}
+.detail-status.running{background:var(--accent-bg);color:var(--accent)}
+.detail-status.queued{background:var(--queue-bg);color:var(--queue)}
+.detail-status.idle{background:var(--surface2);color:var(--text3)}
 
-.detail-panel { display: flex; flex-direction: column; gap: 14px; }
-.detail-empty {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 48px 32px; text-align: center; color: var(--text3); font-size: 13px; line-height: 1.8;
-}
-.detail-card { padding: 20px 22px; }
-.detail-title { font-size: 16px; font-weight: 600; letter-spacing: -0.3px; margin-bottom: 3px; }
-.detail-uri { font-size: 12px; font-family: 'DM Mono', monospace; color: var(--text2); margin-bottom: 14px; }
-.detail-links { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-.detail-link {
-  font-size: 12px; color: var(--accent); font-weight: 500; border: 1px solid rgba(37,99,235,0.2);
-  padding: 4px 10px; border-radius: 5px; text-decoration: none; background: var(--accent-bg);
-}
-.detail-link:hover { background: #dbeafe; }
-.detail-status {
-  display: inline-flex; align-items: center; gap: 6px; font-size: 13px;
-  font-weight: 600; padding: 5px 12px; border-radius: 20px;
-}
-.detail-status.passed { background: var(--pass-bg); color: var(--pass); }
-.detail-status.failed { background: var(--fail-bg); color: var(--fail); }
-.detail-status.execution-error { background: var(--warn-bg); color: var(--warn); }
-.detail-status.running { background: var(--accent-bg); color: var(--accent); }
-.detail-status.queued { background: var(--queue-bg); color: var(--queue); }
-.detail-status.idle { background: var(--surface2); color: var(--text3); }
+.detail-meta{margin-top:12px;display:flex;gap:20px;flex-wrap:wrap;font-size:12px;padding-top:12px;border-top:1px solid var(--border)}
+.detail-meta-item{display:flex;flex-direction:column;gap:2px}
+.meta-label{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--text3)}
+.meta-val{font-weight:600;color:var(--text);font-family:'DM Mono',monospace}
 
-.detail-meta {
-  margin-top: 12px; display: flex; gap: 20px; flex-wrap: wrap;
-  font-size: 12px; padding-top: 12px; border-top: 1px solid var(--border);
-}
-.detail-meta-item { display: flex; flex-direction: column; gap: 2px; }
-.meta-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text3); }
-.meta-val { font-weight: 600; color: var(--text); font-family: 'DM Mono', monospace; }
+.error-box{background:var(--fail-bg);border:1px solid rgba(220,38,38,.15);border-radius:7px;padding:10px 12px;font-size:12px;color:var(--fail);font-family:'DM Mono',monospace;white-space:pre-wrap;word-break:break-all;margin-top:12px}
 
-.error-box {
-  background: var(--fail-bg); border: 1px solid rgba(220,38,38,0.15); border-radius: 7px;
-  padding: 10px 12px; font-size: 12px; color: var(--fail); font-family: 'DM Mono', monospace;
-  white-space: pre-wrap; word-break: break-all; margin-top: 12px;
-}
+.screenshots-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.screenshot-card{overflow:hidden}
+.screenshot-label{padding:10px 14px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);background:var(--surface2)}
+.screenshot-card img{width:100%;display:block}
+.diff-card{overflow:hidden}
+.diff-label{padding:10px 14px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);display:flex;align-items:center;justify-content:space-between;background:var(--surface2)}
+.diff-card img{width:100%;display:block}
 
-.screenshots-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.screenshot-card { overflow: hidden; }
-.screenshot-label {
-  padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 11px; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.5px; color: var(--text2); background: var(--surface2);
-}
-.screenshot-card img { width: 100%; display: block; }
-.diff-card { overflow: hidden; }
-.diff-label {
-  padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 11px; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.5px; color: var(--text2);
-  display: flex; align-items: center; justify-content: space-between; background: var(--surface2);
-}
-.diff-card img { width: 100%; display: block; }
+.log-card{margin-top:16px}
+.log-header{padding:9px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.log-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2)}
+#log-body{padding:10px 14px;font-family:'DM Mono',monospace;font-size:11px;line-height:1.8;color:var(--text2);max-height:180px;overflow-y:auto;background:#fafaf8}
+#log-body::-webkit-scrollbar{width:3px}
+#log-body::-webkit-scrollbar-thumb{background:var(--border2)}
+.log-line{white-space:pre-wrap;word-break:break-all}
+.lpass{color:var(--pass)}.lfail{color:var(--fail)}.lerror{color:var(--warn)}.linfo{color:var(--accent)}
 
-.log-card { margin-top: 16px; }
-.log-header { padding: 9px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-.log-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text2); }
-#log-body {
-  padding: 10px 14px; font-family: 'DM Mono', monospace; font-size: 11px;
-  line-height: 1.8; color: var(--text2); max-height: 180px; overflow-y: auto; background: #fafaf8;
-}
-#log-body::-webkit-scrollbar { width: 3px; }
-#log-body::-webkit-scrollbar-thumb { background: var(--border2); }
-.log-line { white-space: pre-wrap; word-break: break-all; }
-.lpass { color: var(--pass); } .lfail { color: var(--fail); }
-.lerror { color: var(--warn); } .linfo { color: var(--accent); }
+.tests-table{width:100%;border-collapse:collapse}
+.tests-table th{text-align:left;padding:10px 14px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);border-bottom:1px solid var(--border);background:var(--surface2)}
+.tests-table td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+.tests-table tr:last-child td{border-bottom:none}
+.tests-table tr:hover td{background:var(--surface2)}
+.tests-table input{font-family:'DM Sans',sans-serif;font-size:13px;padding:5px 8px;border:1px solid transparent;border-radius:5px;background:transparent;color:var(--text);width:100%;transition:all .15s}
+.tests-table input:hover{border-color:var(--border2);background:var(--surface2)}
+.tests-table input:focus{outline:none;border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.tests-table input.mono{font-family:'DM Mono',monospace;font-size:12px}
+.empty-state{text-align:center;padding:40px;color:var(--text3);font-size:13px}
 
-.tests-table { width: 100%; border-collapse: collapse; }
-.tests-table th {
-  text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.5px; color: var(--text2);
-  border-bottom: 1px solid var(--border); background: var(--surface2);
-}
-.tests-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-.tests-table tr:last-child td { border-bottom: none; }
-.tests-table tr:hover td { background: var(--surface2); }
-.tests-table input {
-  font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 5px 8px;
-  border: 1px solid transparent; border-radius: 5px; background: transparent; color: var(--text); width: 100%; transition: all 0.15s;
-}
-.tests-table input:hover { border-color: var(--border2); background: var(--surface2); }
-.tests-table input:focus { outline: none; border-color: var(--accent); background: var(--surface); box-shadow: 0 0 0 3px rgba(37,99,235,0.08); }
-.tests-table input.mono { font-family: 'DM Mono', monospace; font-size: 12px; }
-.empty-state { text-align: center; padding: 40px; color: var(--text3); font-size: 13px; }
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.settings-section{padding:20px}
+.settings-section+.settings-section{border-left:1px solid var(--border)}
+.settings-section h3{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.field{margin-bottom:13px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px}
+.field input[type=text],.field input[type=password],.field input[type=number]{width:100%;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:13px;border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--text);transition:all .15s}
+.field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.field small{font-size:11px;color:var(--text3);margin-top:4px;display:block}
+.save-feedback{font-size:12px;color:var(--pass);font-weight:500;opacity:0;transition:opacity .3s;margin-left:8px}
+.save-feedback.show{opacity:1}
+.warn-banner{display:none;background:var(--warn-bg);border:1px solid var(--warn);border-radius:var(--radius);padding:12px 18px;margin-bottom:16px;font-size:13px;color:var(--warn)}
 
-.settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
-.settings-section { padding: 20px; }
-.settings-section + .settings-section { border-left: 1px solid var(--border); }
-.settings-section h3 {
-  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
-  color: var(--text2); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
-}
-.field { margin-bottom: 13px; }
-.field:last-child { margin-bottom: 0; }
-.field label { display: block; font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 5px; }
-.field input {
-  width: 100%; padding: 8px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px;
-  border: 1px solid var(--border); border-radius: 7px; background: var(--surface); color: var(--text); transition: all 0.15s;
-}
-.field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.08); }
-.field small { font-size: 11px; color: var(--text3); margin-top: 4px; display: block; }
-.save-feedback { font-size: 12px; color: var(--pass); font-weight: 500; opacity: 0; transition: opacity 0.3s; margin-left: 8px; }
-.save-feedback.show { opacity: 1; }
+.timing-table{width:100%;border-collapse:collapse;font-size:12px}
+.timing-table th{text-align:left;font-size:10px;color:var(--text3);padding-bottom:6px;font-weight:500}
+.timing-table th:not(:first-child){text-align:right}
+.timing-table td{padding:3px 0;color:var(--text2)}
+.timing-table td:not(:first-child){text-align:right;font-family:'DM Mono',monospace;color:var(--text)}
+.timing-section-row td{padding-top:8px;padding-bottom:2px;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);border-top:1px solid var(--border)}
 
-@media (max-width: 720px) {
-  .run-layout, .screenshots-grid, .settings-grid { grid-template-columns: 1fr; }
-  .page { padding: 16px; }
-  nav { padding: 0 16px; gap: 16px; }
+@media(max-width:720px){
+  .run-layout,.screenshots-grid,.settings-grid{grid-template-columns:1fr}
+  .page{padding:16px}
+  nav{padding:0 16px;gap:16px}
 }
 </style>
 </head>
 <body>
 
 <nav>
-  <div class="nav-brand"><div class="nav-brand-dot"></div>EMLO Front Test</div>
+  <div class="nav-brand"><div class="nav-brand-dot"></div>EMLO Tests</div>
   <div class="nav-tabs">
     <button class="nav-tab active" data-page="run">Run</button>
     <button class="nav-tab" data-page="tests">Test Cases</button>
@@ -281,12 +194,12 @@ nav {
   <div class="nav-right"><span id="run-status-badge"></span></div>
 </nav>
 
-<!-- RUN -->
+<!-- ═══ RUN PAGE ═══ -->
 <div class="page active" id="page-run">
   <div class="run-controls">
     <div class="run-controls-left">
       <h2>Visual Regression Tests</h2>
-      <p id="run-subtitle">Compare Cottagelabs and Bodleian layouts side by side.</p>
+      <p id="run-subtitle">Compare site layouts side by side.</p>
     </div>
     <button class="btn btn-execute" id="execute-btn">▶ Execute Tests</button>
   </div>
@@ -298,7 +211,9 @@ nav {
         <span class="test-sidebar-title">Tests</span>
         <span class="test-sidebar-count" id="sidebar-count">0</span>
       </div>
-      <div class="test-sidebar-list" id="sidebar-list"><div class="empty-state">Loading…</div></div>
+      <div class="test-sidebar-list" id="sidebar-list">
+        <div class="empty-state">Loading…</div>
+      </div>
     </div>
     <div class="detail-panel" id="detail-panel">
       <div class="detail-empty">Click <strong>Execute Tests</strong> to run your tests.<br/>Results will appear here.</div>
@@ -313,7 +228,7 @@ nav {
   </div>
 </div>
 
-<!-- TESTS -->
+<!-- ═══ TESTS PAGE ═══ -->
 <div class="page" id="page-tests">
   <div class="page-header">
     <div><h1>Test Cases</h1><p>Add, edit or remove the URLs you want to compare.</p></div>
@@ -322,36 +237,38 @@ nav {
       <button class="btn btn-primary" id="save-tests-btn">Save All</button>
     </div>
   </div>
-  <div id="tests-run-warning" style="display:none;background:var(--warn-bg);border:1px solid var(--warn);border-radius:var(--radius);padding:12px 18px;margin-bottom:16px;font-size:13px;color:var(--warn);">
+  <div class="warn-banner" id="tests-run-warning">
     ⚠ A run is in progress — test cases are read-only until it finishes.
   </div>
   <div class="card">
     <table class="tests-table">
       <thead><tr>
-        <th style="width:120px">ID</th><th>Test Name</th>
-        <th style="width:150px">URI</th><th>Description</th>
+        <th style="width:130px">ID</th>
+        <th>Test Name</th>
+        <th style="width:160px">URI</th>
+        <th>Description</th>
         <th style="width:52px"></th>
       </tr></thead>
-      <tbody id="tests-tbody"><tr><td colspan="5" class="empty-state">Loading…</td></tr></tbody>
+      <tbody id="tests-tbody">
+        <tr><td colspan="5" class="empty-state">Loading…</td></tr>
+      </tbody>
     </table>
   </div>
 </div>
 
-<!-- SETTINGS -->
+<!-- ═══ SETTINGS PAGE ═══ -->
 <div class="page" id="page-settings">
   <div class="page-header">
     <div><h1>Settings</h1><p>Configure sites, authentication and runner behaviour. Saved to <code>runner_config.json</code>.</p></div>
   </div>
-
-  <div id="settings-run-warning" style="display:none;background:var(--warn-bg);border:1px solid var(--warn);border-radius:var(--radius);padding:12px 18px;margin-bottom:16px;font-size:13px;color:var(--warn);max-width:900px;">
+  <div class="warn-banner" id="settings-run-warning">
     ⚠ A run is in progress — settings are read-only until it finishes.
   </div>
-
   <div style="display:flex;flex-direction:column;gap:16px;max-width:900px;">
 
     <!-- Sites -->
     <div class="card">
-      <div style="padding:16px 20px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);">Sites</div>
+      <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);">Sites</div>
       <div class="settings-grid">
         <div class="settings-section">
           <h3>Site A</h3>
@@ -368,7 +285,7 @@ nav {
 
     <!-- Auth -->
     <div class="card">
-      <div style="padding:16px 20px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);">Authentication</div>
+      <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);">Authentication</div>
       <div class="settings-grid">
         <div class="settings-section">
           <h3>Site A Auth</h3>
@@ -393,7 +310,7 @@ nav {
 
     <!-- Runner config -->
     <div class="card">
-      <div style="padding:16px 20px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);">Runner Configuration</div>
+      <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);">Runner Configuration</div>
       <div class="settings-grid">
         <div class="settings-section">
           <h3>Behaviour</h3>
@@ -411,22 +328,27 @@ nav {
           </div>
         </div>
         <div class="settings-section">
-          <h3>Comparison</h3>
+          <h3>Comparison &amp; Timing</h3>
           <div class="field">
-            <label>Diff Threshold <small style="font-weight:400;">(0.0 – 1.0)</small></label>
+            <label>Diff Threshold <small style="font-weight:400;display:inline;">(0.0–1.0)</small></label>
             <input type="number" id="set-diff-threshold" min="0" max="1" step="0.01" placeholder="0.1"/>
             <small>Per-pixel colour tolerance</small>
           </div>
           <div class="field">
             <label>Max Diff Pixels</label>
             <input type="number" id="set-max-diff-pixels" min="0" step="1" placeholder="0"/>
-            <small>Allowed differing pixels before marking as failed</small>
+            <small>Allowed differing pixels before marking failed</small>
+          </div>
+          <div class="field">
+            <label>Page Timeout (ms)</label>
+            <input type="number" id="set-page-timeout" min="10000" step="5000" placeholder="120000"/>
+            <small>Max wait per page — 120000 = 2 min. Increase for slow pages.</small>
           </div>
           <div class="field">
             <label>Viewport</label>
-            <div style="display:flex;gap:8px;">
+            <div style="display:flex;gap:8px;align-items:center;">
               <input type="number" id="set-viewport-w" placeholder="1440" style="width:90px;"/>
-              <span style="line-height:36px;color:var(--text3);">×</span>
+              <span style="color:var(--text3);">×</span>
               <input type="number" id="set-viewport-h" placeholder="900" style="width:90px;"/>
             </div>
             <small>Width × Height in pixels</small>
@@ -444,9 +366,21 @@ nav {
 
 <script>
 // ═══════════════════════════════════════════════════
-// STATE  — dual layer: localStorage (instant) + server (truth)
+// HELPERS
 // ═══════════════════════════════════════════════════
-const LS_KEY = 'emlo_runner_v3';
+const $ = id => document.getElementById(id);
+function human(ms) {
+  if (ms == null) return '—';
+  return ms < 1000 ? ms + ' ms' : (ms / 1000).toFixed(2) + ' s';
+}
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════════════════
+// STATE — localStorage (instant) + server (truth)
+// ═══════════════════════════════════════════════════
+const LS_KEY = 'emlo_runner_v4';
 
 function defaultState() {
   return { activePage: 'run', selectedTestId: null, tests: {}, runState: null, logs: [], running: false };
@@ -454,81 +388,115 @@ function defaultState() {
 
 function loadLS() {
   try {
-    const s = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
-    if (!s) return defaultState();
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return defaultState();
+    const s = JSON.parse(raw);
     s.running = false;
-    // clear in-flight statuses so stale "running/queued" don't persist
-    if (s.runState?.tests) {
-      Object.values(s.runState.tests).forEach(t => {
-        if (['running','queued'].includes(t.status)) t.status = 'idle';
+    if (s.runState && s.runState.tests) {
+      Object.values(s.runState.tests).forEach(function(t) {
+        if (t.status === 'running' || t.status === 'queued') t.status = 'idle';
       });
       if (s.runState.status === 'running') s.runState.status = 'interrupted';
     }
-    return { ...defaultState(), ...s };
-  } catch { return defaultState(); }
+    return Object.assign(defaultState(), s);
+  } catch(e) {
+    return defaultState();
+  }
 }
 
 function saveLS() {
   try {
     localStorage.setItem(LS_KEY, JSON.stringify({
-      activePage: state.activePage, selectedTestId: state.selectedTestId,
-      tests: state.tests, runState: state.runState, logs: state.logs.slice(-200),
+      activePage: state.activePage,
+      selectedTestId: state.selectedTestId,
+      tests: state.tests,
+      runState: state.runState,
+      logs: state.logs.slice(-200),
     }));
-  } catch {}
+  } catch(e) {}
 }
 
 const state = loadLS();
-const $ = id => document.getElementById(id);
 
 // ═══════════════════════════════════════════════════
 // NAV
 // ═══════════════════════════════════════════════════
 function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  $(`page-${name}`)?.classList.add('active');
-  document.querySelector(`[data-page="${name}"]`)?.classList.add('active');
-  state.activePage = name; saveLS();
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.nav-tab').forEach(function(t) { t.classList.remove('active'); });
+  var pg = $('page-' + name);
+  if (pg) pg.classList.add('active');
+  var tab = document.querySelector('[data-page="' + name + '"]');
+  if (tab) tab.classList.add('active');
+  state.activePage = name;
+  saveLS();
 }
-document.querySelectorAll('.nav-tab').forEach(b => b.addEventListener('click', () => showPage(b.dataset.page)));
+document.querySelectorAll('.nav-tab').forEach(function(b) {
+  b.addEventListener('click', function() { showPage(b.dataset.page); });
+});
+
+// ═══════════════════════════════════════════════════
+// UI LOCK — disable edits during a run
+// ═══════════════════════════════════════════════════
+function setRunLock(locked) {
+  $('add-test-btn').disabled = locked;
+  $('save-tests-btn').disabled = locked;
+  $('tests-run-warning').style.display = locked ? 'block' : 'none';
+  $('tests-tbody').querySelectorAll('input,button').forEach(function(el) { el.disabled = locked; });
+  $('save-settings-btn').disabled = locked;
+  $('settings-run-warning').style.display = locked ? 'block' : 'none';
+  document.querySelectorAll('#page-settings input').forEach(function(el) { el.disabled = locked; });
+}
 
 // ═══════════════════════════════════════════════════
 // SIDEBAR
 // ═══════════════════════════════════════════════════
 function renderSidebar() {
-  const ids = Object.keys(state.tests);
+  var ids = Object.keys(state.tests);
   $('sidebar-count').textContent = ids.length;
-  const list = $('sidebar-list');
+  var list = $('sidebar-list');
 
-  if (!ids.length) { list.innerHTML = '<div class="empty-state">No tests. Add them in Test Cases.</div>'; return; }
-
-  const hasRun = state.running || state.runState;
+  if (!ids.length) {
+    list.innerHTML = '<div class="empty-state">No tests. Add them in Test Cases.</div>';
+    return;
+  }
+  var hasRun = state.running || state.runState;
   if (!hasRun) {
-    list.innerHTML = `<div class="empty-state" style="padding:24px 16px;line-height:1.8;">
-      Run your tests first.<br/><span style="font-size:11px;color:var(--text3);">Click Execute Tests to begin.</span></div>`;
+    list.innerHTML = '<div class="empty-state" style="padding:24px 16px;line-height:1.8;">Run your tests first.<br/><span style="font-size:11px;color:var(--text3);">Click Execute Tests to begin.</span></div>';
     return;
   }
 
   list.innerHTML = '';
-  ids.forEach(id => {
-    const t = state.tests[id];
-    const td = state.runState?.tests?.[id];
-    const status = td?.status || 'idle';
-    const div = document.createElement('div');
-    div.className = `test-row-item st-${status}${state.selectedTestId === id ? ' selected' : ''}`;
+  ids.forEach(function(id) {
+    var t = state.tests[id];
+    var td = state.runState && state.runState.tests ? state.runState.tests[id] : null;
+    var status = (td && td.status) ? td.status : 'idle';
+    var div = document.createElement('div');
+    var sel = state.selectedTestId === id ? ' selected' : '';
+    div.className = 'test-row-item st-' + status + sel;
 
-    let badge = '';
-    if (td?.matching_percentage != null) badge = `<span class="test-row-pct">${td.matching_percentage}%</span>`;
-    else if (status === 'running') badge = `<div class="spinner"></div>`;
-    else if (status === 'queued') badge = `<span class="test-row-pct" style="color:var(--queue);opacity:.5">queue</span>`;
+    var badge = '';
+    if (td && td.matching_percentage != null) {
+      badge = '<span class="test-row-pct">' + td.matching_percentage + '%</span>';
+    } else if (status === 'running') {
+      badge = '<div class="spinner"></div>';
+    } else if (status === 'queued') {
+      badge = '<span class="test-row-pct" style="color:var(--queue);opacity:.5">queue</span>';
+    }
 
-    div.innerHTML = `
-      <div class="test-dot"></div>
-      <div class="test-row-info">
-        <div class="test-row-name">${escHtml(t.test_name || id)}</div>
-        <div class="test-row-uri">${escHtml(t.uri || '')}</div>
-      </div>${badge}`;
-    div.addEventListener('click', () => { state.selectedTestId = id; saveLS(); renderSidebar(); renderDetail(); showPage('run'); });
+    div.innerHTML = '<div class="test-dot"></div>' +
+      '<div class="test-row-info">' +
+      '<div class="test-row-name">' + escHtml(t.test_name || id) + '</div>' +
+      '<div class="test-row-uri">' + escHtml(t.uri || '') + '</div>' +
+      '</div>' + badge;
+
+    div.addEventListener('click', function() {
+      state.selectedTestId = id;
+      saveLS();
+      renderSidebar();
+      renderDetail();
+      showPage('run');
+    });
     list.appendChild(div);
   });
 }
@@ -537,102 +505,159 @@ function renderSidebar() {
 // DETAIL
 // ═══════════════════════════════════════════════════
 function renderDetail() {
-  const panel = $('detail-panel');
-  const id = state.selectedTestId;
-  const hasRun = state.running || state.runState;
+  var panel = $('detail-panel');
+  var id = state.selectedTestId;
+  var hasRun = state.running || state.runState;
 
   if (!hasRun) {
-    panel.innerHTML = `<div class="detail-empty">Click <strong>Execute Tests</strong> to run your tests.<br/>Results will appear here.</div>`;
+    panel.innerHTML = '<div class="detail-empty">Click <strong>Execute Tests</strong> to run your tests.<br/>Results will appear here.</div>';
     return;
   }
   if (!id || !state.tests[id]) {
-    panel.innerHTML = `<div class="detail-empty">Select a test from the list to see details.</div>`;
+    panel.innerHTML = '<div class="detail-empty">Select a test from the list to see details.</div>';
     return;
   }
 
-  const t = state.tests[id];
-  const td = state.runState?.tests?.[id];
-  const status = td?.status || 'idle';
-  const labels = { passed:'✓ Passed', failed:'✗ Failed', 'execution-error':'⚠ Execution Error', running:'⟳ Running…', queued:'⏳ In Queue', idle:'— Not run yet', interrupted:'— Interrupted' };
+  var t = state.tests[id];
+  var td = state.runState && state.runState.tests ? state.runState.tests[id] : null;
+  var status = (td && td.status) ? td.status : 'idle';
+  var labels = {
+    passed: '✓ Passed', failed: '✗ Failed',
+    'execution-error': '⚠ Execution Error',
+    running: '⟳ Running…', queued: '⏳ In Queue',
+    idle: '— Not run yet', interrupted: '— Interrupted'
+  };
 
-  const hasUrls = td?.cl_site_url;
-  let metaHtml = '';
+  // Build meta summary row
+  var metaHtml = '';
   if (td && (td.cl_load_time_ms != null || td.duration_ms != null)) {
-    metaHtml = `<div class="detail-meta">
-      ${td.matching_percentage != null ? `<div class="detail-meta-item"><div class="meta-label">Match</div><div class="meta-val">${td.matching_percentage}%</div></div>` : ''}
-      ${td.cl_load_time_ms != null ? `<div class="detail-meta-item"><div class="meta-label">CL Load</div><div class="meta-val">${human(td.cl_load_time_ms)}</div></div>` : ''}
-      ${td.ox_load_time_ms != null ? `<div class="detail-meta-item"><div class="meta-label">OX Load</div><div class="meta-val">${human(td.ox_load_time_ms)}</div></div>` : ''}
-      ${td.duration_ms != null ? `<div class="detail-meta-item"><div class="meta-label">Duration</div><div class="meta-val">${human(td.duration_ms)}</div></div>` : ''}
-    </div>`;
+    var metaItems = '';
+    if (td.matching_percentage != null) {
+      metaItems += '<div class="detail-meta-item"><div class="meta-label">Match</div><div class="meta-val">' + td.matching_percentage + '%</div></div>';
+    }
+    if (td.cl_load_time_ms != null) {
+      // metaItems += '<div class="detail-meta-item"><div class="meta-label">CL Load</div><div class="meta-val">' + human(td.cl_load_time_ms) + '</div></div>';
+    }
+    if (td.ox_load_time_ms != null) {
+      // metaItems += '<div class="detail-meta-item"><div class="meta-label">OX Load</div><div class="meta-val">' + human(td.ox_load_time_ms) + '</div></div>';
+    }
+    if (td.duration_ms != null) {
+      // metaItems += '<div class="detail-meta-item"><div class="meta-label">Duration</div><div class="meta-val">' + human(td.duration_ms) + '</div></div>';
+    }
+    metaHtml = '<div class="detail-meta">' + metaItems + '</div>';
+
+    // Timing breakdown table
+    var cl = (td.cl_timings) || {};
+    var ox = (td.ox_timings) || {};
+    var hasTimings = Object.keys(cl).length > 0 || Object.keys(ox).length > 0;
+    if (hasTimings) {
+      var clHost = td.cl_site_url ? td.cl_site_url.split('/')[2] : 'Site A';
+      var oxHost = td.ox_site_url ? td.ox_site_url.split('/')[2] : 'Site B';
+
+      function timingRow(label, key) {
+        var cv = cl[key], ov = ox[key];
+        if (cv == null && ov == null) return '';
+        return '<tr><td>' + label + '</td><td>' + (cv != null ? human(cv) : '—') + '</td><td>' + (ov != null ? human(ov) : '—') + '</td></tr>';
+      }
+
+      // metaHtml += '<div class="card" style="margin-top:12px;padding:14px 16px;">' +
+      //   '<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin-bottom:10px;">Performance Breakdown</div>' +
+      //   '<table class="timing-table">' +
+      //   '<thead><tr><th>Metric</th><th>' + clHost + '</th><th>' + oxHost + '</th></tr></thead>' +
+      //   '<tbody>' +
+      //   '<tr class="timing-section-row"><td colspan="3">Network</td></tr>' +
+      //   timingRow('DNS Lookup', 'dns_ms') +
+      //   timingRow('TCP Connect', 'tcp_ms') +
+      //   timingRow('TLS Handshake', 'tls_ms') +
+      //   timingRow('Time to First Byte', 'ttfb_ms') +
+      //   timingRow('Download', 'download_ms') +
+      //   timingRow('Total Network', 'network_ms') +
+      //   '<tr class="timing-section-row"><td colspan="3">Rendering</td></tr>' +
+      //   timingRow('DOM Parsing', 'dom_parse_ms') +
+      //   timingRow('DOM Content Loaded', 'dom_content_ms') +
+      //   timingRow('Render / JS', 'render_ms') +
+      //   '<tr class="timing-section-row"><td colspan="3">Totals</td></tr>' +
+      //   timingRow('Page Load', 'load_ms') +
+      //   timingRow('Total', 'total_ms') +
+      //   '</tbody></table></div>';
+    }
   }
 
-  panel.innerHTML = `
-    <div class="card detail-card">
-      <div class="detail-title">${escHtml(t.test_name || id)}</div>
-      <div class="detail-uri">${escHtml(t.uri || '')}</div>
-      ${hasUrls ? `<div class="detail-links">
-        <a class="detail-link" href="${td.cl_site_url}" target="_blank">↗ Cottagelabs</a>
-        <a class="detail-link" href="${td.ox_site_url}" target="_blank">↗ Bodleian</a>
-      </div>` : ''}
-      <span class="detail-status ${status}">${labels[status] || status}${td?.matching_percentage != null && !['passed'].includes(status) ? ` — ${td.matching_percentage}%` : ''}</span>
-      ${metaHtml}
-      ${t.desc ? `<div style="margin-top:10px;font-size:12px;color:var(--text2);">${escHtml(t.desc)}</div>` : ''}
-      ${td?.execution_error ? `<div class="error-box">${escHtml(td.execution_error)}</div>` : ''}
-    </div>`;
+  var hasUrls = td && td.cl_site_url;
+  var linksHtml = '';
+  if (hasUrls) {
+    linksHtml = '<div class="detail-links">' +
+      '<a class="detail-link" href="' + td.cl_site_url + '" target="_blank">↗ ' + escHtml(td.cl_site_url.split('/')[2] || 'Site A') + '</a>' +
+      '<a class="detail-link" href="' + td.ox_site_url + '" target="_blank">↗ ' + escHtml(td.ox_site_url.split('/')[2] || 'Site B') + '</a>' +
+      '</div>';
+  }
 
-  const arts = td?.artifacts || {};
+  var statusLabel = labels[status] || status;
+  if (td && td.matching_percentage != null && status !== 'passed') {
+    statusLabel += ' — ' + td.matching_percentage + '%';
+  }
 
-  // Screenshots (only present if CAPTURE_ALL_SCREENSHOTS=True in runner)
+  var errorHtml = (td && td.execution_error) ? '<div class="error-box">' + escHtml(td.execution_error) + '</div>' : '';
+  var descHtml = t.desc ? '<div style="margin-top:10px;font-size:12px;color:var(--text2);">' + escHtml(t.desc) + '</div>' : '';
+
+  panel.innerHTML = '<div class="card detail-card">' +
+    '<div class="detail-title">' + escHtml(t.test_name || id) + '</div>' +
+    '<div class="detail-uri">' + escHtml(t.uri || '') + '</div>' +
+    linksHtml +
+    '<span class="detail-status ' + status + '">' + statusLabel + '</span>' +
+    metaHtml + descHtml + errorHtml +
+    '</div>';
+
+  // Screenshots
+  var arts = (td && td.artifacts) ? td.artifacts : {};
   if (arts.cl_site_image || arts.ox_site_image) {
-    let html = '<div class="screenshots-grid">';
-    if (arts.cl_site_image) html += `<div class="card screenshot-card"><div class="screenshot-label">Cottagelabs</div><img src="/results/${arts.cl_site_image}" alt="CL screenshot"/></div>`;
-    if (arts.ox_site_image) html += `<div class="card screenshot-card"><div class="screenshot-label">Bodleian</div><img src="/results/${arts.ox_site_image}" alt="OX screenshot"/></div>`;
-    html += '</div>';
-    panel.innerHTML += html;
+    var shtml = '<div class="screenshots-grid">';
+    if (arts.cl_site_image) shtml += '<div class="card screenshot-card"><div class="screenshot-label">Site A</div><img src="/results/' + arts.cl_site_image + '" alt="screenshot"/></div>';
+    if (arts.ox_site_image) shtml += '<div class="card screenshot-card"><div class="screenshot-label">Site B</div><img src="/results/' + arts.ox_site_image + '" alt="screenshot"/></div>';
+    shtml += '</div>';
+    panel.innerHTML += shtml;
   }
 
-  // Diff image — always generated
+  // Diff image
   if (arts.diff_image) {
-    panel.innerHTML += `
-      <div class="card diff-card">
-        <div class="diff-label">
-          <span>Pixel Diff</span>
-          <span style="font-weight:400;color:var(--text3);font-size:10px;">${arts.diff_image}</span>
-        </div>
-        <img src="/results/${arts.diff_image}" alt="Pixel diff"/>
-      </div>`;
-  } else if (['passed','failed'].includes(status)) {
-    panel.innerHTML += `<div class="detail-empty" style="padding:20px;font-size:12px;">
-      No diff image available for this test.<br/>
-      <span style="font-size:11px;color:var(--text3);">Enable <code>CAPTURE_ALL_SCREENSHOTS</code> in test_layout.py to capture screenshots.</span>
-    </div>`;
+    panel.innerHTML += '<div class="card diff-card">' +
+      '<div class="diff-label"><span>Pixel Diff</span><span style="font-weight:400;color:var(--text3);font-size:10px;">' + arts.diff_image + '</span></div>' +
+      '<img src="/results/' + arts.diff_image + '" alt="diff"/></div>';
+  } else if (status === 'passed' || status === 'failed') {
+    panel.innerHTML += '<div class="detail-empty" style="padding:20px;font-size:12px;">No diff image yet.</div>';
   }
 }
 
 // ═══════════════════════════════════════════════════
-// SUMMARY
+// SUMMARY STRIP
 // ═══════════════════════════════════════════════════
 function renderSummary() {
-  const strip = $('summary-strip');
-  const rs = state.runState;
-  if (!rs?.report || rs.status === 'running') { strip.classList.remove('visible'); return; }
-  const s = rs.report.summary;
+  var strip = $('summary-strip');
+  var rs = state.runState;
+  if (!rs || !rs.report || rs.status === 'running') {
+    strip.classList.remove('visible');
+    return;
+  }
+  var s = rs.report.summary;
   strip.classList.add('visible');
-  strip.innerHTML = `
-    <div><div class="sum-label">Last run</div><div style="font-size:12px;font-weight:500;">${rs.report.run_id || '—'}</div></div>
-    <div class="sum-stat p"><div class="sum-label">Passed</div><span>${s.passed} (${s.pass_percentage}%)</span></div>
-    <div class="sum-stat f"><div class="sum-label">Failed</div><span>${s.failed} (${s.fail_percentage}%)</span></div>
-    <div class="sum-stat e"><div class="sum-label">Errors</div><span>${s.execution_error}</span></div>
-    <div class="sum-stat"><div class="sum-label">Duration</div><span>${human(rs.report.run_duration)}</span></div>`
+  strip.innerHTML =
+    '<div><div class="sum-label">Last run</div><div style="font-size:12px;font-weight:500;">' + (rs.report.run_id || '—') + '</div></div>' +
+    '<div class="sum-stat p"><div class="sum-label">Passed</div><span>' + s.passed + ' (' + s.pass_percentage + '%)</span></div>' +
+    '<div class="sum-stat f"><div class="sum-label">Failed</div><span>' + s.failed + ' (' + s.fail_percentage + '%)</span></div>' +
+    '<div class="sum-stat e"><div class="sum-label">Errors</div><span>' + s.execution_error + '</span></div>' +
+    '<div class="sum-stat"><div class="sum-label">Duration</div><span>' + human(rs.report.run_duration) + '</span></div>';
 }
 
 // ═══════════════════════════════════════════════════
 // PROGRESS
 // ═══════════════════════════════════════════════════
 function updateProgress() {
-  const ids = Object.keys(state.tests);
+  var ids = Object.keys(state.tests);
   if (!ids.length) return;
-  const done = ids.filter(id => { const s = state.runState?.tests?.[id]?.status; return s && !['running','queued'].includes(s); }).length;
+  var done = ids.filter(function(id) {
+    var s = state.runState && state.runState.tests && state.runState.tests[id] ? state.runState.tests[id].status : null;
+    return s && s !== 'running' && s !== 'queued';
+  }).length;
   $('progress-bar').style.width = Math.round((done / ids.length) * 95) + '%';
 }
 
@@ -648,43 +673,53 @@ function classifyLog(line) {
 }
 function appendLog(line) {
   $('log-card').style.display = 'block';
-  const body = $('log-body');
-  const div = document.createElement('div');
+  var body = $('log-body');
+  var div = document.createElement('div');
   div.className = classifyLog(line);
   div.textContent = line;
   body.appendChild(div);
   body.scrollTop = body.scrollHeight;
-  state.logs.push({ line, cls: div.className });
+  state.logs.push({ line: line, cls: div.className });
   saveLS();
 }
 function restoreLogs() {
   if (!state.logs.length) return;
   $('log-card').style.display = 'block';
-  const body = $('log-body');
+  var body = $('log-body');
   body.innerHTML = '';
-  state.logs.forEach(({ line, cls }) => {
-    const div = document.createElement('div');
-    div.className = cls || 'log-line';
-    div.textContent = line;
+  state.logs.forEach(function(entry) {
+    var div = document.createElement('div');
+    div.className = entry.cls || 'log-line';
+    div.textContent = entry.line;
     body.appendChild(div);
   });
   body.scrollTop = body.scrollHeight;
 }
-$('log-clear-btn').addEventListener('click', () => { $('log-body').innerHTML = ''; state.logs = []; saveLS(); });
+$('log-clear-btn').addEventListener('click', function() {
+  $('log-body').innerHTML = '';
+  state.logs = [];
+  saveLS();
+});
 
 // ═══════════════════════════════════════════════════
 // SSE
 // ═══════════════════════════════════════════════════
 function connectSSE() {
-  const es = new EventSource('/api/events');
+  var es = new EventSource('/api/events');
 
-  es.addEventListener('run_start', () => {
+  es.addEventListener('run_start', function() {
     state.running = true;
     state.logs = [];
     $('log-body').innerHTML = '';
     state.runState = { status: 'running', tests: {} };
-    Object.keys(state.tests).forEach(id => {
-      state.runState.tests[id] = { test_name: state.tests[id].test_name || id, uri: state.tests[id].uri || '', status: 'queued', matching_percentage: null, artifacts: { cl_site_image: null, ox_site_image: null, diff_image: null } };
+    Object.keys(state.tests).forEach(function(id) {
+      state.runState.tests[id] = {
+        test_name: state.tests[id].test_name || id,
+        uri: state.tests[id].uri || '',
+        status: 'queued',
+        matching_percentage: null,
+        artifacts: { cl_site_image: null, ox_site_image: null, diff_image: null }
+      };
     });
     saveLS();
     $('execute-btn').disabled = true;
@@ -695,60 +730,69 @@ function connectSSE() {
     $('progress-bar').style.width = '0%';
     $('summary-strip').classList.remove('visible');
     setRunLock(true);
-    renderSidebar(); renderDetail();
+    renderSidebar();
+    renderDetail();
   });
 
-  es.addEventListener('test_list', e => {
-    state.tests = JSON.parse(e.data).tests;
-    saveLS(); renderSidebar(); renderTestsTable();
+  es.addEventListener('test_list', function(e) {
+    var d = JSON.parse(e.data);
+    state.tests = d.tests;
+    saveLS();
+    renderSidebar();
+    renderTestsTable();
   });
 
-  es.addEventListener('test_start', e => {
-    const { id, name } = JSON.parse(e.data);
-    if (state.runState?.tests?.[id]) {
-      state.runState.tests[id].status = 'running';
+  es.addEventListener('test_start', function(e) {
+    var d = JSON.parse(e.data);
+    if (state.runState && state.runState.tests && state.runState.tests[d.id]) {
+      state.runState.tests[d.id].status = 'running';
     }
-    saveLS(); renderSidebar();
-    if (state.selectedTestId === id) renderDetail();
-    updateProgress();
-  });
-
-  es.addEventListener('test_result', e => {
-    const d = JSON.parse(e.data);
-    if (state.runState?.tests?.[d.id]) {
-      // Backend now sends the correct test_cases.json key — simple merge
-      Object.assign(state.runState.tests[d.id], d.result || {
-        status: d.status,
-        matching_percentage: d.pct ?? null,
-        execution_error: d.error ?? null,
-      });
-    } else {
-      console.warn('test_result: no key found for id=', d.id);
-    }
-    saveLS(); renderSidebar();
+    saveLS();
+    renderSidebar();
     if (state.selectedTestId === d.id) renderDetail();
     updateProgress();
   });
 
-  es.addEventListener('log', e => { appendLog(JSON.parse(e.data).line); });
+  es.addEventListener('test_result', function(e) {
+    var d = JSON.parse(e.data);
+    if (state.runState && state.runState.tests && state.runState.tests[d.id]) {
+      Object.assign(state.runState.tests[d.id], d.result || {
+        status: d.status,
+        matching_percentage: d.pct != null ? d.pct : null,
+        execution_error: d.error || null
+      });
+    } else {
+      console.warn('test_result: no key for id=', d.id);
+    }
+    saveLS();
+    renderSidebar();
+    if (state.selectedTestId === d.id) renderDetail();
+    updateProgress();
+  });
 
-  es.addEventListener('run_end', e => {
-    const d = JSON.parse(e.data);
+  es.addEventListener('log', function(e) {
+    appendLog(JSON.parse(e.data).line);
+  });
+
+  es.addEventListener('run_end', function(e) {
+    var d = JSON.parse(e.data);
     state.running = false;
     if (d.run_state) state.runState = d.run_state;
     saveLS();
     $('execute-btn').disabled = false;
     $('execute-btn').textContent = '▶ Execute Tests';
     $('progress-bar').style.width = '100%';
-    setTimeout(() => $('progress-wrap').classList.remove('visible'), 1500);
-    const ok = d.exit_code === 0;
+    setTimeout(function() { $('progress-wrap').classList.remove('visible'); }, 1500);
+    var ok = d.exit_code === 0;
     $('run-status-badge').className = ok ? 'done-pass' : 'done-fail';
     $('run-status-badge').textContent = ok ? '✓ All passed' : '✗ Some failed';
     setRunLock(false);
-    renderSidebar(); renderDetail(); renderSummary();
+    renderSidebar();
+    renderDetail();
+    renderSummary();
   });
 
-  es.addEventListener('run_error', e => {
+  es.addEventListener('run_error', function(e) {
     state.running = false;
     $('execute-btn').disabled = false;
     $('execute-btn').textContent = '▶ Execute Tests';
@@ -759,152 +803,126 @@ function connectSSE() {
 }
 
 // ═══════════════════════════════════════════════════
-// UI LOCK — disable edits during a run
+// EXECUTE BUTTON
 // ═══════════════════════════════════════════════════
-function setRunLock(locked) {
-  // Tests page
-  $('add-test-btn').disabled  = locked;
-  $('save-tests-btn').disabled = locked;
-  $('tests-run-warning').style.display = locked ? 'block' : 'none';
-  $('tests-tbody').querySelectorAll('input,button').forEach(el => el.disabled = locked);
-
-  // Settings page
-  $('save-settings-btn').disabled = locked;
-  $('settings-run-warning').style.display = locked ? 'block' : 'none';
-  document.querySelectorAll('#page-settings input').forEach(el => el.disabled = locked);
-}
-$('execute-btn').addEventListener('click', async () => {
+$('execute-btn').addEventListener('click', async function() {
   if (state.running) return;
   try {
-    const r = await fetch('/api/run', { method: 'POST' });
+    var r = await fetch('/api/run', { method: 'POST' });
     if (!r.ok) alert((await r.json()).error || 'Failed to start run.');
-  } catch(e) { alert('Could not connect to server: ' + e.message); }
+  } catch(e) {
+    alert('Could not connect to server: ' + e.message);
+  }
 });
 
 // ═══════════════════════════════════════════════════
 // TESTS TABLE
 // ═══════════════════════════════════════════════════
 function renderTestsTable() {
-  const tbody = $('tests-tbody');
-  const ids = Object.keys(state.tests);
-  if (!ids.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No tests yet. Click "+ Add Test" to add one.</td></tr>'; return; }
+  var tbody = $('tests-tbody');
+  var ids = Object.keys(state.tests);
+  if (!ids.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No tests yet. Click "+ Add Test" to add one.</td></tr>';
+    return;
+  }
   tbody.innerHTML = '';
-  ids.forEach(id => {
-    const t = state.tests[id];
-    const tr = document.createElement('tr');
+  ids.forEach(function(id) {
+    var t = state.tests[id];
+    var tr = document.createElement('tr');
     tr.dataset.id = id;
-    tr.innerHTML = `
-      <td><input class="mono f-id" value="${escHtml(id)}" placeholder="test_id"/></td>
-      <td><input class="f-name" value="${escHtml(t.test_name||'')}" placeholder="Homepage layout"/></td>
-      <td><input class="mono f-uri" value="${escHtml(t.uri||'')}" placeholder="/about"/></td>
-      <td><input class="f-desc" value="${escHtml(t.desc||'')}" placeholder="Optional description"/></td>
-      <td><button class="btn btn-danger remove-btn">✕</button></td>`;
-    tr.querySelector('.remove-btn').addEventListener('click', () => { delete state.tests[id]; tr.remove(); renderSidebar(); saveLS(); });
+    tr.innerHTML =
+      '<td><input class="mono f-id" value="' + escHtml(id) + '" placeholder="test_id"/></td>' +
+      '<td><input class="f-name" value="' + escHtml(t.test_name || '') + '" placeholder="Homepage layout"/></td>' +
+      '<td><input class="mono f-uri" value="' + escHtml(t.uri || '') + '" placeholder="/about"/></td>' +
+      '<td><input class="f-desc" value="' + escHtml(t.desc || '') + '" placeholder="Optional description"/></td>' +
+      '<td><button class="btn btn-danger remove-btn">✕</button></td>';
+    tr.querySelector('.remove-btn').addEventListener('click', function() {
+      delete state.tests[id];
+      tr.remove();
+      renderSidebar();
+      saveLS();
+    });
     tbody.appendChild(tr);
   });
 }
 
-$('add-test-btn').addEventListener('click', () => {
-  const id = 'test_' + Date.now();
+$('add-test-btn').addEventListener('click', function() {
+  var id = 'test_' + Date.now();
   state.tests[id] = { test_name: '', uri: '', desc: '' };
   renderTestsTable();
-  $('tests-tbody').lastElementChild?.querySelector('.f-name')?.focus();
+  var last = $('tests-tbody').lastElementChild;
+  if (last) { var inp = last.querySelector('.f-name'); if (inp) inp.focus(); }
 });
 
-$('save-tests-btn').addEventListener('click', async () => {
-  const updated = {};
-  $('tests-tbody').querySelectorAll('tr[data-id]').forEach(tr => {
-    const newId = tr.querySelector('.f-id').value.trim();
+$('save-tests-btn').addEventListener('click', async function() {
+  var updated = {};
+  $('tests-tbody').querySelectorAll('tr[data-id]').forEach(function(tr) {
+    var newId = tr.querySelector('.f-id').value.trim();
     if (!newId) return;
-    updated[newId] = { test_name: tr.querySelector('.f-name').value.trim(), uri: tr.querySelector('.f-uri').value.trim(), desc: tr.querySelector('.f-desc').value.trim() };
+    updated[newId] = {
+      test_name: tr.querySelector('.f-name').value.trim(),
+      uri: tr.querySelector('.f-uri').value.trim(),
+      desc: tr.querySelector('.f-desc').value.trim()
+    };
   });
-  state.tests = updated; saveLS(); renderSidebar();
-  await fetch('/api/tests', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(updated) });
+  state.tests = updated;
+  saveLS();
+  renderSidebar();
+  await fetch('/api/tests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updated) });
   $('save-tests-btn').textContent = '✓ Saved';
-  setTimeout(() => { $('save-tests-btn').textContent = 'Save All'; }, 1500);
+  setTimeout(function() { $('save-tests-btn').textContent = 'Save All'; }, 1500);
 });
 
 // ═══════════════════════════════════════════════════
 // SETTINGS
 // ═══════════════════════════════════════════════════
-$('save-settings-btn').addEventListener('click', async () => {
+$('save-settings-btn').addEventListener('click', async function() {
   if (state.running) return;
-  const payload = {
+  var payload = {
     sites: {
       cl: { name: $('set-cl-name').value.trim(), base_url: $('set-cl-url').value.trim() },
-      ox: { name: $('set-ox-name').value.trim(), base_url: $('set-ox-url').value.trim() },
+      ox: { name: $('set-ox-name').value.trim(), base_url: $('set-ox-url').value.trim() }
     },
     auth: {
       cl: { required: $('set-cl-auth-required').checked, username: $('set-cl-auth-user').value, password: $('set-cl-auth-pass').value },
-      ox: { required: $('set-ox-auth-required').checked, username: $('set-ox-auth-user').value, password: $('set-ox-auth-pass').value },
+      ox: { required: $('set-ox-auth-required').checked, username: $('set-ox-auth-user').value, password: $('set-ox-auth-pass').value }
     },
     config: {
       capture_all_screenshots: $('set-capture-screenshots').checked,
-      fail_fast:               $('set-fail-fast').checked,
-      clean_old_results:       $('set-clean-results').checked,
-      diff_threshold:          parseFloat($('set-diff-threshold').value) || 0.1,
-      max_diff_pixels:         parseInt($('set-max-diff-pixels').value)  || 0,
-      viewport_width:          parseInt($('set-viewport-w').value)        || 1440,
-      viewport_height:         parseInt($('set-viewport-h').value)        || 900,
-    },
+      fail_fast: $('set-fail-fast').checked,
+      clean_old_results: $('set-clean-results').checked,
+      diff_threshold: parseFloat($('set-diff-threshold').value) || 0.1,
+      max_diff_pixels: parseInt($('set-max-diff-pixels').value) || 0,
+      page_timeout_ms: parseInt($('set-page-timeout').value) || 120000,
+      viewport_width: parseInt($('set-viewport-w').value) || 1440,
+      viewport_height: parseInt($('set-viewport-h').value) || 900
+    }
   };
-  const r = await fetch('/api/settings', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+  var r = await fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
   if (r.ok) {
-    const fb = $('save-feedback'); fb.classList.add('show');
-    setTimeout(() => fb.classList.remove('show'), 2000);
+    var fb = $('save-feedback');
+    fb.classList.add('show');
+    setTimeout(function() { fb.classList.remove('show'); }, 2000);
   } else {
-    const d = await r.json();
+    var d = await r.json();
     alert(d.error || 'Failed to save settings');
   }
 });
 
-// ═══════════════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════════════
-function human(ms) { if (ms == null) return '—'; return ms < 1000 ? ms + ' ms' : (ms/1000).toFixed(2) + ' s'; }
-function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-// ═══════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════
-async function init() {
-  showPage(state.activePage || 'run');
-
-  // Instant render from localStorage (no flash)
-  if (Object.keys(state.tests).length) { renderSidebar(); renderTestsTable(); }
-  if (state.runState) renderSummary();
-  restoreLogs();
-  if (state.selectedTestId) renderDetail();
-
-  // Fetch fresh tests + settings
-  await fetchTests();
-  fetchSettings();
-
-  // Fetch last report from SERVER disk — this is the source of truth on refresh
-  // It overwrites localStorage with the real persisted data
-  await fetchLastReport();
-
-  connectSSE();
-}
-
-async function fetchTests() {
-  try { const r = await fetch('/api/tests'); state.tests = await r.json(); saveLS(); renderSidebar(); renderTestsTable(); } catch {}
-}
 async function fetchSettings() {
   try {
-    const cfg = await (await fetch('/api/settings')).json();
+    var cfg = await (await fetch('/api/settings')).json();
+    var sites = cfg.sites || {};
+    var cl = sites.cl || {};
+    var ox = sites.ox || {};
+    $('set-cl-name').value = cl.name || '';
+    $('set-cl-url').value = cl.base_url || '';
+    $('set-ox-name').value = ox.name || '';
+    $('set-ox-url').value = ox.base_url || '';
 
-    // Sites
-    const sites = cfg.sites || {};
-    const cl = sites.cl || {}; const ox = sites.ox || {};
-    $('set-cl-name').value = cl.name    || '';
-    $('set-cl-url').value  = cl.base_url || '';
-    $('set-ox-name').value = ox.name    || '';
-    $('set-ox-url').value  = ox.base_url || '';
-
-    // Auth
-    const auth = cfg.auth || {};
-    const cla = auth.cl || {}; const oxa = auth.ox || {};
+    var auth = cfg.auth || {};
+    var cla = auth.cl || {};
+    var oxa = auth.ox || {};
     $('set-cl-auth-required').checked = !!cla.required;
     $('set-cl-auth-user').value = cla.username || '';
     $('set-cl-auth-pass').value = cla.password || '';
@@ -912,36 +930,50 @@ async function fetchSettings() {
     $('set-ox-auth-user').value = oxa.username || '';
     $('set-ox-auth-pass').value = oxa.password || '';
 
-    // Runner config
-    const rc = cfg.config || {};
+    var rc = cfg.config || {};
     $('set-capture-screenshots').checked = !!rc.capture_all_screenshots;
-    $('set-fail-fast').checked           = !!rc.fail_fast;
-    $('set-clean-results').checked       = rc.clean_old_results !== false;
-    $('set-diff-threshold').value        = rc.diff_threshold   ?? 0.1;
-    $('set-max-diff-pixels').value       = rc.max_diff_pixels  ?? 0;
-    $('set-viewport-w').value            = rc.viewport_width   || 1440;
-    $('set-viewport-h').value            = rc.viewport_height  || 900;
-  } catch(e) { console.warn('fetchSettings failed', e); }
+    $('set-fail-fast').checked = !!rc.fail_fast;
+    $('set-clean-results').checked = rc.clean_old_results !== false;
+    $('set-diff-threshold').value = rc.diff_threshold != null ? rc.diff_threshold : 0.1;
+    $('set-max-diff-pixels').value = rc.max_diff_pixels != null ? rc.max_diff_pixels : 0;
+    $('set-page-timeout').value = rc.page_timeout_ms != null ? rc.page_timeout_ms : 120000;
+    $('set-viewport-w').value = rc.viewport_width || 1440;
+    $('set-viewport-h').value = rc.viewport_height || 900;
+  } catch(e) {
+    console.warn('fetchSettings failed', e);
+  }
 }
-async function fetchLastReport() {
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+async function init() {
+  showPage(state.activePage || 'run');
+
+  if (Object.keys(state.tests).length) { renderSidebar(); renderTestsTable(); }
+  if (state.runState) renderSummary();
+  restoreLogs();
+  if (state.selectedTestId) renderDetail();
+
+  try { var r = await fetch('/api/tests'); state.tests = await r.json(); saveLS(); renderSidebar(); renderTestsTable(); } catch(e) {}
+  fetchSettings();
+
   try {
-    const data = await (await fetch('/api/last-report')).json();
-    if (!data || !data.tests || typeof data.tests !== 'object') return;
-
-    // Server state uses test_cases.json keys — safe to use directly
-    state.runState = data;
-
-    // Restore logs from disk if we have none locally
-    if (data.logs?.length && !state.logs.length) {
-      state.logs = data.logs.map(l => ({ line: l, cls: classifyLog(l) }));
-      restoreLogs();
+    var data = await (await fetch('/api/last-report')).json();
+    if (data && data.tests && typeof data.tests === 'object') {
+      state.runState = data;
+      if (data.logs && data.logs.length && !state.logs.length) {
+        state.logs = data.logs.map(function(l) { return { line: l, cls: classifyLog(l) }; });
+        restoreLogs();
+      }
+      saveLS();
+      renderSidebar();
+      renderSummary();
+      if (state.selectedTestId) renderDetail();
     }
-
-    saveLS();
-    renderSidebar();
-    renderSummary();
-    if (state.selectedTestId) renderDetail();
   } catch(e) { console.warn('fetchLastReport failed', e); }
+
+  connectSSE();
 }
 
 init();

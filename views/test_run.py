@@ -130,6 +130,7 @@ def _build_initial_state(tests: dict) -> dict:
         "exit_code":   None,
         "report":      None,
         "logs":        [],
+        "tests_snapshot": dict(tests),   # locked copy — immune to file edits during run
         "tests": {
             tid: {
                 "test_name":          t.get("test_name", tid),
@@ -248,7 +249,9 @@ def run_tests():
         logger.info("Run thread started")
         try:
             _broadcast("run_start", {"ts": run_state["started_at"]})
-            _broadcast("test_list", {"ids": list(tests.keys()), "tests": tests})
+            # Use the snapshot so the UI shows exactly what was locked in at run start
+            snapshot = run_state["tests_snapshot"]
+            _broadcast("test_list", {"ids": list(snapshot.keys()), "tests": snapshot})
 
             proc = subprocess.Popen(
                 [sys.executable, str(RUNNER_SCRIPT)],

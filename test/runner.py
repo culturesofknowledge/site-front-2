@@ -7,19 +7,17 @@ from io import BytesIO
 from datetime import datetime, timezone
 from pathlib import Path
 
+from playwright.sync_api import sync_playwright, Page
 from PIL import Image
 from pixelmatch.contrib.PIL import pixelmatch
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 
 
 # ===================== CONFIG =====================
 
-SCHEMA_VERSION = "1.2"
+SCHEMA_VERSION = "1.3"
 
-BASE_DIR     = Path(__file__).resolve().parent
-PROJECT_ROOT = BASE_DIR.parent
+BASE_DIR       = Path(__file__).resolve().parent
+PROJECT_ROOT   = BASE_DIR.parent
 
 CONFIG_FILE    = BASE_DIR / "runner_config.json"
 TESTS_FILE     = BASE_DIR / "test_cases.json"
@@ -35,10 +33,11 @@ def fatal(msg: str):
 
 def emit_result(result: dict):
     """
-    Structured per-test result line parsed by test_run.py in real time.
-    flush=True is critical — Python buffers stdout otherwise.
+    Print a structured result line immediately after each test completes.
+    Prefixed with ##RESULT## so test_run.py can parse it unambiguously.
+    flush=True is critical — without it Python buffers stdout until process exit.
     """
-    print(f"##RESULT## {json.dumps(result)}", flush=False)
+    print(f"##RESULT## {json.dumps(result)}", flush=True)
 
 
 # ===================== LOAD CONFIG =====================
@@ -71,6 +70,8 @@ MAX_DIFF_PIXELS         = run_cfg.get("max_diff_pixels",         0)
 FAIL_FAST               = run_cfg.get("fail_fast",               False)
 CLEAN_OLD_RESULTS       = run_cfg.get("clean_old_results",       True)
 CAPTURE_ALL_SCREENSHOTS = run_cfg.get("capture_all_screenshots", False)
+# Timeout in ms for page load + wait_for_content — default 120s to handle slow pages
+PAGE_TIMEOUT_MS         = int(run_cfg.get("page_timeout_ms",     120_000))
 
 
 # ===================== VALIDATION =====================
@@ -99,88 +100,153 @@ if not TESTS:
     fatal("No test cases found in test_cases.json")
 
 
-# ===================== SELENIUM HELPERS =====================
+# ===================== HELPERS =====================
 
-def make_driver(auth: dict) -> webdriver.Chrome:
+def build_context_args(site_auth: dict) -> dict:
+    """Build Playwright browser context kwargs, adding HTTP auth if required."""
+    args = {"viewport": VIEWPORT}
+    if site_auth.get("required") and site_auth.get("username"):
+        args["http_credentials"] = {
+            "username": site_auth["username"],
+            "password": site_auth.get("password", ""),
+        }
+    return args
+
+
+def wait_for_content(page: Page, timeout: int = 30000, idle_for: float = 1.5):
     """
-    Create a headless Chromium driver.
-    On Alpine: chromium lives at /usr/bin/chromium-browser
-    On Debian/Ubuntu: chromedriver is on PATH after `playwright install` or apt install
-    We try common paths and let Selenium find chromedriver automatically.
+    Wait until the page content is truly ready — no spinners, no pending requests.
+
+    Steps:
+    1. wait for networkidle (Playwright built-in — no requests for 500ms)
+    2. wait for common loading indicators to disappear
+    3. poll until no pending XHR/fetch for `idle_for` consecutive seconds
+
+    This handles 'Loading please wait…' overlays and async data fetching.
     """
-    opts = Options()
-    opts.add_argument("--headless")
-    opts.add_argument("--no-sandbox")           # required in containers
-    opts.add_argument("--disable-dev-shm-usage") # /dev/shm is often small in containers
-    opts.add_argument("--disable-gpu")
-    opts.add_argument(f"--window-size={VIEWPORT['width']},{VIEWPORT['height']}")
-    opts.add_argument("--hide-scrollbars")
-
-    # Inject HTTP basic auth via URL credentials if required
-    # Stored on driver instance for use when building URLs
-    auth_prefix = ""
-    if auth.get("required") and auth.get("username"):
-        u = auth["username"]
-        p = auth.get("password", "")
-        auth_prefix = f"{u}:{p}@"
-
-    # Find Chromium binary — Alpine vs Debian
-    for candidate in [
-        "/usr/bin/chromium-browser",   # Alpine
-        "/usr/bin/chromium",           # Alpine (some versions)
-        "/usr/bin/google-chrome",      # Debian/Ubuntu Chrome
-        "/usr/bin/google-chrome-stable",
-    ]:
-        if Path(candidate).exists():
-            opts.binary_location = candidate
-            break
-
-    # chromedriver — try common locations, fall back to PATH
-    chromedriver_candidates = [
-        "/usr/bin/chromedriver",
-        "/usr/lib/chromium/chromedriver",       # Alpine
-        "/usr/lib/chromium-browser/chromedriver",
-    ]
-    service = None
-    for cd in chromedriver_candidates:
-        if Path(cd).exists():
-            service = Service(cd)
-            break
-
-    driver = webdriver.Chrome(service=service, options=opts) if service else webdriver.Chrome(options=opts)
-    driver.set_window_size(VIEWPORT["width"], VIEWPORT["height"])
-    driver._auth_prefix = auth_prefix   # stash for URL building
-    return driver
-
-
-def build_url(base: str, uri: str, auth_prefix: str) -> str:
-    """Inject basic auth credentials into URL if required."""
-    if not auth_prefix:
-        return base + uri
-    # Insert credentials after the scheme: https://user:pass@host/path
-    scheme, rest = base.split("://", 1)
-    return f"{scheme}://{auth_prefix}{rest}{uri}"
-
-
-def get_page_load_time(driver) -> int:
-    """Return loadEventEnd in ms from Navigation Timing API."""
+    # Step 1 — networkidle: Playwright waits until no network requests for 500ms
     try:
-        val = driver.execute_script(
-            "const e = performance.getEntriesByType('navigation')[0];"
-            "return e ? Math.round(e.loadEventEnd) : null;"
-        )
-        return int(val) if val else None
+        page.wait_for_load_state("networkidle", timeout=timeout)
     except Exception:
-        return None
+        pass  # timeout is acceptable — we continue with the other checks
+
+    # Step 2 — wait for common loading selectors to disappear
+    LOADING_SELECTORS = [
+        "[class*='loading']",
+        "[class*='spinner']",
+        "[class*='loader']",
+        "[id*='loading']",
+        "[aria-label*='Loading']",
+        "[aria-busy='true']",
+    ]
+    selector = ", ".join(LOADING_SELECTORS)
+    deadline = time.time() + 10
+    while time.time() < deadline:
+        try:
+            still_loading = page.evaluate(f"""
+                () => {{
+                    const els = document.querySelectorAll('{selector}');
+                    return Array.from(els).some(el => {{
+                        const s = window.getComputedStyle(el);
+                        return s.display !== 'none'
+                            && s.visibility !== 'hidden'
+                            && s.opacity !== '0';
+                    }});
+                }}
+            """)
+            if not still_loading:
+                break
+        except Exception:
+            break
+        time.sleep(0.3)
+
+    # Step 3 — inject request counter and wait until idle
+    try:
+        page.evaluate("""
+            () => {
+                if (window.__pendingRequests === undefined) {
+                    window.__pendingRequests = 0;
+                    const _fetch = window.fetch;
+                    window.fetch = function(...args) {
+                        window.__pendingRequests++;
+                        return _fetch.apply(this, args)
+                            .finally(() => window.__pendingRequests--);
+                    };
+                    const _open = XMLHttpRequest.prototype.open;
+                    XMLHttpRequest.prototype.open = function(...args) {
+                        window.__pendingRequests++;
+                        this.addEventListener('loadend',
+                            () => window.__pendingRequests--);
+                        return _open.apply(this, args);
+                    };
+                }
+            }
+        """)
+        deadline = time.time() + 10
+        idle_since = None
+        while time.time() < deadline:
+            pending = page.evaluate("() => window.__pendingRequests || 0")
+            if pending == 0:
+                if idle_since is None:
+                    idle_since = time.time()
+                elif time.time() - idle_since >= idle_for:
+                    break
+            else:
+                idle_since = None
+            time.sleep(0.2)
+    except Exception:
+        pass
 
 
-def capture_viewport(driver) -> bytes:
-    """Screenshot clipped to exactly the viewport (not the full page)."""
-    return driver.get_screenshot_as_png()
+def get_performance_timings(page: Page) -> dict:
+    """
+    Extract detailed performance timings from the Navigation Timing API.
+    Returns a flat dict of all timing breakdowns in milliseconds.
+    """
+    try:
+        return page.evaluate("""
+            () => {
+                const e = performance.getEntriesByType('navigation')[0];
+                if (!e) return {};
+                const r = (a, b) => Math.max(0, Math.round(a - b));
+                return {
+                    // Network
+                    dns_ms:        r(e.domainLookupEnd,          e.domainLookupStart),
+                    tcp_ms:        r(e.connectEnd,               e.connectStart),
+                    tls_ms:        e.secureConnectionStart > 0
+                                   ? r(e.requestStart,           e.secureConnectionStart)
+                                   : 0,
+                    ttfb_ms:       r(e.responseStart,            e.requestStart),
+                    download_ms:   r(e.responseEnd,              e.responseStart),
+                    network_ms:    r(e.responseEnd,              e.fetchStart),
+                    // Rendering
+                    dom_parse_ms:    r(e.domInteractive,         e.responseEnd),
+                    dom_content_ms:  r(e.domContentLoadedEventEnd, e.responseEnd),
+                    render_ms:       r(e.domComplete,            e.domInteractive),
+                    // Totals
+                    load_ms:         Math.round(e.loadEventEnd),
+                    total_ms:        r(e.loadEventEnd,           e.fetchStart),
+                };
+            }
+        """) or {}
+    except Exception:
+        return {}
 
 
-def save_image(png_bytes: bytes, path: Path):
-    Image.open(BytesIO(png_bytes)).save(path)
+def capture_viewport(page: Page) -> bytes:
+    """Screenshot of exactly the configured viewport — no full-page scroll."""
+    return page.screenshot(
+        full_page=False,
+        clip={
+            "x": 0, "y": 0,
+            "width":  VIEWPORT["width"],
+            "height": VIEWPORT["height"],
+        },
+    )
+
+
+def save_image(bytes_data: bytes, path: Path):
+    Image.open(BytesIO(bytes_data)).save(path)
 
 
 def normalize_id(value: str) -> str:
@@ -201,137 +267,172 @@ def main():
     print(f"   {OX_NAME}: {OX_BASE_URL}", flush=True)
     print(f"📄 Loaded {len(TESTS)} test cases", flush=True)
 
-    # Create two separate drivers so each site keeps its own session/auth
-    print("  → Starting browsers…", flush=True)
-    try:
-        cl_driver = make_driver(CL_AUTH)
-        ox_driver = make_driver(OX_AUTH)
-    except Exception as e:
-        fatal(f"Failed to start Chromium: {e}\n"
-              "On Alpine run: apk add --no-cache chromium chromium-chromedriver\n"
-              "On Debian run: apt-get install -y chromium chromium-driver")
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
 
-    # Capture browser info for the report
-    browser_info = {
-        "name":       "chromium",
-        "version":    cl_driver.capabilities.get("browserVersion", "unknown"),
-        "headless":   True,
-        "viewport":   VIEWPORT,
-        "user_agent": cl_driver.execute_script("return navigator.userAgent"),
-    }
+        # Separate contexts per site so each gets its own session and auth
+        cl_context = browser.new_context(**build_context_args(CL_AUTH))
+        ox_context = browser.new_context(**build_context_args(OX_AUTH))
 
-    try:
-        for _, test in TESTS.items():
-            uri       = test["uri"]
-            test_name = test["test_name"]
-            test_id   = test.get("id") or normalize_id(test_name)
-            desc      = test.get("desc", "")
+        cl_page = cl_context.new_page()
+        ox_page = ox_context.new_page()
 
-            cl_site_url = build_url(CL_BASE_URL, uri, cl_driver._auth_prefix)
-            ox_site_url = build_url(OX_BASE_URL, uri, ox_driver._auth_prefix)
+        browser_info = {
+            "name":       browser.browser_type.name,
+            "version":    browser.version,
+            "headless":   True,
+            "viewport":   VIEWPORT,
+            "user_agent": cl_page.evaluate("() => navigator.userAgent"),
+        }
 
-            # Public URLs for the report (no embedded credentials)
-            cl_display_url = CL_BASE_URL + uri
-            ox_display_url = OX_BASE_URL + uri
+        try:
+            for _, test in TESTS.items():
+                uri       = test["uri"]
+                test_name = test["test_name"]
+                test_id   = test.get("id") or normalize_id(test_name)
+                desc      = test.get("desc", "")
 
-            print(f"\n▶ Executing test: {test_name}", flush=True)
-            if desc:
-                print(f"  ↳ {desc}", flush=True)
+                cl_site_url = CL_BASE_URL + uri
+                ox_site_url = OX_BASE_URL + uri
 
-            start_time = time.time()
+                print(f"\n▶ Executing test: {test_name}", flush=True)
+                if desc:
+                    print(f"  ↳ {desc}", flush=True)
 
-            status              = "passed"
-            execution_error     = None
-            matching_percentage = None
-            cl_load_time        = None
-            ox_load_time        = None
-            artifacts = {
-                "cl_site_image": None,
-                "ox_site_image": None,
-                "diff_image":    None,
-            }
+                start_time = time.time()
 
-            try:
-                print(f"  → Loading {CL_NAME}", flush=True)
-                cl_driver.get(cl_site_url)
-                # Wait for page to settle (networkidle equivalent)
-                time.sleep(1)
-                cl_load_time = get_page_load_time(cl_driver)
-                cl_img_bytes = capture_viewport(cl_driver)
+                status              = "passed"
+                execution_error     = None
+                matching_percentage = None
+                cl_timings          = {}
+                ox_timings          = {}
+                artifacts = {
+                    "cl_site_image": None,
+                    "ox_site_image": None,
+                    "diff_image":    None,
+                }
 
-                print(f"  → Loading {OX_NAME}", flush=True)
-                ox_driver.get(ox_site_url)
-                time.sleep(1)
-                ox_load_time = get_page_load_time(ox_driver)
-                ox_img_bytes = capture_viewport(ox_driver)
+                try:
+                    print(f"  → Loading {CL_NAME}", flush=True)
+                    cl_page.goto(cl_site_url, wait_until="domcontentloaded", timeout=PAGE_TIMEOUT_MS)
+                    wait_for_content(cl_page, timeout=PAGE_TIMEOUT_MS)
+                    cl_timings   = get_performance_timings(cl_page)
+                    cl_img_bytes = capture_viewport(cl_page)
 
-                if CAPTURE_ALL_SCREENSHOTS:
-                    cl_name = f"{test_id}_cl_site.png"
-                    ox_name = f"{test_id}_ox_site.png"
-                    save_image(cl_img_bytes, SCREENSHOT_DIR / cl_name)
-                    save_image(ox_img_bytes, SCREENSHOT_DIR / ox_name)
-                    artifacts["cl_site_image"] = cl_name
-                    artifacts["ox_site_image"] = ox_name
+                    print(f"  → Loading {OX_NAME}", flush=True)
+                    ox_page.goto(ox_site_url, wait_until="domcontentloaded", timeout=PAGE_TIMEOUT_MS)
+                    wait_for_content(ox_page, timeout=PAGE_TIMEOUT_MS)
+                    ox_timings   = get_performance_timings(ox_page)
+                    ox_img_bytes = capture_viewport(ox_page)
 
-                img_cl   = Image.open(BytesIO(cl_img_bytes))
-                img_ox   = Image.open(BytesIO(ox_img_bytes))
+                    if CAPTURE_ALL_SCREENSHOTS:
+                        cl_name = f"{test_id}_cl_site.png"
+                        ox_name = f"{test_id}_ox_site.png"
+                        save_image(cl_img_bytes, SCREENSHOT_DIR / cl_name)
+                        save_image(ox_img_bytes, SCREENSHOT_DIR / ox_name)
+                        artifacts["cl_site_image"] = cl_name
+                        artifacts["ox_site_image"] = ox_name
 
-                # Ensure both images are same size before diffing
-                if img_cl.size != img_ox.size:
-                    img_ox = img_ox.resize(img_cl.size, Image.LANCZOS)
+                    img_cl = Image.open(BytesIO(cl_img_bytes))
+                    img_ox = Image.open(BytesIO(ox_img_bytes))
 
-                diff_img    = Image.new("RGBA", img_cl.size)
-                diff_pixels = pixelmatch(img_cl, img_ox, diff_img, threshold=DIFF_THRESHOLD)
+                    # Ensure same dimensions before diffing
+                    if img_cl.size != img_ox.size:
+                        img_ox = img_ox.resize(img_cl.size, Image.LANCZOS)
 
-                total_pixels        = img_cl.size[0] * img_cl.size[1]
-                matching_percentage = round(((total_pixels - diff_pixels) / total_pixels) * 100, 2)
+                    diff_img    = Image.new("RGBA", img_cl.size)
+                    diff_pixels = pixelmatch(
+                        img_cl, img_ox, diff_img,
+                        threshold=DIFF_THRESHOLD,
+                    )
 
-                diff_name = f"diff_{test_id}.png"
-                diff_img.save(SCREENSHOT_DIR / diff_name)
-                artifacts["diff_image"] = diff_name
+                    total_pixels        = img_cl.size[0] * img_cl.size[1]
+                    matching_percentage = round(
+                        ((total_pixels - diff_pixels) / total_pixels) * 100, 2
+                    )
 
-                if diff_pixels > MAX_DIFF_PIXELS:
-                    status = "failed"
-                    failed_count += 1
-                    print(f"  ❌ FAILED ({matching_percentage}% match)", flush=True)
-                else:
-                    print("  ✅ PASSED", flush=True)
+                    diff_name = f"diff_{test_id}.png"
+                    diff_img.save(SCREENSHOT_DIR / diff_name)
+                    artifacts["diff_image"] = diff_name
 
-            except Exception as e:
-                status          = "execution-error"
-                execution_error = str(e)
-                failed_count   += 1
-                print(f"  ❌ EXECUTION ERROR: {e}", flush=True)
-                if FAIL_FAST:
-                    raise
+                    if diff_pixels > MAX_DIFF_PIXELS:
+                        status = "failed"
+                        failed_count += 1
+                        print(f"  ❌ FAILED ({matching_percentage}% match)", flush=True)
+                    else:
+                        print("  ✅ PASSED", flush=True)
 
-            duration_ms = int((time.time() - start_time) * 1000)
+                except Exception as e:
+                    status          = "execution-error"
+                    execution_error = str(e)
+                    failed_count   += 1
+                    print(f"  ❌ EXECUTION ERROR: {e}", flush=True)
+                    if FAIL_FAST:
+                        raise
 
-            result = {
-                "id":                  test_id,
-                "test_name":           test_name,
-                "uri":                 uri,
-                "desc":                desc,
-                "cl_site_url":         cl_display_url,
-                "ox_site_url":         ox_display_url,
-                "cl_load_time_ms":     cl_load_time,
-                "ox_load_time_ms":     ox_load_time,
-                "status":              status,
-                "execution_error":     execution_error,
-                "matching_percentage": matching_percentage,
-                "duration_ms":         duration_ms,
-                "artifacts":           artifacts,
-            }
+                duration_ms = int((time.time() - start_time) * 1000)
 
-            results.append(result)
-            emit_result(result)   # real-time update to UI
+                result = {
+                    "id":                  test_id,
+                    "test_name":           test_name,
+                    "uri":                 uri,
+                    "desc":                desc,
+                    "cl_site_url":         cl_site_url,
+                    "ox_site_url":         ox_site_url,
+                    # Flat fields for backwards compat with UI sidebar
+                    "cl_load_time_ms":     cl_timings.get("load_ms"),
+                    "ox_load_time_ms":     ox_timings.get("load_ms"),
+                    # Full breakdowns shown in detail panel
+                    "cl_timings":          cl_timings,
+                    "ox_timings":          ox_timings,
+                    "status":              status,
+                    "execution_error":     execution_error,
+                    "matching_percentage": matching_percentage,
+                    "duration_ms":         duration_ms,
+                    "artifacts":           artifacts,
+                }
 
-            if status != "passed" and FAIL_FAST:
-                break
+                results.append(result)
+                emit_result(result)   # real-time UI update via ##RESULT##
 
-    finally:
-        cl_driver.quit()
-        ox_driver.quit()
+                if status != "passed" and FAIL_FAST:
+                    break
+
+        finally:
+            # Mark any tests that never ran as execution-error so the UI
+            # doesn't leave them stuck in queued state
+            completed_ids = {r["id"] for r in results}
+            for _, test in TESTS.items():
+                tid  = test.get("id") or normalize_id(test.get("test_name", ""))
+                name = test.get("test_name", tid)
+                if tid not in completed_ids:
+                    skipped = {
+                        "id":                  tid,
+                        "test_name":           name,
+                        "uri":                 test.get("uri", ""),
+                        "desc":                test.get("desc", ""),
+                        "cl_site_url":         CL_BASE_URL + test.get("uri", ""),
+                        "ox_site_url":         OX_BASE_URL + test.get("uri", ""),
+                        "cl_load_time_ms":     None,
+                        "ox_load_time_ms":     None,
+                        "cl_timings":          {},
+                        "ox_timings":          {},
+                        "status":              "execution-error",
+                        "execution_error":     "Test did not run — script exited early",
+                        "matching_percentage": None,
+                        "duration_ms":         0,
+                        "artifacts": {
+                            "cl_site_image": None,
+                            "ox_site_image": None,
+                            "diff_image":    None,
+                        },
+                    }
+                    results.append(skipped)
+                    emit_result(skipped)
+
+            cl_context.close()
+            ox_context.close()
+            browser.close()
 
     run_completed_at = datetime.now(timezone.utc)
     run_duration     = int((run_completed_at - run_started_at).total_seconds() * 1000)

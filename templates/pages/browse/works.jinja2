@@ -51,6 +51,7 @@
 {% endblock %}
 
 {% block extra_js_bottom %}
+<script src="{{ url_for('static', filename='js/combo_box.js') }}"> </script>
 <script type="module" src="../static/js/works.edges.js"></script>
 <script lang="js">
 const queryString = window.location.search;

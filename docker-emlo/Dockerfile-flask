@@ -4,8 +4,10 @@ ENV APP_DIR=/data
 WORKDIR ${APP_DIR}
 
 RUN apk update && apk upgrade
-
-RUN apk add bash build-base vim git
+RUN apk add bash build-base vim git \
+    chromium chromium-chromedriver \
+    # required for Pillow/pixelmatch image processing
+    jpeg-dev zlib-dev libffi-dev
 
 RUN python -m pip install --upgrade pip
 
@@ -15,6 +17,7 @@ COPY config.py $APP_DIR/config.py
 COPY views $APP_DIR/views
 COPY templates $APP_DIR/templates
 COPY static $APP_DIR/static
+COPY test $APP_DIR/test
 COPY requirements.txt $APP_DIR/requirements.txt
 RUN cd $APP_DIR && python -m pip install -r requirements.txt
 

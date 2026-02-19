@@ -25,6 +25,7 @@ site_front_2/flaskapp/static/dist/
 results/
 .test_run/
 test/runner_config.json
+test/test_cases.json
 
 # py
 site_front_2/_playground/

@@ -25,12 +25,12 @@
     "desc": "Checking layout for contribute page."
   },
   "test_6": {
-    "uri": "/browse/people?filters=fe%2Cma%2Cun%2Cre%2Cwr%2Cme",
-    "test_name": "Browse people",
+    "uri": "/browse/people?letter=i&filters=fe%2Cma%2Cun%2Cre%2Cwr%2Cme",
+    "test_name": "Browse people with letter I",
     "desc": "Layout checking for peoples"
   },
   "test_7": {
-    "uri": "/browse/locations?filters=fe,ma,un,re,wr,me",
+    "uri": "/browse/locations?letter=z&filters=fe,ma,un,re,wr,me",
     "test_name": "Browse locations",
     "desc": "Layout checking for locations"
   },
@@ -85,12 +85,12 @@
     "desc": "Repository profile layout check"
   },
   "test_18": {
-    "uri": "/profile/manifestation/88f96ebc-7395-457e-987f-3b329b0de20a",
+    "uri": "/profile/manifestation/9dcbb8f2-da22-411b-95d4-478da4267806",
     "test_name": "Manifestation Profile",
     "desc": "Manifestation profile layout check"
   },
   "test_19": {
-    "uri": "/profile/image/a6053013-0a8f-4c6d-96d1-c2e218edd853",
+    "uri": "/profile/image/4ac9b456-35c3-41d6-8828-6b2f9590d74c",
     "test_name": "Image profile",
     "desc": "Image profile layout check"
   },

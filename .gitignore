@@ -24,6 +24,8 @@ node_modules/
 site_front_2/flaskapp/static/dist/
 results/
 .test_run/
+test/runner_config.json
+
 # py
 site_front_2/_playground/
 

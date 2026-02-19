@@ -90,7 +90,7 @@ export const PROFILE_DESCRIPTOR = {
   },
 
   work: {
-    title: "Work",
+    title: "Letter",
     footerType: "w",
     icon: "/static/img/letter_icon.png",
 

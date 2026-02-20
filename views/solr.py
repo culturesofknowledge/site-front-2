@@ -1,8 +1,10 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request , Response
 import requests
 import os
 from dotenv import load_dotenv
 from urllib.parse import urlparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import gzip, json, time
 
 load_dotenv()
 
@@ -418,3 +420,342 @@ def getSolrURL():
         solr_url = solr_url + "/"
     
     return solr_url
+
+# ---------------------------------------- Profile  API ----------------------------------------#
+# ---------------------------------------------------------------------------
+# Configuration
+# ---------------------------------------------------------------------------
+
+FULL_DOCS_THRESHOLD = 30   # matches h4WorkList's `if data.length > 30` branch
+
+# Simple in-process cache: { cache_key: (timestamp, payload_bytes) }
+# Avoids re-hitting Solr when the same profile is requested within TTL seconds.
+_CACHE: dict = {}
+_CACHE_TTL = 60   # seconds — safe for data that changes via an edit UI
+
+# ---------------------------------------------------------------------------
+# Field-list (fl) config — edit here, never in JS
+# ---------------------------------------------------------------------------
+
+_FL_RELATIONS = ",".join([
+    "uuid", "id", "object_type",
+    "dcterms_identifier-uri_",
+    "dcterms_description", "dcterms_type", "foaf_name",
+    "geonames_name", "geonames_officialName",
+    "ox_titleOfResource", "bibo_Note", "dcterms_source",
+    "ox_titlesRolesOccupations", "dcterms_relation", "ox_detailsOfResource",
+    "frbr_Work-work", "ox_resourceAt-institution",
+    "dcterms_identifier-shelf_", "ox_printedEditionDetails",
+    "ox_isAnnotatedBy-comment",
+    "dcterms_created-ox_year", "dcterms_created-ox_month", "dcterms_created-ox_day",
+    "ox_dateAnnotate-comment", "mail_handwroteBy-person", "mail_destination",
+    "ox_incipit", "ox_excipit", "mail_postageMark", "ox_endorsements",
+    "mail_enclosedBy-manifestation", "mail_enclosureOf-manifestation",
+    "ox_nonLetterEnclosures", "ox_accompaniments",
+    "mail_seal", "mail_paper", "mail_paperSize",
+    "bibo_numPages", "ox_numPageText", "dcterms_language", "ox_isTranslation",
+    "ox_previouslyOwnedBy-person",
+    "ox_opened", "ox_routing_mark_ms", "ox_routing_mark_stamp",
+    "ox_handling_instructions", "ox_stored_folded",
+    "ox_postage_costs_as_marked", "ox_postage_costs",
+    "ox_non_delivery_reason", "ox_date_of_receipt_as_marked",
+    "ox_manifestation_receipt_date_day", "ox_manifestation_receipt_date_month",
+    "ox_manifestation_receipt_date_year", "ox_manifestation_receipt_calendar",
+    "ox_manifestation_receipt_date", "ox_manifestation_receipt_date_gregorian",
+    "ox_manifestation_receipt_date_inferred", "ox_manifestation_receipt_date_uncertain",
+    "ox_manifestation_receipt_date_approx", "ox_dateReceiptAnnotate-comment",
+])
+
+_FL_IMAGES = ",".join([
+    "uuid", "uuid_related", "object_type",
+    "dcterms_source", "foaf_thumbnail", "dcterms_identifier-uri_",
+])
+
+_FL_MANI_RELATED = ",".join([
+    "uuid", "id", "object_type", "frbr_Work-work",
+    "dcterms_type", "dcterms_identifier-uri_",
+    "dcterms_identifier-shelf_", "ox_resourceAt-institution", "ox_printedEditionDetails",
+])
+
+_FL_MANI_WORK = ",".join([
+    "uuid", "dcterms_description", "object_type", "dcterms_identifier-uri_",
+])
+
+_FL_TABLE_DOCS = ",".join([
+    "uuid", "id", "dcterms_description",
+    "ox_started-ox_year", "ox_completed-ox_year", "started_date_sort",
+])
+
+# ---------------------------------------------------------------------------
+# tableData field config — server-side allowlist
+# ---------------------------------------------------------------------------
+_TABLE_FIELD_CONFIG = {
+    "frbr_creatorOf-work":          {"core": "works", "objectKey": "uuid_related"},
+    "mail_recipientOf-work":        {"core": "works", "objectKey": "uuid_related"},
+    "dcterms_isReferencedBy-work":  {"core": "works", "objectKey": "uuid_related"},
+    "mail_originOf-work":           {"core": "works", "objectKey": "uuid_related"},
+    "mail_destinationOf-work":      {"core": "works", "objectKey": "uuid_related"},
+    "ox_hasResource-manifestation": {"core": "works", "objectKey": "uuid_related"},
+}
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+def _get_solr_url():
+    url = os.getenv("SOLR_URL", "")
+    if not url:
+        raise ValueError("SOLR_URL environment variable is not set.")
+    return url.rstrip("/") + "/"
+
+
+def _solr_get(core, query, fl="", rows=9999, extra_params=None):
+    url = _get_solr_url() + f"{core}/select"
+    params = {"q": query, "wt": "json", "rows": rows}
+    if fl:
+        params["fl"] = fl
+    if extra_params:
+        params.update(extra_params)
+    resp = requests.get(url, params=params, timeout=15)
+    resp.raise_for_status()
+    return resp.json()
+
+
+def _uuid_from_uri(uri):
+    return urlparse(uri).path.rstrip("/").split("/")[-1]
+
+
+def _extract_uuids_from_field(core_doc, field_name):
+    raw = core_doc.get(field_name, [])
+    if not isinstance(raw, list):
+        raw = [raw]
+    return [v.split("/").pop() if v and "/" in v else v for v in raw if v]
+
+
+def _gzip_json(data: dict) -> bytes:
+    return gzip.compress(json.dumps(data, separators=(",", ":")).encode("utf-8"), compresslevel=6)
+
+
+# ---------------------------------------------------------------------------
+# Sub-query workers (all run in parallel)
+# ---------------------------------------------------------------------------
+
+def _fetch_core(collection, uuid):
+    data = _solr_get(collection, f"uuid:{uuid}", rows=1)
+    docs = data.get("response", {}).get("docs", [])
+    return docs[0] if docs else None
+
+
+def _fetch_relations(uuid):
+    data = _solr_get("all", f"uuid_related:{uuid}", fl=_FL_RELATIONS)
+    return data.get("response", {}).get("docs", [])
+
+
+def _fetch_images_for_mani(mani_uuid):
+    data = _solr_get("images", f"uuid_related:{mani_uuid}", fl=_FL_IMAGES)
+    return data.get("response", {}).get("docs", [])
+
+
+def _fetch_manifestation_data(mani_uuid):
+    result = {}
+    all_data = _solr_get("all", f"uuid_related:{mani_uuid}", fl=_FL_MANI_RELATED)
+    docs = all_data.get("response", {}).get("docs", [])
+
+    work_uuids = []
+    for doc in docs:
+        doc_uuid = doc.get("uuid")
+        if not doc_uuid:
+            continue
+        result[doc_uuid] = doc
+        if doc.get("object_type") == "manifestation" and doc.get("frbr_Work-work"):
+            for uri in doc["frbr_Work-work"]:
+                work_uuids.append(_uuid_from_uri(uri))
+
+    if work_uuids:
+        unique = list(set(work_uuids))
+        q = "uuid:(" + " OR ".join(f'"{u}"' for u in unique) + ")"
+        work_data = _solr_get("works", q, fl=_FL_MANI_WORK, rows=len(unique))
+        for wdoc in work_data.get("response", {}).get("docs", []):
+            result[wdoc["uuid"]] = wdoc
+
+    return result
+
+
+def _fetch_table_field(core_doc, field_name):
+    """
+    Phase 1 (always): Solr facets → total count + year→count map. ~1-3 KB.
+    Phase 2 (only if total ≤ FULL_DOCS_THRESHOLD): fetch full docs for detail view.
+
+    Returns { total, yearCounts, docs }
+    """
+    config = _TABLE_FIELD_CONFIG[field_name]
+    uuids = _extract_uuids_from_field(core_doc, field_name)
+
+    if not uuids:
+        return {"total": 0, "yearCounts": {}, "docs": []}
+
+    object_key = config["objectKey"]
+    solr_core  = config["core"]
+    batch_size = 100
+
+    all_year_counts: dict = {}
+    total = 0
+
+    for i in range(0, len(uuids), batch_size):
+        batch = uuids[i : i + batch_size]
+        q = f"{object_key}:(" + " OR ".join(f'"{u}"' for u in batch) + ")"
+
+        facet_data = _solr_get(
+            solr_core, q, fl="", rows=0,
+            extra_params={
+                "facet": "true",
+                "facet.field": "ox_started-ox_year",
+                "facet.limit": -1,
+                "facet.mincount": 1,
+            }
+        )
+
+        total += facet_data.get("response", {}).get("numFound", 0)
+
+        facet_list = (
+            facet_data.get("facet_counts", {})
+            .get("facet_fields", {})
+            .get("ox_started-ox_year", [])
+        )
+        for j in range(0, len(facet_list), 2):
+            year  = str(facet_list[j])
+            count = facet_list[j + 1]
+            all_year_counts[year] = all_year_counts.get(year, 0) + count
+
+    docs = []
+    if total <= FULL_DOCS_THRESHOLD:
+        for i in range(0, len(uuids), batch_size):
+            batch = uuids[i : i + batch_size]
+            q = f"{object_key}:(" + " OR ".join(f'"{u}"' for u in batch) + ")"
+            data = _solr_get(solr_core, q, fl=_FL_TABLE_DOCS, rows=FULL_DOCS_THRESHOLD + 1)
+            docs.extend(data.get("response", {}).get("docs", []))
+
+    return {"total": total, "yearCounts": all_year_counts, "docs": docs}
+
+
+# ---------------------------------------------------------------------------
+# Main endpoint
+# ---------------------------------------------------------------------------
+
+@solr_bp.route("/profile-data/<collection>/<uuid>", methods=["GET"])
+def get_profile_data(collection, uuid):
+    if not uuid or not collection:
+        return jsonify({"error": "collection and uuid are required"}), 400
+
+    requested_sections = {
+        s.strip()
+        for s in request.args.get(
+            "sections", "relations,images,manifestations,tableData"
+        ).split(",")
+        if s.strip()
+    }
+
+    requested_table_fields = [
+        f.strip()
+        for f in request.args.get("tableFields", "").split(",")
+        if f.strip() in _TABLE_FIELD_CONFIG
+    ]
+
+    # Cache key includes all parameters that affect the response
+    cache_key = f"{collection}:{uuid}:{','.join(sorted(requested_sections))}:{','.join(sorted(requested_table_fields))}"
+    now = time.time()
+
+    cached = _CACHE.get(cache_key)
+    if cached and (now - cached[0]) < _CACHE_TTL:
+        payload_bytes = cached[1]
+        return Response(
+            payload_bytes,
+            status=200,
+            headers={
+                "Content-Type": "application/json",
+                "Content-Encoding": "gzip",
+                "Cache-Control": f"public, max-age={_CACHE_TTL}",
+                "X-Cache": "HIT",
+            }
+        )
+
+    try:
+        core_doc = _fetch_core(collection, uuid)
+        if not core_doc:
+            return jsonify({"error": "Record not found"}), 404
+
+        response_data = {
+            "core":           core_doc,
+            "relations":      [],
+            "images":         {},
+            "manifestations": {},
+            "tableData":      {},
+        }
+
+        futures = {}
+
+        with ThreadPoolExecutor(max_workers=16) as executor:
+
+            if "relations" in requested_sections:
+                futures["relations"] = executor.submit(_fetch_relations, uuid)
+
+            mani_uris = (
+                core_doc.get("frbr_Manifestation-manifestation")
+                or core_doc.get("manifestations")
+                or []
+            )
+            mani_uuids = [uri.split("/").pop() for uri in mani_uris if uri]
+
+            if "images" in requested_sections and mani_uuids:
+                for mu in mani_uuids:
+                    futures[f"images:{mu}"] = executor.submit(_fetch_images_for_mani, mu)
+
+            if "manifestations" in requested_sections and mani_uuids:
+                for mu in mani_uuids:
+                    futures[f"manifestations:{mu}"] = executor.submit(_fetch_manifestation_data, mu)
+
+            if "tableData" in requested_sections and requested_table_fields:
+                for field_name in requested_table_fields:
+                    futures[f"tableData:{field_name}"] = executor.submit(
+                        _fetch_table_field, core_doc, field_name
+                    )
+
+            for key, future in futures.items():
+                try:
+                    result = future.result()
+                    if key == "relations":
+                        response_data["relations"] = result
+                    elif key.startswith("images:"):
+                        response_data["images"][key.split(":", 1)[1]] = result
+                    elif key.startswith("manifestations:"):
+                        response_data["manifestations"][key.split(":", 1)[1]] = result
+                    elif key.startswith("tableData:"):
+                        response_data["tableData"][key.split(":", 1)[1]] = result
+                except Exception as e:
+                    print(f"[profile-data] sub-query '{key}' failed: {e}")
+
+        # Compress and cache
+        payload_bytes = _gzip_json(response_data)
+        _CACHE[cache_key] = (now, payload_bytes)
+
+        # Prune stale cache entries (simple GC — only runs on writes)
+        if len(_CACHE) > 500:
+            cutoff = now - _CACHE_TTL
+            stale = [k for k, (t, _) in _CACHE.items() if t < cutoff]
+            for k in stale:
+                del _CACHE[k]
+
+        return Response(
+            payload_bytes,
+            status=200,
+            headers={
+                "Content-Type": "application/json",
+                "Content-Encoding": "gzip",
+                "Cache-Control": f"public, max-age={_CACHE_TTL}",
+                "X-Cache": "MISS",
+            }
+        )
+
+    except Exception as e:
+        print(f"[profile-data] error for {collection}/{uuid}: {e}")
+        return jsonify({"error": "Internal server error", "details": str(e)}), 500

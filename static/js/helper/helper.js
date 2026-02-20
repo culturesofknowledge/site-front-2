@@ -493,21 +493,6 @@ export function h4WorkList(
   title = "",
   sorting = true
 ) {
-  // Will be done after testing the first implementations
-  // if (sorting) {
-  //   data = data.sort((a, b) => {
-  //     const startA = a["ox_started-ox_year"] ?? a["0x_completed-ox_year"];
-  //     const startB = b["ox_started-ox_year"] ?? b["0x_completed-ox_year"];
-  //     // If both values are undefined, consider them equal
-  //     if (startA === undefined && startB === undefined) return 0;
-  //     // If one value is undefined, treat it as larger (to push it to the end)
-  //     if (startA === undefined) return 1;
-  //     if (startB === undefined) return -1;
-  //     // Otherwise, compare the values normally
-  //     return startA - startB;
-  //   });
-  // }
-
   if (title == "") {
     title = getLabel(field);
   }
@@ -515,18 +500,44 @@ export function h4WorkList(
   let html = `<h3><img src="/static/img/${icon}"/>${title}</h3>
 		<div class="content">`;
 
-  if (data.length > 30) {
-    html += summaryByYear(linkField, profile, data);
+  // Support both the legacy flat-array shape (work/image/mani pages pass arrays
+  // directly) and the new aggregated shape from /profile-data tableData:
+  //   { total: N, yearCounts: { "1620": 3, ... }, docs: [...] }
+  const isAggregated = data && typeof data === "object" && !Array.isArray(data)
+    && "total" in data && "yearCounts" in data;
+
+  if (isAggregated) {
+    const { total, yearCounts, docs } = data;
+
+    if (total === 0) {
+      html += "</div>";
+      return html;
+    }
+
+    if (total > 30) {
+      // Large dataset — use pre-computed yearCounts directly (no doc iteration needed)
+      html += _summaryByYearFromCounts(yearCounts, linkField, profile, total);
+    } else {
+      // Small dataset — full docs available, use detail view
+      const sortedDocs = docs.slice().sort(
+        (a, b) => new Date(a["started_date_sort"]) - new Date(b["started_date_sort"])
+      );
+      html += summaryByDetail(linkField, profile, sortedDocs);
+    }
   } else {
-    const sortedData = data.sort(
-      (a, b) =>
-        new Date(a["started_date_sort"]) - new Date(b["started_date_sort"])
-    );
-    html += summaryByDetail(linkField, profile, data);
+    // Legacy path: data is a plain array (unchanged behaviour)
+    const arr = Array.isArray(data) ? data : [];
+    if (arr.length > 30) {
+      html += summaryByYear(linkField, profile, arr);
+    } else {
+      const sortedData = arr.slice().sort(
+        (a, b) => new Date(a["started_date_sort"]) - new Date(b["started_date_sort"])
+      );
+      html += summaryByDetail(linkField, profile, sortedData);
+    }
   }
 
   html += "</div>";
-
   return html;
 }
 
@@ -547,18 +558,8 @@ function summaryByYear(field, profile, data) {
       queryVal = profile["uuid"];
     }
 
-    // if (this.primaryResultKey) {
-    //   queryVal = this.component.results[0][this.primaryResultKey];
-    // } else {
-    //   if (this.field == "repository") {
-    //     queryVal = this.component.results[0]["browse"];
-    //   } else {
-    //     queryVal = parentObject["author_sort"];
-    //   }
-    // }
-
     if (year) {
-      const decade = Math.floor(year / 10) * 10; // Calculate decade
+      const decade = Math.floor(year / 10) * 10;
 
       if (!acc[decade]) acc[decade] = {};
       acc[decade][year] = (acc[decade][year] || 0) + 1;
@@ -611,6 +612,82 @@ function summaryByYear(field, profile, data) {
       </tbody>
     </table>
 `;
+}
+
+/**
+ * Renders the decade/year table directly from pre-aggregated { year: count } data.
+ * Called when data comes from the new /profile-data tableData endpoint.
+ * Produces identical HTML to summaryByYear() but without iterating full docs.
+ */
+function _summaryByYearFromCounts(yearCounts, field, profile, total) {
+  const queryKey = field;
+  const queryVal = field === "repository" ? profile["browse"] : profile["uuid"];
+
+  // Group year→count into decades
+  const decadeSummary = {};
+  for (const [yearStr, count] of Object.entries(yearCounts)) {
+    const year = parseInt(yearStr, 10);
+    if (isNaN(year)) {
+      // Unknown year bucket — Solr facets won't produce this but handle gracefully
+      if (!decadeSummary["????"]) decadeSummary["????"] = {};
+      decadeSummary["????"]["Unknown year"] =
+        (decadeSummary["????"]["Unknown year"] || 0) + count;
+    } else {
+      const decade = Math.floor(year / 10) * 10;
+      if (!decadeSummary[decade]) decadeSummary[decade] = {};
+      decadeSummary[decade][year] = (decadeSummary[decade][year] || 0) + count;
+    }
+  }
+
+  // Note: docs with no ox_started-ox_year are NOT in Solr facets.
+  // Recover the "unknown year" count from total minus all known-year counts.
+  const knownCount = Object.values(yearCounts).reduce((s, c) => s + c, 0);
+  const unknownCount = total - knownCount;
+  if (unknownCount > 0) {
+    if (!decadeSummary["????"]) decadeSummary["????"] = {};
+    decadeSummary["????"]["Unknown year"] =
+      (decadeSummary["????"]["Unknown year"] || 0) + unknownCount;
+  }
+
+  const rows = Object.entries(decadeSummary)
+    .sort(([a], [b]) => {
+      if (a === "????") return 1;
+      if (b === "????") return -1;
+      return parseInt(a) - parseInt(b);
+    })
+    .map(([decade, years]) => {
+      const yearCells = Object.entries(years)
+        .sort(([a], [b]) => {
+          if (a === "Unknown year") return 1;
+          return parseInt(a) - parseInt(b);
+        })
+        .map(([year, count]) => {
+          if (year === "Unknown year") {
+            return `<a href="/forms/advanced?${queryKey}=${queryVal}&dat_sin_year=">Unknown year: ${count}</a>`;
+          }
+          return `<a href="/forms/advanced?${queryKey}=${queryVal}&dat_sin_year=${year}"> ${year}: ${count} </a>`;
+        })
+        .join(" ♦ ");
+
+      return `
+        <tr>
+          <td>${decade === "????" ? "????" : `${decade}s`}</td>
+          <td>${yearCells}</td>
+        </tr>`;
+    })
+    .join("");
+
+  const countFrag = field === "repository" ? `${total} records` : "";
+
+  return `
+    ${countFrag}
+    <table class="nested-table">
+      <thead>
+        <tr><th>Decade</th><th>Letters per year</th></tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
 }
 
 function summaryByDetail(field, profile, data) {

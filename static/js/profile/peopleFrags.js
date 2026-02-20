@@ -356,14 +356,19 @@ export function _renderGraphSection(graphData) {
 
   // return person_data;
 
-  // FIX ME: Need a better way to handle this case
   if (person_data.length > 0) {
     const checkExist = setInterval(() => {
       const chartEl = document.getElementById("chart");
       if (chartEl) {
         clearInterval(checkExist);
-        personChart = new PersonChart(person_data);
-        _attachEventListeners();
+        // draw() is called multiple times (progressive rendering).
+        // Guard: only create the chart once; update it on subsequent calls.
+        if (personChart) {
+          personChart.update(person_data);
+        } else {
+          personChart = new PersonChart(person_data);
+          _attachEventListeners();
+        }
       } else {
         console.debug("Waiting in queue for chart to be here");
       }
@@ -372,11 +377,8 @@ export function _renderGraphSection(graphData) {
 }
 
 function setYearCountsForGraphs(relevantWorksFieldname, data, counts) {
-  // Check if relevantWorksFieldname exists in profile
-  // if (profile.hasOwnProperty(relevantWorksFieldname)) {
   let relationshipType;
 
-  // Determine relationship type based on the fieldname
   if (relevantWorksFieldname === "frbr_creatorOf-work") {
     relationshipType = "creator";
   } else if (relevantWorksFieldname === "mail_recipientOf-work") {
@@ -384,29 +386,37 @@ function setYearCountsForGraphs(relevantWorksFieldname, data, counts) {
   } else if (relevantWorksFieldname === "dcterms_isReferencedBy-work") {
     relationshipType = "mentioned";
   } else {
-    // Invalid input
     return;
   }
 
-  const yearOfWorkFieldname = "ox_started-ox_year";
+  // data is now { total, yearCounts: { "1620": 3, ... }, docs: [...] }
+  // Use yearCounts directly — it's already aggregated by the server.
+  // Fall back to iterating docs for small datasets (total <= 30) where
+  // yearCounts may be absent but docs are present.
+  const yearCounts = data.yearCounts || {};
 
-  // Iterate through the data array
-  data.forEach((item) => {
-    const obj = item;
-
-    let year = "?";
-    if (obj.hasOwnProperty(yearOfWorkFieldname)) {
-      year = obj[yearOfWorkFieldname];
+  if (Object.keys(yearCounts).length > 0) {
+    // Fast path: server already aggregated year→count for us
+    for (const [year, count] of Object.entries(yearCounts)) {
+      const y = year === "?" ? "?" : year;
+      if (!counts.hasOwnProperty(y)) {
+        counts[y] = { creator: 0, recipient: 0, mentioned: 0 };
+      }
+      counts[y][relationshipType] += count;
     }
-
-    // Initialize year in counts if not already present
-    if (!counts.hasOwnProperty(year)) {
-      counts[year] = { creator: 0, recipient: 0, mentioned: 0 };
-    }
-
-    // Increment the value for the current type of work
-    counts[year][relationshipType] += 1;
-  });
+  } else {
+    // Fallback: small dataset — iterate full docs
+    const docs = Array.isArray(data) ? data : (data.docs || []);
+    docs.forEach((item) => {
+      const year = item.hasOwnProperty("ox_started-ox_year")
+        ? item["ox_started-ox_year"]
+        : "?";
+      if (!counts.hasOwnProperty(year)) {
+        counts[year] = { creator: 0, recipient: 0, mentioned: 0 };
+      }
+      counts[year][relationshipType] += 1;
+    });
+  }
 }
 
 function _toLongFormat(d, p, i, z) {

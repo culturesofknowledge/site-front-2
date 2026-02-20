@@ -3,7 +3,8 @@ import {
   loadFragment,
 } from "./profile/profileFragLoader.js";
 
-const _relationsPromiseMap = new Map();
+// Per-page dedup — multiple components share one in-flight request
+const _profileDataPromiseMap = new Map();
 
 let emlo = {
   active: {},
@@ -463,300 +464,144 @@ emlo.MultiFields = class extends edges.Component {
   }
 
   async synchronise() {
-    this.results = [];
-    this.hitCount = 0;
-    this.loading = true; // Start loading
-    this.errorMessage = ""; // Reset any previous error messages
+    this.results      = [];
+    this.hitCount     = 0;
+    this.loading      = true;
+    this.errorMessage = "";
 
     const source = this.edge.result;
-
-    if (!source) {
-      this.loading = false; // Stop loading if no source
-      return;
-    }
+    if (!source) { this.loading = false; return; }
 
     const results = source.results();
+    if (!results || results.length === 0) { this.loading = false; this.renderer.draw(); return; }
 
-    try {
-      await this._appendResults({ results: results });
-      this.hitCount = source.total();
-      if (results && results.length > 0) {
-        let relations = await this._fetchRelations(results[0]["uuid"]);
-        this.relationships = relations;
-      }
-
-      if (this.fetchTableData && this.tableDataFields.length > 0) {
-        const result = results[0];
-
-        for (const field of this.tableDataFields) {
-          if (Object.prototype.hasOwnProperty.call(result, field)) {
-            const val = result[field]; // Assuming val is an array of URIs
-            const uuids = Array.from(
-              new Set(val.map((uri) => uri.split("/").pop()))
-            );
-
-            if (uuids.length > 0) {
-              let payload = {
-                solrCore: "work",
-                uuids: uuids,
-                filter:
-                  "ox_started-ox_year,started_date_sort,dcterms_description,id,uuid",
-                objectKey: "uuid",
-              };
-
-              // In case of ox_hasResource-manifestation we need manifestation, core needs to be updated
-              if (field == "ox_hasResource-manifestation") {
-                payload.objectKey = "uuid_related";
-              }
-
-              this.gneratedData[field] = await this._fetchMoreWorkData(payload);
-            }
-          }
-        }
-      }
-
-      // This will only work for manifestation since they are only fields which can have image values
-      if (this.fetchImageData && this.manifestationField !== "") {
-        const result = results[0];
-
-        if (result.hasOwnProperty(this.manifestationField)) {
-          const maniUris = result[this.manifestationField];
-
-          if (Array.isArray(maniUris) && maniUris.length > 0) {
-            for (const uri of maniUris) {
-              const uuid = uri.split("/").pop();
-
-              if (uuid) {
-                if (!this.gneratedData.hasOwnProperty("imageData")) {
-                  this.gneratedData["imageData"] = {};
-                }
-
-                const payload = {
-                  solrCore: "image",
-                  uuids: [uuid],
-                  filter: "",
-                  objectKey: "uuid_related",
-                };
-
-                this.gneratedData["imageData"][uuid] = await this._fetchImages(
-                  uuid
-                );
-
-                if (!this.gneratedData.hasOwnProperty("manifestationData")) {
-                  this.gneratedData["manifestationData"] = {};
-                }
-
-                // let relationsArray = await this._fetchManifestationData(uuid);
-
-                this.gneratedData["manifestationData"][uuid] = await this._fetchManifestationData(uuid);
-              }
-            }
-          }
-        }
-      }
-    } catch (error) {
-      console.error("got error", error);
-      this.errorMessage = "Error fetching data.";
-    } finally {
-      this.loading = false; // Stop loading
-    }
-
-    this.renderer.draw();
-
+    // ── Phase 0: immediate render from core Solr doc ──────────────────────
+    // Core doc is already in results[0] — zero extra fetches needed.
+    // Details, Dates, heading, footer all render right now.
+    // Sections that need relations / tableData show skeleton placeholders.
+    this.results  = results;
     this.hitCount = source.total();
-  }
+    this.loading  = false;
+    this.renderer.draw();   // ← first paint at 0ms
 
-  async _fetchManifestationData(uuid) {
-    try {
-      const response = await fetch(`/manifestation-data/${uuid}`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+    // ── Determine what this component needs ───────────────────────────────
+    const needsTableData = this.fetchTableData && this.tableDataFields.length > 0;
+    const needsImages    = !!(this.fetchImageData || this.manifestationField);
+    const needsRelations = true; // every profile type uses relations (sidebar, comments, work sections)
 
-      if (!response.ok) {
-        console.error(`Error fetching relations: ${response.statusText}`);
-        return [];
-      }
+    // Components with no async needs are already fully rendered
+    if (!needsRelations && !needsImages && !needsTableData) return;
 
-      const json = await response.json();
-      return json;
-    } catch (err) {
-      console.error("Error while fetching relations", err);
-      return {};
-    }
-  }
+    const uuid       = results[0]["uuid"];
+    const collection = this._collectionFromUrl();
 
-  async _fetchMoreWorkData(payload) {
-    try {
-      const response = await fetch(`/stats-new`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+    // ── Request A: relations + images/manifestations (fast, small payload) ─
+    // Fires immediately. Redraws sidebar and relation-dependent sections.
+    const sectionsA = ["relations"];
+    if (needsImages) { sectionsA.push("images", "manifestations"); }
 
-      if (!response.ok) {
-        console.error(`Error fetching relations: ${response.statusText}`);
-        return [];
-      }
+    this._fetchProfileData(uuid, collection, sectionsA, [])
+      .then(data => {
+        this.relationships                     = data.relations      || [];
+        this.gneratedData["imageData"]         = data.images         || {};
+        this.gneratedData["manifestationData"] = data.manifestations || {};
+        this.renderer.draw();   // ← second paint: sidebar / relations
+      })
+      .catch(err => console.error("[MultiFields] relations fetch failed:", err));
 
-      const json = await response.json();
-      return json;
-    } catch (err) {
-      console.error("Error while fetching relations", err);
-      return [];
-    }
-  }
-
-  async _fetchRelations(uuid) {
-    console.log("New code");
-    // reuse in-flight or resolved promise
-    if (_relationsPromiseMap.has(uuid)) {
-      return _relationsPromiseMap.get(uuid);
-    }
-
-    const promise = (async () => {
-      try {
-        const response = await fetch(
-          `/solr/all/select?q=uuid_related:${uuid}&wt=json&rows=9999`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
+    // ── Request B: tableData (facet counts — tiny regardless of dataset size) ─
+    // Fires in parallel with A. Redraws charts and letter tables.
+    if (needsTableData) {
+      this._fetchProfileData(uuid, collection, ["tableData"], this.tableDataFields)
+        .then(data => {
+          for (const [field, val] of Object.entries(data.tableData || {})) {
+            // Add .length so existing frag guards (tableData[field].length > 0) still work
+            // without any changes to locationFrag, institutionFrag, or any other frag.
+            val.length = val.total;
+            this.gneratedData[field] = val;
           }
-        );
+          this.renderer.draw();   // ← third paint: charts / tables
+        })
+        .catch(err => console.error("[MultiFields] tableData fetch failed:", err));
+    }
 
-        if (!response.ok) {
-          console.error(`Error fetching relations: ${response.statusText}`);
-          return [];
-        }
+    // Intentionally NOT awaiting — synchronise() returns immediately.
+    // Each .then() redraws only its own component's DOM node independently.
+  }
 
-        const json = await response.json();
-        return json.response.docs; // ✅ SAME AS ORIGINAL
-      } catch (err) {
-        console.error("Error while fetching relations", err);
-        return [];
-      }
-    })();
+  /**
+   * Cached fetch to /profile-data/<collection>/<uuid>.
+   * Cache key includes sections + tableFields so requests with different
+   * params don't collide. Multiple components requesting identical params
+   * share one in-flight fetch.
+   */
+  _fetchProfileData(uuid, collection, sections = [], tableFields = []) {
+    const sectionsStr    = [...sections].sort().join(",");
+    const tableFieldsStr = [...tableFields].sort().join(",");
+    const cacheKey       = `${collection}:${uuid}:${sectionsStr}:${tableFieldsStr}`;
 
-    _relationsPromiseMap.set(uuid, promise);
+    if (_profileDataPromiseMap.has(cacheKey)) {
+      return _profileDataPromiseMap.get(cacheKey);
+    }
 
-    // if this call failed, allow retry next time
-    promise.catch(() => {
-      _relationsPromiseMap.delete(uuid);
-    });
+    const params = new URLSearchParams({ sections: sectionsStr });
+    if (tableFields.length > 0) {
+      params.set("tableFields", tableFieldsStr);
+    }
 
+    const promise = fetch(`/profile-data/${collection}/${uuid}?${params}`, {
+      headers: { "Accept-Encoding": "gzip", "Accept": "application/json" },
+    })
+      .then(resp => {
+        if (!resp.ok) throw new Error(`/profile-data returned ${resp.status}`);
+        return resp.json();
+      })
+      .catch(err => {
+        _profileDataPromiseMap.delete(cacheKey);
+        throw err;
+      });
+
+    _profileDataPromiseMap.set(cacheKey, promise);
     return promise;
   }
 
-  async _fetchImages(uuid) {
-    try {
-      const response = await fetch(
-        `/solr/images/select?q=uuid_related:${uuid}&wt=json&rows=9999`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        console.error(`Error fetching relations: ${response.statusText}`);
-        return [];
-      }
-
-      const json = await response.json();
-      return json.response.docs;
-    } catch (err) {
-      console.error("Error while fetching relations", err);
-      return [];
-    }
+  /**
+   * Derive Solr collection name from the current URL path.
+   * Expects: /profile/<type>/<uuid>  e.g. /profile/work/abc-123
+   */
+  _collectionFromUrl() {
+    const collectionMap = {
+      person:       "people",
+      location:     "locations",
+      work:         "works",
+      repository:   "institutions",
+      manifestation:"manifestations",
+      image:        "images",
+      comment:      "comments",
+      resource:     "resources",
+    };
+    const parts = window.location.pathname.split("/");
+    // /profile/<type>/<uuid> → parts[2] is the type segment
+    return collectionMap[parts[2]] || parts[2] || "works";
   }
 
+  // Kept for non-profile pages that still use fetchSecondaryData
   async _appendResults(params) {
     const results = params.results;
 
-    if (this.fetchSecondaryData) {
-      if (this.optimizedCode) {
-        console.debug("running optimized code for:", this.primaryField);
-        let objectKey = "uuid";
-        const uuidArray = [];
-        let collectionName = "work";
-        for (const result of results) {
-          const fieldData = result[this.primaryField];
-          if (fieldData && Array.isArray(fieldData)) {
-            fieldData.forEach((url) => {
+    if (this.fetchSecondaryData && this.primaryField) {
+      for (const result of results) {
+        const fieldData = result[this.primaryField];
+        if (fieldData && Array.isArray(fieldData)) {
+          const secondaryResults = await Promise.all(
+            fieldData.map((url) => {
               const parts = url.split("/");
-              collectionName = parts[3] === "person" ? "people" : parts[3];
-              const id = parts[4];
-              uuidArray.push(id);
-            });
-          }
-        }
-
-        // Patch changing the collection name for specific primary key
-        if (this.primaryField === "ox_hasResource-manifestation") {
-          collectionName = "work";
-          objectKey = "uuid_related";
-        }
-
-        const payload = {
-          solrCore: collectionName,
-          uuids: uuidArray,
-          objectKey: objectKey,
-          filter: "", // Adjust if a filter is required
-        };
-
-        try {
-          const response = await fetch("/stats-new", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-          });
-
-          if (!response.ok) {
-            console.error(
-              `Error fetching data for ${solrCore}: ${response.statusText}`
-            );
-            return {};
-          }
-
-          results[0][this.primaryField] = await response.json();
-        } catch (err) {
-          console.error("got error while fetching details ", err);
-        }
-
-        // console.log("got uuid", uuidArray);
-      } else {
-        for (const result of results) {
-          const fieldData = result[this.primaryField];
-          if (fieldData && Array.isArray(fieldData)) {
-            // Fetching secondary data for each fieldData URL
-            const secondaryResults = await Promise.all(
-              fieldData.map((url) => {
-                const collection = url.split("/")[3];
-                let collectionName = "";
-
-                if (collection == "person") {
-                  collectionName = "people";
-                } else {
-                  collectionName = collection;
-                }
-
-                const id = url.split("/")[4];
-
-                return this._fetchAndExtractSecondaryData(collectionName, id); // Await the result
-              })
-            );
-
-            result[this.primaryField] = secondaryResults; // Replace with fetched data
-          }
+              const col = parts[3] === "person" ? "people" : parts[3];
+              const id  = parts[4];
+              return this._fetchAndExtractSecondaryData(col, id);
+            })
+          );
+          result[this.primaryField] = secondaryResults;
         }
       }
     }
@@ -766,27 +611,15 @@ emlo.MultiFields = class extends edges.Component {
 
   async _fetchAndExtractSecondaryData(collectionName, ID) {
     try {
-      let url = "";
-
-      if (collectionName == "people") {
-        url = `/solr/${collectionName}/select?q=uuid:${ID}&wt=json`;
-      } else {
-        url = `/solr/${collectionName}s/select?q=uuid:${ID}&wt=json`;
-      }
-
+      const url = collectionName === "people"
+        ? `/solr/${collectionName}/select?q=uuid:${ID}&wt=json`
+        : `/solr/${collectionName}s/select?q=uuid:${ID}&wt=json`;
       const response = await fetch(url);
-      if (!response.ok) {
-        console.error(
-          `Error fetching data from ${url}: ${response.statusText}`
-        );
-        return null;
-      }
+      if (!response.ok) return null;
       const data = await response.json();
-
-      // Extract and return the relevant field from secondary data
       return data.response.docs[0] || null;
     } catch (error) {
-      console.error(`Error fetching data from ${url}: ${error}`);
+      console.error("Error fetching secondary data:", error);
       return null;
     }
   }
@@ -2634,18 +2467,15 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
       theTitle = "";
 
     let footerType = "";
-
     let container = "";
 
-    if (this.component.loading) {
-      frag = "<div class='loading-message'>Loading...</div>"; // Show loading message
-    } else if (this.component.errorMessage) {
-      frag = `<div class='error-message'>${this.component.errorMessage}</div>`; // Show error message
+    // Render immediately when we have the core doc — don't wait for loading flag
+    if (this.component.errorMessage) {
+      frag = `<div class='error-message'>${this.component.errorMessage}</div>`;
     } else if (this.component.results && this.component.results.length > 0) {
       if (this.profileType != "") {
         const sidebarFn = await loadFragment(this.profileType, "sidebar");
         const desc = PROFILE_DESCRIPTOR[this.profileType];
-
 
         if (this.profileType == "people") {
           const isOrg = result?.["ox_isOrganisation"] === true;
@@ -2655,23 +2485,36 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
           theTitle = isOrg ? "Organization" : "Person";
           footerType = "p";
         } else {
-          // Metadata
           footerType = desc.footerType;
           imageSrc = desc.icon;
           theTitle = desc.title;
         }
 
+        // sidebarFn guards against empty relations — renders what's available,
+        // returns "" for relation sections until this.component.relationships is populated.
         frag += sidebarFn(
           result,
           this.component.gneratedData,
           this.component.relationships
         );
-      }
 
+        // If relations aren't loaded yet, show a slim skeleton so user sees the sidebar is loading
+        if (!this.component.relationships || this.component.relationships.length === 0) {
+          frag += `<div class="section-skeleton sidebar-skeleton">
+            <div class="skeleton-bar wide"></div>
+            <div class="skeleton-bar medium"></div>
+            <div class="skeleton-bar short"></div>
+          </div>`;
+        }
+      }
+    } else if (this.component.loading) {
+      frag = "<div class='loading-message'>Loading...</div>";
+    }
+
+    if (result) {
       const currentDomain = window.location.origin;
       const editIdValue = GetRecordID(footerType, result);
       const currentHref = window.location.href;
-
       const shortURL = GenerateShortURL(editIdValue, footerType, currentDomain);
 
       container += `
@@ -2682,7 +2525,6 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
             </div>
         </div>
         <br/>
-
         <p style="${
           ["work"].includes(this.profileType)
             ? "overflow-wrap: anywhere;"
@@ -2693,24 +2535,20 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
             <a href=${shortURL} onclick="redirectShortURL(event)"> ${shortURL} </a>
           </span>
         <p>
-
-        <p style="${
-          ["work"].includes(this.profileType) ? "" : "margin-bottom:20px;"
-        }">
+        <p style="${["work"].includes(this.profileType) ? "" : "margin-bottom:20px;"}">
           <img class="opacity50 icon-tweak" src="../../static/img/icon-send-comment.png" alt="short-url" />
           <a href=/comment/index?id=${result.uuid}> Send Comment </a>           
         </p>
-
-
         <div class="addthis_toolbox addthis_default_style " style="border-bottom:1px solid #efc319; padding-bottom: 10px; padding-top:5px">
-					<span style="text-align:center;"><a class="addthis_button_preferred_1" style="border-bottom:none;"></a>
-					<a class="addthis_button_preferred_2" style="border-bottom:none;"></a>
-					<a class="addthis_button_preferred_3" style="border-bottom:none;"></a>
-					<a class="addthis_button_preferred_4" style="border-bottom:none;"></a>
-					<a class="addthis_button_compact" style="border-bottom:none;"></a>
-					<a class="addthis_counter addthis_bubble_style" style="border-bottom:none;"></a></span>
-				</div>
-
+          <span style="text-align:center;">
+            <a class="addthis_button_preferred_1" style="border-bottom:none;"></a>
+            <a class="addthis_button_preferred_2" style="border-bottom:none;"></a>
+            <a class="addthis_button_preferred_3" style="border-bottom:none;"></a>
+            <a class="addthis_button_preferred_4" style="border-bottom:none;"></a>
+            <a class="addthis_button_compact" style="border-bottom:none;"></a>
+            <a class="addthis_counter addthis_bubble_style" style="border-bottom:none;"></a>
+          </span>
+        </div>
         <br/>
       `;
     }
@@ -2732,27 +2570,16 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
 emlo.ProfileRightRenderer = class extends edges.Renderer {
   constructor(params) {
     super(params);
-    // this.fields = edges.util.getParam(params, "fields", []);
-    // this.primaryField = edges.util.getParam(params, "primaryField", "");
-    // this.sectionTitle = edges.util.getParam(params, "sectionTitle", "");
-    // this.sectionTitleImage = edges.util.getParam(
-    //   params,
-    //   "sectionTitleImage",
-    //   ""
-    // );
-    // this.subSections = edges.util.getParam(params, "subSections", []);
     this.profileType = edges.util.getParam(params, "profileType", "");
-    // this.divider = edges.util.getParam(params, "divider", false);
     this.dividerFrag = ` <hr class="yellow-divider" />`;
   }
 
   async draw() {
     let frag = "";
     const result = this.component.results[0];
-    if (this.component.loading) {
-      frag = "<div class='loading-message'>Loading...</div>"; // Show loading message
-    } else if (this.component.errorMessage) {
-      frag = `<div class='error-message'>${this.component.errorMessage}</div>`; // Show error message
+
+    if (this.component.errorMessage) {
+      frag = `<div class='error-message'>${this.component.errorMessage}</div>`;
     } else if (this.component.results && this.component.results.length > 0) {
       const renderFn = await loadFragment(this.profileType, "profile");
 
@@ -2762,52 +2589,30 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
           this.component.gneratedData,
           this.component.relationships
         );
-      }
 
-      // switch (this.profileType) {
-      //   case "people":
-      //     frag += _renderPeopleProfile();
-      //     break;
-      //   case "work":
-      //     frag += _renderWorkProfile(
-      //       result,
-      //       this.component.relationships,
-      //       this.component.gneratedData
-      //     );
-      //     break;
-      //   case "location":
-      //     frag += _renderLocationProfile(
-      //       result,
-      //       this.component.gneratedData,
-      //       this.component.relationships
-      //     );
-      //     break;
-      //   case "institution":
-      //     frag += _renderInstitutionProfile(
-      //       result,
-      //       this.component.gneratedData
-      //     );
-      //     break;
-      //   case "comment":
-      //     frag += _renderCommentProfile();
-      //     break;
-      //   case "image":
-      //     frag += _renderImageProfile(
-      //       result,
-      //       this.component.relationships,
-      //       this.component.gneratedData
-      //     );
-      //     break;
-      //   case "manifestation":
-      //     frag += _renderManifestationSection(
-      //       result,
-      //       this.component.relationships,
-      //       this.component.gneratedData
-      //     );
-      //     break;
-      //   default:
-      //     console.log("Nothing is valid");
-      // }
+        // Skeleton placeholders for sections whose data hasn't arrived yet.
+        // Each frag already returns "" when data is absent — skeletons make
+        // the pending space visible so the page never looks broken.
+        const needsTableData = this.component.fetchTableData
+          && this.component.tableDataFields.length > 0;
+        const tableDataReady = needsTableData
+          && this.component.tableDataFields.some(f => this.component.gneratedData.hasOwnProperty(f));
+        const relationsReady = this.component.relationships && this.component.relationships.length > 0;
+        const needsRelations = !["comment", "resource"].includes(this.profileType);
+
+        if (needsTableData && !tableDataReady) {
+          frag += `<div class="section-skeleton">
+            <div class="skeleton-bar wide"></div>
+            <div class="skeleton-bar medium"></div>
+            <div class="skeleton-bar wide"></div>
+          </div>`;
+        }
+        if (needsRelations && !relationsReady) {
+          frag += `<div class="section-skeleton"><div class="skeleton-bar medium"></div></div>`;
+        }
+      }
+    } else if (this.component.loading) {
+      frag = "<div class='loading-message'>Loading...</div>";
     }
 
     const containerClasses = edges.util.styleClasses(
@@ -2816,17 +2621,13 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
       this.component.id
     );
 
-    let container = "";
-
     let row = ["work", "location"].includes(this.profileType)
       ? "row"
       : "row-no-margin";
 
+    let container = "";
     if (frag) {
-      container = `
-      <div id="details" class="${containerClasses} ${row}">
-        ${frag}
-      </div>`;
+      container = `<div id="details" class="${containerClasses} ${row}">${frag}</div>`;
     }
 
     this.component.context.html(container);

@@ -2469,6 +2469,20 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
     let footerType = "";
     let container = "";
 
+    // Paint structural skeleton BEFORE the async import so there is never a blank flash.
+    // The skeleton is immediately replaced once loadFragment() resolves (~5-50ms).
+    if (!this.component.errorMessage && this.component.results && this.component.results.length > 0) {
+      this.component.context.html(`
+        <div class="emlo-loading-sidebar">
+          <div class="emlo-loading-bar"></div>
+          <div class="emlo-loading-bar medium"></div>
+          <div class="emlo-loading-bar short"></div>
+          <div class="emlo-loading-status">
+            <span class="emlo-loading-dot"></span> Loading record…
+          </div>
+        </div>`);
+    }
+
     // Render immediately when we have the core doc — don't wait for loading flag
     if (this.component.errorMessage) {
       frag = `<div class='error-message'>${this.component.errorMessage}</div>`;
@@ -2490,6 +2504,10 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
           theTitle = desc.title;
         }
 
+        // Remove the full-page loader now that we have real content to show
+        const pageLoader = document.getElementById("emlo-page-loader");
+        if (pageLoader) pageLoader.remove();
+
         // sidebarFn guards against empty relations — renders what's available,
         // returns "" for relation sections until this.component.relationships is populated.
         frag += sidebarFn(
@@ -2498,9 +2516,14 @@ emlo.ProfileLeftSideRenderer = class extends edges.Renderer {
           this.component.relationships
         );
 
-        // If relations aren't loaded yet, show a slim skeleton so user sees the sidebar is loading
+        // Pending-relations skeleton sits AFTER the frag, in a clear block,
+        // so it never overlaps the header/short-url content above.
+        // It is removed on the next draw() call once relations have arrived.
         if (!this.component.relationships || this.component.relationships.length === 0) {
-          frag += `<div class="section-skeleton sidebar-skeleton">
+          frag += `<div class="emlo-sidebar-pending">
+            <div class="emlo-loading-status">
+              <span class="emlo-loading-dot"></span> Loading links…
+            </div>
             <div class="skeleton-bar wide"></div>
             <div class="skeleton-bar medium"></div>
             <div class="skeleton-bar short"></div>
@@ -2578,6 +2601,21 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
     let frag = "";
     const result = this.component.results[0];
 
+    // Paint structural skeleton BEFORE the async import — eliminates blank flash.
+    if (!this.component.errorMessage && this.component.results && this.component.results.length > 0) {
+      this.component.context.html(`
+        <div class="emlo-loading-main">
+          <div class="emlo-loading-bar"></div>
+          <div class="emlo-loading-bar medium"></div>
+          <div class="emlo-loading-bar short"></div>
+          <div class="emlo-loading-bar" style="margin-top:24px"></div>
+          <div class="emlo-loading-bar medium"></div>
+          <div class="emlo-loading-status">
+            <span class="emlo-loading-dot"></span> Loading record…
+          </div>
+        </div>`);
+    }
+
     if (this.component.errorMessage) {
       frag = `<div class='error-message'>${this.component.errorMessage}</div>`;
     } else if (this.component.results && this.component.results.length > 0) {
@@ -2600,15 +2638,29 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
         const relationsReady = this.component.relationships && this.component.relationships.length > 0;
         const needsRelations = !["comment", "resource"].includes(this.profileType);
 
+        // Pending-data skeletons go in a separate clear block BELOW the rendered content
+        // so they never overlap text that is already showing.
+        let pendingSkeleton = "";
         if (needsTableData && !tableDataReady) {
-          frag += `<div class="section-skeleton">
+          pendingSkeleton += `<div class="emlo-main-pending">
+            <div class="emlo-loading-status">
+              <span class="emlo-loading-dot"></span> Loading statistics…
+            </div>
             <div class="skeleton-bar wide"></div>
             <div class="skeleton-bar medium"></div>
             <div class="skeleton-bar wide"></div>
           </div>`;
         }
         if (needsRelations && !relationsReady) {
-          frag += `<div class="section-skeleton"><div class="skeleton-bar medium"></div></div>`;
+          pendingSkeleton += `<div class="emlo-main-pending">
+            <div class="emlo-loading-status">
+              <span class="emlo-loading-dot"></span> Loading links…
+            </div>
+            <div class="skeleton-bar medium"></div>
+          </div>`;
+        }
+        if (pendingSkeleton) {
+          frag += `<div class="emlo-pending-block">${pendingSkeleton}</div>`;
         }
       }
     } else if (this.component.loading) {

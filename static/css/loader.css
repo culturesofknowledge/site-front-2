@@ -1,0 +1,163 @@
+#emlo-page-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+#emlo-page-loader.emlo-loader-done {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* EMLO gold spinner */
+.emlo-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid #f0f0f0;
+  border-top-color: #efc319;
+  border-radius: 50%;
+  animation: emlo-spin 0.75s linear infinite;
+}
+
+@keyframes emlo-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Label beneath the spinner */
+.emlo-loader-label {
+  font-family: Helvetica Neue, Helvetica, Roboto, Arial, sans-serif;
+  font-size: 13px;
+  color: #999;
+  letter-spacing: 0.03em;
+}
+
+/* Animated trailing dots */
+.emlo-loader-label::after {
+  content: "";
+  display: inline-block;
+  width: 1.4em;
+  text-align: left;
+  animation: emlo-dots 1.4s steps(4, end) infinite;
+}
+
+@keyframes emlo-dots {
+  0%   { content: "";    }
+  25%  { content: ".";   }
+  50%  { content: "..";  }
+  75%  { content: "..."; }
+  100% { content: "";    }
+}
+
+/* ─── 2. SHIMMER ANIMATION ───────────────────────────────────────────────── */
+
+@keyframes skeleton-shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+
+@keyframes loading-pulse {
+  0%, 100% { opacity: 1;    }
+  50%       { opacity: 0.35; }
+}
+
+/* ─── 3. SKELETON BARS ───────────────────────────────────────────────────── */
+
+.skeleton-bar,
+.emlo-loading-bar {
+  height: 13px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  width: 85%;
+  background: linear-gradient(90deg, #ebebeb 25%, #f5f5f5 50%, #ebebeb 75%);
+  background-size: 600px 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+.skeleton-bar.wide,
+.emlo-loading-bar           { width: 85%; }
+.skeleton-bar.medium,
+.emlo-loading-bar.medium    { width: 60%; }
+.skeleton-bar.short,
+.emlo-loading-bar.short     { width: 38%; }
+
+/* ─── 4. INLINE STATUS LABEL (inside skeleton blocks) ───────────────────── */
+
+.emlo-loading-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: #aaa;
+  margin: 4px 0 10px;
+  font-family: Helvetica Neue, Helvetica, Roboto, Arial, sans-serif;
+}
+
+.emlo-loading-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #efc319;
+  animation: loading-pulse 1.2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+/* ─── 5. PENDING SECTION SKELETONS — always BELOW rendered content ────────── */
+/*
+ * clear:both pushes these below any floated/inline content above.
+ * They're appended at the END of frag in draw(), never inserted mid-content.
+ * border-top provides a visual breathing gap from the real content above.
+ */
+
+.emlo-pending-block {
+  clear: both;
+  margin-top: 24px;
+}
+
+.emlo-main-pending,
+.emlo-sidebar-pending {
+  clear: both;
+  padding: 14px 0 4px;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 14px;
+}
+
+/* Sidebar bars slightly narrower to fit the column */
+.emlo-sidebar-pending .skeleton-bar,
+.emlo-sidebar-pending .emlo-loading-bar         { width: 90%; }
+.emlo-sidebar-pending .skeleton-bar.medium,
+.emlo-sidebar-pending .emlo-loading-bar.medium  { width: 65%; }
+.emlo-sidebar-pending .skeleton-bar.short,
+.emlo-sidebar-pending .emlo-loading-bar.short   { width: 42%; }
+
+/* ─── 6. LEGACY SELECTORS ────────────────────────────────────────────────── */
+
+.emlo-loading-sidebar,
+.emlo-loading-main {
+  padding: 12px 4px;
+}
+
+.section-skeleton {
+  clear: both;
+  padding: 14px 0;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 8px;
+}
+
+.sidebar-skeleton .skeleton-bar.wide   { width: 90%; }
+.sidebar-skeleton .skeleton-bar.medium { width: 65%; }
+.sidebar-skeleton .skeleton-bar.short  { width: 40%; }
+
+/* ─── 7. HIDE OLD INLINE "Loading..." TEXT ───────────────────────────────── */
+
+.loading-message {
+  display: none !important;
+}

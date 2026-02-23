@@ -2601,6 +2601,22 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
     let frag = "";
     const result = this.component.results[0];
 
+    if(this.component.loading) {
+      console.log("Inside")
+      this.component.context.html(`
+        <div class="emlo-loading-main">
+          <div class="emlo-loading-bar"></div>
+          <div class="emlo-loading-bar medium"></div>
+          <div class="emlo-loading-bar short"></div>
+          <div class="emlo-loading-bar" style="margin-top:24px"></div>
+          <div class="emlo-loading-bar medium"></div>
+          <div class="emlo-loading-status">
+            <span class="emlo-loading-dot"></span> Loading profile content…
+          </div>
+        </div>`);
+        return
+    }
+
     // Paint structural skeleton BEFORE the async import — eliminates blank flash.
     if (!this.component.errorMessage && this.component.results && this.component.results.length > 0) {
       this.component.context.html(`

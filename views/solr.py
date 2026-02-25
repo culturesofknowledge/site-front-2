@@ -426,7 +426,6 @@ def getSolrURL():
 # Configuration
 # ---------------------------------------------------------------------------
 
-FULL_DOCS_THRESHOLD = 30   # matches h4WorkList's `if data.length > 30` branch
 
 # Simple in-process cache: { cache_key: (timestamp, payload_bytes) }
 # Avoids re-hitting Solr when the same profile is requested within TTL seconds.
@@ -490,9 +489,9 @@ _FL_TABLE_DOCS = ",".join([
 # tableData field config — server-side allowlist
 # ---------------------------------------------------------------------------
 _TABLE_FIELD_CONFIG = {
-    "frbr_creatorOf-work":          {"core": "works", "objectKey": "uuid_related"},
-    "mail_recipientOf-work":        {"core": "works", "objectKey": "uuid_related"},
-    "dcterms_isReferencedBy-work":  {"core": "works", "objectKey": "uuid_related"},
+    "frbr_creatorOf-work":          {"core": "works", "objectKey": "uuid"},
+    "mail_recipientOf-work":        {"core": "works", "objectKey": "uuid"},
+    "dcterms_isReferencedBy-work":  {"core": "works", "objectKey": "uuid"},
     "mail_originOf-work":           {"core": "works", "objectKey": "uuid_related"},
     "mail_destinationOf-work":      {"core": "works", "objectKey": "uuid_related"},
     "ox_hasResource-manifestation": {"core": "works", "objectKey": "uuid_related"},
@@ -558,7 +557,7 @@ def _fetch_images_for_mani(mani_uuid):
 
 def _fetch_manifestation_data(mani_uuid):
     result = {}
-    all_data = _solr_get("all", f"uuid_related:{mani_uuid}", '')
+    all_data = _solr_get("all", f"uuid_related:{mani_uuid}", fl=_FL_MANI_RELATED)
     docs = all_data.get("response", {}).get("docs", [])
 
     work_uuids = []
@@ -583,59 +582,28 @@ def _fetch_manifestation_data(mani_uuid):
 
 def _fetch_table_field(core_doc, field_name):
     """
-    Phase 1 (always): Solr facets → total count + year→count map. ~1-3 KB.
-    Phase 2 (only if total ≤ FULL_DOCS_THRESHOLD): fetch full docs for detail view.
-
-    Returns { total, yearCounts, docs }
+    Fetch all docs for a tableData field and return them as a flat list.
+    This matches the original format the frags and graph code expect:
+    a plain array of work docs each with ox_started-ox_year, dcterms_description, etc.
     """
     config = _TABLE_FIELD_CONFIG[field_name]
     uuids = _extract_uuids_from_field(core_doc, field_name)
 
     if not uuids:
-        return {"total": 0, "yearCounts": {}, "docs": []}
+        return []
 
     object_key = config["objectKey"]
     solr_core  = config["core"]
     batch_size = 100
-
-    all_year_counts: dict = {}
-    total = 0
+    docs = []
 
     for i in range(0, len(uuids), batch_size):
         batch = uuids[i : i + batch_size]
         q = f"{object_key}:(" + " OR ".join(f'"{u}"' for u in batch) + ")"
+        data = _solr_get(solr_core, q, fl=_FL_TABLE_DOCS, rows=len(batch))
+        docs.extend(data.get("response", {}).get("docs", []))
 
-        facet_data = _solr_get(
-            solr_core, q, fl="", rows=0,
-            extra_params={
-                "facet": "true",
-                "facet.field": "ox_started-ox_year",
-                "facet.limit": -1,
-                "facet.mincount": 1,
-            }
-        )
-
-        total += facet_data.get("response", {}).get("numFound", 0)
-
-        facet_list = (
-            facet_data.get("facet_counts", {})
-            .get("facet_fields", {})
-            .get("ox_started-ox_year", [])
-        )
-        for j in range(0, len(facet_list), 2):
-            year  = str(facet_list[j])
-            count = facet_list[j + 1]
-            all_year_counts[year] = all_year_counts.get(year, 0) + count
-
-    docs = []
-    if total <= FULL_DOCS_THRESHOLD:
-        for i in range(0, len(uuids), batch_size):
-            batch = uuids[i : i + batch_size]
-            q = f"{object_key}:(" + " OR ".join(f'"{u}"' for u in batch) + ")"
-            data = _solr_get(solr_core, q, fl=_FL_TABLE_DOCS, rows=FULL_DOCS_THRESHOLD + 1)
-            docs.extend(data.get("response", {}).get("docs", []))
-
-    return {"total": total, "yearCounts": all_year_counts, "docs": docs}
+    return docs
 
 
 # ---------------------------------------------------------------------------

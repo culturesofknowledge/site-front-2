@@ -17,6 +17,10 @@ let showUnkown = true;
 let isDisplayUnkown = false;
 
 export function _renderPeopleProfile(profile, tableData, relations) {
+  // Reset chart instance on each full profile render so navigation to a new
+  // person doesn't carry over the previous page's chart reference.
+  personChart = null;
+
   let frag = "";
 
   frag += _renderDetailsSection(profile);
@@ -149,10 +153,23 @@ function _renderDateSection(profile) {
   }
 }
 
-function _renderContentStatsSection(profile, data) {
-  const graphDataKeys = Object.keys(data);
+const _GRAPH_FIELDS = [
+  "frbr_creatorOf-work",
+  "mail_recipientOf-work",
+  "dcterms_isReferencedBy-work",
+];
 
-  _renderGraphSection(data);
+function _renderContentStatsSection(profile, data) {
+  // Only count the actual tableData fields (flat arrays), not the private __agg__
+  // keys or other gneratedData properties like imageData / manifestationData.
+  const graphDataKeys = _GRAPH_FIELDS.filter(
+    (f) => data.hasOwnProperty(f) && Array.isArray(data[f])
+  );
+
+  // Only render graph when tableData has actually arrived.
+  if (graphDataKeys.length > 0) {
+    _renderGraphSection(data);
+  }
 
   let sectionFrag = `
     <div class="column profilepart">
@@ -331,6 +348,9 @@ export function _renderGraphSection(graphData) {
     setYearCountsForGraphs(key, graphData[key], counts);
   }
 
+  // Nothing to draw — skip to avoid creating an empty chart
+  if (Object.keys(counts).length === 0) return;
+
   let first_and_last = setFirstAndLastYearsForGraphs(counts);
 
   setYearsWithZeroForGraphs(
@@ -339,7 +359,6 @@ export function _renderGraphSection(graphData) {
     counts
   );
 
-  // Sort the years numerically
   let sortedYears = Object.keys(counts).sort((yearA, yearB) => yearA - yearB);
 
   let person_data = _toLongFormat(
@@ -354,24 +373,16 @@ export function _renderGraphSection(graphData) {
     []
   );
 
-  // return person_data;
-
   if (person_data.length > 0) {
-    const checkExist = setInterval(() => {
+    // setTimeout fires exactly once per call — no repeat risk unlike setInterval.
+    // personChart guard prevents duplicates if draw() somehow fires twice after
+    // tableData arrives (e.g. relations and tableData resolve at the same ms).
+    setTimeout(() => {
       const chartEl = document.getElementById("chart");
-      if (chartEl) {
-        clearInterval(checkExist);
-        // draw() is called multiple times (progressive rendering).
-        // Guard: only create the chart once; update it on subsequent calls.
-        if (personChart) {
-          personChart.update(person_data);
-        } else {
-          personChart = new PersonChart(person_data);
-          _attachEventListeners();
-        }
-      } else {
-        console.debug("Waiting in queue for chart to be here");
-      }
+      if (!chartEl) return;
+      if (personChart) return;   // already created for this page load
+      personChart = new PersonChart(person_data);
+      _attachEventListeners();
     }, 50);
   }
 }
@@ -389,34 +400,17 @@ function setYearCountsForGraphs(relevantWorksFieldname, data, counts) {
     return;
   }
 
-  // data is now { total, yearCounts: { "1620": 3, ... }, docs: [...] }
-  // Use yearCounts directly — it's already aggregated by the server.
-  // Fall back to iterating docs for small datasets (total <= 30) where
-  // yearCounts may be absent but docs are present.
-  const yearCounts = data.yearCounts || {};
-
-  if (Object.keys(yearCounts).length > 0) {
-    // Fast path: server already aggregated year→count for us
-    for (const [year, count] of Object.entries(yearCounts)) {
-      const y = year === "?" ? "?" : year;
-      if (!counts.hasOwnProperty(y)) {
-        counts[y] = { creator: 0, recipient: 0, mentioned: 0 };
-      }
-      counts[y][relationshipType] += count;
+  // data is a plain flat array of work docs, each with ox_started-ox_year.
+  const docs = Array.isArray(data) ? data : [];
+  docs.forEach((item) => {
+    const year = item.hasOwnProperty("ox_started-ox_year")
+      ? item["ox_started-ox_year"]
+      : "?";
+    if (!counts.hasOwnProperty(year)) {
+      counts[year] = { creator: 0, recipient: 0, mentioned: 0 };
     }
-  } else {
-    // Fallback: small dataset — iterate full docs
-    const docs = Array.isArray(data) ? data : (data.docs || []);
-    docs.forEach((item) => {
-      const year = item.hasOwnProperty("ox_started-ox_year")
-        ? item["ox_started-ox_year"]
-        : "?";
-      if (!counts.hasOwnProperty(year)) {
-        counts[year] = { creator: 0, recipient: 0, mentioned: 0 };
-      }
-      counts[year][relationshipType] += 1;
-    });
-  }
+    counts[year][relationshipType] += 1;
+  });
 }
 
 function _toLongFormat(d, p, i, z) {
@@ -470,55 +464,33 @@ function setYearsWithZeroForGraphs(minYear, maxYear, counts) {
   }
 }
 
+// Event delegation for chart buttons.
+// draw() replaces innerHTML on every paint, destroying any directly-attached listeners.
+// By listening on document once (guarded by _chartListenersAttached), clicks on
+// chart buttons always reach the current personChart regardless of DOM replacement.
+let _chartListenersAttached = false;
+
 function _attachEventListeners() {
-  const showUnknownButton = document.getElementById("show_unknown");
-  if (showUnknownButton) {
-    showUnknownButton.addEventListener("click", function () {
+  if (_chartListenersAttached) return;
+  _chartListenersAttached = true;
+
+  document.addEventListener("click", function (e) {
+    const id = e.target && e.target.id;
+    if (!id) return;
+
+    if (id === "show_unknown") {
       if (personChart) {
         personChart.unknownShow(showUnkown);
         showUnkown = !showUnkown;
       }
-      // Handle the click event for the 'Full screen' button
-    });
-  }
-
-  const splitButton = document.getElementById("bars_split");
-  if (splitButton) {
-    splitButton.addEventListener("click", function () {
-      if (personChart) {
-        personChart.switchBars(2);
-      }
-      // Handle the click event for the 'Full screen' button
-    });
-  }
-
-  const seprateButton = document.getElementById("bars_seperate");
-  if (seprateButton) {
-    seprateButton.addEventListener("click", function () {
-      if (personChart) {
-        personChart.switchBars(3);
-      }
-      // Handle the click event for the 'Full screen' button
-    });
-  }
-
-  const stackButton = document.getElementById("bars_stacked");
-  if (stackButton) {
-    stackButton.addEventListener("click", function () {
-      if (personChart) {
-        personChart.switchBars(1);
-      }
-      // Handle the click event for the 'Full screen' button
-    });
-  }
-
-  const fullscreenButton = document.getElementById("fullscreen");
-  if (fullscreenButton) {
-    fullscreenButton.addEventListener("click", function () {
-      if (personChart) {
-        personChart.launchFullScreen();
-      }
-      // Handle the click event for the 'Full screen' button
-    });
-  }
+    } else if (id === "bars_split") {
+      if (personChart) personChart.switchBars(2);
+    } else if (id === "bars_seperate") {
+      if (personChart) personChart.switchBars(3);
+    } else if (id === "bars_stacked") {
+      if (personChart) personChart.switchBars(1);
+    } else if (id === "fullscreen") {
+      if (personChart) personChart.launchFullScreen();
+    }
+  });
 }

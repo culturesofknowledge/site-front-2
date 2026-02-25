@@ -500,41 +500,22 @@ export function h4WorkList(
   let html = `<h3><img src="/static/img/${icon}"/>${title}</h3>
 		<div class="content">`;
 
-  // Support both the legacy flat-array shape (work/image/mani pages pass arrays
-  // directly) and the new aggregated shape from /profile-data tableData:
-  //   { total: N, yearCounts: { "1620": 3, ... }, docs: [...] }
-  const isAggregated = data && typeof data === "object" && !Array.isArray(data)
-    && "total" in data && "yearCounts" in data;
+  // data is always a flat array of work docs (normalised in synchronise()).
+  // Each doc has: ox_started-ox_year, started_date_sort, dcterms_description, uuid.
+  const arr = Array.isArray(data) ? data : [];
 
-  if (isAggregated) {
-    const { total, yearCounts, docs } = data;
+  if (arr.length === 0) {
+    html += "</div>";
+    return html;
+  }
 
-    if (total === 0) {
-      html += "</div>";
-      return html;
-    }
-
-    if (total > 30) {
-      // Large dataset — use pre-computed yearCounts directly (no doc iteration needed)
-      html += _summaryByYearFromCounts(yearCounts, linkField, profile, total);
-    } else {
-      // Small dataset — full docs available, use detail view
-      const sortedDocs = docs.slice().sort(
-        (a, b) => new Date(a["started_date_sort"]) - new Date(b["started_date_sort"])
-      );
-      html += summaryByDetail(linkField, profile, sortedDocs);
-    }
+  if (arr.length > 30) {
+    html += summaryByYear(linkField, profile, arr);
   } else {
-    // Legacy path: data is a plain array (unchanged behaviour)
-    const arr = Array.isArray(data) ? data : [];
-    if (arr.length > 30) {
-      html += summaryByYear(linkField, profile, arr);
-    } else {
-      const sortedData = arr.slice().sort(
-        (a, b) => new Date(a["started_date_sort"]) - new Date(b["started_date_sort"])
-      );
-      html += summaryByDetail(linkField, profile, sortedData);
-    }
+    const sortedData = arr.slice().sort(
+      (a, b) => new Date(a["started_date_sort"]) - new Date(b["started_date_sort"])
+    );
+    html += summaryByDetail(linkField, profile, sortedData);
   }
 
   html += "</div>";
@@ -612,82 +593,6 @@ function summaryByYear(field, profile, data) {
       </tbody>
     </table>
 `;
-}
-
-/**
- * Renders the decade/year table directly from pre-aggregated { year: count } data.
- * Called when data comes from the new /profile-data tableData endpoint.
- * Produces identical HTML to summaryByYear() but without iterating full docs.
- */
-function _summaryByYearFromCounts(yearCounts, field, profile, total) {
-  const queryKey = field;
-  const queryVal = field === "repository" ? profile["browse"] : profile["uuid"];
-
-  // Group year→count into decades
-  const decadeSummary = {};
-  for (const [yearStr, count] of Object.entries(yearCounts)) {
-    const year = parseInt(yearStr, 10);
-    if (isNaN(year)) {
-      // Unknown year bucket — Solr facets won't produce this but handle gracefully
-      if (!decadeSummary["????"]) decadeSummary["????"] = {};
-      decadeSummary["????"]["Unknown year"] =
-        (decadeSummary["????"]["Unknown year"] || 0) + count;
-    } else {
-      const decade = Math.floor(year / 10) * 10;
-      if (!decadeSummary[decade]) decadeSummary[decade] = {};
-      decadeSummary[decade][year] = (decadeSummary[decade][year] || 0) + count;
-    }
-  }
-
-  // Note: docs with no ox_started-ox_year are NOT in Solr facets.
-  // Recover the "unknown year" count from total minus all known-year counts.
-  const knownCount = Object.values(yearCounts).reduce((s, c) => s + c, 0);
-  const unknownCount = total - knownCount;
-  if (unknownCount > 0) {
-    if (!decadeSummary["????"]) decadeSummary["????"] = {};
-    decadeSummary["????"]["Unknown year"] =
-      (decadeSummary["????"]["Unknown year"] || 0) + unknownCount;
-  }
-
-  const rows = Object.entries(decadeSummary)
-    .sort(([a], [b]) => {
-      if (a === "????") return 1;
-      if (b === "????") return -1;
-      return parseInt(a) - parseInt(b);
-    })
-    .map(([decade, years]) => {
-      const yearCells = Object.entries(years)
-        .sort(([a], [b]) => {
-          if (a === "Unknown year") return 1;
-          return parseInt(a) - parseInt(b);
-        })
-        .map(([year, count]) => {
-          if (year === "Unknown year") {
-            return `<a href="/forms/advanced?${queryKey}=${queryVal}&dat_sin_year=">Unknown year: ${count}</a>`;
-          }
-          return `<a href="/forms/advanced?${queryKey}=${queryVal}&dat_sin_year=${year}"> ${year}: ${count} </a>`;
-        })
-        .join(" ♦ ");
-
-      return `
-        <tr>
-          <td>${decade === "????" ? "????" : `${decade}s`}</td>
-          <td>${yearCells}</td>
-        </tr>`;
-    })
-    .join("");
-
-  const countFrag = field === "repository" ? `${total} records` : "";
-
-  return `
-    ${countFrag}
-    <table class="nested-table">
-      <thead>
-        <tr><th>Decade</th><th>Letters per year</th></tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>
-  `;
 }
 
 function summaryByDetail(field, profile, data) {
@@ -958,7 +863,9 @@ export function detailsOfOneObject(profile, obj, data, nested = false) {
     const url = profileFromUri(uri);
     const objectType = relation["object_type"];
 
-    const mainDisplayValue = relation[displayfields[objectType].value];
+    // displayfields[objectType].value may not be set on every Solr doc
+    // (e.g. dcterms_type is absent on some manifestations). Guard against undefined.
+    const mainDisplayValue = relation[displayfields[objectType].value] ?? "(untyped)";
 
     let fieldsToDisplay = [],
       detailsToDisplay = [],

@@ -2601,22 +2601,6 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
     let frag = "";
     const result = this.component.results[0];
 
-    if(this.component.loading) {
-      console.log("Inside")
-      this.component.context.html(`
-        <div class="emlo-loading-main">
-          <div class="emlo-loading-bar"></div>
-          <div class="emlo-loading-bar medium"></div>
-          <div class="emlo-loading-bar short"></div>
-          <div class="emlo-loading-bar" style="margin-top:24px"></div>
-          <div class="emlo-loading-bar medium"></div>
-          <div class="emlo-loading-status">
-            <span class="emlo-loading-dot"></span> Loading profile content…
-          </div>
-        </div>`);
-        return
-    }
-
     // Paint structural skeleton BEFORE the async import — eliminates blank flash.
     if (!this.component.errorMessage && this.component.results && this.component.results.length > 0) {
       this.component.context.html(`
@@ -2699,8 +2683,50 @@ emlo.ProfileRightRenderer = class extends edges.Renderer {
     }
 
     this.component.context.html(container);
+
+    // Re-initialise the Leaflet map every time draw() sets new HTML.
+    // Each draw() replaces innerHTML, destroying any previous Leaflet instance.
+    if (this.profileType === "location") {
+      _initLocationMap();
+    }
   }
 };
+
+/**
+ * Initialise (or reinitialise) the Leaflet map inside #location-map.
+ * Safe to call on every draw() — clears the old instance before creating a new one.
+ */
+function _initLocationMap() {
+  setTimeout(() => {
+    const el = document.getElementById("location-map");
+    if (!el) return;
+
+    const lat  = parseFloat(el.dataset.lat);
+    const long = parseFloat(el.dataset.long);
+    if (isNaN(lat) || isNaN(long)) return;
+
+    // Leaflet attaches _leaflet_id when initialised — clear it to allow reinit
+    if (el._leaflet_id) {
+      el._leaflet_id = null;
+      el.innerHTML   = "";
+    }
+
+    // Guard: Leaflet must be loaded as a global on the page
+    if (typeof L === "undefined") return;
+
+    const map = L.map(el).setView([lat, long], 8);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap contributors",
+      maxZoom: 18,
+    }).addTo(map);
+
+    L.marker([lat, long]).addTo(map);
+
+    // Force Leaflet to remeasure the container — needed after progressive redraws
+    map.invalidateSize();
+  }, 50);
+}
 
 emlo.Stats = class extends edges.Component {
   constructor(params) {

@@ -1,4 +1,6 @@
 import emlo from "/static/js/edges.js";
+import { _removeUrlParam } from "../../helper/urlparams.js";
+import {searchQueryObj} from "/static/js/search.js"
 
 emlo.Facet = class extends edges.components.RefiningANDTermSelector {
   constructor(params) {

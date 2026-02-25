@@ -557,7 +557,7 @@ def _fetch_images_for_mani(mani_uuid):
 
 def _fetch_manifestation_data(mani_uuid):
     result = {}
-    all_data = _solr_get("all", f"uuid_related:{mani_uuid}", fl=_FL_MANI_RELATED)
+    all_data = _solr_get("all", f"uuid_related:{mani_uuid}", "")
     docs = all_data.get("response", {}).get("docs", [])
 
     work_uuids = []

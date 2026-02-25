@@ -3516,8 +3516,6 @@ function GetRecordID(type, result) {
     // }, // Manifestation query pattern
   };
 
-  console.log("result" , result["id"] , result["dcterms_identifier-edit_"])
-
   const queryConfig = QUERY_MAP[type];
   if (queryConfig) {
     // Retrieve the value from the result object for the given field

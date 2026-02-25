@@ -826,11 +826,9 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
     let extraBr = "<br/>";
 
     if (this.field == "frbr_Work-work") {
-      const workUri = this.component.relationships[0]["frbr_Work-work"][0];
-
-      const workUUID = workUri.split("/").pop();
-
-      const apiUrl = `/solr/works/select?q=uuid:${workUUID}&wt=json&fl=dcterms_description,uuid`;
+      const uuid = this.component.results[0]["uuid"]
+  
+      const apiUrl = `/image-heading/${uuid}`;
 
       fetch(apiUrl)
         .then((response) => {
@@ -845,15 +843,12 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
           if (
             data &&
-            data.response &&
-            data.response.docs &&
-            data.response.docs.length > 0
+            data &&
+            data.heading && data.uuid
           ) {
-            const result = data.response.docs[0];
-
             if (element) {
               element.innerHTML = `
-                <a href=/profile/work/${result.uuid}> ${result.dcterms_description} </a>
+                <a href=/profile/work/${data.uuid}> ${data.heading} </a>
               `;
             }
           }

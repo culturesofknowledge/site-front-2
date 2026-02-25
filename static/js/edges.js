@@ -3,7 +3,7 @@ import {
   loadFragment,
 } from "./profile/profileFragLoader.js";
 
-import { _addUrlParam , _removeUrlParam } from "./helper/urlparams.js";
+import { _addUrlParam , _removeUrlParam } from "/static/js/helper/urlparams.js";
 
 // Per-page dedup — multiple components share one in-flight request
 const _profileDataPromiseMap = new Map();

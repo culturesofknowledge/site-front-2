@@ -1,5 +1,6 @@
 volumes:
   redis:
+  test_run_state:   # persists .test_run/ results across restarts
 
 services:
   web:

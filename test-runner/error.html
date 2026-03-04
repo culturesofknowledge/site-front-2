@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>404 — Not Found</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #f5f4f0; --surface: #ffffff; --surface2: #f0ede8;
+  --border: #e2ddd8; --border2: #d0cbc4;
+  --text: #1a1814; --text2: #6b6560; --text3: #9e9890;
+  --accent: #2563eb; --accent-bg: #eff6ff;
+  --fail: #dc2626; --fail-bg: #fef2f2;
+  --radius: 10px; --shadow: 0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh;display:flex;flex-direction:column}
+
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;height:56px;gap:32px;box-shadow:var(--shadow)}
+.nav-brand{font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--text)}
+.nav-brand-dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+
+main{flex:1;display:flex;align-items:center;justify-content:center;padding:32px}
+.error-wrap{text-align:center;max-width:480px}
+
+.error-code{font-family:'DM Mono',monospace;font-size:96px;font-weight:500;color:var(--border2);line-height:1;margin-bottom:24px;letter-spacing:-4px}
+
+.error-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--fail);background:var(--fail-bg);border:1px solid rgba(220,38,38,.15);padding:5px 12px;border-radius:20px;margin-bottom:20px}
+.error-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--fail)}
+
+h1{font-size:24px;font-weight:600;letter-spacing:-.5px;margin-bottom:10px}
+p{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:32px}
+
+.path-box{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:8px 14px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);margin-bottom:32px}
+.path-label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);font-family:'DM Sans',sans-serif}
+
+.actions{display:flex;align-items:center;justify-content:center;gap:10px}
+.btn{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:8px 16px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;text-decoration:none;white-space:nowrap}
+.btn:hover{border-color:var(--border2);background:var(--surface2)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:white}
+.btn-primary:hover{background:#1d4ed8;border-color:#1d4ed8}
+
+footer{border-top:1px solid var(--border);padding:16px 32px;text-align:center;font-size:12px;color:var(--text3)}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-brand">
+    <div class="nav-brand-dot"></div>
+    Visual Regression
+  </a>
+</nav>
+
+<main>
+  <div class="error-wrap">
+    <div class="error-code">404</div>
+
+    <div class="error-badge">
+      <div class="error-badge-dot"></div>
+      Page not found
+    </div>
+
+    <h1>Nothing here</h1>
+    <p>The page you're looking for doesn't exist in this service. This runner only handles test-related routes.</p>
+
+    <div class="path-box">
+      <span class="path-label">Requested</span>
+      <span id="req-path">—</span>
+    </div>
+
+    <div class="actions">
+      <a href="/" class="btn">← Home</a>
+      <a href="/test-run" class="btn btn-primary">Open Test Runner</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  Visual Regression Test Runner
+</footer>
+
+<script>
+  document.getElementById('req-path').textContent = window.location.pathname;
+</script>
+</body>
+</html>

@@ -12,6 +12,7 @@ from views.errors import errors_bp
 from views.solr import solr_bp
 from views.shortURL import shortURL_bp
 from views.redirectUUID import redirect_uuid_bp
+from views.test_run import test_run_bp
 from config import Config
 import os
 
@@ -32,6 +33,7 @@ def create_app():
     app.register_blueprint(solr_bp)
     app.register_blueprint(shortURL_bp)
     app.register_blueprint(redirect_uuid_bp)
+    app.register_blueprint(test_run_bp)
 
     return app
 

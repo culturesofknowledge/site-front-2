@@ -15,6 +15,27 @@ services:
       - 5000:5000
     command: bash -c "/bin/docker-entrypoint.sh"
 
+  # ── Test Runner ───────────────────────────────────────────────────────────
+  # Self-contained service. All files live in ./test-runner/.
+  # Proxied via the web container — users access it at localhost:5000/test-run.
+  # Start independently:  docker compose up test-runner
+  # Remove from stack:    comment out this block + TEST_RUNNER_URL in web above
+  test-runner:
+    build:
+      context: ./test-runner
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    expose:
+      - "8085"
+    ports:
+      - 8085:8085          # internal only — not exposed to host
+    volumes:
+      - test_run_state:/app/.test_run
+    environment:
+      DEBUG: "false"
+  # ─────────────────────────────────────────────────────────────────────────
+
+
   solr:
     build: ./docker-emlo/solr-conf
     restart: always

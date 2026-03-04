@@ -16,7 +16,7 @@
   --fail: #dc2626; --fail-bg: #fef2f2;
   --warn: #d97706; --warn-bg: #fffbeb;
   --queue: #7c3aed; --queue-bg: #f5f3ff;
-  --radius: 10px; --shadow: 0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --radius: 10px; --shadow: 0 1px 3px rgba(0,0,0,.08),0 1px 2px rgbaa(0,0,0,.04);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh}
@@ -755,15 +755,15 @@ function connectSSE() {
 
   es.addEventListener('test_result', function(e) {
     var d = JSON.parse(e.data);
-    if (state.runState && state.runState.tests && state.runState.tests[d.id]) {
-      Object.assign(state.runState.tests[d.id], d.result || {
-        status: d.status,
-        matching_percentage: d.pct != null ? d.pct : null,
-        execution_error: d.error || null
-      });
-    } else {
-      console.warn('test_result: no key for id=', d.id);
-    }
+    if (!state.runState) state.runState = { status: 'running', tests: {} };
+    if (!state.runState.tests) state.runState.tests = {};
+    // Always upsert — key may not exist if runner crashed before test_list fired
+    var existing = state.runState.tests[d.id] || {};
+    state.runState.tests[d.id] = Object.assign({}, existing, d.result || {
+      status: d.status,
+      matching_percentage: d.pct != null ? d.pct : null,
+      execution_error: d.error || null
+    });
     saveLS();
     renderSidebar();
     if (state.selectedTestId === d.id) renderDetail();
@@ -777,7 +777,23 @@ function connectSSE() {
   es.addEventListener('run_end', function(e) {
     var d = JSON.parse(e.data);
     state.running = false;
-    if (d.run_state) state.runState = d.run_state;
+    if (d.run_state) {
+      // Merge tests rather than overwrite — preserves execution-error statuses
+      // that were set via test_result events before run_end fires
+      var incomingTests = (d.run_state.tests) || {};
+      var mergedTests = Object.assign({}, incomingTests);
+      if (state.runState && state.runState.tests) {
+        Object.keys(state.runState.tests).forEach(function(id) {
+          var local = state.runState.tests[id];
+          var remote = mergedTests[id];
+          // Keep local status if remote is still queued (backend hasn't updated it yet)
+          if (remote && remote.status === 'queued' && local.status !== 'queued') {
+            mergedTests[id] = local;
+          }
+        });
+      }
+      state.runState = Object.assign({}, d.run_state, { tests: mergedTests });
+    }
     saveLS();
     $('execute-btn').disabled = false;
     $('execute-btn').textContent = '▶ Execute Tests';

@@ -17,11 +17,10 @@ from pixelmatch.contrib.PIL import pixelmatch
 SCHEMA_VERSION = "1.3"
 
 BASE_DIR       = Path(__file__).resolve().parent
-PROJECT_ROOT   = BASE_DIR.parent
 
 CONFIG_FILE    = BASE_DIR / "runner_config.json"
 TESTS_FILE     = BASE_DIR / "test_cases.json"
-SCREENSHOT_DIR = PROJECT_ROOT / ".test_run/results"
+SCREENSHOT_DIR = BASE_DIR / ".test_run/results"
 
 
 # ===================== HELPERS =====================
@@ -45,8 +44,11 @@ def emit_result(result: dict):
 if not CONFIG_FILE.exists():
     fatal(f"runner_config.json not found at {CONFIG_FILE}")
 
-with open(CONFIG_FILE) as f:
-    CFG = json.load(f)
+try:
+    with open(CONFIG_FILE) as f:
+        CFG = json.load(f)
+except json.JSONDecodeError as exc:
+    fatal(f"runner_config.json is not valid JSON: {exc}")
 
 sites       = CFG.get("sites", {})
 CL_CFG      = sites.get("cl", {})
@@ -88,13 +90,16 @@ if not TESTS_FILE.exists():
 if CLEAN_OLD_RESULTS and SCREENSHOT_DIR.exists():
     shutil.rmtree(SCREENSHOT_DIR)
 
-SCREENSHOT_DIR.mkdir(exist_ok=True)
+SCREENSHOT_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # ===================== LOAD TEST CASES =====================
 
-with open(TESTS_FILE) as f:
-    TESTS = json.load(f)
+try:
+    with open(TESTS_FILE) as f:
+        TESTS = json.load(f)
+except json.JSONDecodeError as exc:
+    fatal(f"test_cases.json is not valid JSON: {exc}")
 
 if not TESTS:
     fatal("No test cases found in test_cases.json")
@@ -287,8 +292,8 @@ def main():
 
         try:
             for _, test in TESTS.items():
-                uri       = test["uri"]
-                test_name = test["test_name"]
+                uri       = test.get("uri", "")
+                test_name = test.get("test_name", "") or test.get("id", "unknown")
                 test_id   = test.get("id") or normalize_id(test_name)
                 desc      = test.get("desc", "")
 
@@ -476,9 +481,14 @@ def main():
     }
 
     report_path = SCREENSHOT_DIR / f"reports_{run_id}.json"
-    with open(report_path, "w") as f:
-        json.dump(report, f, indent=2)
-    print(f"\n📄 Report generated: {report_path}", flush=True)
+    try:
+        SCREENSHOT_DIR.mkdir(parents=True, exist_ok=True)
+        tmp_report = report_path.with_suffix(".tmp")
+        tmp_report.write_text(json.dumps(report, indent=2))
+        tmp_report.replace(report_path)
+        print(f"\n📄 Report generated: {report_path}", flush=True)
+    except Exception as exc:
+        print(f"\n❌ Failed to write report: {exc}", flush=True)
 
     sys.exit(1 if failed_count > 0 else 0)
 

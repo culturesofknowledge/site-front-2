@@ -1,6 +1,7 @@
 const labels = {
-  people_gend: "People gender",
-  people_roles: "Roles or titles of people",
+  people : "Person",
+  people_gend: "Person gender",
+  people_roles: "Roles or titles of person",
   aut: "Author",
   author_sort: "Author",
   aut_mark: "Author as marked",

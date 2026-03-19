@@ -81,157 +81,229 @@
         import { modifyCurrentSearch } from "{{ url_for('static', filename='js/helper/modifyCurrentSearch.js') }}";
         import { buildSolrQuery } from "{{ url_for('static', filename='js/helper/buildSolrQuery.js') }}";
 
-        document.addEventListener('DOMContentLoaded', function() {
+       document.addEventListener('DOMContentLoaded', function() {
+        try {
             const urlParams = new URLSearchParams(window.location.search);
             const uuid = urlParams.get('uuid');
             const type = urlParams.get('type');
-            const start = parseInt(urlParams.get('start') || '0');
-            const numFound = parseInt(urlParams.get('numFound') || '0');
+            const startRaw = urlParams.get('start');
+            const numFoundRaw = urlParams.get('numFound');
+            const start = startRaw !== null ? parseInt(startRaw, 10) : NaN;
+            const numFound = numFoundRaw !== null ? parseInt(numFoundRaw, 10) : NaN;
             const sort = urlParams.get('sort');
             const letter = urlParams.get('letter');
             const browsing = urlParams.get('browsing');
             const uuids = urlParams.get('uuids');
             const filters = urlParams.get('filters');
 
-            let modDoc = document.getElementById("modify-search")
-            let controlDoc = document.getElementById("control")
-            let backResultDoc = document.getElementById("back-to-results")
-            let backBrowseDoc = document.getElementById("back-to-browse")
+            const modDoc = document.getElementById("modify-search");
+            const controlDoc = document.getElementById("control");
+            const backResultDoc = document.getElementById("back-to-results");
+            const backBrowseDoc = document.getElementById("back-to-browse");
 
-            const queryObj = searchQueryObj()
-
-
-            const query = buildSolrQuery(queryObj.openingQuery)
-
-            // Only make the API call if uuid, type, and start are present
-            if (!isNaN(start) && (!isNaN(numFound) && numFound > 0  )) {
-                let apiUrl = '/results?';
-                let qAndOp = "{!q.op=AND} "
-
-                if(queryObj.collection && queryObj.collection == "/solr/all/select") {
-                    qAndOp = ""
-                }
-
-                if(query) apiUrl += `q=${qAndOp}${query}&`
-
-                // Add parameters only if they exist
-                if (uuid) apiUrl += `uuid=${uuid}&`;
-                if (type) apiUrl += `type=${type}&`;
-                if (!isNaN(start)) apiUrl += `start=${start}&`;
-                if (!isNaN(numFound)) apiUrl += `numFound=${numFound}&`;
-                if (sort) apiUrl += `sort=${sort}&`;
-                if (uuids) apiUrl += `uuids=${uuids}&`;
-
-                // Remove trailing '&' if exists
-                apiUrl = apiUrl.endsWith('&') ? apiUrl.slice(0, -1) : apiUrl;
-
-                // API call logic here
-                fetch(apiUrl)
-                    .then(response => response.json())
-                    .then(data => {
-                        const { first_entry, prev_entry, next_entry, last_entry } = data;
-
-                        // Enable/Disable navigation buttons based on API response
-                        if (!prev_entry) {
-                            document.getElementById('prev-entry').disabled = true;
-                        }
-                        if (!next_entry) {
-                            document.getElementById('next-entry').disabled = true;
-                        }
-
-                        if(start == 0) {
-                            document.getElementById('first-entry').disabled = true;
-                        }
-
-                        if(start >= numFound - 1) {
-                            document.getElementById('last-entry').disabled = true;
-                        }
-
-                        // Hide navigation buttons if start and numFound are missing
-                        if (!urlParams.get('start') || !urlParams.get('numFound')) {
-                            document.getElementById('navigation-buttons').style.display = 'none';
-                        }
-
-                         // Deleting start from params after adding it's value
-                        urlParams.delete("start")
-                        
-                        // Set navigation button actions
-                        document.getElementById('first-entry').onclick = () => window.location.href = `/profile/${first_entry.object_type}/${first_entry.uuid}?${urlParams}&start=0`;
-                        document.getElementById('prev-entry').onclick = () => window.location.href = `/profile/${prev_entry.object_type}/${prev_entry.uuid}?${urlParams}&start=${start - 1}`;
-                        document.getElementById('next-entry').onclick = () => window.location.href = `/profile/${next_entry.object_type}/${next_entry.uuid}?${urlParams}&start=${start + 1}`;
-                        document.getElementById('last-entry').onclick = () => window.location.href = `/profile/${last_entry.object_type}/${last_entry.uuid}?${urlParams}&start=${numFound -1}`;
-
-                        // Back to browse
-                        if (browsing) {
-                            backBrowseDoc.style.display = ""
-                            document.getElementById('back-to-browse').onclick = () => window.location.href = `/browse/${browsing}?letter=${letter}&uuids=${uuids}&filters=${filters}`;
-                        }
-
-                        // Back to results
-                        if (type) {
-                            // enable divs
-                           
-                            if(!browsing) {
-                                modDoc.style.display = "inline"
-                            }
-
-                           backResultDoc.style.display = "inline"
-                           controlDoc.style.display = "inline"
-
-                            const params = new URLSearchParams(window.location.search);
-
-                            // Delete 'type' and 'numFound' if present
-                            params.delete('type');
-                            params.delete('numFound');
-
-                            let pageNumber = 0;
-                            const start = params.get("start")
-                            if (start != null) {
-                                // Calculate page number from start offset
-                                pageNumber = Math.floor(start / 50) * 50;
-                            }
-                            
-                            params.set('start' , pageNumber);
-                            const newQuery = params.toString()
-                            const href = newQuery ? `/forms/advanced?${newQuery}` : '/forms/advanced';
-                            const modSearch =  newQuery ? `/advanced?${newQuery}` : '/advanced';
-                            document.getElementById('back-to-results').onclick = () => window.location.href = href;
-                            document.getElementById('modify-search').onclick = () => modifyCurrentSearch()
-                        }
-
-                        if(numFound && start >= 0) {
-                            const count = document.getElementById("count-heading")
-                            if(count) {
-                                count.innerHTML = `Result ${start + 1} of ${numFound}`
-                            }
-                        }
-                    });
+            let queryObj = {};
+            try {
+                queryObj = searchQueryObj() || {};
+            } catch (e) {
+                console.warn("searchQueryObj() failed:", e);
             }
 
-            // Initialize the map after rendering the HTML
-            const checkMapElement = setInterval(function() {
-                const mapElement = document.getElementById('location-map');
+            console.log("queryObj", queryObj);
 
-                if (mapElement) {
+            let query = '';
+            try {
+                query = buildSolrQuery(queryObj.openingQuery) || '';
+            } catch (e) {
+                console.warn("buildSolrQuery() failed:", e);
+            }
+
+            if (!isNaN(start)) {
+                try {
+                    let apiUrl = '/results?';
+                    let qAndOp = "{!q.op=AND} ";
+
+                    if (queryObj.collection && queryObj.collection === "/solr/all/select") {
+                        qAndOp = "";
+                    }
+
+                    if (query) apiUrl += `q=${qAndOp}${query}&`;
+                    if (uuid) apiUrl += `uuid=${uuid}&`;
+                    if (type) apiUrl += `type=${type}&`;
+                    if (!isNaN(start)) apiUrl += `start=${start}&`;
+                    if (!isNaN(numFound)) apiUrl += `numFound=${numFound}&`;
+                    if (sort) apiUrl += `sort=${sort}&`;
+                    if (uuids) apiUrl += `uuids=${uuids}&`;
+
+                    apiUrl = apiUrl.endsWith('&') ? apiUrl.slice(0, -1) : apiUrl;
+
+                    fetch(apiUrl)
+                        .then(response => {
+                            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                            return response.json();
+                        })
+                        .then(data => {
+                            try {
+                                if (!data || typeof data !== 'object') {
+                                    console.warn("Unexpected API response shape:", data);
+                                    return;
+                                }
+
+                                const { first_entry, prev_entry, next_entry, last_entry } = data;
+
+                                const prevBtn  = document.getElementById('prev-entry');
+                                const nextBtn  = document.getElementById('next-entry');
+                                const firstBtn = document.getElementById('first-entry');
+                                const lastBtn  = document.getElementById('last-entry');
+                                const navEl    = document.getElementById('navigation-buttons');
+                                const countEl  = document.getElementById('count-heading');
+
+                                // Disable nav buttons based on API response
+                                if (prevBtn && !prev_entry)  prevBtn.disabled  = true;
+                                if (nextBtn && !next_entry)  nextBtn.disabled  = true;
+                                if (firstBtn && start === 0) firstBtn.disabled = true;
+                                if (lastBtn  && !isNaN(numFound) && start >= numFound - 1) {
+                                    lastBtn.disabled = true;
+                                }
+
+                                // Hide nav if start/numFound were absent from the URL
+                                if (navEl && (startRaw === null || numFoundRaw === null)) {
+                                    navEl.style.display = 'none';
+                                }
+
+                                urlParams.delete("start");
+
+                                // Wire navigation buttons only when the entry data exists
+                                if (firstBtn && first_entry?.object_type && first_entry?.uuid) {
+                                    firstBtn.onclick = () => {
+                                        window.location.href = `/profile/${first_entry.object_type}/${first_entry.uuid}?${urlParams}&start=0`;
+                                    };
+                                }
+                                if (prevBtn && prev_entry?.object_type && prev_entry?.uuid && !isNaN(start)) {
+                                    prevBtn.onclick = () => {
+                                        window.location.href = `/profile/${prev_entry.object_type}/${prev_entry.uuid}?${urlParams}&start=${start - 1}`;
+                                    };
+                                }
+                                if (nextBtn && next_entry?.object_type && next_entry?.uuid && !isNaN(start)) {
+                                    nextBtn.onclick = () => {
+                                        window.location.href = `/profile/${next_entry.object_type}/${next_entry.uuid}?${urlParams}&start=${start + 1}`;
+                                    };
+                                }
+                                if (lastBtn && last_entry?.object_type && last_entry?.uuid && !isNaN(numFound)) {
+                                    lastBtn.onclick = () => {
+                                        window.location.href = `/profile/${last_entry.object_type}/${last_entry.uuid}?${urlParams}&start=${numFound - 1}`;
+                                    };
+                                }
+
+                                // Back to browse
+                                if (browsing && backBrowseDoc) {
+                                    backBrowseDoc.style.display = "";
+                                    backBrowseDoc.onclick = () => {
+                                        const browseParams = new URLSearchParams();
+                                        if (letter)  browseParams.set('letter', letter);
+                                        if (uuids)   browseParams.set('uuids', uuids);
+                                        if (filters) browseParams.set('filters', filters);
+                                        window.location.href = `/browse/${browsing}?${browseParams}`;
+                                    };
+                                }
+
+                                // Back to results / modify search
+                                if (type) {
+                                    if (!browsing && modDoc)    modDoc.style.display    = "inline";
+                                    if (backResultDoc)          backResultDoc.style.display = "inline";
+                                    if (controlDoc)             controlDoc.style.display    = "inline";
+
+                                    try {
+                                        const params = new URLSearchParams(window.location.search);
+                                        params.delete('type');
+                                        params.delete('numFound');
+
+                                        const startParam = params.get("start");
+                                        const pageNumber = (startParam !== null && !isNaN(parseInt(startParam, 10)))
+                                            ? Math.floor(parseInt(startParam, 10) / 50) * 50
+                                            : 0;
+
+                                        params.set('start', pageNumber);
+                                        const newQuery = params.toString();
+                                        const href     = newQuery ? `/forms/advanced?${newQuery}` : '/forms/advanced';
+
+                                        if (backResultDoc) {
+                                            backResultDoc.onclick = () => { window.location.href = href; };
+                                        }
+                                        if (modDoc) {
+                                            modDoc.onclick = () => {
+                                                try {
+                                                    modifyCurrentSearch();
+                                                } catch (e) {
+                                                    console.error("modifyCurrentSearch() failed:", e);
+                                                }
+                                            };
+                                        }
+                                    } catch (e) {
+                                        console.error("Error building back-to-results URL:", e);
+                                    }
+                                }
+
+                                // Result count display
+                                if (countEl && !isNaN(numFound) && !isNaN(start) && start >= 0) {
+                                    countEl.innerHTML = `Result ${start + 1} of ${numFound}`;
+                                }
+
+                            } catch (e) {
+                                console.error("Error processing navigation API response:", e);
+                            }
+                        })
+                        .catch(err => {
+                            console.error("Navigation API fetch failed:", err);
+                        });
+
+                } catch (e) {
+                    console.error("Error building or dispatching navigation API request:", e);
+                }
+            }
+
+            // Map initialization
+            const checkMapElement = setInterval(function() {
+                try {
+                    const mapElement = document.getElementById('location-map');
+
+                    if (!mapElement) return; // still waiting
+
                     clearInterval(checkMapElement);
-                    
-                    const lat = mapElement.getAttribute("data-lat");
-                    const long = mapElement.getAttribute("data-long");
-                    
-                    const map = L.map('location-map').setView([lat, long], 8); // Adjust zoom level as needed
-                   
-                    // Add OpenStreetMap tile layer
+
+                    const lat  = parseFloat(mapElement.getAttribute("data-lat"));
+                    const long = parseFloat(mapElement.getAttribute("data-long"));
+
+                    if (isNaN(lat) || isNaN(long)) {
+                        console.warn("Invalid map coordinates — data-lat or data-long missing/non-numeric.");
+                        return;
+                    }
+
+                    if (typeof L === 'undefined') {
+                        console.error("Leaflet (L) is not loaded — cannot initialize map.");
+                        return;
+                    }
+
+                    const map = L.map('location-map').setView([lat, long], 8);
+
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     }).addTo(map);
 
-                    // Add a marker at the given lat, long
-                    L.marker([lat, long]).addTo(map)
-                        .bindPopup("Location: " + lat + ", " + long)
+                    L.marker([lat, long])
+                        .addTo(map)
+                        .bindPopup(`Location: ${lat}, ${long}`)
                         .openPopup();
+
+                } catch (e) {
+                    clearInterval(checkMapElement);
+                    console.error("Map initialization failed:", e);
                 }
             }, 100);
-        })
+
+        } catch (e) {
+            console.error("Critical error during DOMContentLoaded setup:", e);
+        }
+    });
     </script>
 
 {% endblock extra_js_bottom %}

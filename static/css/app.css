@@ -10431,7 +10431,7 @@ button.tiny {
   white-space: pre-wrap; /* Preserves formatting like spaces and line breaks */
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
   z-index: 9;
-  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+  /* transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease; */
 }
 
 .tooltip::before {

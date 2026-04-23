@@ -217,7 +217,7 @@ function advanceSearch(params) {
       {
         param: "rec_roles",
         queryStringFields: [
-          { field: "person-recipient-roles", operator: "AND" },
+          { field: "person-addressee-roles", operator: "AND" },
         ],
       },
       {

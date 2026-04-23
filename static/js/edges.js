@@ -2340,13 +2340,9 @@ emlo.MultiFields = class extends edges.Component {
                   this.gneratedData["manifestationData"] = {};
                 }
 
-                let relationsArray = await this._fetchRelations(uuid);
+                // let relationsArray = await this._fetchManifestationData(uuid);
 
-                this.gneratedData["manifestationData"][uuid] =
-                  relationsArray.reduce((acc, item) => {
-                    acc[item.uuid] = item;
-                    return acc;
-                  }, {});
+                this.gneratedData["manifestationData"][uuid] = await this._fetchManifestationData(uuid);
               }
             }
           }
@@ -2362,6 +2358,27 @@ emlo.MultiFields = class extends edges.Component {
     this.renderer.draw();
 
     this.hitCount = source.total();
+  }
+
+  async _fetchManifestationData(uuid) {
+    try {
+      const response = await fetch(`/manifestation-data/${uuid}`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        console.error(`Error fetching relations: ${response.statusText}`);
+        return [];
+      }
+
+      const json = await response.json();
+      return json;
+    } catch (err) {
+      console.error("Error while fetching relations", err);
+      return {};
+    }
   }
 
   async _fetchMoreWorkData(payload) {
@@ -5830,19 +5847,38 @@ function GetRecordID(type, result) {
     }, // Resource query pattern
     m: {
       field: "dcterms_identifier-edit_",
-      splitValue: "edit_cofk_union_manifestation-cofk_edit_interface-iwork_id:",
-    }, // Manifestation query pattern
+      splitValues: [
+        ":",
+        "edit_cofk_union_manifestation-",
+      ],
+    },
+    // m: {
+    //   field: "dcterms_identifier-edit_",
+    //   splitValue: "edit_cofk_union_manifestation-cofk_edit_interface-iwork_id:",
+    // }, // Manifestation query pattern
   };
+
+  console.log("result" , result["id"] , result["dcterms_identifier-edit_"])
 
   const queryConfig = QUERY_MAP[type];
   if (queryConfig) {
     // Retrieve the value from the result object for the given field
     const fieldValue = result[queryConfig.field];
     if (fieldValue) {
-      // Split the value using the delimiter (e.g., "editi_") and get the last part
-      const splitValue = fieldValue.split(queryConfig.splitValue).pop();
-      // Return the query by combining the split value and the id
-      return `${splitValue}`;
+
+       if (queryConfig.splitValues) {
+        for (const splitter of queryConfig.splitValues) {
+          if (fieldValue.includes(splitter)) {
+            return fieldValue.split(splitter).pop();
+          }
+        }
+        throw new Error(`No valid splitter found in value: ${fieldValue}`);
+      } else {
+        // Split the value using the delimiter (e.g., "editi_") and get the last part
+        const splitValue = fieldValue.split(queryConfig.splitValue).pop();
+        // Return the query by combining the split value and the id
+        return `${splitValue}`;
+      }
     } else {
       throw new Error(`Field ${queryConfig.field} not found in result object`);
     }

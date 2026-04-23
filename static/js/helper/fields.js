@@ -55,10 +55,9 @@ export function getFieldsToDisplayInProfile(objectType, nested = true) {
 
         "ox_isAnnotatedBy-comment",
 
-        "dcterms_created", // dummy field to insert date
-        // get_creation_date_year_fieldname(),
-        // get_creation_date_month_fieldname(),
-        // get_creation_date_day_fieldname(),
+        "dcterms_created-ox_year", 
+        "dcterms_created-ox_month",
+        "dcterms_created-ox_day",
         "ox_dateAnnotate-comment",
 
         "mail_handwroteBy-person",
@@ -88,14 +87,12 @@ export function getFieldsToDisplayInProfile(objectType, nested = true) {
         "ox_postage_costs",
         "ox_non_delivery_reason",
         "ox_date_of_receipt_as_marked",
-
-        // get_fieldname_manifestation_receipt_date_day(),
-        // get_fieldname_manifestation_receipt_date_month(),
-        // get_fieldname_manifestation_receipt_date_year(),
+        "ox_manifestation_receipt_date_day",
+        "ox_manifestation_receipt_date_month",
+        "ox_manifestation_receipt_date_year",
         "ox_manifestation_receipt_calendar",
         "ox_manifestation_receipt_date",
-        // get_manifestation_receipt_date_gregorian_fn(),
-
+        "ox_manifestation_receipt_date_gregorian",
         "ox_manifestation_receipt_date_inferred",
         "ox_manifestation_receipt_date_uncertain",
         "ox_manifestation_receipt_date_approx",

@@ -25,7 +25,7 @@ QUERY_MAP = {
     "i" : lambda id : f"dcterms_identifier-edit_:edit_cofk_union_image-{id}",
     "c" : lambda id : f"dcterms_identifier-edit_:edit_cofk_union_comment-{id}",
     "re" : lambda id : f"dcterms_identifier-edit_:edit_cofk_union_resource-{id}",
-    "m": lambda id: f'dcterms_identifier-edit_:\"edit_cofk_union_manifestation-cofk_edit_interface-iwork_id:{id}\"'
+    "m": lambda id: f'dcterms_identifier-edit_:*{id}'
 }
 
 # Function to query Solr based on type and ID
@@ -61,12 +61,7 @@ def index(type, id):
     # Check if the type exists in the core map
     if type not in CORE_MAP:
         abort(404)
-    
-    # Special case for type 'm'
-    if type == 'm' and 2 <= len(id) <= 10:
-        # Append leading zeros to make id length 10
-        id = id.zfill(10)
-
+        
     core = CORE_MAP[type]  # Get the core name based on type
     return redirect_function(type, id, core)
 

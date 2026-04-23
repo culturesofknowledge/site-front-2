@@ -487,6 +487,7 @@ function _renderMultipleFields(val, res, fieldName) {
 
   let objectType = res.object_type;
 
+
   if (objectType === "image") return "";
 
   const htmlParts = [];
@@ -514,6 +515,7 @@ function _renderMultipleFields(val, res, fieldName) {
   let inferredType = objectType;
   let uuid = "";
   const possibleRelation = relationMap[objectType];
+
   let moreData = {};
   if (possibleRelation) {
     outer: for (const [type, keys] of Object.entries(possibleRelation)) {
@@ -545,8 +547,13 @@ function _renderMultipleFields(val, res, fieldName) {
   const fields = getAddtionalFields(inferredType);
   for (const [label, fieldKey] of Object.entries(fields)) {
     if (res?.[fieldKey]) {
-      const value = res[fieldKey];
-      htmlParts.push(`<div>${label}: ${value}</div>`);
+      let lines = res[fieldKey];
+
+      if(typeof lines == "string") {
+        lines = lines.replace(/shelf_/g, '');
+      }
+      
+      htmlParts.push(`<div>${label}: ${lines}</div>`);
     } else {
       if (["comment", "resource"].includes(res["object_type"])) {
         htmlParts.push(`<p id=${uuid}></p>`);
@@ -728,8 +735,10 @@ function _getAllMatchingFieldsHTML(val, res, fieldName, edge) {
       // Build results
       for (const { label, value } of entriesWithLabels) {
         const lines = value.join("");
+
+        const result = lines.replace(/shelf_/g, '');
         results.push(
-          `<p class="highlighter">Found in <strong>${label}</strong>:<br>${lines}<p>`
+          `<p class="highlighter">Found in <strong>${label}</strong>:<br>${result}<p>`
         );
       }
 

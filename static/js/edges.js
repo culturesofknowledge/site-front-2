@@ -2285,25 +2285,23 @@ emlo.MultiFields = class extends edges.Component {
 
         for (const field of this.tableDataFields) {
           if (Object.prototype.hasOwnProperty.call(result, field)) {
-            const val = result[field]; // Assuming val is an array of URIs
-            const uuids = Array.from(
-              new Set(val.map((uri) => uri.split("/").pop()))
-            );
+            if (field === "ox_hasResource-manifestation") {
+              // Query Solr directly by institution UUID to avoid sending thousands of UUIDs in a POST body
+              this.gneratedData[field] = await this._fetchWorksByRelation(result["uuid"]);
+            } else {
+              const val = result[field];
+              const uuids = Array.from(
+                new Set(val.map((uri) => uri.split("/").pop()))
+              );
 
-            if (uuids.length > 0) {
-              let payload = {
-                solrCore: "work",
-                uuids: uuids,
-                filter: "",
-                objectKey: "uuid",
-              };
-
-              // In case of ox_hasResource-manifestation we need manifestation, core needs to be updated
-              if (field == "ox_hasResource-manifestation") {
-                payload.objectKey = "uuid_related";
+              if (uuids.length > 0) {
+                this.gneratedData[field] = await this._fetchMoreWorkData({
+                  solrCore: "work",
+                  uuids: uuids,
+                  filter: "",
+                  objectKey: "uuid",
+                });
               }
-
-              this.gneratedData[field] = await this._fetchMoreWorkData(payload);
             }
           }
         }
@@ -2400,6 +2398,22 @@ emlo.MultiFields = class extends edges.Component {
       return json;
     } catch (err) {
       console.error("Error while fetching relations", err);
+      return [];
+    }
+  }
+
+  async _fetchWorksByRelation(uuid) {
+    try {
+      const response = await fetch(`/collection-year-data/${uuid}`);
+
+      if (!response.ok) {
+        console.error(`Error fetching collection overview: ${response.statusText}`);
+        return [];
+      }
+
+      return await response.json();
+    } catch (err) {
+      console.error("Error while fetching collection overview", err);
       return [];
     }
   }

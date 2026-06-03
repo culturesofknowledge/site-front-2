@@ -157,9 +157,7 @@ function _renderContentStatsSection(profile, data) {
   let sectionFrag = `
     <div class="column profilepart">
       <h3><img src="/static/img/icon-statistics.png" class=""/>Catalogue Statistics</h3>
-      <div class="content">${totalLinkingToListWork(profile, "person")}`;
-
-  sectionFrag += `
+      <div class="content">${totalLinkingToListWork(profile, "person")}</div>
       <div id="chart">
         <div class="button-bar">
           <ul id="hello" class="button-group unknown" style="${
@@ -182,9 +180,7 @@ function _renderContentStatsSection(profile, data) {
         </div>
       </div>
       <br/>
-    `;
-
-  sectionFrag += "</div></div>";
+    </div>`;
 
   return sectionFrag;
 }

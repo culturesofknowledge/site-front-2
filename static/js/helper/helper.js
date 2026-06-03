@@ -182,6 +182,7 @@ export function relationshipList(
   for (const relationVal of profile[field]) {
     const relKey = uuidFromUri(relationVal, true);
     for (const relation of relations) {
+      console.log("jsjsjs" , relation)
       if (relation.id === relKey) {
         let obj_type = relation["object_type"];
         let displayField = displayfields[obj_type]?.value;

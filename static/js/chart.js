@@ -258,7 +258,7 @@ class PersonChart {
   }
 
   getMax(person_data, includeUnknown) {
-    return d3.max(person_data, function (d) {
+    return d3.max(person_data, (d) => {
       if (!includeUnknown && d.year == this.unknownYear) {
         return 0;
       }
@@ -295,12 +295,24 @@ class PersonChart {
       val,
       j;
 
-    if (widthBar > 40) {
+    // Dynamically pick ticks_every so labels never overlap.
+    // A 4-digit year at 11px sans-serif is ~26px wide; we target a minimum
+    // 35px centre-to-centre gap so there is always ~9px of breathing room.
+    // Round up to a "nice" decade-aligned interval so ticks land on round years.
+    const minLabelPx = 35;
+    const naturalEvery = Math.ceil(minLabelPx / widthBar);
+    if (naturalEvery <= 1) {
       ticks_every = 1;
-    } else if (widthBar > 20) {
+    } else if (naturalEvery <= 3) {
       ticks_every = 3;
-    } else if (widthBar > 10) {
+    } else if (naturalEvery <= 5) {
       ticks_every = 5;
+    } else if (naturalEvery <= 10) {
+      ticks_every = 10;
+    } else if (naturalEvery <= 20) {
+      ticks_every = 20;
+    } else {
+      ticks_every = 50;
     }
 
     for (j = 0; j < xAxisTicksDomain.length; j++) {

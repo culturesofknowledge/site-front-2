@@ -192,6 +192,7 @@ export function relationshipList(
           obj: relation,
           type: obj_type,
           sort: displayField,
+          catalog :  relation?.["cito_Catalog"]
         };
 
         sortList.push(item);
@@ -220,6 +221,10 @@ export function relationshipList(
 
     if (role) {
       html += `<p><a href="${url}">${display}</a> - ${role}</p>`;
+    } else if (field == "owl_sameAs-work" && item.catalog) {
+      html += `<p>
+        <a href="${url}">${display}</a> - [catalogue: ${item.catalog}]
+      </p>`;
     } else {
       html += `<p>
         <a href="${url}">${display}</a>

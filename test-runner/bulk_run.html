@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Bulk Run — EMLO Tests</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:#f5f4f0;--surface:#ffffff;--surface2:#f0ede8;
+  --border:#e2ddd8;--border2:#d0cbc4;
+  --text:#1a1814;--text2:#6b6560;--text3:#9e9890;
+  --accent:#2563eb;--accent-bg:#eff6ff;
+  --pass:#16a34a;--pass-bg:#f0fdf4;
+  --fail:#dc2626;--fail-bg:#fef2f2;
+  --warn:#d97706;--warn-bg:#fffbeb;
+  --queue:#7c3aed;--queue-bg:#f5f3ff;
+  --skip:#6b7280;--skip-bg:#f3f4f6;
+  --radius:10px;--shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh}
+
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;height:56px;gap:24px;position:sticky;top:0;z-index:100;box-shadow:var(--shadow)}
+.nav-brand{font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px}
+.nav-brand-dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.nav-link{font-size:13px;color:var(--text2);text-decoration:none;padding:5px 10px;border-radius:6px;font-weight:500}
+.nav-link:hover{background:var(--surface2);color:var(--text)}
+.nav-link.active{background:var(--accent-bg);color:var(--accent)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+#run-badge{font-size:12px;padding:4px 10px;border-radius:20px;font-weight:500;display:none;align-items:center;gap:6px}
+#run-badge.running{display:inline-flex;background:var(--accent-bg);color:var(--accent)}
+#run-badge.done{display:inline-flex;background:var(--pass-bg);color:var(--pass)}
+#run-badge.error{display:inline-flex;background:var(--fail-bg);color:var(--fail)}
+.spinner{width:10px;height:10px;border:2px solid rgba(37,99,235,.2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+main{padding:28px 32px;max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card-header{padding:13px 18px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);display:flex;align-items:center;justify-content:space-between}
+.card-body{padding:18px}
+
+.btn{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:7px 14px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:var(--border2);background:var(--surface2)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:white}
+.btn-primary:hover{background:#1d4ed8;border-color:#1d4ed8}
+.btn-danger{background:var(--fail-bg);border-color:rgba(220,38,38,.25);color:var(--fail)}
+.btn-danger:hover{background:#fee2e2}
+.btn:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
+
+.field{margin-bottom:12px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px}
+.field input[type=text],.field input[type=number],.field select{
+  width:100%;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:13px;
+  border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--text);transition:all .15s}
+.field input:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.field small{font-size:11px;color:var(--text3);margin-top:4px;display:block}
+.field .hint{font-size:11px;color:var(--accent);font-weight:500;display:none;margin-top:4px}
+.field .hint.show{display:block}
+
+.config-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0}
+.config-section{padding:16px 18px}
+.config-section+.config-section{border-left:1px solid var(--border)}
+.config-section h4{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin-bottom:12px}
+
+.collections-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.coll-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;user-select:none;border:1px solid var(--border);background:var(--surface2);color:var(--text2);transition:all .12s}
+.coll-chip:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+.coll-chip.selected{background:var(--accent-bg);color:var(--accent);border-color:var(--accent)}
+.coll-chip input{display:none}
+
+.actions-row{display:flex;align-items:center;gap:10px;padding:14px 18px;border-top:1px solid var(--border);flex-wrap:wrap}
+#preview-result{font-size:12px;color:var(--text2);font-weight:500}
+#preview-result .big{font-size:15px;font-weight:600;color:var(--text);margin-right:4px}
+
+/* Stats bar */
+.stats-bar{display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--surface);box-shadow:var(--shadow)}
+.stat-cell{flex:1;padding:14px 16px;border-right:1px solid var(--border);text-align:center;min-width:90px}
+.stat-cell:last-child{border-right:none}
+.stat-label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:3px}
+.stat-val{font-size:20px;font-weight:600;font-family:'DM Mono',monospace;color:var(--text)}
+.stat-cell.s-passed .stat-val{color:var(--pass)}
+.stat-cell.s-failed .stat-val{color:var(--fail)}
+.stat-cell.s-error  .stat-val{color:var(--warn)}
+.stat-cell.s-running .stat-val{color:var(--accent)}
+
+.progress-wrap{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin:0 -1px}
+.progress-bar{height:100%;background:var(--accent);width:0%;transition:width .5s ease}
+
+/* Filter row */
+.filter-row{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.filter-chip{font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;transition:all .12s;font-family:'DM Sans',sans-serif}
+.filter-chip:hover{border-color:var(--border2);background:var(--surface2)}
+.filter-chip.active{background:var(--accent-bg);color:var(--accent);border-color:var(--accent)}
+.filter-chip.fc-passed.active{background:var(--pass-bg);color:var(--pass);border-color:var(--pass)}
+.filter-chip.fc-failed.active{background:var(--fail-bg);color:var(--fail);border-color:var(--fail)}
+.filter-chip.fc-error.active{background:var(--warn-bg);color:var(--warn);border-color:var(--warn)}
+.filter-chip.fc-skipped.active{background:var(--skip-bg);color:var(--skip);border-color:var(--skip)}
+.type-filter{font-size:12px;padding:5px 10px;border:1px solid var(--border);border-radius:6px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--surface);margin-left:auto}
+.type-filter:focus{outline:none;border-color:var(--accent)}
+
+/* Results table */
+.results-table-wrap{overflow-x:auto}
+.results-table{width:100%;border-collapse:collapse;font-size:13px}
+.results-table th{text-align:left;padding:10px 14px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);background:var(--surface2);border-bottom:1px solid var(--border);white-space:nowrap}
+.results-table td{padding:9px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+.results-table tbody tr:hover td{background:var(--surface2)}
+.results-table tbody tr:last-child td{border-bottom:none}
+.uri-cell{font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.type-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500;background:var(--surface2);color:var(--text2)}
+.status-dot{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:3px 9px;border-radius:12px}
+.status-dot.passed{background:var(--pass-bg);color:var(--pass)}
+.status-dot.failed{background:var(--fail-bg);color:var(--fail)}
+.status-dot.execution-error{background:var(--warn-bg);color:var(--warn)}
+.status-dot.queued{background:var(--queue-bg);color:var(--queue)}
+.status-dot.skipped{background:var(--skip-bg);color:var(--skip)}
+.stat-cell.s-skipped .stat-val{color:var(--skip)}
+.status-dot.running{background:var(--accent-bg);color:var(--accent)}
+.pct-cell{font-family:'DM Mono',monospace;font-size:12px;font-weight:600}
+.pct-cell.ok{color:var(--pass)}
+.pct-cell.bad{color:var(--fail)}
+.img-link{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--accent);text-decoration:none;border:1px solid rgba(37,99,235,.2);padding:2px 8px;border-radius:5px;background:var(--accent-bg)}
+.img-link:hover{background:#dbeafe}
+.dur-cell{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3)}
+.empty-state{text-align:center;padding:40px;color:var(--text3);font-size:13px}
+
+/* Pagination */
+.pagination{display:flex;align-items:center;gap:6px;padding:12px 16px;border-top:1px solid var(--border);font-size:13px}
+.page-btn{font-family:'DM Sans',sans-serif;font-size:12px;padding:4px 10px;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text);cursor:pointer;transition:all .12s}
+.page-btn:hover{border-color:var(--border2);background:var(--surface2)}
+.page-btn.active{background:var(--accent);border-color:var(--accent);color:white}
+.page-btn:disabled{opacity:.4;cursor:not-allowed}
+.page-info{font-size:12px;color:var(--text2);margin:0 6px}
+
+/* Log panel */
+.log-body{padding:10px 14px;font-family:'DM Mono',monospace;font-size:11px;line-height:1.8;color:var(--text2);max-height:180px;overflow-y:auto;background:#fafaf8}
+.log-line{white-space:pre-wrap;word-break:break-all}
+.lpass{color:var(--pass)}.lfail{color:var(--fail)}.lerror{color:var(--warn)}.linfo{color:var(--accent)}
+
+/* Diff modal */
+#diff-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;align-items:center;justify-content:center;padding:24px}
+#diff-modal.open{display:flex}
+.modal-box{background:var(--surface);border-radius:var(--radius);box-shadow:0 20px 60px rgba(0,0,0,.25);max-width:95vw;max-height:95vh;overflow:auto;min-width:340px}
+.modal-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;background:var(--surface)}
+.modal-title{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.modal-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--text2);padding:0 4px;line-height:1}
+.modal-close:hover{color:var(--text)}
+.modal-body{padding:16px;display:flex;flex-direction:column;gap:12px}
+.modal-imgs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-img-wrap{overflow:hidden;border-radius:8px;border:1px solid var(--border)}
+.modal-img-label{padding:7px 12px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);background:var(--surface2);border-bottom:1px solid var(--border)}
+.modal-img-wrap img,.diff-full img{width:100%;display:block}
+.modal-error{padding:10px 14px;background:var(--fail-bg);border-radius:7px;font-family:'DM Mono',monospace;font-size:12px;color:var(--fail);white-space:pre-wrap;word-break:break-all}
+
+@media(max-width:768px){
+  main{padding:16px}
+  nav{padding:0 16px}
+  .config-grid,.modal-imgs{grid-template-columns:1fr}
+  .config-section+.config-section{border-left:none;border-top:1px solid var(--border)}
+  .stats-bar{flex-wrap:wrap}
+  .stat-cell{flex:1 1 40%;border-bottom:1px solid var(--border)}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand"><div class="nav-brand-dot"></div>EMLO Tests</div>
+  <a class="nav-link" href="/test-run">Manual Run</a>
+  <a class="nav-link active" href="/bulk-run">Bulk Run</a>
+  <div class="nav-right">
+    <span id="run-badge"></span>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ═══ Config card ═══ -->
+  <div class="card" id="config-card">
+    <div class="card-header">
+      <span>New Bulk Run</span>
+      <span id="config-run-id" style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace"></span>
+    </div>
+    <div class="config-grid">
+      <div class="config-section">
+        <h4>Solr Connection</h4>
+        <div class="field">
+          <label>Solr Base URL</label>
+          <input type="text" id="solr-url" placeholder="http://localhost:28983"/>
+          <small>The Solr instance to pull record IDs from</small>
+          <div class="hint" id="preview-hint"></div>
+        </div>
+        <div class="field">
+          <label>Collections</label>
+          <div class="collections-grid" id="collections-grid">
+            <label class="coll-chip selected"><input type="checkbox" value="works" checked> works</label>
+            <label class="coll-chip selected"><input type="checkbox" value="people" checked> people</label>
+            <label class="coll-chip selected"><input type="checkbox" value="locations" checked> locations</label>
+            <label class="coll-chip selected"><input type="checkbox" value="manifestations" checked> manifestations</label>
+            <label class="coll-chip selected"><input type="checkbox" value="images" checked> images</label>
+            <label class="coll-chip selected"><input type="checkbox" value="resources" checked> resources</label>
+            <label class="coll-chip selected"><input type="checkbox" value="institutions" checked> institutions</label>
+          </div>
+          <small>Which Solr cores to include in the run</small>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <h4>Scope</h4>
+        <div class="field">
+          <label>Limit per collection</label>
+          <input type="number" id="limit" min="1" step="1" placeholder="Leave blank for all records"/>
+          <small>Set e.g. 100 for a quick smoke test. Empty = every record.</small>
+        </div>
+        <div class="field">
+          <label>Parallel workers</label>
+          <input type="number" id="workers" min="1" max="16" step="1" value="4"/>
+          <small>Browser instances running at the same time. 4 is a safe default.</small>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <h4>Sites to Compare</h4>
+        <div class="field">
+          <label>Site A — Name</label>
+          <input type="text" id="cl-name" placeholder="Cottagelabs"/>
+        </div>
+        <div class="field">
+          <label>Site A — Base URL</label>
+          <input type="text" id="cl-url" placeholder="https://example.com"/>
+          <small>Profile paths are appended to this URL</small>
+        </div>
+        <div class="field" style="margin-top:10px">
+          <label>Site B — Name</label>
+          <input type="text" id="ox-name" placeholder="Bodleian"/>
+        </div>
+        <div class="field">
+          <label>Site B — Base URL</label>
+          <input type="text" id="ox-url" placeholder="https://example.com"/>
+        </div>
+        <p style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.6">Auth &amp; viewport settings are shared with the <a href="/test-run" style="color:var(--accent)">manual runner</a>.</p>
+      </div>
+    </div>
+    <div class="actions-row">
+      <button class="btn" id="preview-btn">Preview count</button>
+      <span id="preview-result"></span>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+        <span id="sites-saved" style="font-size:12px;color:var(--pass);font-weight:500;opacity:0;transition:opacity .3s">✓ Sites saved</span>
+        <button class="btn btn-danger" id="stop-btn" style="display:none;">■ Stop Run</button>
+        <button class="btn btn-primary" id="start-btn">▶ Start Bulk Run</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Stats bar ═══ -->
+  <div id="stats-wrap" style="display:none">
+    <div class="stats-bar">
+      <div class="stat-cell"><div class="stat-label">Total</div><div class="stat-val" id="st-total">—</div></div>
+      <div class="stat-cell s-running"><div class="stat-label">In Progress</div><div class="stat-val" id="st-running">—</div></div>
+      <div class="stat-cell"><div class="stat-label">Completed</div><div class="stat-val" id="st-completed">—</div></div>
+      <div class="stat-cell s-passed"><div class="stat-label">Passed</div><div class="stat-val" id="st-passed">—</div></div>
+      <div class="stat-cell s-failed"><div class="stat-label">Failed (&lt;99%)</div><div class="stat-val" id="st-failed">—</div></div>
+      <div class="stat-cell s-error"><div class="stat-label">Errors</div><div class="stat-val" id="st-errors">—</div></div>
+      <div class="stat-cell s-skipped"><div class="stat-label">Skipped</div><div class="stat-val" id="st-skipped">—</div></div>
+      <div class="stat-cell"><div class="stat-label">Run ID</div><div class="stat-val" id="st-run-id" style="font-size:11px;padding-top:2px">—</div></div>
+    </div>
+    <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+  </div>
+
+  <!-- ═══ Results card ═══ -->
+  <div class="card" id="results-card">
+    <div class="filter-row">
+      <button class="filter-chip active" data-status="">All</button>
+      <button class="filter-chip fc-passed" data-status="passed">Passed</button>
+      <button class="filter-chip fc-failed" data-status="failed">Failed</button>
+      <button class="filter-chip fc-error" data-status="execution-error">Errors</button>
+      <button class="filter-chip fc-skipped" data-status="skipped">Skipped</button>
+      <button class="filter-chip" data-status="queued">Queued</button>
+      <select class="type-filter" id="type-filter">
+        <option value="">All types</option>
+      </select>
+    </div>
+    <div class="results-table-wrap">
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th style="width:44px">#</th>
+            <th>URI</th>
+            <th style="width:110px">Type</th>
+            <th style="width:110px">Status</th>
+            <th style="width:80px">Match</th>
+            <th style="width:90px">Duration</th>
+            <th style="width:100px">Screenshots</th>
+          </tr>
+        </thead>
+        <tbody id="results-tbody">
+          <tr><td colspan="7" class="empty-state">No run data yet. Start a run above.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination" id="pagination"></div>
+  </div>
+
+  <!-- ═══ Log panel ═══ -->
+  <div class="card" id="log-card" style="display:none">
+    <div class="card-header">
+      <span>Console Output</span>
+      <button class="btn" style="padding:3px 10px;font-size:11px" id="log-clear-btn">Clear</button>
+    </div>
+    <div class="log-body" id="log-body"></div>
+  </div>
+
+</main>
+
+<!-- ═══ Diff modal ═══ -->
+<div id="diff-modal">
+  <div class="modal-box" style="width:min(900px,95vw)">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">—</span>
+      <button class="modal-close" id="modal-close-btn">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ──────────────────────────────────────────────────────
+// State
+// ──────────────────────────────────────────────────────
+var state = {
+  running:   false,
+  currentRunId: null,
+  stats:     {},
+  filter:    { status: '', record_type: '' },
+  page:      1,
+  perPage:   50,
+  pages:     1,
+  total:     0,
+  types:     [],
+};
+
+function $(id){ return document.getElementById(id); }
+
+function human(ms){
+  if (ms==null) return '—';
+  return ms < 1000 ? ms+'ms' : (ms/1000).toFixed(1)+'s';
+}
+function escHtml(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ──────────────────────────────────────────────────────
+// Collections chips
+// ──────────────────────────────────────────────────────
+document.querySelectorAll('.coll-chip').forEach(function(chip){
+  chip.addEventListener('click', function(){
+    var cb = chip.querySelector('input');
+    cb.checked = !cb.checked;
+    chip.classList.toggle('selected', cb.checked);
+  });
+});
+
+function getSelectedCores(){
+  return Array.from(document.querySelectorAll('.coll-chip input:checked')).map(function(cb){ return cb.value; });
+}
+
+// ──────────────────────────────────────────────────────
+// Stats & progress
+// ──────────────────────────────────────────────────────
+function updateStats(run){
+  if (!run || !run.run_id) return;
+  state.currentRunId = run.run_id;
+  var total     = run.total     || 0;
+  var completed = run.completed || 0;
+  var passed    = run.passed    || 0;
+  var failed    = run.failed    || 0;
+  var errors    = run.exec_errors || 0;
+  var inprog    = total - completed;
+
+  var skipped = run.skipped || 0;
+  $('st-total').textContent     = total;
+  $('st-running').textContent   = inprog > 0 ? inprog : '—';
+  $('st-completed').textContent = completed;
+  $('st-passed').textContent    = passed;
+  $('st-failed').textContent    = failed;
+  $('st-errors').textContent    = errors;
+  $('st-skipped').textContent   = skipped > 0 ? skipped : '—';
+  $('st-run-id').textContent    = run.run_id;
+  $('stats-wrap').style.display = 'block';
+
+  var pct = total > 0 ? (completed / total) * 100 : 0;
+  $('progress-bar').style.width = Math.min(100, pct) + '%';
+
+  var isActive = run.status === 'running' || run.status === 'generating';
+  state.running = isActive;
+  if (run.status === 'generating') {
+    setBadge('running');
+  } else {
+    setBadge(isActive ? 'running' : (run.status === 'finished' ? 'done' : (run.status === 'error' || run.status === 'interrupted' ? 'error' : '')));
+  }
+  $('start-btn').disabled = isActive;
+  $('stop-btn').style.display = isActive ? '' : 'none';
+  $('config-run-id').textContent = 'run: ' + run.run_id;
+}
+
+function setBadge(type){
+  var badge = $('run-badge');
+  badge.className = type;
+  if (type === 'running') badge.innerHTML = '<div class="spinner"></div> Running';
+  else if (type === 'done') badge.textContent = '✓ Finished';
+  else badge.textContent = '';
+}
+
+// ──────────────────────────────────────────────────────
+// Results table
+// ──────────────────────────────────────────────────────
+async function fetchResults(){
+  var params = new URLSearchParams({
+    page: state.page,
+    per_page: state.perPage,
+  });
+  if (state.currentRunId) params.set('run_id', state.currentRunId);
+  if (state.filter.status) params.set('status', state.filter.status);
+  if (state.filter.record_type) params.set('record_type', state.filter.record_type);
+
+  try {
+    var resp = await fetch('/api/bulk/results?' + params.toString());
+    var data = await resp.json();
+    state.total = data.total;
+    state.pages = data.pages;
+    if (data.record_types && data.record_types.length) updateTypeFilter(data.record_types);
+    renderTable(data.items || []);
+    renderPagination();
+  } catch(e){
+    console.warn('fetchResults error', e);
+  }
+}
+
+function updateTypeFilter(types){
+  state.types = types;
+  var sel = $('type-filter');
+  var cur = sel.value;
+  sel.innerHTML = '<option value="">All types</option>';
+  types.forEach(function(t){
+    var opt = document.createElement('option');
+    opt.value = t;
+    opt.textContent = t;
+    if (t === cur) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function renderTable(items){
+  var tbody = $('results-tbody');
+  if (!items.length){
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No results match the current filter.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = '';
+  var offset = (state.page - 1) * state.perPage;
+  items.forEach(function(item, idx){
+    var rowNum = offset + idx + 1;
+    var tr = document.createElement('tr');
+    tr.style.cursor = 'pointer';
+
+    var pctHtml = '—';
+    if (item.match_pct != null){
+      var cls = item.match_pct >= 99 ? 'ok' : 'bad';
+      pctHtml = '<span class="pct-cell '+cls+'">'+item.match_pct+'%</span>';
+    }
+
+    var screenshotHtml = '—';
+    if (item.diff_image){
+      screenshotHtml = '<a class="img-link" href="#" data-item-id="'+item.id+'">⊞ View</a>';
+    }
+
+    var statusLabel = item.status || 'queued';
+
+    tr.innerHTML =
+      '<td style="color:var(--text3);font-size:11px;font-family:\'DM Mono\',monospace">'+rowNum+'</td>'+
+      '<td><div class="uri-cell" title="'+escHtml(item.uri)+'">'+escHtml(item.uri)+'</div></td>'+
+      '<td><span class="type-badge">'+escHtml(item.record_type||'—')+'</span></td>'+
+      '<td><span class="status-dot '+escHtml(statusLabel)+'">'+escHtml(statusLabel)+'</span></td>'+
+      '<td>'+pctHtml+'</td>'+
+      '<td class="dur-cell">'+human(item.duration_ms)+'</td>'+
+      '<td>'+screenshotHtml+'</td>';
+
+    tr.addEventListener('click', function(e){
+      if (e.target.closest('a')) return; // let link handle itself
+      openModal(item);
+    });
+
+    var link = tr.querySelector('.img-link');
+    if (link){
+      link.addEventListener('click', function(e){
+        e.preventDefault();
+        openModal(item);
+      });
+    }
+
+    tbody.appendChild(tr);
+  });
+}
+
+function renderPagination(){
+  var pg = $('pagination');
+  pg.innerHTML = '';
+
+  var info = document.createElement('span');
+  info.className = 'page-info';
+  info.textContent = 'Page ' + state.page + ' of ' + state.pages + ' (' + state.total + ' records)';
+  pg.appendChild(info);
+
+  if (state.pages <= 1) return;
+
+  function mkBtn(label, targetPage, active, disabled){
+    var btn = document.createElement('button');
+    btn.className = 'page-btn' + (active?' active':'');
+    btn.textContent = label;
+    btn.disabled = disabled || false;
+    btn.addEventListener('click', function(){
+      state.page = targetPage;
+      fetchResults();
+    });
+    return btn;
+  }
+
+  pg.appendChild(mkBtn('‹ Prev', state.page - 1, false, state.page <= 1));
+
+  // show window of pages around current
+  var start = Math.max(1, state.page - 3);
+  var end   = Math.min(state.pages, state.page + 3);
+  if (start > 1) { pg.appendChild(mkBtn('1', 1, false)); if (start > 2) pg.appendChild(Object.assign(document.createElement('span'),{textContent:'…',style:'padding:0 4px;color:var(--text3)'})); }
+  for (var i = start; i <= end; i++) pg.appendChild(mkBtn(String(i), i, i===state.page));
+  if (end < state.pages) { if (end < state.pages-1) pg.appendChild(Object.assign(document.createElement('span'),{textContent:'…',style:'padding:0 4px;color:var(--text3)'})); pg.appendChild(mkBtn(String(state.pages), state.pages, false)); }
+
+  pg.appendChild(mkBtn('Next ›', state.page + 1, false, state.page >= state.pages));
+}
+
+// ──────────────────────────────────────────────────────
+// Filters
+// ──────────────────────────────────────────────────────
+document.querySelectorAll('.filter-chip').forEach(function(chip){
+  chip.addEventListener('click', function(){
+    document.querySelectorAll('.filter-chip').forEach(function(c){ c.classList.remove('active'); });
+    chip.classList.add('active');
+    state.filter.status = chip.dataset.status || '';
+    state.page = 1;
+    fetchResults();
+  });
+});
+
+$('type-filter').addEventListener('change', function(){
+  state.filter.record_type = this.value;
+  state.page = 1;
+  fetchResults();
+});
+
+// ──────────────────────────────────────────────────────
+// Diff modal
+// ──────────────────────────────────────────────────────
+function openModal(item){
+  $('modal-title').textContent = item.uri || '—';
+  var body = $('modal-body');
+  body.innerHTML = '';
+
+  // Error message
+  if (item.error_msg){
+    var errDiv = document.createElement('div');
+    errDiv.className = 'modal-error';
+    errDiv.textContent = item.error_msg;
+    body.appendChild(errDiv);
+  }
+
+  // Stats row
+  var stats = document.createElement('div');
+  stats.style.cssText = 'display:flex;gap:16px;font-size:12px;flex-wrap:wrap;padding:4px 0';
+  [
+    ['Match', item.match_pct != null ? item.match_pct+'%' : '—'],
+    ['Type', item.record_type || '—'],
+    ['Duration', human(item.duration_ms)],
+    ['Status', item.status],
+  ].forEach(function(pair){
+    var d = document.createElement('div');
+    d.innerHTML = '<span style="color:var(--text3);text-transform:uppercase;font-size:10px;letter-spacing:.4px;display:block">'+escHtml(pair[0])+'</span><strong>'+escHtml(pair[1])+'</strong>';
+    stats.appendChild(d);
+  });
+  body.appendChild(stats);
+
+  // Screenshots grid
+  if (item.cl_image || item.ox_image){
+    var grid = document.createElement('div');
+    grid.className = 'modal-imgs';
+    if (item.cl_image){
+      grid.innerHTML += '<div class="modal-img-wrap"><div class="modal-img-label">Site A</div><img src="/bulk-results/'+escHtml(item.cl_image)+'" loading="lazy"/></div>';
+    }
+    if (item.ox_image){
+      grid.innerHTML += '<div class="modal-img-wrap"><div class="modal-img-label">Site B</div><img src="/bulk-results/'+escHtml(item.ox_image)+'" loading="lazy"/></div>';
+    }
+    body.appendChild(grid);
+  }
+
+  // Diff image
+  if (item.diff_image){
+    var dw = document.createElement('div');
+    dw.className = 'diff-full';
+    dw.innerHTML = '<div style="padding:10px 0 6px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2)">Pixel Diff</div>'+
+      '<div class="modal-img-wrap"><img src="/bulk-results/'+escHtml(item.diff_image)+'" loading="lazy"/></div>';
+    body.appendChild(dw);
+  }
+
+  $('diff-modal').classList.add('open');
+}
+
+$('modal-close-btn').addEventListener('click', function(){ $('diff-modal').classList.remove('open'); });
+$('diff-modal').addEventListener('click', function(e){ if (e.target === $('diff-modal')) $('diff-modal').classList.remove('open'); });
+document.addEventListener('keydown', function(e){ if (e.key==='Escape') $('diff-modal').classList.remove('open'); });
+
+// ──────────────────────────────────────────────────────
+// Log
+// ──────────────────────────────────────────────────────
+function appendLog(line){
+  $('log-card').style.display='';
+  var body = $('log-body');
+  var cls = /PASSED|✅/.test(line)?'log-line lpass':/FAILED|❌/.test(line)?'log-line lfail':/ERROR|WARNING/.test(line)?'log-line lerror':/BULK_/.test(line)?'log-line linfo':'log-line';
+  var d = document.createElement('div');
+  d.className = cls; d.textContent = line;
+  body.appendChild(d);
+  body.scrollTop = body.scrollHeight;
+  if (body.children.length > 600) body.removeChild(body.firstChild);
+}
+$('log-clear-btn').addEventListener('click', function(){ $('log-body').innerHTML = ''; });
+
+// ──────────────────────────────────────────────────────
+// SSE  (with auto-reconnect)
+// ──────────────────────────────────────────────────────
+var _resultBuffer = [];
+var _flushTimer   = null;
+var _sseRetryMs   = 2000;
+
+function connectSSE(){
+  var es = new EventSource('/api/bulk/events');
+
+  es.addEventListener('bulk_generating', function(e){
+    var d = JSON.parse(e.data);
+    var msg = d.phase === 'db'
+      ? 'Inserting ' + (d.total||'').toLocaleString() + ' tests into database ...'
+      : 'Querying Solr for record IDs ...';
+    appendLog('[' + (d.run_id||'') + '] ' + msg);
+    if (d.run_id) state.currentRunId = d.run_id;
+    fetch('/api/bulk/status').then(function(r){ return r.json(); }).then(function(sd){
+      if (sd.run) updateStats(sd.run);
+    });
+  });
+
+  es.addEventListener('bulk_run_start', function(e){
+    var d = JSON.parse(e.data);
+    state.running = true;
+    if (d.run_id) state.currentRunId = d.run_id;
+    $('start-btn').disabled = true;
+    $('stop-btn').style.display = '';
+    setBadge('running');
+    updateStats(d);
+    appendLog('[' + d.run_id + '] Tests ready — ' + (d.total||0).toLocaleString() + ' queued, starting workers ...');
+  });
+
+  es.addEventListener('bulk_start', function(e){
+    var d = JSON.parse(e.data);
+    updateStats(d);
+  });
+
+  es.addEventListener('bulk_result', function(e){
+    // Buffer results and flush every 300ms to avoid hammering the DOM
+    _resultBuffer.push(JSON.parse(e.data));
+    if (!_flushTimer) _flushTimer = setTimeout(flushResults, 300);
+  });
+
+  es.addEventListener('bulk_progress', function(e){
+    updateStats(JSON.parse(e.data));
+  });
+
+  es.addEventListener('bulk_done', function(e){
+    var d = JSON.parse(e.data);
+    appendLog('Run complete — passed='+(d.passed||0)+' failed='+(d.failed||0)+
+              ' errors='+(d.exec_errors||0)+' skipped='+(d.skipped||0));
+    fetchResults();
+    // Let syncStatus be the authority on button state — avoids the race where
+    // bulk_done fires before _run_active is set to False on the server.
+    setTimeout(syncStatus, 300);
+    setTimeout(syncStatus, 1200);
+  });
+
+  es.addEventListener('bulk_error', function(e){
+    var d = JSON.parse(e.data);
+    appendLog('ERROR: ' + d.error);
+    setTimeout(syncStatus, 300);
+    setTimeout(syncStatus, 1200);
+  });
+
+  es.addEventListener('bulk_log', function(e){
+    appendLog(JSON.parse(e.data).line);
+  });
+
+  // Let the browser's native EventSource retry handle reconnects.
+  // Calling es.close() here is what causes Chrome's "interrupted while page loading" message.
+  es.onerror = function(){
+    // Do nothing — EventSource will retry automatically after 3s (browser default).
+    // The polling loop below keeps the UI in sync regardless of SSE state.
+  };
+
+  es.addEventListener('connected', function(){
+    // Re-sync anything missed while SSE was disconnected
+    syncStatus();
+  });
+}
+
+function syncStatus(){
+  fetch('/api/bulk/status').then(function(r){ return r.json(); }).then(function(d){
+    if (d.run) {
+      updateStats(d.run);
+      if (!state.currentRunId) state.currentRunId = d.run.run_id;
+    }
+    // Server flag is the only authority on whether a run is truly active
+    state.running = d.running;
+    $('start-btn').disabled = d.running;
+
+    if (d.running) {
+      $('stop-btn').style.display = '';
+      fetchResults();
+    } else {
+      // Run has stopped — hide stop button and reset it for next use
+      $('stop-btn').style.display  = 'none';
+      $('stop-btn').disabled       = false;
+      $('stop-btn').textContent    = '■ Stop Run';
+
+      if (d.run) {
+        var s = d.run.status;
+        setBadge(s === 'finished' ? 'done' : (s === 'error' || s === 'interrupted' ? 'error' : ''));
+      }
+    }
+  }).catch(function(){});
+}
+
+function flushResults(){
+  _flushTimer = null;
+  if (!_resultBuffer.length) return;
+  _resultBuffer = [];
+  // Refresh stats and results when we have new data
+  fetch('/api/bulk/status').then(function(r){ return r.json(); }).then(function(d){
+    if (d.run) updateStats(d.run);
+    fetchResults();
+  }).catch(function(){});
+}
+
+// ──────────────────────────────────────────────────────
+// Preview
+// ──────────────────────────────────────────────────────
+$('preview-btn').addEventListener('click', async function(){
+  var solrUrl = $('solr-url').value.trim();
+  if (!solrUrl){ alert('Enter a Solr URL first.'); return; }
+  var cores = getSelectedCores();
+  $('preview-result').innerHTML = '<span style="color:var(--text3)">Counting…</span>';
+  try {
+    var resp = await fetch('/api/bulk/preview', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({solr_url: solrUrl, cores: cores}),
+    });
+    var data = await resp.json();
+    if (!resp.ok || data.error){
+      var msg = data.error || 'Preview failed';
+      $('preview-result').innerHTML = '<span style="color:var(--fail)">'+escHtml(msg)+'</span>';
+      appendLog('ERROR: ' + msg);
+      $('log-card').style.display = '';
+      return;
+    }
+    var parts = Object.entries(data.counts).map(function(kv){ return kv[0]+': '+kv[1].toLocaleString(); });
+    $('preview-result').innerHTML = '<span class="big">'+data.total.toLocaleString()+'</span>total records — '+parts.join(', ');
+    $('preview-hint').textContent = 'Solr is reachable ✓';
+    $('preview-hint').classList.add('show');
+    setTimeout(function(){ $('preview-hint').classList.remove('show'); }, 3000);
+  } catch(e){
+    $('preview-result').innerHTML = '<span style="color:var(--fail)">'+escHtml(e.message)+'</span>';
+  }
+});
+
+// ──────────────────────────────────────────────────────
+// Start run
+// ──────────────────────────────────────────────────────
+$('start-btn').addEventListener('click', async function(){
+  if (state.running) return;
+
+  var solrUrl = $('solr-url').value.trim();
+  var clUrl   = $('cl-url').value.trim();
+  var oxUrl   = $('ox-url').value.trim();
+  var cores   = getSelectedCores();
+
+  if (!solrUrl)          { alert('Enter a Solr URL first.'); return; }
+  if (!clUrl || !oxUrl)  { alert('Enter both Site A and Site B URLs.'); return; }
+  if (!cores.length)     { alert('Select at least one collection.'); return; }
+
+  var limit   = parseInt($('limit').value)   || null;
+  var workers = parseInt($('workers').value) || 4;
+
+  // Lock the button immediately so the user sees something happened
+  $('start-btn').disabled = true;
+  $('start-btn').textContent = '⟳ Starting…';
+  $('log-card').style.display = '';
+  appendLog('Sending start request…');
+
+  try {
+    var resp = await fetch('/api/bulk/start', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        solr_url: solrUrl,
+        cores:    cores,
+        limit:    limit,
+        workers:  workers,
+        cl_name:  $('cl-name').value.trim() || 'Site A',
+        cl_url:   clUrl,
+        ox_name:  $('ox-name').value.trim() || 'Site B',
+        ox_url:   oxUrl,
+      }),
+    });
+    var data = await resp.json();
+
+    if (!resp.ok) {
+      var errMsg = data.error || 'Failed to start run';
+      appendLog('ERROR: ' + errMsg);
+      $('start-btn').disabled = false;
+      $('start-btn').textContent = '▶ Start Bulk Run';
+      alert(errMsg);
+      return;
+    }
+
+    // Accepted — background thread is now querying Solr
+    state.running     = true;
+    state.currentRunId = data.run_id;
+    $('start-btn').textContent = '▶ Start Bulk Run';
+    $('stop-btn').style.display = '';
+    setBadge('running');
+    appendLog('Run accepted: ' + data.run_id + ' — querying Solr in background…');
+
+    var fb = $('sites-saved');
+    fb.style.opacity = '1';
+    setTimeout(function(){ fb.style.opacity = '0'; }, 2500);
+
+    syncStatus();
+
+  } catch(e) {
+    appendLog('ERROR: ' + e.message);
+    $('start-btn').disabled = false;
+    $('start-btn').textContent = '▶ Start Bulk Run';
+    alert('Could not connect to server: ' + e.message);
+  }
+});
+
+// ──────────────────────────────────────────────────────
+// Stop run
+// ──────────────────────────────────────────────────────
+$('stop-btn').addEventListener('click', async function(){
+  var btn = $('stop-btn');
+  btn.disabled = true;
+  btn.textContent = '⟳ Stopping…';
+  appendLog('Stop requested — waiting for workers to shut down…');
+  try {
+    var resp = await fetch('/api/bulk/stop', {method:'POST'});
+    var d = await resp.json();
+    if (!resp.ok){
+      appendLog('ERROR: ' + (d.error || 'Failed to stop'));
+      btn.disabled = false;
+      btn.textContent = '■ Stop Run';
+    } else {
+      appendLog('Stop signal sent — waiting for workers to exit…');
+      // Poll every 800ms until the server confirms the run has stopped,
+      // so the start button re-enables as soon as the process is actually dead.
+      var polls = 0;
+      var pollUntilStopped = setInterval(function(){
+        polls++;
+        fetch('/api/bulk/status').then(function(r){ return r.json(); }).then(function(sd){
+          if (!sd.running || polls > 20) {
+            clearInterval(pollUntilStopped);
+            syncStatus(); // final authoritative update
+          }
+        }).catch(function(){ clearInterval(pollUntilStopped); });
+      }, 800);
+    }
+  } catch(e){
+    appendLog('ERROR: ' + e.message);
+    btn.disabled = false;
+    btn.textContent = '■ Stop Run';
+  }
+});
+
+// ──────────────────────────────────────────────────────
+// Init
+// ──────────────────────────────────────────────────────
+async function init(){
+  // Pre-fill site URLs from runner_config.json
+  try {
+    var cfg = await (await fetch('/api/settings')).json();
+    var cl = (cfg.sites||{}).cl || {};
+    var ox = (cfg.sites||{}).ox || {};
+    $('cl-name').value = cl.name || '';
+    $('cl-url').value  = cl.base_url || '';
+    $('ox-name').value = ox.name || '';
+    $('ox-url').value  = ox.base_url || '';
+  } catch(e){ console.warn('fetchSettings error', e); }
+
+  // Load current bulk status
+  try {
+    var resp = await fetch('/api/bulk/status');
+    var data = await resp.json();
+    if (data.run) {
+      state.currentRunId = data.run.run_id;
+      // Show last run's stats (counts, progress bar, run ID)
+      updateStats(data.run);
+    }
+    // Server's running flag is the ONLY authority on whether buttons should be locked.
+    // Never infer this from the DB status — stale DB rows can survive restarts.
+    state.running = data.running;
+    $('start-btn').disabled = data.running;
+    $('stop-btn').style.display = data.running ? '' : 'none';
+    if (data.running) {
+      setBadge('running');
+    } else if (data.run) {
+      var s = data.run.status;
+      setBadge(s === 'finished' ? 'done' : (s === 'error' || s === 'interrupted' ? 'error' : ''));
+    }
+  } catch(e){ console.warn('init status error', e); }
+
+  fetchResults();
+  connectSSE();
+
+  // Polling fallback — keeps stats and results current even when SSE is unreliable.
+  // Runs every 3s when there is an active or recently-started run.
+  setInterval(function(){
+    if (state.running || state.currentRunId) {
+      syncStatus();
+      if (state.running) fetchResults();
+    }
+  }, 3000);
+}
+
+init();
+</script>
+</body>
+</html>

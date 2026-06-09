@@ -186,6 +186,26 @@ def finish_run(run_id: str, status: str = "finished"):
         )
 
 
+def estimate_remaining_ms(run_id: str) -> int | None:
+    """
+    Returns estimated ms to completion based on avg duration of finished tests.
+    Returns None if not enough data yet.
+    """
+    with _conn() as c:
+        row = c.execute(
+            "SELECT AVG(duration_ms) as avg_ms, COUNT(*) as done "
+            "FROM bulk_tests WHERE run_id=? AND duration_ms IS NOT NULL",
+            (run_id,),
+        ).fetchone()
+        if not row or not row["done"] or not row["avg_ms"]:
+            return None
+        remaining = c.execute(
+            "SELECT COUNT(*) FROM bulk_tests WHERE run_id=? AND status IN ('queued','running')",
+            (run_id,),
+        ).fetchone()[0]
+        return int(row["avg_ms"] * remaining)
+
+
 def get_run_stats(run_id: str) -> dict:
     with _conn() as c:
         row = c.execute(

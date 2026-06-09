@@ -288,6 +288,7 @@ main{padding:28px 32px;max-width:1280px;margin:0 auto;display:flex;flex-directio
       <div class="stat-cell s-failed"><div class="stat-label">Failed (&lt;99%)</div><div class="stat-val" id="st-failed">—</div></div>
       <div class="stat-cell s-error"><div class="stat-label">Errors</div><div class="stat-val" id="st-errors">—</div></div>
       <div class="stat-cell s-skipped"><div class="stat-label">Skipped</div><div class="stat-val" id="st-skipped">—</div></div>
+      <div class="stat-cell s-running"><div class="stat-label">ETA</div><div class="stat-val" id="st-eta" style="font-size:15px">—</div></div>
       <div class="stat-cell"><div class="stat-label">Run ID</div><div class="stat-val" id="st-run-id" style="font-size:11px;padding-top:2px">—</div></div>
     </div>
     <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
@@ -399,6 +400,15 @@ function human(ms){
   if (ms==null) return '—';
   return ms < 1000 ? ms+'ms' : (ms/1000).toFixed(1)+'s';
 }
+function humanEta(ms){
+  if (ms==null || ms<=0) return '—';
+  var s = Math.round(ms/1000);
+  if (s < 60) return s+'s';
+  var m = Math.floor(s/60), rem = s%60;
+  if (m < 60) return m+'m '+(rem>0?rem+'s':'');
+  var h = Math.floor(m/60), rm = m%60;
+  return h+'h '+(rm>0?rm+'m':'');
+}
 function escHtml(s){
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
@@ -439,6 +449,7 @@ function updateStats(run){
   $('st-failed').textContent    = failed;
   $('st-errors').textContent    = errors;
   $('st-skipped').textContent   = skipped > 0 ? skipped : '—';
+  // ETA is set separately by syncStatus which has it from the API
   $('st-run-id').textContent    = run.run_id;
   $('stats-wrap').style.display = 'block';
 
@@ -806,6 +817,13 @@ function syncStatus(){
     if (d.run) {
       updateStats(d.run);
       if (!state.currentRunId) state.currentRunId = d.run.run_id;
+    }
+    // Update ETA from server
+    var etaEl = $('st-eta');
+    if (d.running && d.eta_ms != null) {
+      etaEl.textContent = humanEta(d.eta_ms);
+    } else if (!d.running) {
+      etaEl.textContent = d.run && d.run.status === 'finished' ? '✓ Done' : '—';
     }
     // Server flag is the only authority on whether a run is truly active
     state.running = d.running;

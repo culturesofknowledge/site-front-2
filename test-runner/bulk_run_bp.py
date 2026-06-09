@@ -60,7 +60,10 @@ def bulk_run_page():
 def get_status():
     bulk_db.init_db()
     run = bulk_db.get_latest_run()
-    return jsonify({"running": _run_active, "run": run})
+    eta_ms = None
+    if run and _run_active:
+        eta_ms = bulk_db.estimate_remaining_ms(run["run_id"])
+    return jsonify({"running": _run_active, "run": run, "eta_ms": eta_ms})
 
 
 @bulk_run_bp.route("/api/bulk/runs")

@@ -1,8 +1,10 @@
 """
 Standalone Flask app for the test-runner service.
-Runs internally on port 5001. Users access it via the main app at:
-  http://localhost:5000/test-run
+Runs internally on port 8085.
 """
+import preflight
+preflight.run()
+
 from flask import Flask, send_from_directory
 from test_run import test_run_bp
 from bulk_run_bp import bulk_run_bp, init_bulk

@@ -167,6 +167,7 @@ def worker_fn(
 
                 test_id  = test["id"]
                 uri      = test["uri"]
+                bulk_db.mark_test_running(test_id)
                 start    = time.time()
 
                 status      = "passed"
@@ -306,11 +307,9 @@ def main():
         t.start()
         workers.append(t)
 
-    # Feed the queue — marks each test 'running' right before it enters the queue
-    # so only tests that are actually being processed show as 'running' in the UI
+    # Feed the queue — workers mark each test 'running' when they dequeue it
     def _feed():
         for test in tests:
-            bulk_db.mark_test_running(test["id"])
             work_q.put(test)
         for _ in range(args.workers):
             work_q.put(None)  # one poison pill per worker

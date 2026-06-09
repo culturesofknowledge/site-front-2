@@ -165,13 +165,19 @@ def skip_remaining_tests(run_id: str, include_queued: bool = True) -> int:
     include_queued=True  → skip both 'queued' and 'running' (use for stop/interrupt)
     include_queued=False → skip only 'running' (use for crashes; leave 'queued' alone)
     """
-    statuses = "('queued', 'running')" if include_queued else "('running',)"
     with _conn() as c:
-        c.execute(
-            f"UPDATE bulk_tests SET status='skipped', finished_at=? "
-            f"WHERE run_id=? AND status IN {statuses}",
-            (time.time(), run_id),
-        )
+        if include_queued:
+            c.execute(
+                "UPDATE bulk_tests SET status='skipped', finished_at=? "
+                "WHERE run_id=? AND status IN ('queued', 'running')",
+                (time.time(), run_id),
+            )
+        else:
+            c.execute(
+                "UPDATE bulk_tests SET status='skipped', finished_at=? "
+                "WHERE run_id=? AND status='running'",
+                (time.time(), run_id),
+            )
         return c.execute(
             "SELECT COUNT(*) FROM bulk_tests WHERE run_id=? AND status='skipped'",
             (run_id,),

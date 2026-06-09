@@ -330,12 +330,17 @@ main{padding:28px 32px;max-width:1280px;margin:0 auto;display:flex;flex-directio
   </div>
 
   <!-- ═══ Log panel ═══ -->
-  <div class="card" id="log-card" style="display:none">
+  <div class="card" id="log-card">
     <div class="card-header">
       <span>Console Output</span>
-      <button class="btn" style="padding:3px 10px;font-size:11px" id="log-clear-btn">Clear</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span id="log-status" style="font-size:11px;color:var(--text3)">No run active</span>
+        <button class="btn" style="padding:3px 10px;font-size:11px" id="log-clear-btn">Clear</button>
+      </div>
     </div>
-    <div class="log-body" id="log-body"></div>
+    <div class="log-body" id="log-body">
+      <div class="log-line" style="color:var(--text3);font-style:italic" id="log-placeholder">Waiting for output — start a run above to see logs here.</div>
+    </div>
   </div>
 
 </main>
@@ -718,16 +723,27 @@ document.addEventListener('keydown', function(e){ if (e.key==='Escape') $('diff-
 // Log
 // ──────────────────────────────────────────────────────
 function appendLog(line){
-  $('log-card').style.display='';
+  var placeholder = $('log-placeholder');
+  if (placeholder) placeholder.remove();
   var body = $('log-body');
-  var cls = /PASSED|✅/.test(line)?'log-line lpass':/FAILED|❌/.test(line)?'log-line lfail':/ERROR|WARNING/.test(line)?'log-line lerror':/BULK_/.test(line)?'log-line linfo':'log-line';
+  var cls = /PASSED|✅/.test(line)?'log-line lpass'
+          : /FAILED|❌/.test(line)?'log-line lfail'
+          : /ERROR|WARNING|FATAL/.test(line)?'log-line lerror'
+          : /\[.*\]|workers|queued|Solr|Inserting|Run accepted|bulk_runner/.test(line)?'log-line linfo'
+          : 'log-line';
   var d = document.createElement('div');
   d.className = cls; d.textContent = line;
   body.appendChild(d);
   body.scrollTop = body.scrollHeight;
-  if (body.children.length > 600) body.removeChild(body.firstChild);
+  // Keep last 500 lines
+  while (body.children.length > 500) body.removeChild(body.firstChild);
 }
-$('log-clear-btn').addEventListener('click', function(){ $('log-body').innerHTML = ''; });
+
+function setLogStatus(text){ $('log-status').textContent = text; }
+
+$('log-clear-btn').addEventListener('click', function(){
+  $('log-body').innerHTML = '<div class="log-line" style="color:var(--text3);font-style:italic">Log cleared.</div>';
+});
 
 // ──────────────────────────────────────────────────────
 // SSE  (with auto-reconnect)
@@ -759,6 +775,7 @@ function connectSSE(){
     $('stop-btn').style.display = '';
     setBadge('running');
     updateStats(d);
+    setLogStatus('Running — ' + (d.total||0).toLocaleString() + ' tests');
     appendLog('[' + d.run_id + '] Tests ready — ' + (d.total||0).toLocaleString() + ' queued, starting workers ...');
   });
 
@@ -781,9 +798,8 @@ function connectSSE(){
     var d = JSON.parse(e.data);
     appendLog('Run complete — passed='+(d.passed||0)+' failed='+(d.failed||0)+
               ' errors='+(d.exec_errors||0)+' skipped='+(d.skipped||0));
+    setLogStatus('Finished');
     fetchResults();
-    // Let syncStatus be the authority on button state — avoids the race where
-    // bulk_done fires before _run_active is set to False on the server.
     setTimeout(syncStatus, 300);
     setTimeout(syncStatus, 1200);
   });
@@ -791,6 +807,7 @@ function connectSSE(){
   es.addEventListener('bulk_error', function(e){
     var d = JSON.parse(e.data);
     appendLog('ERROR: ' + d.error);
+    setLogStatus('Error — see above');
     setTimeout(syncStatus, 300);
     setTimeout(syncStatus, 1200);
   });
@@ -876,7 +893,7 @@ $('preview-btn').addEventListener('click', async function(){
       var msg = data.error || 'Preview failed';
       $('preview-result').innerHTML = '<span style="color:var(--fail)">'+escHtml(msg)+'</span>';
       appendLog('ERROR: ' + msg);
-      $('log-card').style.display = '';
+      setLogStatus('Error');
       return;
     }
     var parts = Object.entries(data.counts).map(function(kv){ return kv[0]+': '+kv[1].toLocaleString(); });
@@ -955,7 +972,7 @@ $('confirm-start-btn').addEventListener('click', async function(){
 
   $('start-btn').disabled = true;
   $('start-btn').textContent = '⟳ Starting…';
-  $('log-card').style.display = '';
+  setLogStatus('Starting…');
   appendLog('Sending start request…');
 
   try {
@@ -1058,25 +1075,33 @@ async function init(){
     $('ox-url').value  = ox.base_url || '';
   } catch(e){ console.warn('fetchSettings error', e); }
 
+  // Restore logs from server buffer (survives page refresh)
+  try {
+    var lr = await (await fetch('/api/bulk/logs')).json();
+    if (lr.logs && lr.logs.length) {
+      lr.logs.forEach(appendLog);
+      setLogStatus(lr.logs.length + ' lines restored');
+    }
+  } catch(e){ console.warn('fetchLogs error', e); }
+
   // Load current bulk status
   try {
     var resp = await fetch('/api/bulk/status');
     var data = await resp.json();
     if (data.run) {
       state.currentRunId = data.run.run_id;
-      // Show last run's stats (counts, progress bar, run ID)
       updateStats(data.run);
     }
-    // Server's running flag is the ONLY authority on whether buttons should be locked.
-    // Never infer this from the DB status — stale DB rows can survive restarts.
     state.running = data.running;
     $('start-btn').disabled = data.running;
     $('stop-btn').style.display = data.running ? '' : 'none';
     if (data.running) {
       setBadge('running');
+      setLogStatus('Run in progress');
     } else if (data.run) {
       var s = data.run.status;
       setBadge(s === 'finished' ? 'done' : (s === 'error' || s === 'interrupted' ? 'error' : ''));
+      setLogStatus('Last run: ' + data.run.run_id + ' (' + s + ')');
     }
   } catch(e){ console.warn('init status error', e); }
 

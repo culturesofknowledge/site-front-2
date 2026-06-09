@@ -26,9 +26,13 @@ bulk_run_bp = Blueprint("bulk_run", __name__)
 _event_queues: list[queue.Queue] = []
 _run_active    = False
 _run_lock      = threading.Lock()
-_stop_event    = threading.Event()   # set() to request cancellation
-_current_proc: Optional[subprocess.Popen] = None   # the live bulk_runner.py process
+_stop_event    = threading.Event()
+_current_proc: Optional[subprocess.Popen] = None
 _current_run_id: Optional[str] = None
+
+# In-memory log ring-buffer — survives page refreshes within the same server session
+_log_buffer: list[str] = []
+_LOG_MAX = 500
 
 def init_bulk():
     """Call once from create_app() — not at module level to avoid firing on reloads."""
@@ -45,6 +49,11 @@ def _broadcast(event: str, data: dict):
             q.put_nowait(msg)
         except queue.Full:
             pass
+    if event == "bulk_log":
+        line = data.get("line", "")
+        _log_buffer.append(line)
+        if len(_log_buffer) > _LOG_MAX:
+            del _log_buffer[:-_LOG_MAX]
 
 
 # ── Pages ─────────────────────────────────────────────────────────────────────
@@ -64,6 +73,11 @@ def get_status():
     if run and _run_active:
         eta_ms = bulk_db.estimate_remaining_ms(run["run_id"])
     return jsonify({"running": _run_active, "run": run, "eta_ms": eta_ms})
+
+
+@bulk_run_bp.route("/api/bulk/logs")
+def get_logs():
+    return jsonify({"logs": list(_log_buffer)})
 
 
 @bulk_run_bp.route("/api/bulk/runs")
@@ -134,6 +148,7 @@ def start_run():
         return jsonify({"error": f"Failed to save site config: {exc}"}), 500
 
     _stop_event.clear()
+    _log_buffer.clear()
 
     # Create the run record NOW so the browser gets a run_id immediately
     bulk_db.init_db()

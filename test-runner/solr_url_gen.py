@@ -65,10 +65,12 @@ def generate_urls(
         count = 0
         try:
             for record_id in _iter_ids(solr_base, core):
+                # Strip known Solr ID prefixes so URLs work correctly
+                clean_id = record_id.removeprefix("uuid_")
                 results.append({
-                    "uri":         uri_template.format(id=record_id),
+                    "uri":         uri_template.format(id=clean_id),
                     "record_type": rtype,
-                    "record_id":   record_id,
+                    "record_id":   clean_id,
                 })
                 count += 1
                 if limit and count >= limit:

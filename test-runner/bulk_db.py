@@ -65,38 +65,17 @@ def init_db():
 
 def reset_interrupted_runs():
     """
-    On startup: any run that was 'running' or 'generating' when the process
-    died gets marked 'interrupted', and its leftover queued/running tests
-    get marked 'skipped' so they don't show as stuck.
-    Also cleans up queued tests on runs already marked 'error' — can happen
-    if the thread crashed before skip_remaining_tests ran.
+    On startup: mark any unfinished runs as 'interrupted'.
+    We do NOT change individual test statuses — tests keep their last-known
+    state so the user can see what happened. Starting a new run creates a
+    fresh run_id with fresh tests, so old stale statuses don't interfere.
     """
     with _conn() as c:
-        stale = c.execute(
-            "SELECT run_id FROM bulk_runs WHERE status IN ('running', 'generating')"
-        ).fetchall()
-        for row in stale:
-            rid = row["run_id"]
-            c.execute(
-                "UPDATE bulk_tests SET status='skipped', finished_at=? "
-                "WHERE run_id=? AND status IN ('queued', 'running')",
-                (time.time(), rid),
-            )
-            c.execute(
-                "UPDATE bulk_runs SET status='interrupted', finished_at=? WHERE run_id=?",
-                (time.time(), rid),
-            )
-
-        # Also clean up any 'error' runs whose tests are still queued
-        error_runs = c.execute(
-            "SELECT run_id FROM bulk_runs WHERE status='error'"
-        ).fetchall()
-        for row in error_runs:
-            c.execute(
-                "UPDATE bulk_tests SET status='skipped', finished_at=? "
-                "WHERE run_id=? AND status IN ('queued', 'running')",
-                (time.time(), row["run_id"]),
-            )
+        c.execute(
+            "UPDATE bulk_runs SET status='interrupted', finished_at=? "
+            "WHERE status IN ('running', 'generating')",
+            (time.time(),),
+        )
 
 
 def create_run(config: dict, status: str = "generating") -> str:
@@ -180,12 +159,17 @@ def update_test_result(test_id: int, run_id: str, result: dict):
             )
 
 
-def skip_remaining_tests(run_id: str) -> int:
-    """Mark every queued/running test as skipped. Returns the count skipped."""
+def skip_remaining_tests(run_id: str, include_queued: bool = True) -> int:
+    """
+    Mark unfinished tests as skipped. Returns the count skipped.
+    include_queued=True  → skip both 'queued' and 'running' (use for stop/interrupt)
+    include_queued=False → skip only 'running' (use for crashes; leave 'queued' alone)
+    """
+    statuses = "('queued', 'running')" if include_queued else "('running',)"
     with _conn() as c:
         c.execute(
-            "UPDATE bulk_tests SET status='skipped', finished_at=? "
-            "WHERE run_id=? AND status IN ('queued', 'running')",
+            f"UPDATE bulk_tests SET status='skipped', finished_at=? "
+            f"WHERE run_id=? AND status IN {statuses}",
             (time.time(), run_id),
         )
         return c.execute(

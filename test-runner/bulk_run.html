@@ -140,6 +140,29 @@ main{padding:28px 32px;max-width:1280px;margin:0 auto;display:flex;flex-directio
 .log-line{white-space:pre-wrap;word-break:break-all}
 .lpass{color:var(--pass)}.lfail{color:var(--fail)}.lerror{color:var(--warn)}.linfo{color:var(--accent)}
 
+/* Toggle switch */
+.toggle-wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.toggle-info{flex:1}
+.toggle-label{font-size:13px;font-weight:500;color:var(--text)}
+.toggle-desc{font-size:11px;color:var(--text3);margin-top:2px}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:var(--border2);border-radius:12px;cursor:pointer;transition:background .2s}
+.toggle input:checked + .toggle-track{background:var(--accent)}
+.toggle-track::after{content:'';position:absolute;left:3px;top:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle input:checked + .toggle-track::after{transform:translateX(20px)}
+
+/* Confirmation modal */
+#confirm-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:998;align-items:center;justify-content:center;padding:24px}
+#confirm-modal.open{display:flex}
+.confirm-box{background:var(--surface);border-radius:var(--radius);box-shadow:0 20px 60px rgba(0,0,0,.2);width:min(480px,95vw);overflow:hidden}
+.confirm-header{padding:16px 20px;border-bottom:1px solid var(--border);font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:space-between}
+.confirm-body{padding:18px 20px;display:flex;flex-direction:column;gap:14px}
+.confirm-summary{font-size:12px;display:grid;grid-template-columns:auto 1fr;gap:4px 12px}
+.confirm-summary dt{color:var(--text3);font-weight:500;white-space:nowrap}
+.confirm-summary dd{color:var(--text);font-family:'DM Mono',monospace;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.confirm-footer{padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+
 /* Diff modal */
 #diff-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;align-items:center;justify-content:center;padding:24px}
 #diff-modal.open{display:flex}
@@ -293,7 +316,8 @@ main{padding:28px 32px;max-width:1280px;margin:0 auto;display:flex;flex-directio
             <th style="width:110px">Status</th>
             <th style="width:80px">Match</th>
             <th style="width:90px">Duration</th>
-            <th style="width:100px">Screenshots</th>
+            <th style="width:80px">Open</th>
+            <th style="width:100px">Images</th>
           </tr>
         </thead>
         <tbody id="results-tbody">
@@ -314,6 +338,33 @@ main{padding:28px 32px;max-width:1280px;margin:0 auto;display:flex;flex-directio
   </div>
 
 </main>
+
+<!-- ═══ Confirmation modal ═══ -->
+<div id="confirm-modal">
+  <div class="confirm-box">
+    <div class="confirm-header">
+      <span>Start Bulk Run</span>
+      <button class="modal-close" id="confirm-close-btn">✕</button>
+    </div>
+    <div class="confirm-body">
+      <dl class="confirm-summary" id="confirm-summary"></dl>
+      <div class="toggle-wrap">
+        <div class="toggle-info">
+          <div class="toggle-label">Capture diff image for passing tests</div>
+          <div class="toggle-desc">Saves a pixel diff even when match ≥ 99% — lets you see what "passing" looks like. Failing tests always save screenshots.</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="confirm-capture-diff" checked/>
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+    </div>
+    <div class="confirm-footer">
+      <button class="btn" id="confirm-cancel-btn">Cancel</button>
+      <button class="btn btn-primary" id="confirm-start-btn">▶ Start Run</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══ Diff modal ═══ -->
 <div id="diff-modal">
@@ -453,10 +504,19 @@ function updateTypeFilter(types){
   });
 }
 
+function siteLinks(uri){
+  var clBase = ($('cl-url').value || '').trim().replace(/\/$/, '');
+  var oxBase = ($('ox-url').value || '').trim().replace(/\/$/, '');
+  var html = '';
+  if (clBase) html += '<a class="img-link" href="'+escHtml(clBase+uri)+'" target="_blank" title="Open on Site A">A ↗</a> ';
+  if (oxBase) html += '<a class="img-link" href="'+escHtml(oxBase+uri)+'" target="_blank" title="Open on Site B">B ↗</a>';
+  return html || '—';
+}
+
 function renderTable(items){
   var tbody = $('results-tbody');
   if (!items.length){
-    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No results match the current filter.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No results match the current filter.</td></tr>';
     return;
   }
   tbody.innerHTML = '';
@@ -473,7 +533,7 @@ function renderTable(items){
     }
 
     var screenshotHtml = '—';
-    if (item.diff_image){
+    if (item.diff_image || item.cl_image){
       screenshotHtml = '<a class="img-link" href="#" data-item-id="'+item.id+'">⊞ View</a>';
     }
 
@@ -486,6 +546,7 @@ function renderTable(items){
       '<td><span class="status-dot '+escHtml(statusLabel)+'">'+escHtml(statusLabel)+'</span></td>'+
       '<td>'+pctHtml+'</td>'+
       '<td class="dur-cell">'+human(item.duration_ms)+'</td>'+
+      '<td style="white-space:nowrap">'+siteLinks(item.uri)+'</td>'+
       '<td>'+screenshotHtml+'</td>';
 
     tr.addEventListener('click', function(e){
@@ -575,6 +636,23 @@ function openModal(item){
     body.appendChild(errDiv);
   }
 
+  // Site links
+  var clBase = ($('cl-url').value || '').trim().replace(/\/$/, '');
+  var oxBase = ($('ox-url').value || '').trim().replace(/\/$/, '');
+  var clName = ($('cl-name').value || 'Site A').trim();
+  var oxName = ($('ox-name').value || 'Site B').trim();
+  if (clBase || oxBase) {
+    var links = document.createElement('div');
+    links.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px';
+    if (clBase) {
+      links.innerHTML += '<a href="'+escHtml(clBase+item.uri)+'" target="_blank" class="detail-link" style="font-size:12px">↗ '+escHtml(clName)+'</a>';
+    }
+    if (oxBase) {
+      links.innerHTML += '<a href="'+escHtml(oxBase+item.uri)+'" target="_blank" class="detail-link" style="font-size:12px">↗ '+escHtml(oxName)+'</a>';
+    }
+    body.appendChild(links);
+  }
+
   // Stats row
   var stats = document.createElement('div');
   stats.style.cssText = 'display:flex;gap:16px;font-size:12px;flex-wrap:wrap;padding:4px 0';
@@ -610,6 +688,12 @@ function openModal(item){
     dw.innerHTML = '<div style="padding:10px 0 6px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2)">Pixel Diff</div>'+
       '<div class="modal-img-wrap"><img src="/bulk-results/'+escHtml(item.diff_image)+'" loading="lazy"/></div>';
     body.appendChild(dw);
+  } else if (item.status === 'passed') {
+    var nd = document.createElement('div');
+    nd.style.cssText = 'background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.6';
+    nd.innerHTML = '<strong style="color:var(--text)">No diff image captured.</strong><br>'+
+      'Enable <em>Save diff image for passing tests</em> in the Start Run confirmation to compare screenshots even when tests pass.';
+    body.appendChild(nd);
   }
 
   $('diff-modal').classList.add('open');
@@ -790,7 +874,12 @@ $('preview-btn').addEventListener('click', async function(){
 // ──────────────────────────────────────────────────────
 // Start run
 // ──────────────────────────────────────────────────────
-$('start-btn').addEventListener('click', async function(){
+// ──────────────────────────────────────────────────────
+// Confirmation modal
+// ──────────────────────────────────────────────────────
+var _pendingRun = null;
+
+$('start-btn').addEventListener('click', function(){
   if (state.running) return;
 
   var solrUrl = $('solr-url').value.trim();
@@ -798,14 +887,54 @@ $('start-btn').addEventListener('click', async function(){
   var oxUrl   = $('ox-url').value.trim();
   var cores   = getSelectedCores();
 
-  if (!solrUrl)          { alert('Enter a Solr URL first.'); return; }
-  if (!clUrl || !oxUrl)  { alert('Enter both Site A and Site B URLs.'); return; }
-  if (!cores.length)     { alert('Select at least one collection.'); return; }
+  if (!solrUrl)         { alert('Enter a Solr URL first.'); return; }
+  if (!clUrl || !oxUrl) { alert('Enter both Site A and Site B URLs.'); return; }
+  if (!cores.length)    { alert('Select at least one collection.'); return; }
 
   var limit   = parseInt($('limit').value)   || null;
   var workers = parseInt($('workers').value) || 4;
+  var clName  = $('cl-name').value.trim() || 'Site A';
+  var oxName  = $('ox-name').value.trim() || 'Site B';
 
-  // Lock the button immediately so the user sees something happened
+  _pendingRun = { solrUrl: solrUrl, clUrl: clUrl, oxUrl: oxUrl, clName: clName, oxName: oxName, cores: cores, limit: limit, workers: workers };
+
+  // Build the summary table inside the modal
+  var rows = [
+    ['Site A',       clName + ' — ' + clUrl],
+    ['Site B',       oxName + ' — ' + oxUrl],
+    ['Solr',         solrUrl],
+    ['Collections',  cores.join(', ')],
+    ['Limit',        limit ? limit + ' per collection' : 'All records'],
+    ['Workers',      String(workers)],
+  ];
+  $('confirm-summary').innerHTML = rows.map(function(p){
+    return '<dt>'+escHtml(p[0])+'</dt><dd title="'+escHtml(p[1])+'">'+escHtml(p[1])+'</dd>';
+  }).join('');
+
+  // Restore last-used value; fall back to true (ON) if never set
+  var saved = localStorage.getItem('bulk_capture_passed_diff');
+  $('confirm-capture-diff').checked = saved === null ? true : saved === 'true';
+  $('confirm-modal').classList.add('open');
+});
+
+function closeConfirmModal(){
+  $('confirm-modal').classList.remove('open');
+  _pendingRun = null;
+}
+
+$('confirm-close-btn').addEventListener('click', closeConfirmModal);
+$('confirm-cancel-btn').addEventListener('click', closeConfirmModal);
+$('confirm-modal').addEventListener('click', function(e){
+  if (e.target === $('confirm-modal')) closeConfirmModal();
+});
+
+$('confirm-start-btn').addEventListener('click', async function(){
+  if (!_pendingRun) return;
+  var run = _pendingRun;
+  var capturePassedDiff = $('confirm-capture-diff').checked;
+  localStorage.setItem('bulk_capture_passed_diff', String(capturePassedDiff));
+  closeConfirmModal();
+
   $('start-btn').disabled = true;
   $('start-btn').textContent = '⟳ Starting…';
   $('log-card').style.display = '';
@@ -816,14 +945,15 @@ $('start-btn').addEventListener('click', async function(){
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-        solr_url: solrUrl,
-        cores:    cores,
-        limit:    limit,
-        workers:  workers,
-        cl_name:  $('cl-name').value.trim() || 'Site A',
-        cl_url:   clUrl,
-        ox_name:  $('ox-name').value.trim() || 'Site B',
-        ox_url:   oxUrl,
+        solr_url:            run.solrUrl,
+        cores:               run.cores,
+        limit:               run.limit,
+        workers:             run.workers,
+        cl_name:             run.clName,
+        cl_url:              run.clUrl,
+        ox_name:             run.oxName,
+        ox_url:              run.oxUrl,
+        capture_passed_diff: capturePassedDiff,
       }),
     });
     var data = await resp.json();
@@ -837,10 +967,9 @@ $('start-btn').addEventListener('click', async function(){
       return;
     }
 
-    // Accepted — background thread is now querying Solr
-    state.running     = true;
+    state.running      = true;
     state.currentRunId = data.run_id;
-    $('start-btn').textContent = '▶ Start Bulk Run';
+    $('start-btn').textContent  = '▶ Start Bulk Run';
     $('stop-btn').style.display = '';
     setBadge('running');
     appendLog('Run accepted: ' + data.run_id + ' — querying Solr in background…');

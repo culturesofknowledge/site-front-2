@@ -30,9 +30,10 @@ _stop_event    = threading.Event()   # set() to request cancellation
 _current_proc: Optional[subprocess.Popen] = None   # the live bulk_runner.py process
 _current_run_id: Optional[str] = None
 
-# Reset any runs left in 'running' state from a previous crashed process
-bulk_db.init_db()
-bulk_db.reset_interrupted_runs()
+def init_bulk():
+    """Call once from create_app() — not at module level to avoid firing on reloads."""
+    bulk_db.init_db()
+    bulk_db.reset_interrupted_runs()
 
 
 # ── Broadcast ─────────────────────────────────────────────────────────────────
@@ -100,8 +101,9 @@ def start_run():
     data     = request.get_json(force=True) or {}
     solr_url = data.get("solr_url", "").strip()
     limit    = data.get("limit")        # per-core limit; None = all
-    cores    = data.get("cores") or None
-    workers  = int(data.get("workers", 4))
+    cores               = data.get("cores") or None
+    workers             = int(data.get("workers", 4))
+    capture_passed_diff = bool(data.get("capture_passed_diff", False))
     cl_name  = data.get("cl_name", "").strip()
     cl_url   = data.get("cl_url",  "").strip()
     ox_name  = data.get("ox_name", "").strip()
@@ -145,10 +147,12 @@ def start_run():
 
         def _stopped(reason: str):
             """Shared cleanup when the run is cancelled at any phase."""
-            skipped = bulk_db.skip_remaining_tests(run_id)
+            skipped = bulk_db.skip_remaining_tests(run_id, include_queued=True)
             bulk_db.finish_run(run_id, "interrupted")
             stats = bulk_db.get_run_stats(run_id)
-            _broadcast("bulk_log",  {"line": f"[{run_id}] Stopped: {reason} — {skipped} tests skipped"})
+            msg = f"[{run_id}] Stopped: {reason} — {skipped} tests skipped"
+            logger.warning(msg)
+            _broadcast("bulk_log",  {"line": msg})
             _broadcast("bulk_done", {**stats, "exit_code": -1})
 
         try:
@@ -192,12 +196,16 @@ def start_run():
             logger.info("Run %s: %d tests queued, launching runner", run_id, len(tests))
 
             # Phase 3 — launch the parallel Playwright runner subprocess
+            cmd = [
+                sys.executable, str(BASE_DIR / "bulk_runner.py"),
+                "--run-id", run_id,
+                "--workers", str(workers),
+            ]
+            if capture_passed_diff:
+                cmd.append("--capture-passed-diff")
+
             proc = subprocess.Popen(
-                [
-                    sys.executable, str(BASE_DIR / "bulk_runner.py"),
-                    "--run-id", run_id,
-                    "--workers", str(workers),
-                ],
+                cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
@@ -228,12 +236,21 @@ def start_run():
             proc.wait()
             _current_proc = None
 
-            # Always skip any tests still in queued/running state — covers crashes,
-            # SIGTERM kills, and early exits in addition to normal completion.
-            skipped = bulk_db.skip_remaining_tests(run_id)
+            was_stopped = _stop_event.is_set() or proc.returncode == -signal.SIGTERM
 
-            was_stopped  = _stop_event.is_set() or proc.returncode == -signal.SIGTERM
-            final_status = "interrupted" if was_stopped else ("finished" if proc.returncode == 0 else "error")
+            if was_stopped:
+                # User requested stop — skip everything still pending
+                skipped = bulk_db.skip_remaining_tests(run_id, include_queued=True)
+                final_status = "interrupted"
+            elif proc.returncode != 0:
+                # Subprocess crashed — skip only tests already marked 'running';
+                # leave 'queued' tests alone so they don't silently disappear
+                skipped = bulk_db.skip_remaining_tests(run_id, include_queued=False)
+                final_status = "error"
+            else:
+                # Clean exit — all tests should already have final statuses
+                skipped = 0
+                final_status = "finished"
 
             bulk_db.finish_run(run_id, final_status)
             stats = bulk_db.get_run_stats(run_id)

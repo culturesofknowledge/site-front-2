@@ -5,7 +5,7 @@ Runs internally on port 5001. Users access it via the main app at:
 """
 from flask import Flask, send_from_directory
 from test_run import test_run_bp
-from bulk_run_bp import bulk_run_bp
+from bulk_run_bp import bulk_run_bp, init_bulk
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -14,6 +14,7 @@ def create_app():
     app = Flask(__name__)
     app.register_blueprint(test_run_bp)
     app.register_blueprint(bulk_run_bp)
+    init_bulk()
 
     @app.route("/")
     def landing():

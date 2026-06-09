@@ -136,6 +136,7 @@ def worker_fn(
     work_q: Queue,
     result_q: Queue,
     cfg: dict,
+    capture_passed_diff: bool = False,
 ):
     sites    = cfg.get("sites", {})
     cl_base  = sites.get("cl", {}).get("base_url", "").rstrip("/")
@@ -203,13 +204,15 @@ def worker_fn(
                     match_pct    = round(((total_pixels - diff_pixels) / total_pixels) * 100, 2)
 
                     if match_pct < SCREENSHOT_THRESHOLD:
+                        # Failed — save diff + both screenshots
                         status    = "failed"
-                        safe_name = f"{test_id}"
+                        safe_name = str(test_id)
+                        SCREENSHOT_DIR.mkdir(parents=True, exist_ok=True)
+
                         diff_name = f"diff_{safe_name}.png"
                         cl_name   = f"cl_{safe_name}.png"
                         ox_name   = f"ox_{safe_name}.png"
 
-                        SCREENSHOT_DIR.mkdir(parents=True, exist_ok=True)
                         diff_img.save(SCREENSHOT_DIR / diff_name)
                         Image.open(BytesIO(cl_img_bytes)).save(SCREENSHOT_DIR / cl_name)
                         Image.open(BytesIO(ox_img_bytes)).save(SCREENSHOT_DIR / ox_name)
@@ -217,6 +220,13 @@ def worker_fn(
                         diff_image = diff_name
                         cl_image   = cl_name
                         ox_image   = ox_name
+
+                    elif capture_passed_diff:
+                        # Passed but user asked for diff images — save diff only (no screenshots)
+                        SCREENSHOT_DIR.mkdir(parents=True, exist_ok=True)
+                        diff_name = f"diff_{test_id}.png"
+                        diff_img.save(SCREENSHOT_DIR / diff_name)
+                        diff_image = diff_name
 
                 except Exception as exc:
                     status = "execution-error"
@@ -250,14 +260,24 @@ def worker_fn(
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--run-id",  required=True)
-    parser.add_argument("--workers", type=int, default=4)
+    parser.add_argument("--run-id",           required=True)
+    parser.add_argument("--workers",          type=int, default=4)
+    parser.add_argument("--capture-passed-diff", action="store_true")
     args = parser.parse_args()
 
     print(f"bulk_runner started — run={args.run_id}  workers={args.workers}", flush=True)
 
-    cfg = load_config()
-    bulk_db.init_db()
+    try:
+        cfg = load_config()
+    except Exception as exc:
+        print(f"FATAL: failed to load config — {exc}", flush=True)
+        sys.exit(1)
+
+    try:
+        bulk_db.init_db()
+    except Exception as exc:
+        print(f"FATAL: failed to init DB — {exc}", flush=True)
+        sys.exit(1)
 
     tests = bulk_db.get_pending_tests(args.run_id)
     total = len(tests)
@@ -268,35 +288,34 @@ def main():
         emit("BULK_DONE", bulk_db.get_run_stats(args.run_id))
         return
 
-    # Mark every test 'running' immediately so the UI shows progress right away,
-    # not only when a worker actually picks the test up from the queue.
-    for test in tests:
-        bulk_db.mark_test_running(test["id"])
-
     emit("BULK_START", {"run_id": args.run_id, "total": total})
-    print(f"Bulk run {args.run_id}: {total} tests marked running, launching {args.workers} workers", flush=True)
+    print(f"Bulk run {args.run_id}: {total} tests, {args.workers} workers", flush=True)
 
-    # Unbounded queue — tests are already marked running, no need to throttle
+    # Unbounded queue so the feeder can mark tests running as fast as possible
     work_q:   Queue = Queue()
     result_q: Queue = Queue()
 
-    # Load the queue before starting workers so workers find work immediately
-    for test in tests:
-        work_q.put(test)
-    for _ in range(args.workers):
-        work_q.put(None)  # one poison pill per worker
-
-    # Start worker threads
+    # Start worker threads first
     workers = []
     for i in range(args.workers):
         t = threading.Thread(
             target=worker_fn,
-            args=(i, work_q, result_q, cfg),
+            args=(i, work_q, result_q, cfg, args.capture_passed_diff),
             daemon=True,
         )
         t.start()
         workers.append(t)
 
+    # Feed the queue — marks each test 'running' right before it enters the queue
+    # so only tests that are actually being processed show as 'running' in the UI
+    def _feed():
+        for test in tests:
+            bulk_db.mark_test_running(test["id"])
+            work_q.put(test)
+        for _ in range(args.workers):
+            work_q.put(None)  # one poison pill per worker
+
+    threading.Thread(target=_feed, daemon=True).start()
     print(f"Workers started — waiting for results", flush=True)
 
     # Collect results

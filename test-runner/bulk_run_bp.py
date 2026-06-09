@@ -42,6 +42,13 @@ def init_bulk():
 
 # ── Broadcast ─────────────────────────────────────────────────────────────────
 
+def _log(run_id: str, msg: str):
+    """Print to terminal AND broadcast to SSE clients."""
+    line = f"[{run_id}] {msg}"
+    print(line, flush=True)
+    _broadcast("bulk_log", {"line": line})
+
+
 def _broadcast(event: str, data: dict):
     msg = f"event: {event}\ndata: {json.dumps(data)}\n\n"
     for q in list(_event_queues):
@@ -168,14 +175,13 @@ def start_run():
             skipped = bulk_db.skip_remaining_tests(run_id, include_queued=True)
             bulk_db.finish_run(run_id, "interrupted")
             stats = bulk_db.get_run_stats(run_id)
-            msg = f"[{run_id}] Stopped: {reason} — {skipped} tests skipped"
-            logger.warning(msg)
-            _broadcast("bulk_log",  {"line": msg})
+            logger.warning("Run %s stopped: %s — %d skipped", run_id, reason, skipped)
+            _log(run_id, f"Stopped: {reason} — {skipped} tests skipped")
             _broadcast("bulk_done", {**stats, "exit_code": -1})
 
         try:
             # Phase 1 — query Solr for all record IDs
-            _broadcast("bulk_log",        {"line": f"[{run_id}] Querying Solr at {solr_url} ..."})
+            _log(run_id, f"Querying Solr at {solr_url} ...")
             _broadcast("bulk_generating", {"run_id": run_id, "phase": "solr"})
 
             try:
@@ -184,7 +190,7 @@ def start_run():
                 err = str(exc)
                 logger.error("Solr error for run %s: %s", run_id, err)
                 bulk_db.finish_run(run_id, "error")
-                _broadcast("bulk_log",   {"line": f"ERROR: {err}"})
+                _log(run_id, f"ERROR: {err}")
                 _broadcast("bulk_error", {"run_id": run_id, "error": err})
                 return
 
@@ -195,12 +201,12 @@ def start_run():
             if not tests:
                 err = "No records returned from Solr — check the Solr URL and selected collections."
                 bulk_db.finish_run(run_id, "error")
-                _broadcast("bulk_log",   {"line": f"ERROR: {err}"})
+                _log(run_id, f"ERROR: {err}")
                 _broadcast("bulk_error", {"run_id": run_id, "error": err})
                 return
 
             # Phase 2 — write tests to SQLite
-            _broadcast("bulk_log",        {"line": f"[{run_id}] Inserting {len(tests):,} tests into database ..."})
+            _log(run_id, f"Inserting {len(tests):,} tests into database ...")
             _broadcast("bulk_generating", {"run_id": run_id, "phase": "db", "total": len(tests)})
             bulk_db.insert_tests(run_id, tests)
 
@@ -239,6 +245,7 @@ def start_run():
                 if not line:
                     continue
 
+                print(f"[bulk_runner] {line}", flush=True)
                 _broadcast("bulk_log", {"line": line})
 
                 for tag in ("BULK_START", "BULK_RESULT", "BULK_PROGRESS", "BULK_DONE"):
@@ -273,9 +280,10 @@ def start_run():
             bulk_db.finish_run(run_id, final_status)
             stats = bulk_db.get_run_stats(run_id)
             if skipped:
-                _broadcast("bulk_log", {"line": f"[{run_id}] {skipped} tests skipped"})
+                _log(run_id, f"{skipped} tests skipped")
             _broadcast("bulk_done", {**stats, "exit_code": proc.returncode})
             logger.info("Run %s %s — exit_code=%s  skipped=%d", run_id, final_status, proc.returncode, skipped)
+            _log(run_id, f"Run {final_status} — passed={stats.get('passed',0)} failed={stats.get('failed',0)} errors={stats.get('exec_errors',0)} skipped={skipped}")
 
         except Exception as exc:
             logger.exception("Run thread error for %s: %s", run_id, exc)
@@ -285,7 +293,7 @@ def start_run():
                 stats = bulk_db.get_run_stats(run_id)
             except Exception:
                 stats = {}
-            _broadcast("bulk_log",   {"line": f"INTERNAL ERROR: {exc}"})
+            _log(run_id, f"INTERNAL ERROR: {exc}")
             _broadcast("bulk_error", {"run_id": run_id, "error": str(exc)})
             _broadcast("bulk_done",  {**stats, "exit_code": -1})
 

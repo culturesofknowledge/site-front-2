@@ -24,7 +24,7 @@ class PersonChart {
     this.person_data_with_unknown = [];
     this.charts = [];
     this.chart_titles = [];
-    this.show_unknown = true;
+    this.showUnknown = true;
     this.bars_are = this.separate;
     this.svg_chart = null;
     this.axes = [];
@@ -157,7 +157,7 @@ class PersonChart {
         // Create X scale (scoped per chart)
         const xScaleDomain = this.getXScaleDomain(
           this.person_data,
-          this.show_unknown
+          this.showUnknown
         );
         const xScale = d3.scale
           .ordinal()
@@ -203,6 +203,10 @@ class PersonChart {
           .ticks(y_ticks)
           .tickSize(4, 2, 0);
 
+        yAxis.tickSubdivide(
+          this.getYAxisSubTickNumber(yScale.ticks(y_ticks), this.bars_are)
+        );
+
         this.axes[chart] = { x: xAxis, y: yAxis };
 
         this.svgChart
@@ -224,12 +228,18 @@ class PersonChart {
           .call(yAxis);
 
         // Render bars for this chart
-        this.renderBars(chart, xScale, yScale, chart_x, chart_y, chart_height);
+        this.renderBars(chart, xScale, yScale, chart_x, chart_y, chart_height, i);
       }
     }
+
+    this.highlight(["#show_unknown"], this.showUnknown);
+    this.hide(["#chart .unknown"], !this.have.unknown);
+    this.hide(["#chart .bars"], this.charts.length === 1);
+    this.hide(["#chart"], false);
   }
 
-  renderBars(chart, xScale, yScale, chart_x, chart_y, chart_height) {
+  renderBars(chart, xScale, yScale, chart_x, chart_y, chart_height, chart_index) {
+    const self = this;
     const bars = this.svgChart
       .selectAll(`rect.${chart}`)
       .data(this.person_data, (d) => `${d.year}-${chart}`);
@@ -243,7 +253,15 @@ class PersonChart {
       .attr("x", (d, i) => chart_x + xScale(i))
       .attr("y", chart_y + chart_height)
       .attr("width", xScale.rangeBand())
-      .attr("height", 0);
+      .attr("height", 0)
+      .classed("unknown", function (d) {
+        return d.year == self.unknownYear;
+      });
+
+    bars.append("title").text(function (d) {
+      var year = d.year != self.unknownYear ? d.year : "Years unknown";
+      return year + ": " + d[chart] + " " + self.chart_titles[chart_index];
+    });
 
     bars
       .transition()
@@ -275,7 +293,7 @@ class PersonChart {
     const xDomain = [];
     this.person_data_length = person_data.length;
     for (var j = 0; j < this.person_data_length; j++) {
-      var year = this.person_data[j].year;
+      var year = person_data[j].year;
 
       if (showUnknown || year != this.unknownYear) {
         if (year == this.unknownYear) xDomain.push(this.unknownYearText);
@@ -295,12 +313,20 @@ class PersonChart {
       val,
       j;
 
-    if (widthBar > 40) {
+    const minLabelPx = 35;
+    const naturalEvery = Math.ceil(minLabelPx / widthBar);
+    if (naturalEvery <= 1) {
       ticks_every = 1;
-    } else if (widthBar > 20) {
+    } else if (naturalEvery <= 3) {
       ticks_every = 3;
-    } else if (widthBar > 10) {
+    } else if (naturalEvery <= 5) {
       ticks_every = 5;
+    } else if (naturalEvery <= 10) {
+      ticks_every = 10;
+    } else if (naturalEvery <= 20) {
+      ticks_every = 20;
+    } else {
+      ticks_every = 50;
     }
 
     for (j = 0; j < xAxisTicksDomain.length; j++) {
@@ -538,7 +564,7 @@ class PersonChart {
           .remove();
         // let self = this;
         bars.append("title").text(function (d) {
-          var year = d.year != this.unknownYear ? d.year : "Years unknown";
+          var year = d.year != self.unknownYear ? d.year : "Years unknown";
           return year + ": " + d[chart] + " " + self.chart_titles[i];
         });
 
@@ -616,7 +642,22 @@ class PersonChart {
     this.highlight(["#bars_stacked", "#bars_split", "#bars_seperate"], false);
     this.highlight([`#bars_${bars_should_be}`], true);
 
-    this.updateCharts(1000, 0);
+    const self = this;
+    this.updateCharts(1000, function (d, i) {
+      if (d.creator === 0 && d.recipient === 0 && d.mentioned === 0) {
+        return 0;
+      }
+      for (var j = 0, count = 0; j < i; j++) {
+        if (
+          self.person_data[j].creator !== 0 ||
+          self.person_data[j].recipient !== 0 ||
+          self.person_data[j].mentioned !== 0
+        ) {
+          count += 1;
+        }
+      }
+      return (self.person_data_length - count - 1) * (1300 / self.person_data_length);
+    });
   }
 
   highlight(selectors, highlight) {
@@ -678,7 +719,7 @@ class PersonChart {
         d3Chart.style("-ms-transform", transform);
         d3Chart.style("-webkit-transform", transform);
         d3Chart.style("transform", transform);
-        this.highlight(["#fullscreen"], fullscreen);
+        this.highlight(["#fullscreen"], this.fullscreen);
       }
 
       this.fullscreen = !this.fullscreen;

@@ -178,16 +178,19 @@ def worker_fn(
                 error       = None
                 cl_load_ms  = None
                 ox_load_ms  = None
+                cl_t0 = ox_t0 = None
 
                 try:
                     cl_url = cl_base + uri
                     ox_url = ox_base + uri
 
+                    cl_t0 = time.time()
                     cl_page.goto(cl_url, wait_until="domcontentloaded", timeout=page_timeout)
                     wait_for_content(cl_page, timeout=page_timeout)
                     cl_load_ms   = int(cl_page.evaluate("()=>Math.round(performance.now())") or 0)
                     cl_img_bytes = capture_viewport(cl_page, viewport)
 
+                    ox_t0 = time.time()
                     ox_page.goto(ox_url, wait_until="domcontentloaded", timeout=page_timeout)
                     wait_for_content(ox_page, timeout=page_timeout)
                     ox_load_ms   = int(ox_page.evaluate("()=>Math.round(performance.now())") or 0)
@@ -231,7 +234,15 @@ def worker_fn(
 
                 except Exception as exc:
                     status = "execution-error"
-                    error  = str(exc)
+                    now = time.time()
+                    if cl_load_ms is None and cl_t0 is not None:
+                        cl_load_ms = int((now - cl_t0) * 1000)
+                        error = f"[site-a: {cl_url}] {exc}"
+                    elif ox_load_ms is None and ox_t0 is not None:
+                        ox_load_ms = int((now - ox_t0) * 1000)
+                        error = f"[site-b: {ox_url}] {exc}"
+                    else:
+                        error = str(exc)
 
                 duration_ms = int((time.time() - start) * 1000)
 

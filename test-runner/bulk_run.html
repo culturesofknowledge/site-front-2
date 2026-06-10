@@ -264,8 +264,11 @@ main{padding:28px 32px;max-width:1280px;margin:0 auto;display:flex;flex-directio
         </div>
         <div class="field">
           <label>Parallel workers</label>
-          <input type="number" id="workers" min="1" max="16" step="1" value="4"/>
+          <input type="number" id="workers" min="1" max="64" step="1" value="4"/>
           <small>Browser instances running at the same time. 4 is a safe default.</small>
+          <div class="hint" id="workers-warn" style="color:var(--warn);display:none">
+            ⚠ High worker count — each Chromium instance needs ~300 MB RAM and a CPU core. Too many workers causes timeouts and OOM crashes. Recommended max: 2× your CPU core count.
+          </div>
         </div>
       </div>
 
@@ -378,6 +381,11 @@ main{padding:28px 32px;max-width:1280px;margin:0 auto;display:flex;flex-directio
     </div>
     <div class="confirm-body">
       <dl class="confirm-summary" id="confirm-summary"></dl>
+      <div id="workers-cap-notice" style="display:none;background:var(--warn-bg);border:1px solid rgba(217,119,6,.25);border-radius:8px;padding:11px 14px;font-size:12px;color:var(--warn);line-height:1.6">
+        <strong>Worker count capped to 8.</strong>
+        You entered more workers than the allowed maximum. The run will start with <strong>8 workers</strong> — not beyond that.
+        Click <em>Start Run</em> to proceed or <em>Cancel</em> to go back and adjust.
+      </div>
       <div class="toggle-wrap">
         <div class="toggle-info">
           <div class="toggle-label">Capture diff image for passing tests</div>
@@ -441,6 +449,17 @@ function humanEta(ms){
 function escHtml(s){
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+// ──────────────────────────────────────────────────────
+// Workers sanity warning
+// ──────────────────────────────────────────────────────
+var WORKERS_WARN_THRESHOLD = 8; // warn above this; set conservatively for typical servers
+
+$('workers').addEventListener('input', function(){
+  var v = parseInt(this.value) || 0;
+  var warn = $('workers-warn');
+  warn.style.display = v > WORKERS_WARN_THRESHOLD ? '' : 'none';
+});
 
 // ──────────────────────────────────────────────────────
 // Form lock / unlock
@@ -987,12 +1006,18 @@ $('start-btn').addEventListener('click', function(){
   if (!clUrl || !oxUrl) { alert('Enter both Site A and Site B URLs.'); return; }
   if (!cores.length)    { alert('Select at least one collection.'); return; }
 
-  var limit   = parseInt($('limit').value)   || null;
-  var workers = parseInt($('workers').value) || 4;
-  var clName  = $('cl-name').value.trim() || 'Site A';
-  var oxName  = $('ox-name').value.trim() || 'Site B';
+  var limit      = parseInt($('limit').value)   || null;
+  var workers    = parseInt($('workers').value) || 4;
+  var clName     = $('cl-name').value.trim() || 'Site A';
+  var oxName     = $('ox-name').value.trim() || 'Site B';
+  var MAX_UI_WORKERS = 8;
+  var cappedWorkers  = Math.min(workers, MAX_UI_WORKERS);
 
-  _pendingRun = { solrUrl: solrUrl, clUrl: clUrl, oxUrl: oxUrl, clName: clName, oxName: oxName, cores: cores, limit: limit, workers: workers };
+  _pendingRun = { solrUrl: solrUrl, clUrl: clUrl, oxUrl: oxUrl, clName: clName, oxName: oxName, cores: cores, limit: limit, workers: cappedWorkers };
+
+  // Show/hide the cap notice
+  var capNotice = $('workers-cap-notice');
+  capNotice.style.display = workers > MAX_UI_WORKERS ? '' : 'none';
 
   // Build the summary table inside the modal
   var rows = [
@@ -1001,7 +1026,7 @@ $('start-btn').addEventListener('click', function(){
     ['Solr',         solrUrl],
     ['Collections',  cores.join(', ')],
     ['Limit',        limit ? limit + ' per collection' : 'All records'],
-    ['Workers',      String(workers)],
+    ['Workers',      workers > MAX_UI_WORKERS ? cappedWorkers + ' (capped from ' + workers + ')' : String(workers)],
   ];
   $('confirm-summary').innerHTML = rows.map(function(p){
     return '<dt>'+escHtml(p[0])+'</dt><dd title="'+escHtml(p[1])+'">'+escHtml(p[1])+'</dd>';

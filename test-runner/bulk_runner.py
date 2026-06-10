@@ -12,7 +12,9 @@ Emits structured lines to stdout (read by bulk_run_bp.py):
 from __future__ import annotations
 
 import argparse
+import errno
 import json
+import shutil
 import sys
 import threading
 import time
@@ -129,6 +131,21 @@ def capture_viewport(page: Page, viewport: dict) -> bytes:
     )
 
 
+SCREENSHOT_MIN_BYTES = 50 * 1024 * 1024  # 50 MB — below this, skip screenshot saves
+
+
+def _check_disk_space(directory: Path):
+    """Raise OSError(ENOSPC) if free space in directory is below the minimum."""
+    try:
+        free = shutil.disk_usage(str(directory)).free
+        if free < SCREENSHOT_MIN_BYTES:
+            raise OSError(errno.ENOSPC, f"Only {free // (1024*1024)} MB free — need 50 MB for screenshots")
+    except OSError:
+        raise
+    except Exception:
+        pass  # if the check itself fails, let the save attempt surface any real error
+
+
 # ── Worker ────────────────────────────────────────────────────────────────────
 
 def worker_fn(
@@ -217,20 +234,28 @@ def worker_fn(
                         cl_name   = f"cl_{safe_name}.png"
                         ox_name   = f"ox_{safe_name}.png"
 
-                        diff_img.save(SCREENSHOT_DIR / diff_name)
-                        Image.open(BytesIO(cl_img_bytes)).save(SCREENSHOT_DIR / cl_name)
-                        Image.open(BytesIO(ox_img_bytes)).save(SCREENSHOT_DIR / ox_name)
-
-                        diff_image = diff_name
-                        cl_image   = cl_name
-                        ox_image   = ox_name
+                        try:
+                            _check_disk_space(SCREENSHOT_DIR)
+                            diff_img.save(SCREENSHOT_DIR / diff_name)
+                            Image.open(BytesIO(cl_img_bytes)).save(SCREENSHOT_DIR / cl_name)
+                            Image.open(BytesIO(ox_img_bytes)).save(SCREENSHOT_DIR / ox_name)
+                            diff_image = diff_name
+                            cl_image   = cl_name
+                            ox_image   = ox_name
+                        except OSError as save_exc:
+                            # Disk full — comparison result is still valid, just no images
+                            error = f"Disk full — screenshots not saved ({save_exc})"
 
                     elif capture_passed_diff:
                         # Passed but user asked for diff images — save diff only (no screenshots)
                         SCREENSHOT_DIR.mkdir(parents=True, exist_ok=True)
                         diff_name = f"diff_{test_id}.png"
-                        diff_img.save(SCREENSHOT_DIR / diff_name)
-                        diff_image = diff_name
+                        try:
+                            _check_disk_space(SCREENSHOT_DIR)
+                            diff_img.save(SCREENSHOT_DIR / diff_name)
+                            diff_image = diff_name
+                        except OSError:
+                            pass  # disk full — skip the optional diff image silently
 
                 except Exception as exc:
                     status = "execution-error"
@@ -279,6 +304,14 @@ def main():
 
     print(f"bulk_runner started — run={args.run_id}  workers={args.workers}", flush=True)
 
+    # Abort early if disk is already too full to save any screenshots
+    try:
+        SCREENSHOT_DIR.mkdir(parents=True, exist_ok=True)
+        _check_disk_space(SCREENSHOT_DIR)
+    except OSError as exc:
+        print(f"FATAL: {exc}", flush=True)
+        sys.exit(1)
+
     try:
         cfg = load_config()
     except Exception as exc:
@@ -300,8 +333,14 @@ def main():
         emit("BULK_DONE", bulk_db.get_run_stats(args.run_id))
         return
 
+    # Clamp workers to the actual test count — spinning up more threads than
+    # tests wastes resources and can exhaust browser memory on large machines.
+    num_workers = min(args.workers, total)
+    if num_workers != args.workers:
+        print(f"Workers clamped from {args.workers} to {num_workers} (test count={total})", flush=True)
+
     emit("BULK_START", {"run_id": args.run_id, "total": total})
-    print(f"Bulk run {args.run_id}: {total} tests, {args.workers} workers", flush=True)
+    print(f"Bulk run {args.run_id}: {total} tests, {num_workers} workers", flush=True)
 
     # Unbounded queue so the feeder can mark tests running as fast as possible
     work_q:   Queue = Queue()
@@ -309,7 +348,7 @@ def main():
 
     # Start worker threads first
     workers = []
-    for i in range(args.workers):
+    for i in range(num_workers):
         t = threading.Thread(
             target=worker_fn,
             args=(i, work_q, result_q, cfg, args.capture_passed_diff),
@@ -322,7 +361,7 @@ def main():
     def _feed():
         for test in tests:
             work_q.put(test)
-        for _ in range(args.workers):
+        for _ in range(num_workers):
             work_q.put(None)  # one poison pill per worker
 
     threading.Thread(target=_feed, daemon=True).start()

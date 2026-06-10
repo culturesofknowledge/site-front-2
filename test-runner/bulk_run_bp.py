@@ -15,6 +15,7 @@ from typing import Optional
 from flask import Blueprint, Response, jsonify, request, send_from_directory
 
 import bulk_db
+import run_checks
 import solr_url_gen
 
 logger   = logging.getLogger("bulk_run")
@@ -111,6 +112,35 @@ def preview():
         return jsonify({"error": str(exc)}), 500
 
 
+# ── Validate (pre-run checks without starting anything) ───────────────────────
+
+@bulk_run_bp.route("/api/bulk/validate", methods=["POST"])
+def validate_run():
+    """
+    Run pre-flight checks and return results without creating a run.
+    Frontend can call this to show errors/warnings before the user hits Start.
+    """
+    data     = request.get_json(force=True) or {}
+    solr_url = data.get("solr_url", "").strip()
+    cl_url   = data.get("cl_url",  "").strip()
+    ox_url   = data.get("ox_url",  "").strip()
+    workers  = int(data.get("workers", 4))
+
+    missing = []
+    if not solr_url:
+        missing.append("solr_url")
+    if not cl_url:
+        missing.append("cl_url")
+    if not ox_url:
+        missing.append("ox_url")
+    if missing:
+        return jsonify({"errors": [f"Required: {', '.join(missing)}"], "warnings": [], "workers": workers}), 400
+
+    result = run_checks.run_all(solr_url, cl_url, ox_url, workers, RESULTS_DIR)
+    status = 200 if not result["errors"] else 422
+    return jsonify(result), status
+
+
 # ── Start run ─────────────────────────────────────────────────────────────────
 
 @bulk_run_bp.route("/api/bulk/start", methods=["POST"])
@@ -140,6 +170,16 @@ def start_run():
     if not cl_url or not ox_url:
         _run_active = False
         return jsonify({"error": "Site A and Site B base URLs are required"}), 400
+
+    # Pre-run checks — Solr reachability, site reachability, disk space, worker cap
+    checks = run_checks.run_all(solr_url, cl_url, ox_url, workers, RESULTS_DIR)
+    if checks["errors"]:
+        _run_active = False
+        return jsonify({"error": "Pre-run checks failed", "details": checks["errors"]}), 422
+    workers = checks["workers"]   # use the clamped value from here on
+    if checks["warnings"]:
+        for w in checks["warnings"]:
+            logger.warning("Pre-run warning: %s", w)
 
     # Save site URLs synchronously (fast — just writes a small JSON file)
     try:

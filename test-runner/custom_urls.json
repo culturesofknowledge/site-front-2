@@ -1,0 +1,104 @@
+[
+  { "name": "Home page",              "uri": "/",                                                          "desc": "Home page layout" },
+  { "name": "Search+",               "uri": "/advanced",                                                  "desc": "Search+ page layout" },
+  { "name": "Search+ section anchor","uri": "/advanced#letters_section",                                  "desc": "Direct link to a specific section" },
+  { "name": "Quick search",          "uri": "/forms/quick?everything=godalming&search_type=quick",        "desc": "Quick search results" },
+  { "name": "Advanced search",       "uri": "/forms/advanced?people=newton",                              "desc": "Advanced search for Newton" },
+  { "name": "Browse works by year",  "uri": "/browse/works?year=1611",                                    "desc": "Browse works filtered by year" },
+  { "name": "Browse people",         "uri": "/browse/people?letter=i&filters=fe%2Cma%2Cun%2Cre%2Cwr%2Cme", "desc": "Browse people starting with I" },
+  { "name": "Browse locations",      "uri": "/browse/locations?letter=z&filters=fe,ma,un,re,wr,me",       "desc": "Browse locations starting with Z" },
+  { "name": "Browse organizations",  "uri": "/browse/organizations?filters=fe,ma,un,re,wr,me",            "desc": "Browse organizations" },
+  { "name": "Browse repositories",   "uri": "/browse/repositories?letter=o",                              "desc": "Browse repositories starting with O" },
+  { "name": "About",                 "uri": "/about",                                                     "desc": "About page layout" },
+  { "name": "Contribute",            "uri": "/contribute",                                                "desc": "Contribute page layout" },
+  {
+    "name": "Advanced page",
+    "uri": "/forms/advanced?people=william+temple",
+    "desc": "Advanced page"
+  },
+  {
+    "name": "Advanced page",
+    "uri": "/forms/advanced?col_cat=Wallis+cipher+books.",
+    "desc": "Advanced page"
+  },
+  {
+    "name": "Advanced page",
+    "uri": "/forms/advanced?mail_recipient-person=6bd60310-988c-47b3-9a91-17af575047f4",
+    "desc": "Advanced page"
+  },
+  {
+    "name": "Quick page",
+    "uri": "/forms/quick?everything=erasmus&search_type=quick",
+    "desc": "Quick page"
+  },
+  {
+    "name": "Quick page",
+    "uri": "/forms/quick?everything=Godalming&search_type=quick",
+    "desc": "Quick page"
+  },
+  {
+    "name": "Quick page",
+    "uri": "/forms/quick?everything=Beale&start=700",
+    "desc": "Quick page"
+  },
+  {
+    "name": "Quick page",
+    "uri": "/forms/quick?everything=Eashing&search_type=quick",
+    "desc": "Quick page"
+  },
+  {
+    "name": "Advanced page",
+    "uri": "/forms/advanced?people=mersenne%2C+marin",
+    "desc": "Advanced page"
+  },
+  {
+    "name": "Advanced page",
+    "uri": "/forms/advanced?mail_destination-location=http%3A%2F%2Flocalhost%2Flocation%2Feae99d3a-f32f-4266-85b6-31a57bdd5d2b",
+    "desc": "Advanced page"
+  },
+  {
+    "name": "Advanced page",
+    "uri": "/forms/advanced?mail_origin-location=http%3A%2F%2Flocalhost%2Flocation%2F6c07b3b4-c9dd-4347-9fc1-7b98bad424cc",
+    "desc": "Advanced page"
+  },
+  {
+    "name": "Advanced page",
+    "uri": "/forms/advanced?mail_destination-location=http%3A%2F%2Flocalhost%2Flocation%2F6c07b3b4-c9dd-4347-9fc1-7b98bad424cc",
+    "desc": "Advanced page"
+  },
+  {
+    "name": "Advanced page",
+    "uri": "/forms/advanced?dcterms_references-location=http%3A%2F%2Flocalhost%2Flocation%2F6c07b3b4-c9dd-4347-9fc1-7b98bad424cc",
+    "desc": "Advanced page"
+  },
+  {
+    "name": "Advanced page",
+    "uri": "/forms/advanced?col_cat=Aubrey%2C+John",
+    "desc": "Advanced page"
+  },
+  {
+    "name": "Advanced page",
+    "uri": "/forms/advanced?dat_sin_year=1823&repository=Archivio+di+Stato+di+Roma",
+    "desc": "Advanced page"
+  },
+  {
+    "name": "Advanced page",
+    "uri": "/forms/advanced?let_page=true",
+    "desc": "Advanced page"
+  },
+  {
+    "name": "Advanced page",
+    "uri": "/forms/advanced?agent_org=true",
+    "desc": "Advanced page"
+  },
+  {
+    "name": "Advanced page",
+    "uri": "/forms/advanced?browsing=organisations&letter=a&mail_recipient-person=http%3A%2F%2Flocalhost%2Fperson%2F9c723aae-6499-4328-a1c4-7d92e07d9316&return_to_anchor=uuid_9c723aae-6499-4328-a1c4-7d92e07d9316",
+    "desc": "Advanced page"
+  },
+  {
+    "name": "Advanced page",
+    "uri": "/forms/advanced?people=giraffe",
+    "desc": "Advanced page"
+  }
+]

@@ -190,6 +190,14 @@ main{padding:28px 32px;max-width:1280px;margin:0 auto;display:flex;flex-directio
 .config-locked-notice{font-size:11px;color:var(--accent);font-weight:500;display:none;align-items:center;gap:5px}
 .config-locked-notice.visible{display:flex}
 
+.page-tab-bar{display:flex;gap:2px;padding:0 2px;margin-bottom:4px}
+.page-tab{background:none;border:none;padding:8px 16px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
+.page-tab:hover{background:var(--surface2);color:var(--text)}
+.page-tab.active{background:var(--accent-bg);color:var(--accent)}
+
+.page{display:none;flex-direction:column;gap:18px}
+.page.active{display:flex}
+
 @media(max-width:768px){
   main{padding:16px}
   nav{padding:0 16px}
@@ -206,12 +214,20 @@ main{padding:28px 32px;max-width:1280px;margin:0 auto;display:flex;flex-directio
   <div class="nav-brand"><div class="nav-brand-dot"></div>EMLO Tests</div>
   <a class="nav-link" href="/test-run">Manual Run</a>
   <a class="nav-link active" href="/bulk-run">Bulk Run</a>
+  <a class="nav-link" href="/test-run#settings">Settings</a>
   <div class="nav-right">
     <span id="run-badge"></span>
   </div>
 </nav>
 
 <main>
+
+<div class="page-tab-bar">
+  <button class="page-tab active" data-page="run">Run</button>
+  <button class="page-tab" data-page="custom-urls">Custom URLs</button>
+</div>
+
+<div class="page active" id="page-run">
 
   <!-- ═══ Config card ═══ -->
   <div class="card" id="config-card">
@@ -269,6 +285,14 @@ main{padding:28px 32px;max-width:1280px;margin:0 auto;display:flex;flex-directio
           <div class="hint" id="workers-warn" style="color:var(--warn);display:none">
             ⚠ High worker count — each Chromium instance needs ~300 MB RAM and a CPU core. Too many workers causes timeouts and OOM crashes. Recommended max: 2× your CPU core count.
           </div>
+        </div>
+        <div class="field">
+          <label>Static test cases</label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:9px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;transition:border-color .15s" id="custom-toggle-label">
+            <input type="checkbox" id="include-custom" style="width:15px;height:15px;accent-color:var(--accent);cursor:pointer;flex-shrink:0"/>
+            <span style="font-size:12px;color:var(--text2);line-height:1.4">Include <code style="font-family:'DM Mono',monospace;font-size:11px;background:var(--border);padding:1px 5px;border-radius:3px">custom_urls.json</code> in this run</span>
+          </label>
+          <small>Hand-picked pages run alongside Solr-generated URLs, tagged as <em>custom</em> in results.</small>
         </div>
       </div>
 
@@ -369,6 +393,43 @@ main{padding:28px 32px;max-width:1280px;margin:0 auto;display:flex;flex-directio
       <div class="log-line" style="color:var(--text3);font-style:italic" id="log-placeholder">Waiting for output — start a run above to see logs here.</div>
     </div>
   </div>
+
+</div><!-- end page-run -->
+
+<div class="page" id="page-custom-urls">
+
+  <!-- ═══ Custom URLs card ═══ -->
+  <div class="card" id="custom-card">
+    <div class="card-header">
+      <span>Custom URLs</span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="custom-count" style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace"></span>
+        <span id="custom-save-feedback" style="font-size:12px;color:var(--pass);font-weight:500;opacity:0;transition:opacity .3s">✓ Saved</span>
+        <button class="btn" id="custom-add-btn">+ Add</button>
+        <button class="btn btn-primary" id="custom-save-btn">Save</button>
+      </div>
+    </div>
+    <div style="padding:10px 18px 6px;font-size:12px;color:var(--text2);border-bottom:1px solid var(--border)">
+      Hand-picked URLs included alongside Solr results when <em>Include custom URLs</em> is checked on the Bulk Run tab. Stored in <code style="font-family:'DM Mono',monospace;font-size:11px;background:var(--surface2);padding:1px 5px;border-radius:3px">custom_urls.json</code>.
+    </div>
+    <div style="overflow-x:auto">
+      <table class="results-table" id="custom-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>URI</th>
+            <th>Description</th>
+            <th style="width:52px"></th>
+          </tr>
+        </thead>
+        <tbody id="custom-tbody">
+          <tr><td colspan="4" class="empty-state">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- end page-custom-urls -->
 
 </main>
 
@@ -1006,14 +1067,15 @@ $('start-btn').addEventListener('click', function(){
   if (!clUrl || !oxUrl) { alert('Enter both Site A and Site B URLs.'); return; }
   if (!cores.length)    { alert('Select at least one collection.'); return; }
 
-  var limit      = parseInt($('limit').value)   || null;
-  var workers    = parseInt($('workers').value) || 4;
-  var clName     = $('cl-name').value.trim() || 'Site A';
-  var oxName     = $('ox-name').value.trim() || 'Site B';
+  var limit         = parseInt($('limit').value)   || null;
+  var workers       = parseInt($('workers').value) || 4;
+  var clName        = $('cl-name').value.trim() || 'Site A';
+  var oxName        = $('ox-name').value.trim() || 'Site B';
+  var includeCustom  = $('include-custom').checked;
   var MAX_UI_WORKERS = 8;
   var cappedWorkers  = Math.min(workers, MAX_UI_WORKERS);
 
-  _pendingRun = { solrUrl: solrUrl, clUrl: clUrl, oxUrl: oxUrl, clName: clName, oxName: oxName, cores: cores, limit: limit, workers: cappedWorkers };
+  _pendingRun = { solrUrl: solrUrl, clUrl: clUrl, oxUrl: oxUrl, clName: clName, oxName: oxName, cores: cores, limit: limit, workers: cappedWorkers, includeCustom: includeCustom };
 
   // Show/hide the cap notice
   var capNotice = $('workers-cap-notice');
@@ -1027,6 +1089,7 @@ $('start-btn').addEventListener('click', function(){
     ['Collections',  cores.join(', ')],
     ['Limit',        limit ? limit + ' per collection' : 'All records'],
     ['Workers',      workers > MAX_UI_WORKERS ? cappedWorkers + ' (capped from ' + workers + ')' : String(workers)],
+    ['Custom URLs',  includeCustom ? 'Yes — custom_urls.json included' : 'No'],
   ];
   $('confirm-summary').innerHTML = rows.map(function(p){
     return '<dt>'+escHtml(p[0])+'</dt><dd title="'+escHtml(p[1])+'">'+escHtml(p[1])+'</dd>';
@@ -1075,6 +1138,7 @@ $('confirm-start-btn').addEventListener('click', async function(){
         ox_name:             run.oxName,
         ox_url:              run.oxUrl,
         capture_passed_diff: capturePassedDiff,
+        include_custom:      run.includeCustom,
       }),
     });
     var data = await resp.json();
@@ -1147,6 +1211,118 @@ $('stop-btn').addEventListener('click', async function(){
 });
 
 // ──────────────────────────────────────────────────────
+// Custom URLs
+// ──────────────────────────────────────────────────────
+var _customRows = [];   // in-memory working copy
+
+function renderCustomTable() {
+  var tbody = $('custom-tbody');
+  $('custom-count').textContent = _customRows.length + ' entr' + (_customRows.length === 1 ? 'y' : 'ies');
+
+  if (!_customRows.length) {
+    tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No custom URLs yet — click "+ Add" to add one.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = '';
+  _customRows.forEach(function(row, idx) {
+    var tr = document.createElement('tr');
+    tr.dataset.idx = idx;
+    tr.innerHTML =
+      '<td><input class="s-name" value="' + escHtml(row.name || '') + '" placeholder="Home page" style="width:100%;padding:5px 8px;font-family:\'DM Sans\',sans-serif;font-size:13px;border:1px solid transparent;border-radius:5px;background:transparent;color:var(--text);transition:all .15s"/></td>' +
+      '<td><input class="s-uri"  value="' + escHtml(row.uri  || '') + '" placeholder="/about"    style="width:100%;padding:5px 8px;font-family:\'DM Mono\',monospace;font-size:12px;border:1px solid transparent;border-radius:5px;background:transparent;color:var(--text);transition:all .15s"/></td>' +
+      '<td><input class="s-desc" value="' + escHtml(row.desc || '') + '" placeholder="Optional description" style="width:100%;padding:5px 8px;font-family:\'DM Sans\',sans-serif;font-size:13px;border:1px solid transparent;border-radius:5px;background:transparent;color:var(--text);transition:all .15s"/></td>' +
+      '<td><button class="btn btn-danger s-del-btn" style="padding:4px 10px;font-size:12px">✕</button></td>';
+
+    tr.querySelectorAll('input').forEach(function(inp) {
+      inp.addEventListener('focus', function() { this.style.borderColor = 'var(--accent)'; this.style.background = 'var(--surface)'; this.style.boxShadow = '0 0 0 3px rgba(37,99,235,.08)'; });
+      inp.addEventListener('blur',  function() { this.style.borderColor = 'transparent';   this.style.background = 'transparent';    this.style.boxShadow = ''; });
+      inp.addEventListener('mouseenter', function() { if (document.activeElement !== this) { this.style.borderColor = 'var(--border2)'; this.style.background = 'var(--surface2)'; } });
+      inp.addEventListener('mouseleave', function() { if (document.activeElement !== this) { this.style.borderColor = 'transparent';    this.style.background = 'transparent'; } });
+    });
+
+    tr.querySelector('.s-del-btn').addEventListener('click', function() {
+      _customRows.splice(idx, 1);
+      renderCustomTable();
+    });
+
+    tbody.appendChild(tr);
+  });
+}
+
+function _collectCustomRows() {
+  var rows = [];
+  $('custom-tbody').querySelectorAll('tr[data-idx]').forEach(function(tr) {
+    rows.push({
+      name: tr.querySelector('.s-name').value.trim(),
+      uri:  tr.querySelector('.s-uri').value.trim(),
+      desc: tr.querySelector('.s-desc').value.trim(),
+    });
+  });
+  return rows;
+}
+
+$('custom-add-btn').addEventListener('click', function() {
+  _customRows = _collectCustomRows();
+  _customRows.push({ name: '', uri: '', desc: '' });
+  renderCustomTable();
+  var last = $('custom-tbody').lastElementChild;
+  if (last) { var inp = last.querySelector('.s-name'); if (inp) inp.focus(); }
+});
+
+$('custom-save-btn').addEventListener('click', async function() {
+  _customRows = _collectCustomRows().filter(function(r) { return r.uri; });
+  renderCustomTable();
+  try {
+    var resp = await fetch('/api/custom-urls', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(_customRows),
+    });
+    var data = await resp.json();
+    if (!resp.ok) { alert(data.error || 'Save failed'); return; }
+    var fb = $('custom-save-feedback');
+    fb.style.opacity = '1';
+    setTimeout(function() { fb.style.opacity = '0'; }, 2000);
+  } catch(e) {
+    alert('Could not save: ' + e.message);
+  }
+});
+
+async function loadCustomUrls() {
+  try {
+    var resp = await fetch('/api/custom-urls');
+    _customRows = await resp.json();
+    if (!Array.isArray(_customRows)) _customRows = [];
+  } catch(e) {
+    _customRows = [];
+  }
+  renderCustomTable();
+}
+
+// Lock/unlock custom table during an active run (extend setFormDisabled)
+var _origSetFormDisabled = setFormDisabled;
+setFormDisabled = function(disabled) {
+  _origSetFormDisabled(disabled);
+  $('custom-add-btn').disabled  = disabled;
+  $('custom-save-btn').disabled = disabled;
+  $('custom-tbody').querySelectorAll('input,button').forEach(function(el) { el.disabled = disabled; });
+};
+
+// ──────────────────────────────────────────────────────
+// Tab switching
+// ──────────────────────────────────────────────────────
+document.querySelectorAll('.page-tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.page-tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+    tab.classList.add('active');
+    var page = $('page-' + tab.dataset.page);
+    if (page) page.classList.add('active');
+  });
+});
+
+// ──────────────────────────────────────────────────────
 // Init
 // ──────────────────────────────────────────────────────
 async function init(){
@@ -1191,6 +1367,7 @@ async function init(){
     }
   } catch(e){ console.warn('init status error', e); }
 
+  loadCustomUrls();
   fetchResults();
   connectSSE();
 

@@ -20,7 +20,28 @@ import solr_url_gen
 
 logger   = logging.getLogger("bulk_run")
 BASE_DIR = Path(__file__).resolve().parent
-RESULTS_DIR = BASE_DIR / ".bulk_run" / "results"
+RESULTS_DIR      = BASE_DIR / ".bulk_run" / "results"
+CUSTOM_URLS_FILE = BASE_DIR / "custom_urls.json"
+
+
+def _load_custom_tests() -> list[dict]:
+    """Load custom_urls.json and return test dicts ready for insert_tests().
+    Returns an empty list (with a warning) if the file is missing or invalid."""
+    if not CUSTOM_URLS_FILE.exists():
+        logger.warning("custom_urls.json not found at %s — skipping custom tests", CUSTOM_URLS_FILE)
+        return []
+    try:
+        entries = json.loads(CUSTOM_URLS_FILE.read_text())
+        tests = [
+            {"uri": e["uri"], "record_type": "custom", "record_id": e.get("name")}
+            for e in entries
+            if e.get("uri")
+        ]
+        logger.info("Loaded %d custom tests from %s", len(tests), CUSTOM_URLS_FILE)
+        return tests
+    except Exception as exc:
+        logger.warning("Could not load custom_urls.json: %s — skipping custom tests", exc)
+        return []
 
 bulk_run_bp = Blueprint("bulk_run", __name__)
 
@@ -158,6 +179,7 @@ def start_run():
     cores               = data.get("cores") or None
     workers             = int(data.get("workers", 4))
     capture_passed_diff = bool(data.get("capture_passed_diff", False))
+    include_custom      = bool(data.get("include_custom", False))
     cl_name  = data.get("cl_name", "").strip()
     cl_url   = data.get("cl_url",  "").strip()
     ox_name  = data.get("ox_name", "").strip()
@@ -245,6 +267,15 @@ def start_run():
                 _log(run_id, f"ERROR: {err}")
                 _broadcast("bulk_error", {"run_id": run_id, "error": err})
                 return
+
+            # Merge custom tests if requested
+            if include_custom:
+                custom_tests = _load_custom_tests()
+                if custom_tests:
+                    tests = tests + custom_tests
+                    _log(run_id, f"Added {len(custom_tests)} custom tests — total: {len(tests):,}")
+                else:
+                    _log(run_id, "include_custom=True but custom_urls.json is empty or missing — continuing without custom tests")
 
             # Phase 2 — write tests to SQLite
             _log(run_id, f"Inserting {len(tests):,} tests into database ...")
@@ -431,6 +462,39 @@ def events():
         mimetype="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
+
+
+# ── Static URLs CRUD ──────────────────────────────────────────────────────────
+
+@bulk_run_bp.route("/api/custom-urls", methods=["GET"])
+def get_custom_urls():
+    if not CUSTOM_URLS_FILE.exists():
+        return jsonify([])
+    try:
+        return jsonify(json.loads(CUSTOM_URLS_FILE.read_text()))
+    except Exception as exc:
+        logger.error("Failed to read custom_urls.json: %s", exc)
+        return jsonify({"error": str(exc)}), 500
+
+
+@bulk_run_bp.route("/api/custom-urls", methods=["POST"])
+def save_custom_urls():
+    if _run_active:
+        return jsonify({"error": "Cannot edit custom URLs while a bulk run is in progress"}), 409
+    data = request.get_json(force=True)
+    if not isinstance(data, list):
+        return jsonify({"error": "Expected a JSON array"}), 400
+    # Strip entries with no URI
+    cleaned = [e for e in data if isinstance(e, dict) and e.get("uri", "").strip()]
+    try:
+        tmp = CUSTOM_URLS_FILE.with_suffix(".tmp")
+        tmp.write_text(json.dumps(cleaned, indent=2))
+        tmp.replace(CUSTOM_URLS_FILE)
+        logger.info("Saved %d custom URLs to %s", len(cleaned), CUSTOM_URLS_FILE)
+        return jsonify({"ok": True, "count": len(cleaned)})
+    except Exception as exc:
+        logger.error("Failed to write custom_urls.json: %s", exc)
+        return jsonify({"error": str(exc)}), 500
 
 
 # ── Serve result images ───────────────────────────────────────────────────────

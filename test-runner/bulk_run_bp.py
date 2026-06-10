@@ -162,6 +162,7 @@ def start_run():
     run_id = bulk_db.create_run({
         "solr_url": solr_url, "workers": workers, "limit": limit,
         "cl_url": cl_url, "ox_url": ox_url,
+        "cores": cores or list(solr_url_gen.CORE_URL_MAP.keys()),
     }, status="generating")
     logger.info("Run %s created (status=generating)", run_id)
 

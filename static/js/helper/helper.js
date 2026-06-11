@@ -219,17 +219,17 @@ export function relationshipList(
     const display = item.display;
     const role = item.obj?.["ox_titlesRolesOccupations"];
 
-    if (role) {
-      html += `<p><a href="${url}">${display}</a> - ${role}</p>`;
-    } else if (field == "owl_sameAs-work" && item.catalog) {
-      html += `<p>
-        <a href="${url}">${display}</a> - [catalogue: ${item.catalog}]
-      </p>`;
-    } else {
-      html += `<p>
-        <a href="${url}">${display}</a>
-      </p>`;
+    html += `<p><a href="${url}">${display}</a>`
+
+    if (role) { 
+      html += `- ${role} `
     }
+
+    if (field == "owl_sameAs-work" && item.catalog) {
+      html += ` [catalogue: ${item.catalog}]`
+    }
+
+    html += `</p>`
   }
 
   if (displayLabel) {

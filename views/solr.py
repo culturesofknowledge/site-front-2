@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 import requests
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dotenv import load_dotenv
 from urllib.parse import urlparse
 
@@ -170,6 +171,58 @@ def fetchStatsNew():
 
     except Exception as e:
         return jsonify({'error': 'Internal Server Error', 'details': str(e)}), 500
+
+
+@solr_bp.route('/collection-year-data/<institution_uuid>', methods=['GET'])
+def fetchCollectionYearData(institution_uuid):
+    """
+    Two-step server-side join: institution UUID → manifestation UUIDs → work year data.
+    Avoids sending tens of thousands of UUIDs from the browser (which hits nginx body size limits).
+    """
+    try:
+        SOLR_URL = getSolrURL()
+
+        # Step 1: get all manifestation UUIDs related to this institution
+        mani_resp = requests.get(
+            f"{SOLR_URL}manifestations/select",
+            params={'q': f'uuid_related:{institution_uuid}', 'fl': 'uuid', 'rows': 200000, 'wt': 'json'}
+        )
+        mani_resp.raise_for_status()
+        mani_uuids = [doc['uuid'] for doc in mani_resp.json().get('response', {}).get('docs', [])]
+
+        if not mani_uuids:
+            return jsonify([])
+
+        # Step 2: query works by those manifestation UUIDs in parallel batches.
+        # Use POST to Solr to avoid URL length limits with large UUID sets.
+        BATCH_SIZE = 100
+
+        def fetch_batch(batch):
+            uuid_query = ' OR '.join([f'"{u}"' for u in batch])
+            resp = requests.post(
+                f"{SOLR_URL}works/select",
+                data={
+                    'q': f'uuid_related:({uuid_query})',
+                    'fl': 'ox_started-ox_year,ox_completed-ox_year,uuid,dcterms_description',
+                    'rows': BATCH_SIZE,
+                    'wt': 'json'
+                }
+            )
+            resp.raise_for_status()
+            return resp.json().get('response', {}).get('docs', [])
+
+        all_results = []
+        batches = [mani_uuids[i:i + BATCH_SIZE] for i in range(0, len(mani_uuids), BATCH_SIZE)]
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            futures = [executor.submit(fetch_batch, b) for b in batches]
+            for future in as_completed(futures):
+                all_results.extend(future.result())
+
+        return jsonify(all_results)
+
+    except Exception as e:
+        return jsonify({'error': 'Internal Server Error', 'details': str(e)}), 500
+
 
 ## Will be deleted by next deployment, keeping this untill that time
 @solr_bp.route('/stats', methods=['POST'])  # Include methods you need

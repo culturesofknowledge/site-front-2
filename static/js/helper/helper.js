@@ -222,7 +222,7 @@ export function relationshipList(
     html += `<p><a href="${url}">${display}</a>`
 
     if (role) { 
-      html += `- ${role} `
+      html += ` - ${role} `
     }
 
     if (field == "owl_sameAs-work" && item.catalog) {

@@ -17,6 +17,7 @@ SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.ox.ac.uk")
 SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
 SMTP_LOGIN = os.getenv("SMTP_LOGIN")
 SMTP_PASS = os.getenv("SMTP_PASS")
+EMAIL_FROM = os.getenv("EMAIL_FROM")
 EMAIL_TO = os.getenv("EMAIL_TO")
 SEND_A_COPY = os.getenv("SEND_A_COPY")
 
@@ -97,9 +98,9 @@ def send_comment():
             with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT) as server:
                 if SMTP_PASS:
                     server.login(SMTP_LOGIN, SMTP_PASS)
-                send_message(server, "A comment from EMLO record", EMAIL_TO, EMAIL_TO, email_body)
+                send_message(server, "A comment from EMLO record", EMAIL_FROM, EMAIL_TO, email_body)
                 if send_copy:
-                    send_message(server, "Your comment on EMLO record", EMAIL_TO, email, email_body)
+                    send_message(server, "Your comment on EMLO record", EMAIL_FROM, email, email_body)
 
         elif SMTP_PORT == 587:
             # Explicit TLS (STARTTLS)
@@ -110,9 +111,9 @@ def send_comment():
 
                 if SMTP_PASS:
                     server.login(SMTP_LOGIN, SMTP_PASS)
-                send_message(server, "A comment from EMLO record", EMAIL_TO, EMAIL_TO, email_body)
+                send_message(server, "A comment from EMLO record", EMAIL_FROM, EMAIL_TO, email_body)
                 if send_copy:
-                    send_message(server, "Your comment on EMLO record", EMAIL_TO, email, email_body)
+                    send_message(server, "Your comment on EMLO record", EMAIL_FROM, email, email_body)
 
         elif SMTP_PORT == 25:
             # Plain SMTP or opportunistic TLS
@@ -130,9 +131,9 @@ def send_comment():
                 else:
                     print("No password provided — using unauthenticated plain SMTP")
 
-                send_message(server, "A comment from EMLO record", EMAIL_TO, EMAIL_TO, email_body)
+                send_message(server, "A comment from EMLO record", EMAIL_FROM, EMAIL_TO, email_body)
                 if send_copy:
-                    send_message(server, "Your comment on EMLO record", EMAIL_TO, email, email_body)
+                    send_message(server, "Your comment on EMLO record", EMAIL_FROM, email, email_body)
 
         else:
             print(f"Unsupported port: {SMTP_PORT}")

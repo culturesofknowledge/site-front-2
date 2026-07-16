@@ -46,7 +46,7 @@ try {
           {
             title: "Organizations",
             titleImage: "/static/img/icon-stats-organisations.png",
-            redirectURL: "/browse/organisations",
+            redirectURL: "/browse/organizations",
             statKey: "organizations",
             tweakCount: 0,
             upperLimit: 0,
@@ -54,7 +54,7 @@ try {
           {
             title: "Repositories",
             titleImage: "/static/img/icon-stats-repositories.png",
-            redirectURL: "/browse/institutions",
+            redirectURL: "/browse/repositories",
             statKey: "institution",
             tweakCount: 0,
             upperLimit: 0,

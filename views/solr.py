@@ -204,7 +204,7 @@ def fetchCollectionYearData(institution_uuid):
                 data={
                     'q': f'uuid_related:({uuid_query})',
                     'fl': 'ox_started-ox_year,ox_completed-ox_year,uuid,dcterms_description',
-                    'rows': BATCH_SIZE * 50,
+                    'rows': BATCH_SIZE,
                     'wt': 'json'
                 }
             )

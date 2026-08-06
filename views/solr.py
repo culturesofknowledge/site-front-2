@@ -218,7 +218,11 @@ def fetchCollectionYearData(institution_uuid):
             for future in as_completed(futures):
                 all_results.extend(future.result())
 
-        return jsonify(all_results)
+        # A work can have manifestations that fall into different batches above,
+        # so the same work doc can come back more than once. Dedupe by uuid.
+        deduped_results = list({doc['uuid']: doc for doc in all_results}.values())
+
+        return jsonify(deduped_results)
 
     except Exception as e:
         return jsonify({'error': 'Internal Server Error', 'details': str(e)}), 500

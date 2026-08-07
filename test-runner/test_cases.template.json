@@ -1,0 +1,102 @@
+{
+  "test_1": {
+    "test_name": "Home page",
+    "uri": "/",
+    "desc": "Testing home page layout"
+  },
+  "test_10": {
+    "test_name": "Browse works for year 1611",
+    "uri": "/browse/works?year=1611",
+    "desc": ""
+  },
+  "test_11": {
+    "test_name": "Quick search",
+    "uri": "/forms/quick?everything=godalming&search_type=quick",
+    "desc": "Quick search godalming"
+  },
+  "test_12": {
+    "test_name": "Search for Newton",
+    "uri": "/forms/advanced?people=newton",
+    "desc": "Searching for newton in all people"
+  },
+  "test_13": {
+    "test_name": "Work profile",
+    "uri": "/profile/work/8a0b8091-ea30-444d-a9b3-d45029b56d3c",
+    "desc": "Work profile template check"
+  },
+  "test_14": {
+    "test_name": "Person profile",
+    "uri": "/profile/person/6bd60310-988c-47b3-9a91-17af575047f4",
+    "desc": "Person profile layout check"
+  },
+  "test_15": {
+    "test_name": "Location profile",
+    "uri": "/profile/location/8d126056-cd1b-44e6-ac87-b59cbeb718b6",
+    "desc": "Location profile layout check"
+  },
+  "test_16": {
+    "test_name": "Organizations profile",
+    "uri": "/profile/person/476425ae-34b3-421f-b1c7-e9e7fd990241",
+    "desc": "Organizations profile layout check"
+  },
+  "test_17": {
+    "test_name": "Repository profile",
+    "uri": "/profile/repository/44e4cc09-01f3-463a-9057-0e7dd35955be",
+    "desc": "Repository profile layout check"
+  },
+  "test_18": {
+    "test_name": "Manifestation Profile",
+    "uri": "/profile/manifestation/9dcbb8f2-da22-411b-95d4-478da4267806",
+    "desc": "Manifestation profile layout check"
+  },
+  "test_19": {
+    "test_name": "Image profile",
+    "uri": "/profile/image/4ac9b456-35c3-41d6-8828-6b2f9590d74c",
+    "desc": "Image profile layout check"
+  },
+  "test_2": {
+    "test_name": "Search+",
+    "uri": "/advanced",
+    "desc": "Testing search+ page."
+  },
+  "test_20": {
+    "test_name": "Broken URL",
+    "uri": "/broken-url",
+    "desc": "Broken layout page check"
+  },
+  "test_3": {
+    "test_name": "Search+ specific section",
+    "uri": "/advanced#letters_section",
+    "desc": "Checking layout if we directly go on specific section."
+  },
+  "test_4": {
+    "test_name": "About page",
+    "uri": "/about",
+    "desc": "Checking layout for about page"
+  },
+  "test_5": {
+    "test_name": "Contribute",
+    "uri": "/contribute",
+    "desc": "Checking layout for contribute page."
+  },
+  "test_6": {
+    "test_name": "Browse people with letter I",
+    "uri": "/browse/people?letter=i&filters=fe%2Cma%2Cun%2Cre%2Cwr%2Cme",
+    "desc": "Layout checking for peoples"
+  },
+  "test_7": {
+    "test_name": "Browse locations",
+    "uri": "/browse/locations?letter=z&filters=fe,ma,un,re,wr,me",
+    "desc": "Layout checking for locations"
+  },
+  "test_8": {
+    "test_name": "Browse organizations",
+    "uri": "/browse/organizations?filters=fe,ma,un,re,wr,me",
+    "desc": "Layout checking for organizations"
+  },
+  "test_9": {
+    "test_name": "Browse repos with letter O",
+    "uri": "/browse/repositories?letter=o",
+    "desc": "Layout checking for repositories"
+  }
+}

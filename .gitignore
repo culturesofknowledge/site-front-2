@@ -24,6 +24,12 @@ node_modules/
 site_front_2/flaskapp/static/dist/
 
 
+#test runner
+results/
+.test_run/
+test-runner/runner_config.json
+test-runner/test_cases.json
+test-runner/.bulk_run
 # py
 site_front_2/_playground/
 
@@ -43,3 +49,4 @@ docker-emlo/solr-conf/solr/home/**/core.properties
 
 # ENV folder
 site-front-2
+test-runner/.bulk_run/bulk.db

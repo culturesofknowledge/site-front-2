@@ -10630,3 +10630,8 @@ button.tiny {
 .showEle {
   display: block;
 }
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

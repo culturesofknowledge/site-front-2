@@ -168,9 +168,9 @@ function _renderPeopleSection(profile, relations) {
     // === Authors ===
     if (profile[authorUriField]) {
       const authorLabel =
-        profile[authorUriField].length > 1 ? "Authors" : "Author";
+        profile[authorUriField]?.length > 1 ? "Authors" : "Author";
       const certainLabel =
-        profile[authorUriField].length > 1 ? "Authors are" : "Author is";
+        profile[authorUriField]?.length > 1 ? "Authors are" : "Author is";
       frag += `<h4>${authorLabel}</h4>
           <div class="people authors">
             ${relationshipList(relations, profile, authorUriField)}
@@ -212,9 +212,9 @@ function _renderPeopleSection(profile, relations) {
     // === Addressees ===
     if (profile[addresseeUriField]) {
       const recipientLabel =
-        profile[addresseeUriField].length > 1 ? "Recipients" : "Recipient";
+        profile[addresseeUriField]?.length > 1 ? "Recipients" : "Recipient";
       const certainLabel =
-        profile[authorUriField].length > 1 ? "Recipients are" : "Recipient is";
+        profile[addresseeUriField]?.length > 1 ? "Recipients are" : "Recipient is";
       frag += `<h4>${recipientLabel}</h4>
           <div class="people recipients">
             ${relationshipList(relations, profile, addresseeUriField)}

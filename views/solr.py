@@ -228,6 +228,106 @@ def fetchCollectionYearData(institution_uuid):
         return jsonify({'error': 'Internal Server Error', 'details': str(e)}), 500
 
 
+@solr_bp.route('/result-enrichment', methods=['POST'])
+def fetchResultEnrichment():
+    """
+    Bulk manifestation -> institution enrichment for the search-results table
+    ("Repositories & Versions" column).
+
+    Replaces the old behaviour of ~1-2 /stats-new calls PER RESULT ROW
+    (≈60 requests for a 50-row page) with ONE request that runs two batched
+    Solr queries server-side.
+
+    Body:    { "manifestation_uuids": ["<uuid>", ...] }
+    Returns: { "<manifestation_uuid>": { "dcterms_type": <raw>,
+                                         "shelf": <raw shelf_ value>,
+                                         "repoName": <geonames_officialName> } }
+             Keys are omitted when the underlying field is absent, mirroring the
+             old client-side hasOwnProperty checks. All formatting
+             (stripValuePrefix, bullet list) stays in the browser so output is
+             byte-identical to the previous implementation.
+    """
+    try:
+        SOLR_URL = getSolrURL()
+
+        data = request.get_json(silent=True) or {}
+        mani_uuids = data.get('manifestation_uuids', [])
+        if not mani_uuids:
+            return jsonify({})
+
+        # dedupe, preserve order
+        mani_uuids = list(dict.fromkeys(u for u in mani_uuids if u))
+
+        def _first(v):
+            """Solr multi-valued fields come back as lists; the old code used the raw value."""
+            if isinstance(v, list):
+                return v[0] if v else None
+            return v
+
+        def _as_list(v):
+            if v is None:
+                return []
+            return v if isinstance(v, list) else [v]
+
+        def solr_by_uuid(core, values, fl):
+            """OR-query `core` for uuid:(v1 OR v2 ...) in batches; return the docs."""
+            docs = []
+            batch_size = 200
+            for i in range(0, len(values), batch_size):
+                chunk = values[i:i + batch_size]
+                uuid_query = ' OR '.join(f'"{v}"' for v in chunk)
+                resp = requests.post(
+                    f"{SOLR_URL}{core}/select",
+                    data={'q': f'uuid:({uuid_query})', 'fl': fl,
+                          'rows': len(chunk), 'wt': 'json'},
+                )
+                resp.raise_for_status()
+                docs.extend(resp.json().get('response', {}).get('docs', []))
+            return docs
+
+        mani_docs = solr_by_uuid(
+            'manifestations', mani_uuids,
+            'uuid,dcterms_type,dcterms_identifier-shelf_,ox_resourceAt-institution',
+        )
+
+        # collect the institution uuids referenced by those manifestations
+        inst_uuids = set()
+        for d in mani_docs:
+            for uri in _as_list(d.get('ox_resourceAt-institution')):
+                inst_uuids.add(uri.rstrip('/').split('/')[-1])
+
+        inst_name = {}
+        if inst_uuids:
+            for d in solr_by_uuid('institutions', list(inst_uuids),
+                                  'uuid,geonames_officialName'):
+                inst_name[d.get('uuid')] = _first(d.get('geonames_officialName')) or ''
+
+        out = {}
+        for d in mani_docs:
+            uid = d.get('uuid')
+            if not uid:
+                continue
+            entry = {}
+            if 'dcterms_type' in d:
+                entry['dcterms_type'] = _first(d.get('dcterms_type'))
+            if 'dcterms_identifier-shelf_' in d:
+                entry['shelf'] = _first(d.get('dcterms_identifier-shelf_'))
+            repo_name = ''
+            for uri in _as_list(d.get('ox_resourceAt-institution')):
+                iid = uri.rstrip('/').split('/')[-1]
+                if inst_name.get(iid):
+                    repo_name = inst_name[iid]
+                    break
+            if repo_name:
+                entry['repoName'] = repo_name
+            out[uid] = entry
+
+        return jsonify(out)
+
+    except Exception as e:
+        return jsonify({'error': 'Internal Server Error', 'details': str(e)}), 500
+
+
 ## Will be deleted by next deployment, keeping this untill that time
 @solr_bp.route('/stats', methods=['POST'])  # Include methods you need
 def fetchStats():

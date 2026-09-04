@@ -2,8 +2,15 @@ import {
   PROFILE_DESCRIPTOR,
   loadFragment,
 } from "./profile/profileFragLoader.js";
+import { searchQueryObj } from "./search.js";
+import { buildSolrQuery } from "./helper/buildSolrQuery.js";
+import { getLabel } from "./helper/getFieldLabls.js";
 
 const _relationsPromiseMap = new Map();
+// The image profile mounts two components (sidebar + main) that both request
+// the same image/manifestation data; memoise so each uuid is fetched once.
+const _imagesPromiseMap = new Map();
+const _manifestationDataPromiseMap = new Map();
 
 let emlo = {
   active: {},
@@ -2271,17 +2278,13 @@ emlo.MultiFields = class extends edges.Component {
                 new Set(val.map((uri) => uri.split("/").pop()))
               );
 
-            if (uuids.length > 0) {
-              let payload = {
-                solrCore: "work",
-                uuids: uuids,
-                filter: "",
-                objectKey: "uuid",
-              };
-
-              // In case of ox_hasResource-manifestation we need manifestation, core needs to be updated
-              if (field == "ox_hasResource-manifestation") {
-                payload.objectKey = "uuid_related";
+              if (uuids.length > 0) {
+                this.gneratedData[field] = await this._fetchMoreWorkData({
+                  solrCore: "work",
+                  uuids: uuids,
+                  filter: "",
+                  objectKey: "uuid",
+                });
               }
             }
           }
@@ -2340,24 +2343,34 @@ emlo.MultiFields = class extends edges.Component {
   }
 
   async _fetchManifestationData(uuid) {
-    try {
-      const response = await fetch(`/manifestation-data/${uuid}`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        console.error(`Error fetching relations: ${response.statusText}`);
-        return [];
-      }
-
-      const json = await response.json();
-      return json;
-    } catch (err) {
-      console.error("Error while fetching relations", err);
-      return {};
+    if (_manifestationDataPromiseMap.has(uuid)) {
+      return _manifestationDataPromiseMap.get(uuid);
     }
+
+    const promise = (async () => {
+      try {
+        const response = await fetch(`/manifestation-data/${uuid}`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          console.error(`Error fetching relations: ${response.statusText}`);
+          return [];
+        }
+
+        const json = await response.json();
+        return json;
+      } catch (err) {
+        console.error("Error while fetching relations", err);
+        return {};
+      }
+    })();
+
+    _manifestationDataPromiseMap.set(uuid, promise);
+    promise.catch(() => _manifestationDataPromiseMap.delete(uuid));
+    return promise;
   }
 
   async _fetchMoreWorkData(payload) {
@@ -2442,28 +2455,38 @@ emlo.MultiFields = class extends edges.Component {
   }
 
   async _fetchImages(uuid) {
-    try {
-      const response = await fetch(
-        `/solr/images/select?q=uuid_related:${uuid}&wt=json&rows=9999`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+    if (_imagesPromiseMap.has(uuid)) {
+      return _imagesPromiseMap.get(uuid);
+    }
 
-      if (!response.ok) {
-        console.error(`Error fetching relations: ${response.statusText}`);
+    const promise = (async () => {
+      try {
+        const response = await fetch(
+          `/solr/images/select?q=uuid_related:${uuid}&wt=json&rows=9999`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          console.error(`Error fetching relations: ${response.statusText}`);
+          return [];
+        }
+
+        const json = await response.json();
+        return json.response.docs;
+      } catch (err) {
+        console.error("Error while fetching relations", err);
         return [];
       }
+    })();
 
-      const json = await response.json();
-      return json.response.docs;
-    } catch (err) {
-      console.error("Error while fetching relations", err);
-      return [];
-    }
+    _imagesPromiseMap.set(uuid, promise);
+    promise.catch(() => _imagesPromiseMap.delete(uuid));
+    return promise;
   }
 
   async _appendResults(params) {
@@ -5447,7 +5470,7 @@ function GenerateShortURL(id, type, currentDomain) {
   }
 }
 
-function _addUrlParam(field, term) {
+export function _addUrlParam(field, term) {
   let url_param_field = field;
   const url = new URL(window.location.href);
 

@@ -482,7 +482,95 @@ function _displayWhereFound(val, res, fieldName, edge) {
   }
 }
 
-function _renderMultipleFields(val, res, fieldName) {
+// Relation keys used to find the record a comment/resource row points at.
+const _RELATION_KEYS = {
+  comment: {
+    work: [
+      "bibo_annotates-work",
+      "ox_annotatesDate-work",
+      "ox_annotatesAuthor-work",
+      "ox_annotatesAddressee-work",
+      "ox_annotatesAgentsReferenced-work",
+    ],
+    person: ["bibo_annotates-person"],
+    location: ["bibo_annotates-location"],
+    manifestation: ["bibo_annotates-manifestation"],
+  },
+  resource: {
+    work: ["rdfs_seeAlso-work"],
+    person: ["rdfs_seeAlso-person"],
+  },
+};
+
+function _relatedRefForRow(res) {
+  const rel = _RELATION_KEYS[res && res.object_type];
+  if (!rel) return null;
+  for (const [type, keys] of Object.entries(rel)) {
+    for (const key of keys) {
+      if (res[key]) return { type, uuid: uuidFromUri(res[key][0]) };
+    }
+  }
+  return null;
+}
+
+// Bulk-fetch every related record referenced by comment/resource rows in ONE
+// /stats-new call (solrCore "all") instead of one GET per row.
+const _relatedEnrichmentCache = new Map(); // uuid -> doc | null
+let _relatedEnrichmentInFlight = null;
+
+async function _ensureRelatedEnrichment(renderer) {
+  // Let any fetch already running finish before we decide what is still missing.
+  while (_relatedEnrichmentInFlight) await _relatedEnrichmentInFlight;
+
+  const results =
+    (renderer && renderer.component && renderer.component.results) || [];
+
+  const missing = new Set();
+  for (const res of results) {
+    const ref = _relatedRefForRow(res);
+    if (ref && ref.uuid && !_relatedEnrichmentCache.has(ref.uuid)) {
+      missing.add(ref.uuid);
+    }
+  }
+
+  if (missing.size === 0) return;
+
+  _relatedEnrichmentInFlight = (async () => {
+    try {
+      const response = await fetch("/stats-new", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          solrCore: "all",
+          objectKey: "uuid",
+          uuids: [...missing],
+          filter: "",
+        }),
+      });
+      if (response.ok) {
+        const docs = await response.json();
+        for (const doc of Array.isArray(docs) ? docs : []) {
+          if (doc && doc.uuid) _relatedEnrichmentCache.set(doc.uuid, doc);
+        }
+      } else {
+        console.error(`Failed to fetch related records: ${response.status}`);
+      }
+    } catch (err) {
+      console.error("Error while fetching related-record enrichment", err);
+    } finally {
+      for (const id of missing) {
+        if (!_relatedEnrichmentCache.has(id)) {
+          _relatedEnrichmentCache.set(id, null);
+        }
+      }
+      _relatedEnrichmentInFlight = null;
+    }
+  })();
+
+  return _relatedEnrichmentInFlight;
+}
+
+function _renderMultipleFields(val, res, fieldName, edge) {
   if (!res?.object_type) return "";
 
   let objectType = res.object_type;
@@ -492,55 +580,30 @@ function _renderMultipleFields(val, res, fieldName) {
 
   const htmlParts = [];
 
-  // Infer type based on relation map
-  const relationMap = {
-    comment: {
-      work: [
-        "bibo_annotates-work",
-        "ox_annotatesDate-work",
-        "ox_annotatesAuthor-work",
-        "ox_annotatesAddressee-work",
-        "ox_annotatesAgentsReferenced-work",
-      ],
-      person: ["bibo_annotates-person"],
-      location: ["bibo_annotates-location"],
-      manifestation: ["bibo_annotates-manifestation"],
-    },
-    resource: {
-      work: ["rdfs_seeAlso-work"],
-      person: ["rdfs_seeAlso-person"],
-    },
-  };
-
   let inferredType = objectType;
   let uuid = "";
-  const possibleRelation = relationMap[objectType];
+  const possibleRelation = _RELATION_KEYS[objectType];
 
-  let moreData = {};
   if (possibleRelation) {
-    outer: for (const [type, keys] of Object.entries(possibleRelation)) {
-      for (const key of keys) {
-        if (res[key]) {
-          inferredType = type;
-          uuid = uuidFromUri(res[key][0]);
-          fetchMoreData(uuid, possibleRelation[type]).then((response) => {
-            const fields = displayfields[inferredType];
-            let data = [];
+    const ref = _relatedRefForRow(res);
+    if (ref) {
+      inferredType = ref.type;
+      uuid = ref.uuid;
+      _ensureRelatedEnrichment(edge).then(() => {
+        const doc = _relatedEnrichmentCache.get(uuid);
+        const fields = displayfields[inferredType];
+        let data = [];
 
-            for (const [label, fieldKey] of Object.entries(fields)) {
-              if (response[0]?.[fieldKey]) {
-                const value = response[0][fieldKey];
-                data.push(`${value}`);
-              }
-            }
-            const div = document.getElementById(uuid);
-            if (div) {
-              div.innerHTML = data.join("");
-            }
-          });
-          break outer;
+        for (const [label, fieldKey] of Object.entries(fields)) {
+          if (doc?.[fieldKey]) {
+            data.push(`${doc[fieldKey]}`);
+          }
         }
-      }
+        const div = document.getElementById(uuid);
+        if (div) {
+          div.innerHTML = data.join("");
+        }
+      });
     }
   }
 
@@ -853,33 +916,87 @@ function _displayDate(val, res) {
   }
 }
 
+// Per-manifestation enrichment cache (uuid -> { dcterms_type?, shelf?, repoName? } | null).
+// Shared across all rows and across infinite-scroll pages so a manifestation is
+// only ever fetched once.
+const _manifEnrichmentCache = new Map();
+let _manifEnrichmentInFlight = null;
+
+const MANIF_FIELD = "frbr_Manifestation-manifestation";
+
+// Collect every manifestation uuid still missing from the cache across the
+// currently-loaded result rows, and fetch them all in ONE /result-enrichment
+// request. All rows rendered in the same pass await the same promise.
+async function _ensureManifEnrichment(renderer) {
+  // Let any fetch already running finish before we decide what is still missing.
+  while (_manifEnrichmentInFlight) await _manifEnrichmentInFlight;
+
+  const results =
+    (renderer && renderer.component && renderer.component.results) || [];
+
+  const missing = new Set();
+  for (const res of results) {
+    const uris = res && res[MANIF_FIELD];
+    if (!uris) continue;
+    for (const uri of Array.isArray(uris) ? uris : [uris]) {
+      const id = uri.split("/").pop();
+      if (id && !_manifEnrichmentCache.has(id)) missing.add(id);
+    }
+  }
+
+  if (missing.size === 0) return;
+
+  _manifEnrichmentInFlight = (async () => {
+    try {
+      const response = await fetch("/result-enrichment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ manifestation_uuids: [...missing] }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        for (const [id, entry] of Object.entries(data || {})) {
+          _manifEnrichmentCache.set(id, entry);
+        }
+      } else {
+        console.error(
+          `Failed to fetch result enrichment: ${response.status}`
+        );
+      }
+    } catch (err) {
+      console.error("Error while fetching result enrichment", err);
+    } finally {
+      // Anything Solr didn't return: cache as null so we don't retry forever.
+      for (const id of missing) {
+        if (!_manifEnrichmentCache.has(id)) _manifEnrichmentCache.set(id, null);
+      }
+      _manifEnrichmentInFlight = null;
+    }
+  })();
+
+  return _manifEnrichmentInFlight;
+}
+
 async function _displayRepoAndVersion(val, item, field, element, index) {
   const reposDetails = [];
 
-  const manifFieldname = "frbr_Manifestation-manifestation";
-  if (!item.hasOwnProperty(manifFieldname)) {
+  if (!item.hasOwnProperty(MANIF_FIELD)) {
     return "";
   }
 
-  const manifUris = item[manifFieldname];
-  if (manifUris.length > 0) {
-    const fieldsToGet = [
-      "dcterms_type",
-      "ox_resourceAt-institution",
-      "dcterms_identifier-shelf_",
-    ];
+  const manifUris = item[MANIF_FIELD];
+  const manifUriList = Array.isArray(manifUris) ? manifUris : [manifUris];
 
-    const manifUuidDict = await getRecordsFromSolr(
-      Array.isArray(manifUris) ? manifUris : [manifUris],
-      fieldsToGet,
-      "manifestation"
-    );
-
-    const repoFieldsToGet = ["geonames_officialName"];
+  if (manifUriList.length > 0) {
+    await _ensureManifEnrichment(element);
 
     let numPrintedEds = 0;
 
-    for (const [manifUuid, manifFieldDict] of Object.entries(manifUuidDict)) {
+    for (const uri of manifUriList) {
+      const manifUuid = uri.split("/").pop();
+      const manifFieldDict = _manifEnrichmentCache.get(manifUuid);
+      if (!manifFieldDict) continue;
+
       let documentLocationString = "";
       let reposNameAndLocation = "";
       let shelfmark = "";
@@ -889,46 +1006,16 @@ async function _displayRepoAndVersion(val, item, field, element, index) {
         documentType = manifFieldDict["dcterms_type"];
       }
 
-      if (manifFieldDict.hasOwnProperty("dcterms_identifier-shelf_")) {
-        const val = manifFieldDict["dcterms_identifier-shelf_"];
-        shelfmark = stripValuePrefix(val, "shelf_");
+      if (manifFieldDict.hasOwnProperty("shelf")) {
+        shelfmark = stripValuePrefix(manifFieldDict["shelf"], "shelf_");
       }
 
-      if (manifFieldDict.hasOwnProperty("ox_resourceAt-institution")) {
-        const reposUriList = manifFieldDict["ox_resourceAt-institution"];
-        if (reposUriList.length > 0) {
-          const reposUuidDict = await getRecordsFromSolr(
-            Array.isArray(reposUriList) ? reposUriList : [reposUriList],
-            repoFieldsToGet,
-            "institution"
-          );
-
-          for (const [reposUuid, reposFieldDict] of Object.entries(
-            reposUuidDict
-          )) {
-            let reposName = "";
-            let reposCity = "";
-            let reposCountry = "";
-
-            for (const [reposFieldname, reposFieldval] of Object.entries(
-              reposFieldDict
-            )) {
-              if (reposFieldname === "geonames_officialName") {
-                reposName = reposFieldval;
-              } else if (reposFieldname === "geonames_locatedIn") {
-                reposCity = reposFieldval;
-              } else if (reposFieldname === "geonames_inCountry") {
-                reposCountry = reposFieldval;
-              }
-            }
-
-            const reposFieldList = [];
-            if (reposName) reposFieldList.push(reposName);
-            if (reposCity) reposFieldList.push(reposCity);
-            if (reposCountry) reposFieldList.push(reposCountry);
-            reposNameAndLocation = reposFieldList.join(", ");
-          }
+      if (manifFieldDict.hasOwnProperty("repoName")) {
+        const reposFieldList = [];
+        if (manifFieldDict["repoName"]) {
+          reposFieldList.push(manifFieldDict["repoName"]);
         }
+        reposNameAndLocation = reposFieldList.join(", ");
       }
 
       if (reposNameAndLocation && shelfmark) {
@@ -953,67 +1040,15 @@ async function _displayRepoAndVersion(val, item, field, element, index) {
     }
   }
 
-  // Build <ul><li>...</li></ul> HTML
   if (reposDetails.length === 0) return "";
 
   const listItems = reposDetails
     .map((detail) => `${reposDetails.length > 1 ? "• " : ""}${detail} <br/>`)
     .join("");
 
-  // FIXME: Need a better code for rendering the data
   const el = document.getElementById(`repo-${index}`);
 
   if (el) {
     el.innerHTML = `${listItems}`;
-  }
-}
-
-async function getRecordsFromSolr(uris, fieldsToGet, core) {
-  const uuids = uris.map((uri) => uri.split("/").pop());
-
-  const payload = {
-    solrCore: core,
-    uuids: uuids,
-    filter: fieldsToGet,
-  };
-
-  const response = await fetch("/stats-new", {
-    // <-- Update your actual API endpoint
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch records from Solr: ${response.status}`);
-  }
-
-  return await response.json();
-}
-
-async function fetchMoreData(uuid, fieldsToGet) {
-  try {
-    const response = await fetch(
-      `/solr/all/select?q=uuid:${uuid}&wt=json&rows=9999`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      console.error(`Error fetching relations: ${response.statusText}`);
-      return [];
-    }
-
-    const json = await response.json();
-    return json.response.docs;
-  } catch (err) {
-    console.error("Error while fetching relations", err);
-    return [];
   }
 }

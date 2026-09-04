@@ -1,7 +1,7 @@
-<script type="text/javascript" src="{{ url_for('static', filename='libs/edges/src/components/RefiningANDTermSelector.js') }}"></script>
-<script type="module" src="../static/js/edges/components/resultTable.js"></script>
-<script type="module" src="../static/js/edges/components/facet.js"></script>
-<script type="module" src="../static/js/edges/renderers/resultTable.js"></script>
-<script type="module" src="../static/js/edges/renderers/selectedFacet.js"></script>
-<script type="module" src="../static/js/edges/renderers/facets.js"></script>
+{# The emlo.Facet / FacetRenderer / SelectedFacetRenderer / ResultTable /
+   ResultTableRenderer classes are already defined by edges.js (loaded globally
+   via _edges_common_js.jinja2). The static/js/edges/* modules were an unfinished
+   extraction that shipped byte-identical copies whose calls to edges.js-internal
+   helpers (_addUrlParam, _removeUrlParam, searchQueryObj) throw ReferenceError,
+   so we load only the page entrypoint here. #}
 <script type="module" src="../static/js/result.edges.js"></script>

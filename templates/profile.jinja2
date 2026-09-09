@@ -1,8 +1,18 @@
 {% extends "base.jinja2" %}
 
 {% block title %}Profile{% endblock %}
+
+{# Profile pages import static/js/edges.js, which only needs the core edges
+   runtime — not the full Facetview search stack the base template loads. #}
+{% block edges_js %}{% include "_edges_core_js.jinja2" %}{% endblock %}
+
 {% block extra_stylesheets %}
+{% if collection == 'person' %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/chart.css') }}">
+{% endif %}
+{% if collection == 'location' %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+{% endif %}
 <style>
    .content{
     margin-left: 40px;
@@ -72,8 +82,12 @@
 
 {% block extra_js_bottom %}
     <script type="module" src="{{ url_for('static', filename='js/profile.edges.js') }}"></script>
+    {% if collection == 'location' %}
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    {% endif %}
+    {% if collection == 'person' %}
     <script type="text/javascript" src="{{ url_for('static', filename='libs/d3/d3.v3.min.js') }}"></script>
+    {% endif %}
 
     <script type="module">
         import { searchQueryObj } from "{{ url_for('static', filename='js/search.js') }}";
@@ -260,12 +274,17 @@
                 }
             }
 
-            // Map initialization
+            {% if collection == 'location' %}
+            // Map initialization — only location profiles render #location-map.
+            let mapPollsLeft = 100; // ~10s, then give up instead of polling forever
             const checkMapElement = setInterval(function() {
                 try {
                     const mapElement = document.getElementById('location-map');
 
-                    if (!mapElement) return; // still waiting
+                    if (!mapElement) {
+                        if (--mapPollsLeft <= 0) clearInterval(checkMapElement);
+                        return; // still waiting
+                    }
 
                     clearInterval(checkMapElement);
 
@@ -298,6 +317,7 @@
                     console.error("Map initialization failed:", e);
                 }
             }, 100);
+            {% endif %}
 
         } catch (e) {
             console.error("Critical error during DOMContentLoaded setup:", e);

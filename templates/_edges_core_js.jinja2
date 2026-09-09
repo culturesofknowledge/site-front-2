@@ -1,0 +1,11 @@
+{# ---------------------------------------------------------------------------
+   Core edges runtime — the minimum every page that imports static/js/edges.js
+   needs. `emlo.Facet` subclasses `edges.components.RefiningANDTermSelector`
+   at module-load time, so that one component ships in the core bundle too.
+   Search / browse / home pages pull the full Facetview stack on top of this
+   via _edges_common_js.jinja2; profile pages include only this file.
+   --------------------------------------------------------------------------- #}
+<script src="{{ url_for('static', filename='libs/edges/vendor/jquery-3.6.0/jquery-3.6.0.min.js') }}"></script>
+<script src="{{ url_for('static', filename='libs/edges/src/edges.js') }}"></script>
+<script src="{{ url_for('static', filename='libs/edges/src/datasources/solr9x.js') }}"></script>
+<script src="{{ url_for('static', filename='libs/edges/src/components/RefiningANDTermSelector.js') }}"></script>

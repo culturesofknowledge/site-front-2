@@ -1,23 +1,26 @@
-{# Loading base files for edges #}
-<script type="text/javascript" src="{{ url_for('static', filename='libs/edges/vendor/jquery-3.6.0/jquery-3.6.0.min.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='libs/edges/src/edges.js') }}"></script>
-    
-{# Loading datasource files for edges #}
-<script type="text/javascript" src="{{ url_for('static', filename='libs/edges/src/datasources/solr9x.js') }}"></script>
+{# ---------------------------------------------------------------------------
+   Full edges stack: the core runtime plus the Facetview search UI (extra
+   components, the bs3 Facetview template and its renderers, the bs5 search
+   box). Needed by any page that mounts an `edges.templates.bs3.Facetview`
+   — search, browse, home. Profile pages don't; they include
+   _edges_core_js.jinja2 directly.
 
-{# Loading edges components (edges.js extends edges.components.RefiningANDTermSelector at load time) #}
-<script type="text/javascript" src="{{ url_for('static', filename='libs/edges/src/components/RefiningANDTermSelector.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='libs/edges/src/components/ResultsDisplay.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='libs/edges/src/components/FullSearchController.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='libs/edges/src/components/Pager.js') }}"></script>
+   Loaded at the end of <body> (see base.jinja2) so it never blocks first
+   paint. Keep the order: core → components → template → renderers.
+   --------------------------------------------------------------------------- #}
+{% include "_edges_core_js.jinja2" %}
 
-{# Loading edges default template #}
-<script type="text/javascript" src="{{ url_for('static', filename='libs/edges/src/templates/bs3/Facetview.js') }}"></script>
+{# Facetview components #}
+<script src="{{ url_for('static', filename='libs/edges/src/components/ResultsDisplay.js') }}"></script>
+<script src="{{ url_for('static', filename='libs/edges/src/components/FullSearchController.js') }}"></script>
+<script src="{{ url_for('static', filename='libs/edges/src/components/Pager.js') }}"></script>
 
-{# Loading edges renderer #}
-<script type="text/javascript" src="{{ url_for('static', filename='libs/edges/src/renderers/bs3/RefiningANDTermSelector.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='libs/edges/src/renderers/bs3/ResultsFieldsByRow.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='libs/edges/src/renderers/bs3/FullSearchController.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='libs/edges/src/renderers/bs3/Pager.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='libs/edges/src/renderers/bs5/SearchBox.js') }}"></script>
+{# Facetview template #}
+<script src="{{ url_for('static', filename='libs/edges/src/templates/bs3/Facetview.js') }}"></script>
 
+{# Facetview renderers #}
+<script src="{{ url_for('static', filename='libs/edges/src/renderers/bs3/RefiningANDTermSelector.js') }}"></script>
+<script src="{{ url_for('static', filename='libs/edges/src/renderers/bs3/ResultsFieldsByRow.js') }}"></script>
+<script src="{{ url_for('static', filename='libs/edges/src/renderers/bs3/FullSearchController.js') }}"></script>
+<script src="{{ url_for('static', filename='libs/edges/src/renderers/bs3/Pager.js') }}"></script>
+<script src="{{ url_for('static', filename='libs/edges/src/renderers/bs5/SearchBox.js') }}"></script>

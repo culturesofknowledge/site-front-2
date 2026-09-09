@@ -6,7 +6,6 @@
     <link href="https://fonts.googleapis.com/css?family=Arvo" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <title>Early Modern Letters Online : {{ title }}</title>
     {% block extra_stylesheets %}{% endblock %}
     <script>
@@ -61,7 +60,6 @@
         }
     </script>
     <script src="{{ url_for('static', filename='js/top.js') }}"> </script>
-    {% include "_edges_common_js.jinja2" %}
 </head>
 <body>
     <div id="back-top" style="display:block;"><a href="#top"><span>Top</span></a></div>
@@ -166,6 +164,9 @@
     </div>
     <!-- END footer -->
 
+    {# edges runtime loads here, after the content — never blocks first paint.
+       Pages that only need the core runtime (profile) override this block. #}
+    {% block edges_js %}{% include "_edges_common_js.jinja2" %}{% endblock %}
     {% block extra_js_bottom %}{% endblock %}
     <script src="{{ url_for('static', filename='js/mobile-menu.js') }}"></script>
 </body>

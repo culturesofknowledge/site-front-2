@@ -8,6 +8,10 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     <title>Early Modern Letters Online : {{ title }}</title>
     {% block extra_stylesheets %}{% endblock %}
+    {# Early-discovery hints for the scripts the page will run at end of <body>.
+       preload/modulepreload only fetch — execution still happens at the
+       original <script> tag, so first paint is not blocked. #}
+    {% block head_preload %}{% endblock %}
     <script>
         function quickSearch(event) {
             event.preventDefault();

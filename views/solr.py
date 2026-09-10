@@ -445,38 +445,35 @@ def fetchNextResults():
             "rows": 1  # Only fetch a single document at a time for pagination
         }
         
-        # Fetch first entry
-        first_entry = requests.get(solr_query_url, params={**solr_params, "start": 0})
-        if first_entry.status_code != 200:
-            return jsonify({'error': 'Error fetching first entry', 'details': first_entry.text}), 500
-
-        # Fetch last entry (numFound is used to calculate the last entry)
         last_start = max(0, numFound - 1)  # Ensure we don't exceed available records
-        last_entry = requests.get(solr_query_url, params={**solr_params, "start": last_start})
-        if last_entry.status_code != 200:
-            return jsonify({'error': 'Error fetching last entry', 'details': last_entry.text}), 500
 
-        # Fetch previous, current, and next entries
-        prev_entry = None if start <= 0 else requests.get(solr_query_url, params={**solr_params, "start": start - 1})
-        if prev_entry and prev_entry.status_code != 200:
-            return jsonify({'error': 'Error fetching previous entry', 'details': prev_entry.text}), 500
-
-        current_entry = requests.get(solr_query_url, params={**solr_params, "start": start})
-        if current_entry.status_code != 200:
-            return jsonify({'error': 'Error fetching current entry', 'details': current_entry.text}), 500
-
-        next_entry = None if start >= last_start else requests.get(solr_query_url, params={**solr_params, "start": start + 1})
-        if next_entry and next_entry.status_code != 200:
-            return jsonify({'error': 'Error fetching next entry', 'details': next_entry.text}), 500
-
-        # Prepare the response data
-        response_data = {
-            "first_entry": first_entry.json().get('response').get('docs' , [])[0] if first_entry else None,  # Access JSON from the Response object
-            "last_entry": last_entry.json().get('response').get('docs' , [])[0] if last_entry else None,  # Access JSON from the Response object
-            "prev_entry": prev_entry.json().get('response').get('docs' , [])[0] if prev_entry else None,  # Access JSON from the Response object if exists
-            "current_entry": current_entry.json().get('response').get('docs' , [])[0] if current_entry else None,  # Access JSON from the Response object
-            "next_entry": next_entry.json().get('response').get('docs' , [])[0] if next_entry else None # Access JSON from the Response object
+        # first / last / prev / current / next are independent single-doc
+        # look-ups. Previously these were up to five sequential round trips to
+        # Solr on every profile page that carries navigation params; run them
+        # concurrently instead.
+        entry_starts = {
+            "first_entry": 0,
+            "last_entry": last_start,
+            "current_entry": start,
         }
+        if start > 0:
+            entry_starts["prev_entry"] = start - 1
+        if start < last_start:
+            entry_starts["next_entry"] = start + 1
+
+        def _fetch_entry(entry_start):
+            resp = requests.get(solr_query_url, params={**solr_params, "start": entry_start}, timeout=15)
+            resp.raise_for_status()
+            docs = resp.json().get('response', {}).get('docs', [])
+            return docs[0] if docs else None
+
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            futures = {key: executor.submit(_fetch_entry, s) for key, s in entry_starts.items()}
+            response_data = {key: fut.result() for key, fut in futures.items()}
+
+        # prev/next are omitted at the edges — keep the response shape stable.
+        response_data.setdefault("prev_entry", None)
+        response_data.setdefault("next_entry", None)
 
         return jsonify(response_data), 200
 

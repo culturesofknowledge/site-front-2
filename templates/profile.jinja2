@@ -6,6 +6,47 @@
    runtime — not the full Facetview search stack the base template loads. #}
 {% block edges_js %}{% include "_edges_core_js.jinja2" %}{% endblock %}
 
+{# The profile body is rendered client-side, so the JS module graph is on the
+   critical path to first paint. The <script> tags live at the end of <body>
+   (below the fold) and the per-collection renderer chunks are pulled in with
+   dynamic import() at run time, which otherwise waterfalls one round trip at a
+   time. Preload the whole chain from <head> so it downloads in parallel while
+   the HTML parses; nothing here executes early. #}
+{% block head_preload %}
+  {# edges core runtime (classic scripts, executed by _edges_core_js.jinja2) #}
+  <link rel="preload" as="script" href="{{ url_for('static', filename='libs/edges/vendor/jquery-3.6.0/jquery-3.6.0.min.js') }}">
+  <link rel="preload" as="script" href="{{ url_for('static', filename='libs/edges/src/edges.js') }}">
+  <link rel="preload" as="script" href="{{ url_for('static', filename='libs/edges/src/datasources/solr9x.js') }}">
+  <link rel="preload" as="script" href="{{ url_for('static', filename='libs/edges/src/components/RefiningANDTermSelector.js') }}">
+  {# app module graph #}
+  <link rel="modulepreload" href="{{ url_for('static', filename='js/profile.edges.js') }}">
+  <link rel="modulepreload" href="{{ url_for('static', filename='js/profile.js') }}">
+  <link rel="modulepreload" href="{{ url_for('static', filename='js/edges.js') }}">
+  {# per-collection component + renderer chunks (dynamically imported at run time) #}
+  {% if collection == 'person' %}
+  <link rel="modulepreload" href="{{ url_for('static', filename='js/profile/people.js') }}">
+  <link rel="modulepreload" href="{{ url_for('static', filename='js/profile/peopleFrags.js') }}">
+  <link rel="modulepreload" href="{{ url_for('static', filename='js/chart.js') }}">
+  {% elif collection == 'location' %}
+  <link rel="modulepreload" href="{{ url_for('static', filename='js/profile/location.js') }}">
+  <link rel="modulepreload" href="{{ url_for('static', filename='js/profile/locationFrag.js') }}">
+  {% elif collection == 'work' %}
+  <link rel="modulepreload" href="{{ url_for('static', filename='js/profile/work.js') }}">
+  <link rel="modulepreload" href="{{ url_for('static', filename='js/profile/workFrag.js') }}">
+  <link rel="modulepreload" href="{{ url_for('static', filename='js/profile/collectionDetails.js') }}">
+  {% elif collection == 'image' %}
+  <link rel="modulepreload" href="{{ url_for('static', filename='js/profile/imageFrag.js') }}">
+  {% elif collection == 'repository' %}
+  <link rel="modulepreload" href="{{ url_for('static', filename='js/profile/institutionFrag.js') }}">
+  <link rel="modulepreload" href="{{ url_for('static', filename='js/helper/helper.js') }}">
+  <link rel="modulepreload" href="{{ url_for('static', filename='js/helper/fields.js') }}">
+  {% elif collection == 'manifestation' %}
+  <link rel="modulepreload" href="{{ url_for('static', filename='js/profile/manifestationFrag.js') }}">
+  {% elif collection == 'comment' %}
+  <link rel="modulepreload" href="{{ url_for('static', filename='js/profile/commentFrag.js') }}">
+  {% endif %}
+{% endblock %}
+
 {% block extra_stylesheets %}
 {% if collection == 'person' %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/chart.css') }}">

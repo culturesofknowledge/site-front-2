@@ -626,24 +626,48 @@ _TABLE_DATA_FIELDS = {
     "repository": ("ox_hasResource-manifestation",),
 }
 
-# Collections whose relations list is only ever consumed through
-# resourceRelation(profile, relations, field) — a lookup that walks
-# profile[field] and matches each uri's id against `relations`, reading
-# only ox_titleOfResource/dcterms_relation/ox_detailsOfResource off the
-# match (see static/js/helper/helper.js). For these, the generic
-# `uuid_related:{uuid}` sweep — which for a repository means every
-# manifestation it holds, sometimes thousands — is fetched and shipped for
-# nothing: verified by reading every function institutionFrag.js's
-# _renderInstitutionProfile/_renderInstitutionSidebar call
-# (profileFragLoader.js), the only two functions a repository profile
-# renders. Only "repository" is enabled here; work/person/location also
-# call resourceRelation but their renderers use `relations` for other
-# things too (image/manifestation lookups, relationshipList, ...), so
-# narrowing their relations fetch needs the same per-collection audit
-# before it's safe — not done yet.
-_RELATIONS_FILTER_FIELD = {
-    "repository": "rdfs_seeAlso-resource",
+# Collections whose relations list is only ever consumed by walking a fixed,
+# enumerable set of profile[field] uri lists and matching each against
+# `relations` — resourceRelation() (rdfs_seeAlso-resource), relationshipList()
+# (the field lists below), and h4RelationshipList() (ox_isAnnotatedBy-comment)
+# in static/js/helper/helper.js. For these, the generic `uuid_related:{uuid}`
+# sweep — every *other* record pointing at this one, in any direction, which
+# for a repository means every manifestation it holds and for a prolific
+# person means every letter they ever wrote/received — is fetched and shipped
+# for nothing beyond that small matched set. Verified per collection by
+# reading every function its profile+sidebar render (profileFragLoader.js
+# names them): institutionFrag.js (repository), peopleFrags.js (person),
+# locationFrag.js (location) — none of the three read `relations` any other
+# way. work/image/manifestation/comment also call resourceRelation but use
+# `relations` for other things too (image/manifestation lookups, ...), so
+# narrowing theirs needs the same audit before it's safe — not done yet.
+_RELATIONS_FILTER_FIELDS = {
+    "repository": ("rdfs_seeAlso-resource",),
+    "person": (
+        "rdfs_seeAlso-resource", "ox_isAnnotatedBy-comment",
+        "ox_wasBornIn-location", "ox_diedAt-location", "ox_wasAt-location",
+        "rel_childOf-person", "rel_parentOf-person", "rel_siblingOf-person",
+        "rel_spouseOf-person", "rel_relativeOf-person",
+        "ox_unspecifiedRelationshipWith-person", "taught-person",
+        "was_taught_by-person", "employed-person", "was_employed_by-person",
+        "friend-person", "ox_memberOf-person", "foaf_member-person",
+    ),
+    "location": (
+        "rdfs_seeAlso-resource", "ox_isAnnotatedBy-comment",
+        "rel_wasBirthplaceOf-person", "rel_wasPlaceOfDeathOf-person",
+        "rel_wasVisitedBy-person",
+    ),
 }
+
+# Fields the client only ever reads through h4WorkList() / the correspondence
+# graph (static/js/helper/helper.js summaryByYear/summaryByDetail,
+# static/js/profile/peopleFrags.js _renderGraphSection) — uuid,
+# dcterms_description and the two year fields, nothing else, whether the list
+# renders as a >30-item year summary or a <=30-item detail table. The
+# existing /collection-year-data join already restricts to exactly this set
+# for repository; this applies the same restriction to the equivalent
+# person/location uuid-list lookup, which had no `fl` at all.
+_TABLE_DATA_WORK_FIELDS = "uuid,dcterms_description,ox_started-ox_year,ox_completed-ox_year"
 
 
 def _profile_table_data(field, primary):
@@ -655,7 +679,7 @@ def _profile_table_data(field, primary):
         return _collection_year_data(primary.get("uuid"))
 
     uuids = list({uuid_from_uri(v) for v in (primary.get(field) or [])})
-    return _stats_new_lookup("work", uuids, "uuid", "") if uuids else []
+    return _stats_new_lookup("work", uuids, "uuid", _TABLE_DATA_WORK_FIELDS) if uuids else []
 
 
 @solr_bp.route('/profile-data/<collection>/<uuid>', methods=['GET'])
@@ -703,29 +727,40 @@ def profile_data(collection, uuid):
             resp.raise_for_status()
             return _strip_bulk_correspondence_fields(resp.json()).get('response', {}).get('docs', [])
 
-        def fetch_targeted_relations(primary, filter_field):
-            """Only the docs resourceRelation() will actually look up —
-            straight id:(...) lookup instead of sweeping every uuid_related
-            match (for a repository, that sweep is every manifestation it
-            holds)."""
-            ids = [f"uuid_{uuid_from_uri(u)}" for u in (primary.get(filter_field) or [])]
+        def fetch_targeted_relations(primary, filter_fields):
+            """Only the docs relationshipList()/resourceRelation()/
+            h4RelationshipList() will actually look up — id:(...) lookups for
+            the union of every filter field's uris, instead of sweeping every
+            uuid_related match (for a repository that sweep is every
+            manifestation it holds; for a prolific person, every letter they
+            ever wrote or received)."""
+            ids = sorted({
+                f"uuid_{uuid_from_uri(u)}"
+                for field in filter_fields
+                for u in (primary.get(field) or [])
+            })
             if not ids:
                 return []
-            id_query = ' OR '.join(f'"{i}"' for i in ids)
-            resp = requests.get(
-                f"{SOLR_URL}all/select",
-                params={'q': f'id:({id_query})', 'rows': len(ids), 'wt': 'json'},
-            )
-            resp.raise_for_status()
-            return _strip_bulk_correspondence_fields(resp.json()).get('response', {}).get('docs', [])
+            docs = []
+            BATCH = 100
+            for i in range(0, len(ids), BATCH):
+                batch = ids[i:i + BATCH]
+                id_query = ' OR '.join(f'"{i}"' for i in batch)
+                resp = requests.get(
+                    f"{SOLR_URL}all/select",
+                    params={'q': f'id:({id_query})', 'rows': len(batch), 'wt': 'json'},
+                )
+                resp.raise_for_status()
+                docs.extend(_strip_bulk_correspondence_fields(resp.json()).get('response', {}).get('docs', []))
+            return docs
 
-        filter_field = _RELATIONS_FILTER_FIELD.get(collection)
-        if filter_field:
+        filter_fields = _RELATIONS_FILTER_FIELDS.get(collection)
+        if filter_fields:
             # The targeted query needs primary's own field values first, so
             # this can't run in parallel with fetch_primary like the
             # default path below does.
             primary = fetch_primary()
-            relations = fetch_targeted_relations(primary, filter_field) if primary else []
+            relations = fetch_targeted_relations(primary, filter_fields) if primary else []
         else:
             # Primary and relations both key off the record's own uuid and
             # don't depend on each other's result, so run them together.

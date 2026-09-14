@@ -626,6 +626,25 @@ _TABLE_DATA_FIELDS = {
     "repository": ("ox_hasResource-manifestation",),
 }
 
+# Collections whose relations list is only ever consumed through
+# resourceRelation(profile, relations, field) — a lookup that walks
+# profile[field] and matches each uri's id against `relations`, reading
+# only ox_titleOfResource/dcterms_relation/ox_detailsOfResource off the
+# match (see static/js/helper/helper.js). For these, the generic
+# `uuid_related:{uuid}` sweep — which for a repository means every
+# manifestation it holds, sometimes thousands — is fetched and shipped for
+# nothing: verified by reading every function institutionFrag.js's
+# _renderInstitutionProfile/_renderInstitutionSidebar call
+# (profileFragLoader.js), the only two functions a repository profile
+# renders. Only "repository" is enabled here; work/person/location also
+# call resourceRelation but their renderers use `relations` for other
+# things too (image/manifestation lookups, relationshipList, ...), so
+# narrowing their relations fetch needs the same per-collection audit
+# before it's safe — not done yet.
+_RELATIONS_FILTER_FIELD = {
+    "repository": "rdfs_seeAlso-resource",
+}
+
 
 def _profile_table_data(field, primary):
     """Mirrors MultiFields.synchronise()'s fetchTableData branch in
@@ -684,17 +703,46 @@ def profile_data(collection, uuid):
             resp.raise_for_status()
             return _strip_bulk_correspondence_fields(resp.json()).get('response', {}).get('docs', [])
 
-        # Primary and relations both key off the record's own uuid and don't
-        # depend on each other's result, so run them together.
-        with ThreadPoolExecutor(max_workers=2) as executor:
-            f_primary = executor.submit(fetch_primary)
-            f_relations = executor.submit(fetch_relations)
-            primary = f_primary.result()
-            relations = f_relations.result()
+        def fetch_targeted_relations(primary, filter_field):
+            """Only the docs resourceRelation() will actually look up —
+            straight id:(...) lookup instead of sweeping every uuid_related
+            match (for a repository, that sweep is every manifestation it
+            holds)."""
+            ids = [f"uuid_{uuid_from_uri(u)}" for u in (primary.get(filter_field) or [])]
+            if not ids:
+                return []
+            id_query = ' OR '.join(f'"{i}"' for i in ids)
+            resp = requests.get(
+                f"{SOLR_URL}all/select",
+                params={'q': f'id:({id_query})', 'rows': len(ids), 'wt': 'json'},
+            )
+            resp.raise_for_status()
+            return _strip_bulk_correspondence_fields(resp.json()).get('response', {}).get('docs', [])
+
+        filter_field = _RELATIONS_FILTER_FIELD.get(collection)
+        if filter_field:
+            # The targeted query needs primary's own field values first, so
+            # this can't run in parallel with fetch_primary like the
+            # default path below does.
+            primary = fetch_primary()
+            relations = fetch_targeted_relations(primary, filter_field) if primary else []
+        else:
+            # Primary and relations both key off the record's own uuid and
+            # don't depend on each other's result, so run them together.
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                f_primary = executor.submit(fetch_primary)
+                f_relations = executor.submit(fetch_relations)
+                primary = f_primary.result()
+                relations = f_relations.result()
 
         empty = {'primary': None, 'relations': [], 'images': {}, 'manifestationData': {}, 'tableData': {}}
         if primary is None:
             return jsonify(empty), 404
+
+        # Never read anywhere off a doc (primary or relations) — only ever
+        # used as a facet field name / query key, confirmed by grepping
+        # every reference to it in static/js/. Safe to drop unconditionally.
+        primary.pop('uuid_related', None)
 
         # Every manifestation the old client-side code would have fetched
         # images/manifestation-data for — union+dedupe across every field
@@ -739,6 +787,24 @@ def profile_data(collection, uuid):
                 manifestation_data[mani_futures[future]] = future.result()
             for future in as_completed(table_futures):
                 table_data[table_futures[future]] = future.result()
+
+        # MultiFields.synchronise()'s fetchTableData branch only reads a
+        # resolved field's raw value on `primary` as an existence check
+        # once `tableData[field]` is populated in prefetch mode — EXCEPT
+        # totalLinkingToListWork() (static/js/helper/helper.js), which
+        # reads profile[field].length directly for the "N letters sent
+        # from/received/mentioning" stats line on person and location
+        # profiles specifically (peopleFrags.js / locationFrag.js) —
+        # clearing the field there zeroes that count. Only clear it for
+        # collections verified not to do that: repository's
+        # institutionFrag.js doesn't call totalLinkingToListWork at all, so
+        # its ox_hasResource-manifestation (every manifestation URI the
+        # institution holds — often the majority of this response's size)
+        # is genuinely dead weight once tableData has been computed above.
+        _SAFE_TO_CLEAR_TABLE_FIELDS_ON_PRIMARY = {"repository"}
+        if collection in _SAFE_TO_CLEAR_TABLE_FIELDS_ON_PRIMARY:
+            for field in table_fields:
+                primary[field] = []
 
         return jsonify({
             'primary': primary,

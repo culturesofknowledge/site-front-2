@@ -21,6 +21,16 @@ let emlo = {
   openingQuery: null,
   components: [],
 
+  // Set by profile.edges.js, per migrated collection, from a single
+  // /profile-data/<collection>/<uuid> call: `queryAdapter` (a
+  // PrefetchedQueryAdapter) supplies the primary record without a network
+  // round trip, and `prefetchedExtras` supplies what MultiFields.synchronise()
+  // below would otherwise fetch itself (relations / images / manifestation
+  // data) one round trip at a time. Left null for every other collection,
+  // which keeps making those calls exactly as before.
+  queryAdapter: null,
+  prefetchedExtras: null,
+
   init: function () {
     if (!this.selector) {
       throw new Error("Selector must be provided.");
@@ -43,13 +53,15 @@ let emlo = {
       );
     }
 
+    const queryAdapter = this.queryAdapter || new edges.es.SolrQueryAdapter();
+
     if (this.openingQuery) {
       this.active[this.selector] = new edges.Edge({
         selector: `#${this.selector}`,
         searchUrl: `${this.solrURL}${this.collection}`,
         openingQuery: new es.Query(this.openingQuery),
         template: this.template,
-        queryAdapter: new edges.es.SolrQueryAdapter(),
+        queryAdapter: queryAdapter,
         components: this.components,
       });
     } else {
@@ -57,11 +69,39 @@ let emlo = {
         selector: `#${this.selector}`,
         searchUrl: `${this.solrURL}${this.collection}`,
         template: this.template,
-        queryAdapter: new edges.es.SolrQueryAdapter(),
+        queryAdapter: queryAdapter,
         components: this.components,
       });
     }
   },
+};
+
+// Stands in for edges.es.SolrQueryAdapter when the primary record has
+// already been fetched (as part of a combined /profile-data/... call) —
+// resolves with it directly instead of making a second network request.
+// Mirrors SolrQueryAdapter's async success/error callback shape exactly so
+// edges.Edge's query cycle (doPrimaryQuery -> querySuccess -> synchronise
+// -> draw) runs completely unmodified.
+emlo.PrefetchedQueryAdapter = class extends edges.QueryAdapter {
+  constructor(doc) {
+    super();
+    this.doc = doc;
+  }
+
+  doQuery({ success }) {
+    Promise.resolve().then(() => {
+      success(
+        new es.Result({
+          raw: {
+            response: {
+              docs: this.doc ? [this.doc] : [],
+              numFound: this.doc ? 1 : 0,
+            },
+          },
+        })
+      );
+    });
+  }
 };
 
 emlo.ResultTemplate = class extends edges.Template {
@@ -2260,16 +2300,26 @@ emlo.MultiFields = class extends edges.Component {
       await this._appendResults({ results: results });
       this.hitCount = source.total();
       if (results && results.length > 0) {
-        let relations = await this._fetchRelations(results[0]["uuid"]);
+        let relations = emlo.prefetchedExtras
+          ? emlo.prefetchedExtras.relations
+          : await this._fetchRelations(results[0]["uuid"]);
         this.relationships = relations;
       }
 
       if (this.fetchTableData && this.tableDataFields.length > 0) {
         const result = results[0];
+        const prefetchedTableData = emlo.prefetchedExtras
+          ? emlo.prefetchedExtras.tableData
+          : null;
 
         for (const field of this.tableDataFields) {
           if (Object.prototype.hasOwnProperty.call(result, field)) {
-            if (field === "ox_hasResource-manifestation") {
+            if (
+              prefetchedTableData &&
+              Object.prototype.hasOwnProperty.call(prefetchedTableData, field)
+            ) {
+              this.gneratedData[field] = prefetchedTableData[field];
+            } else if (field === "ox_hasResource-manifestation") {
               // Query Solr directly by institution UUID to avoid sending thousands of UUIDs in a POST body
               this.gneratedData[field] = await this._fetchWorksByRelation(result["uuid"]);
             } else {
@@ -2306,25 +2356,22 @@ emlo.MultiFields = class extends edges.Component {
                 if (!this.gneratedData.hasOwnProperty("imageData")) {
                   this.gneratedData["imageData"] = {};
                 }
-
-                const payload = {
-                  solrCore: "image",
-                  uuids: [uuid],
-                  filter: "",
-                  objectKey: "uuid_related",
-                };
-
-                this.gneratedData["imageData"][uuid] = await this._fetchImages(
-                  uuid
-                );
-
                 if (!this.gneratedData.hasOwnProperty("manifestationData")) {
                   this.gneratedData["manifestationData"] = {};
                 }
 
-                // let relationsArray = await this._fetchManifestationData(uuid);
-
-                this.gneratedData["manifestationData"][uuid] = await this._fetchManifestationData(uuid);
+                if (emlo.prefetchedExtras) {
+                  this.gneratedData["imageData"][uuid] =
+                    emlo.prefetchedExtras.images[uuid] || [];
+                  this.gneratedData["manifestationData"][uuid] =
+                    emlo.prefetchedExtras.manifestationData[uuid] || {};
+                } else {
+                  this.gneratedData["imageData"][uuid] = await this._fetchImages(
+                    uuid
+                  );
+                  this.gneratedData["manifestationData"][uuid] =
+                    await this._fetchManifestationData(uuid);
+                }
               }
             }
           }

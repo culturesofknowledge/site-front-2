@@ -31,6 +31,38 @@ try {
     console.error(`UUID is missing, unable to make any query`);
   }
 
+  // Every profile page fetches everything it needs (primary record +
+  // relations + whatever a collection's own components need on top —
+  // images/manifestation-data or tableData) in this one combined call,
+  // computed server-side, instead of the up-to-4 sequential client-side
+  // round trips the edges query cycle would otherwise make.
+  if (uuid) {
+    try {
+      const response = await fetch(`/profile-data/${splittedPath[2]}/${uuid}`);
+      if (!response.ok) {
+        throw new Error(`/profile-data/${splittedPath[2]}/${uuid} -> ${response.status}`);
+      }
+      const data = await response.json();
+
+      if (data.primary) {
+        emlo.queryAdapter = new emlo.PrefetchedQueryAdapter(data.primary);
+        emlo.prefetchedExtras = {
+          relations: data.relations || [],
+          images: data.images || {},
+          manifestationData: data.manifestationData || {},
+          tableData: data.tableData || {},
+        };
+      }
+      // data.primary missing (e.g. 404) falls through with queryAdapter/
+      // prefetchedExtras left unset, so init() below takes the normal path
+      // and the page still renders (as "not found") exactly as before.
+    } catch (err) {
+      // Fetch failed for any reason: leave queryAdapter/prefetchedExtras
+      // unset so init() below falls back to the original per-request path.
+      console.error("profile-data fetch failed, falling back:", err);
+    }
+  }
+
   //   Setting emlo object
   emlo.selector = "profile-display";
   emlo.template = new emlo.ProfileTemplate();

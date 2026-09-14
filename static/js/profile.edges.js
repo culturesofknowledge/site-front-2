@@ -45,10 +45,19 @@ try {
   // edges.Edge.startup() in this file and libs/edges/src/edges.js). With
   // the fetch moved earlier, #profile-display was left blank for its whole
   // duration instead. Show the same message ourselves for that window so
-  // the page doesn't look empty/stuck while it loads.
+  // the page doesn't look empty/stuck while it loads — inside the same
+  // row/columns grid emlo.ProfileTemplate.draw() uses below, so it lands in
+  // the main content column instead of flush against the left edge.
   const profileDisplay = document.getElementById("profile-display");
   if (profileDisplay) {
-    profileDisplay.innerHTML = "<div class='loading-message'>Loading...</div>";
+    profileDisplay.innerHTML = `
+      <div id="main" class="row">
+        <div class="columns large-9 large-push-3">
+          <div class="loading-message">Loading...</div>
+        </div>
+        <div class="columns large-3 large-pull-9 side"></div>
+      </div>
+    `;
   }
 
   if (uuid) {

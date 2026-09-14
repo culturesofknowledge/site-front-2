@@ -36,6 +36,21 @@ try {
   // images/manifestation-data or tableData) in this one combined call,
   // computed server-side, instead of the up-to-4 sequential client-side
   // round trips the edges query cycle would otherwise make.
+  //
+  // That combined fetch now runs *before* emlo.init(), which is what used
+  // to synchronously draw the "Loading..." message the instant
+  // `new edges.Edge(...)` was constructed (MultiFields defaults
+  // `loading = true` and Edge.startup() draws every component once, before
+  // any query even starts — see emlo.MultiFieldsRenderer.draw() /
+  // edges.Edge.startup() in this file and libs/edges/src/edges.js). With
+  // the fetch moved earlier, #profile-display was left blank for its whole
+  // duration instead. Show the same message ourselves for that window so
+  // the page doesn't look empty/stuck while it loads.
+  const profileDisplay = document.getElementById("profile-display");
+  if (profileDisplay) {
+    profileDisplay.innerHTML = "<div class='loading-message'>Loading...</div>";
+  }
+
   if (uuid) {
     try {
       const response = await fetch(`/profile-data/${splittedPath[2]}/${uuid}`);

@@ -25,8 +25,11 @@ try {
     size: 999999999,
     queryStrings: [],
     sort: [{ field: "browse", order: "asc" }],
+    // "ox_hasResource-manifestation" deliberately excluded: it's every
+    // manifestation the repository holds (hundreds of KB to several MB for
+    // a large one) and this table never renders it — selectField below only
+    // reads it when showCheckbox is true, which this page never sets.
     filters: [
-      "ox_hasResource-manifestation",
       "uuid",
       "browse",
       "object_type",
@@ -82,7 +85,6 @@ try {
         serialHeader: "",
         showIndex: false,
         showCheckbox: false,
-        selectField: "ox_hasResource-manifestation",
         displayField: "browse",
         tableDisplay: [
           {

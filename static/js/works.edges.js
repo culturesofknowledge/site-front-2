@@ -17,15 +17,12 @@ try {
     from: 0,
     size: 999999999,
     queryStrings: [],
+    // Sorting by started_date_sort doesn't require it in the response —
+    // Solr sorts from the index. Neither it nor the two year fields are
+    // read anywhere in ResultTableRenderer or this page's tableDisplay
+    // (every row in a given year's result set already shares that year).
     sort: [{ field: "started_date_sort", order: "asc" }],
-    filters: [
-      "started_date_sort",
-      "ox_started-ox_year",
-      "ox_completed-ox_year",
-      "uuid",
-      "object_type",
-      "dcterms_description",
-    ],
+    filters: ["uuid", "object_type", "dcterms_description"],
   };
 
   emlo.openingQuery.queryStrings.push({

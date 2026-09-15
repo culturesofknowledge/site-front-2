@@ -53,6 +53,9 @@ try {
     size: 999999999,
     queryStrings: [],
     sort: [{ field: "browse", order: "asc" }],
+    // "rdfs_seeAlso-resource" / "dcterms_identifier-uri_" deliberately
+    // excluded: not read anywhere in tableDisplay or ResultTableRenderer —
+    // confirmed by grepping every reference to both field names.
     filters: [
       "foaf_name",
       "uuid",
@@ -63,8 +66,6 @@ try {
       "skos_altLabel",
       "ox_titlesRolesOccupations",
       "object_type",
-      "rdfs_seeAlso-resource",
-      "dcterms_identifier-uri_",
     ],
   };
 

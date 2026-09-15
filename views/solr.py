@@ -9,14 +9,20 @@ load_dotenv()
 
 solr_bp = Blueprint("solr", __name__)
 
-# Fields that hold a person's/location's own full correspondence list —
-# e.g. a prolific letter-writer's `mail_recipientOf-work` can be hundreds of
-# KB of work URIs on its own. The profile UI renders these only from the
-# *primary* record's own tableData (see people.js / location.js
-# tableDataFields and their _renderLetters* functions) — never off an entry
-# in a "relations" / "related images" list. Stripping them there is a
-# byte-for-byte no-op for every page that reads this response; see
-# [[perf_edges_bundle_refactor]] memory for how this was verified.
+# Fields that hold a hub record's (person/location/institution) own full
+# correspondence or collection list — e.g. a prolific letter-writer's
+# `mail_recipientOf-work`, or a large repository's `ox_hasResource-manifestation`
+# (every manifestation it holds), can be hundreds of KB to several MB on its
+# own. The UI renders these only from the *primary* record's own tableData
+# (see people.js / location.js tableDataFields, _getInstitutionComponents()
+# in profile.js, and their _renderLetters*/_renderCollectionOverview
+# functions) — never off an entry in a "relations" / "related images" list.
+# Stripping them there is a byte-for-byte no-op for every page that reads
+# this response; see [[perf_edges_bundle_refactor]] memory for how the first
+# five were verified. `ox_hasResource-manifestation` was added after finding
+# it: any page whose relations list happens to include a large institution
+# (e.g. a manifestation held by a major repository) was shipping that
+# repository's full manifestation list — same class of bug, different field.
 _BULK_CORRESPONDENCE_FIELDS = {
     "uuid_related",
     "frbr_creatorOf-work",
@@ -24,6 +30,7 @@ _BULK_CORRESPONDENCE_FIELDS = {
     "mail_originOf-work",
     "mail_destinationOf-work",
     "dcterms_isReferencedBy-work",
+    "ox_hasResource-manifestation",
 }
 
 

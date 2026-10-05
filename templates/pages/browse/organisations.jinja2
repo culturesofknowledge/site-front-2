@@ -42,5 +42,5 @@
 
 
 {% block extra_js_bottom %}
-<script type="module" src="../static/js/organisation.edges.js"></script>
+<script type="module" src="{{ url_for('static', filename='js/organisation.edges.js') }}"></script>
 {% endblock extra_js_bottom %} 

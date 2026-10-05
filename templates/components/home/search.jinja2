@@ -162,7 +162,7 @@
 
   </div>
 
-  <script src="../static/js/clearFields.js"></script>
+  <script src="{{ url_for('static', filename='js/clearFields.js') }}"></script>
   <script>
     function clearAllSearchFields() {
       const form = document.getElementById('search');

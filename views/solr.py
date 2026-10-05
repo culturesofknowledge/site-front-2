@@ -666,15 +666,23 @@ _RELATIONS_FILTER_FIELDS = {
     ),
 }
 
-# Fields the client only ever reads through h4WorkList() / the correspondence
-# graph (static/js/helper/helper.js summaryByYear/summaryByDetail,
-# static/js/profile/peopleFrags.js _renderGraphSection) — uuid,
-# dcterms_description and the two year fields, nothing else, whether the list
-# renders as a >30-item year summary or a <=30-item detail table. The
-# existing /collection-year-data join already restricts to exactly this set
-# for repository; this applies the same restriction to the equivalent
-# person/location uuid-list lookup, which had no `fl` at all.
-_TABLE_DATA_WORK_FIELDS = "uuid,dcterms_description,ox_started-ox_year,ox_completed-ox_year"
+# Fields the client reads through h4WorkList() (static/js/helper/helper.js)
+# for a person/location's "Letters Written/Received/Mentioning" list — a
+# >30-item list renders via summaryByYear (needs only the two year fields);
+# a <=30-item list renders via summaryByDetail, which needs uuid +
+# dcterms_description for the link/text, ox_started-ox_year for the
+# day-level display and as its actual sort key, and — easy to miss —
+# started_date_sort: h4WorkList pre-sorts by it before handing off to
+# summaryByDetail, and since JS's Array.sort is stable, that ordering
+# survives as the *within-year* tie-break once summaryByDetail's own
+# ox_started-ox_year sort runs (same year, different day). Confirmed by
+# reproducing both sorts in sequence: without started_date_sort, letters
+# from the same year fall back to whatever order Solr happened to return —
+# not visibly broken (still grouped correctly by year), but a real ordering
+# regression this field list originally missed (every profile-data test
+# case used to verify it happened to have >30-item lists, which never
+# exercises this path at all).
+_TABLE_DATA_WORK_FIELDS = "uuid,dcterms_description,ox_started-ox_year,ox_completed-ox_year,started_date_sort"
 
 
 def _profile_table_data(field, primary):

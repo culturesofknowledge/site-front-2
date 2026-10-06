@@ -139,7 +139,9 @@
         import { modifyCurrentSearch } from "{{ url_for('static', filename='js/helper/modifyCurrentSearch.js') }}";
         import { buildSolrQuery } from "{{ url_for('static', filename='js/helper/buildSolrQuery.js') }}";
 
-       document.addEventListener('DOMContentLoaded', function() {
+       // Runs once profile.edges.js has drawn the profile template, since that
+       // is what creates the navigation buttons used below.
+       function setupProfileNavigation() {
         try {
             const urlParams = new URLSearchParams(window.location.search);
             const uuid = urlParams.get('uuid');
@@ -367,7 +369,13 @@
         } catch (e) {
             console.error("Critical error during DOMContentLoaded setup:", e);
         }
-    });
+    }
+
+    if (window.emloProfileRendered) {
+        setupProfileNavigation();
+    } else {
+        document.addEventListener('emlo:profile-rendered', setupProfileNavigation, { once: true });
+    }
     </script>
 
 {% endblock extra_js_bottom %}

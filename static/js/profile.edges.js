@@ -104,6 +104,12 @@ try {
   emlo.components = await getComponents(collectioName, emlo);
 
   emlo.init();
+
+  // init() draws the search-results navigation (#control, #count-heading...)
+  // that profile.jinja2 wires up. Because of the awaited fetch above, that
+  // now happens after DOMContentLoaded, so signal it explicitly.
+  window.emloProfileRendered = true;
+  document.dispatchEvent(new Event("emlo:profile-rendered"));
 } catch (err) {
   console.error(err);
 }

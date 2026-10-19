@@ -595,7 +595,7 @@ function summaryByYear(field, profile, data) {
 
   let countFrag = "";
   if (field == "repository") {
-    countFrag += `${data.length} records`;
+    countFrag += `<div style="margin-bottom:10px">${data.length} records (for manifestation count, see Browse Repositories page)</div>`;
   }
 
   return `

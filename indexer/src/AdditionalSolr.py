@@ -745,12 +745,13 @@ def get_details_from_uri_list( solr_instance, uri_list, field_list ): #{
 
   if uri_list : #{
     uri_list = [ escaped_uri_prefix + escape_colons(one_uri) for one_uri in uri_list ]
-    query_str = escaped_uri_fieldname + ":(" + " ".join( uri_list ) + ")"
+    fq = "{!terms f="+ escaped_uri_fieldname +"}" + ",".join(uri_list)
+
     # Maybe convert into a curl with a POST commnd?, as in
     # https://stackoverflow.com/questions/2997014/can-you-use-post-to-run-a-query-in-solr-select
     try:
       # field_str = ','.join( field_list )
-      further_details = solr_instance.query( query_str, fields=field_list,
+      further_details = solr_instance.query( "*:*", fq=fq, fields=field_list,
                                            start=0, rows=len( uri_list ), score=False )
       return further_details
     except Exception as e:

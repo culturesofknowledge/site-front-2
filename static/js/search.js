@@ -303,6 +303,7 @@ function advanceSearch(params) {
       "pla_ori_name",
       "pla_des_name",
       "let_con",
+      "repository",
     ];
     // Loop through paramConfigs to generate query strings
     paramConfigs.forEach((config) => {
@@ -417,6 +418,15 @@ function advanceSearch(params) {
           });
         }
         // Content specific search ends here
+      }
+
+      // Phrase match so the repository's words can't match across
+      // different institutions/places on the same letter.
+      if (config.param == "repository" && paramValue) {
+        openingQuery.queryStrings.push({
+          queryString: `"${paramValue}"`,
+          fields: config.queryStringFields,
+        });
       }
 
       if (paramValue && !customValue.includes(config.param)) {

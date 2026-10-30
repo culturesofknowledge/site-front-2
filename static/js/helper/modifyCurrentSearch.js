@@ -10,6 +10,7 @@ export async function modifyCurrentSearch() {
       "ox_started-ox_year": "dat_sin_year",
       "mail_origin-location": "pla_ori_name",
       "mail_destination-location": "pla_des_name",
+      "dcterms_references-location": "pla_ment_name",
     };
 
     // uuid params that must be resolved to a name, and the core to resolve them from
@@ -18,6 +19,7 @@ export async function modifyCurrentSearch() {
       "mail_recipient-person": "people",
       "mail_origin-location": "location",
       "mail_destination-location": "location",
+      "dcterms_references-location": "location",
     };
     const apiKeys = Object.keys(apiKeyCollections);
     const uuidsMap = {}; // { key: [uuid1, uuid2] }

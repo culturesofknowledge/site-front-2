@@ -8,18 +8,10 @@ export async function modifyCurrentSearch() {
       origin_sort: "pla_ori_name",
       destination_sort: "pla_des_name",
       "ox_started-ox_year": "dat_sin_year",
-      "mail_origin-location": "pla_ori_name",
-      "mail_destination-location": "pla_des_name",
     };
 
-    // uuid params that must be resolved to a name, and the core to resolve them from
-    const apiKeyCollections = {
-      "frbr_creator-person": "people",
-      "mail_recipient-person": "people",
-      "mail_origin-location": "location",
-      "mail_destination-location": "location",
-    };
-    const apiKeys = Object.keys(apiKeyCollections);
+    const apiKeys = ["frbr_creator-person", "mail_recipient-person"];
+    const collectionName = "people";
     const uuidsMap = {}; // { key: [uuid1, uuid2] }
     const newParams = new URLSearchParams();
 
@@ -31,19 +23,9 @@ export async function modifyCurrentSearch() {
       }
     }
 
-    // Step 2: Call _fetchNamesNew once per collection
-    const uuidsByCollection = {};
-    for (const [key, uuids] of Object.entries(uuidsMap)) {
-      const collection = apiKeyCollections[key];
-      uuidsByCollection[collection] = (uuidsByCollection[collection] || []).concat(uuids);
-    }
-    const resolvedValues = (
-      await Promise.all(
-        Object.entries(uuidsByCollection).map(([collection, uuids]) =>
-          _fetchNamesNew(uuids, collection)
-        )
-      )
-    ).flat();
+    // Step 2: Call _fetchNamesNew for all UUIDs (flattened into one array)
+    const allUuids = Object.values(uuidsMap).flat();
+    const resolvedValues = await _fetchNamesNew(allUuids, collectionName);
     const uuidToNameMap = {};
 
     // Step 3: Create a quick lookup map from UUID to resolved name

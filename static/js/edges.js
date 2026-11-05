@@ -2063,7 +2063,7 @@ emlo.SelectedFacetRenderer = class extends edges.Renderer {
           <td class="${filterRemoveClass} selected-facets" data-key='${
         filt.term
       }' data-field='${filt.field}' data-render="selected">
-              <span data-val='${filt.field}'  style="width:100px">
+              <span data-val='${filt.field}' class="ellipsis" style="width:100px">
               ${this._getDisplayValue(filt.field, filt.display)}
               </span>
               <span style="margin-left:15px;widht:50px">
@@ -3553,7 +3553,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
       let countFrag = "";
       if (this.primaryField == "ox_hasResource-manifestation") {
-        countFrag += `${allParentObjects.length} records`;
+        countFrag += `<div style="margin-bottom:10px">${allParentObjects.length} records (for manifestation count, see Browse Repositories page)</div>`;
       }
 
       return `

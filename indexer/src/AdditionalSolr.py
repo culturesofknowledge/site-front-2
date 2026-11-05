@@ -17,12 +17,6 @@ import sourceconfig_base
 web_lib_path = 'lib'
 sys.path.append( web_lib_path )
 import fieldmap as f
-from helpers import escape_colons
-
-# We'll need the following strings again and again, so may as well make them global, I think.
-# Convert ':' to '\:' for use in a Solr query
-escaped_uri_fieldname = escape_colons( f.get_uri_fieldname())
-escaped_uri_prefix = escape_colons( f.get_uri_value_prefix())
 
 #================================================================
 
@@ -744,18 +738,24 @@ def AdditionalWorksData( use_staging=True ) : #{
 def get_details_from_uri_list( solr_instance, uri_list, field_list ): #{
 
   if uri_list : #{
-    uri_list = [ escaped_uri_prefix + escape_colons(one_uri) for one_uri in uri_list ]
-    query_str = escaped_uri_fieldname + ":(" + " ".join( uri_list ) + ")"
+    # PR #35 replaced "field:(uri1 uri2 ...)" with {!terms} because batches of
+    # more than 1024 uris failed with a Solr 400 "too many boolean clauses",
+    # and the works in those batches were left without manifestation data.
+    # {!terms} has no clause limit but matches values literally, so the uris
+    # must not have their colons escaped (escaped values match nothing).
+    uri_list = [ f.get_uri_value_prefix() + one_uri for one_uri in uri_list ]
+    fq = "{!terms f="+ f.get_uri_fieldname() +"}" + ",".join(uri_list)
+
     # Maybe convert into a curl with a POST commnd?, as in
     # https://stackoverflow.com/questions/2997014/can-you-use-post-to-run-a-query-in-solr-select
     try:
       # field_str = ','.join( field_list )
-      further_details = solr_instance.query( query_str, fields=field_list,
+      further_details = solr_instance.query( "*:*", fq=fq, fields=field_list,
                                            start=0, rows=len( uri_list ), score=False )
       return further_details
     except Exception as e:
     #####
-      print(f"Failed to query solr. Query too long? Query length : {len(query_str)}")
+      print(f"Failed to query solr. Query too long? Query length : {len(fq)}")
       print(f"Field list : {field_list}")
       # Need a magic query which returns an empty Response object
       further_details = solr_instance.query( "id:abcdefghijkllkjihgfedcba" )

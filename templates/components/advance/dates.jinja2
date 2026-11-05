@@ -52,9 +52,7 @@
       <div class="columns small-12 large-3">
         <select id="dat_from_year" name="dat_from_year" class="select2-hidden-accessible" tabindex="-1" aria-hidden="true"
         onchange="updateDays('dat_from_year' , 'dat_from_month' , 'dat_from_day')">
-          <option class="default">
-            {{dat_from_year}}
-          </option>
+          <option class="default" selected="selected">all years</option>
           {% for year in range(start_year, end_year) %}
             <option value="{{ year }}">{{ year }}</option>
           {% endfor %}
@@ -90,9 +88,7 @@
       <div class="columns small-12 large-3">
         <select id="dat_to_year" name="dat_to_year" class="select2-hidden-accessible" tabindex="-1" aria-hidden="true"
         onchange="updateDays('dat_to_year' , 'dat_to_month' , 'dat_to_day')">
-          <option class="default">
-            {{dat_to_year}}
-          </option>
+          <option class="default" selected="selected">all years</option>
           {% for year in range(start_year, end_year) %}
           <option value="{{ year }}">{{ year }}</option>
           {% endfor %}

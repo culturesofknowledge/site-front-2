@@ -3553,7 +3553,7 @@ emlo.MultiFieldsRenderer = class extends edges.Renderer {
 
       let countFrag = "";
       if (this.primaryField == "ox_hasResource-manifestation") {
-        countFrag += `${allParentObjects.length} records`;
+        countFrag += `<div style="margin-bottom:10px">${allParentObjects.length} records (for manifestation count, see Browse Repositories page)</div>`;
       }
 
       return `

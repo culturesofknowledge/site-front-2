@@ -11,7 +11,9 @@ def conversion(value):
 '''
 
 
+import re
 import time
+from html import unescape
 
 def convert_to_rdf_date(value):
     
@@ -91,3 +93,11 @@ def convert_manifestation_opened( value ):
         return "Unopened"
 
     return "Unknown:"+value
+
+
+def strip_markup( value ):
+    # Tags become a space so adjacent paragraphs don't fuse into one word, then entities are decoded.
+    # Text without markup comes back untouched, so records that were already plain index exactly as before.
+    clean = re.sub( r'</?[A-Za-z][^>]*>', ' ', value )
+    clean = re.sub( r'&(?:#x?[0-9A-Fa-f]+|[A-Za-z]+);', lambda m: unescape( m.group(0) ), clean )  # ';' only: "&pound 5" is plain text
+    return value if clean == value else re.sub( r'\s+', ' ', clean ).strip()

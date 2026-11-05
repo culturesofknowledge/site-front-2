@@ -286,7 +286,7 @@ export function renderH4Section(profile, field, icon = null) {
   if (!profile.hasOwnProperty(field)) return "";
 
   const label = getLabel(field);
-  const value = profile[field];
+  const value = profile[field + "_html"] ?? profile[field];
 
   return `
     <div class="profilepart">

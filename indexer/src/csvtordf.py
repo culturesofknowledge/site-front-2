@@ -62,6 +62,7 @@ transient = 'transient'           #  transient - this predicate is to be stored 
                                   #     with following settings:
                                   #         transient - id to append to main URI (e.g. transient:"_authors")
                                   #         predicate - predicate to use for new URI (e.g. predicate "mail:authors"
+keep_html = 'keep_html'           #     keep_html - also store the original value, markup included, in <predicate>_html (no transient/prefix)
 ignoreIfEqual = 'ignoreIfEqual'   #     ignoreIfEqual - ignore this piece of data if set to this value (post converter)
 additional = 'additional'         # additional - a list of additional values to add which are not in the csv file
 solr = 'solr'                     #     solr - an alternative name to use in solr (currently only for fields not translated to RDF)
@@ -200,7 +201,8 @@ conversions = [
 
       'comment' :
       {  
-        predicate: fieldmap.get_comments_fieldname()
+        predicate: fieldmap.get_comments_fieldname(),
+        converter: strip_markup,
       },
 
       'creation_timestamp':
@@ -334,16 +336,20 @@ conversions = [
       'abstract':
       {
         predicate: fieldmap.get_abstract_fieldname(),
+        converter: strip_markup,
+        keep_html: True,
       },
 
       'description':
       {
         predicate: fieldmap.get_work_description_fieldname(),
+        converter: strip_markup,
       },
 
       'authors_as_marked':
       {
         predicate: fieldmap.get_as_marked_fieldname_end(),
+        converter: strip_markup,
         transient: {
           transient: "_authors",
           predicate: fieldmap.get_authors_fieldname_start() 
@@ -375,6 +381,7 @@ conversions = [
       'destination_as_marked':
       {
         predicate: fieldmap.get_as_marked_fieldname_end(),
+        converter: strip_markup,
         transient: {
           transient: "_destination",
           predicate: fieldmap.get_destination_fieldname_start() 
@@ -406,6 +413,7 @@ conversions = [
       'origin_as_marked':
       {
         predicate: fieldmap.get_as_marked_fieldname_end(),
+        converter: strip_markup,
         transient: {
           transient: "_origin",
           predicate: fieldmap.get_origin_fieldname_start()
@@ -442,6 +450,7 @@ conversions = [
       'addressees_as_marked':
       {
         predicate: fieldmap.get_as_marked_fieldname_end(),
+        converter: strip_markup,
         transient: {
           transient: "_addressees",
           predicate: fieldmap.get_addressees_fieldname_start()
@@ -567,6 +576,7 @@ conversions = [
       'date_of_work_as_marked':
       {
         predicate: fieldmap.get_date_as_marked_fieldname(),
+        converter: strip_markup,
       },
 
       'language_of_work':
@@ -594,6 +604,7 @@ conversions = [
       'incipit':
       {
         predicate: fieldmap.get_incipit_fieldname(),
+        converter: strip_markup,
       },
 
       'keywords':
@@ -755,11 +766,13 @@ conversions = [
       'skos_altlabel':
       {
         predicate: fieldmap.get_alias_fieldname(),
+        converter: strip_markup,
       }, 
 
       'foaf_name':
       {
-        predicate: fieldmap.get_person_name_fieldname(), 
+        predicate: fieldmap.get_person_name_fieldname(),
+        converter: strip_markup,
                                # could do with adding firstName, givenName, surname...
       },                       # yeah well, we're not going to, data model is frozen for now.
 
@@ -1036,6 +1049,7 @@ conversions = [
       'printed_edition_details': 
       {
         predicate: fieldmap.get_printed_edition_details_fieldname(),
+        converter: strip_markup,
       },
 
       'endorsements': 

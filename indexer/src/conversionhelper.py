@@ -95,9 +95,14 @@ def convert_manifestation_opened( value ):
     return "Unknown:"+value
 
 
+# shortcut: only tag names seen in the EMLO export; a new tag in a future export stays in the index until added here.
+# Anything else in <...> (editorial insertions, <http://...> links) is real text and must survive.
+MARKUP_TAGS = 'p|emph|note|lb|entry|row|blockquote|table|tgroup|tbody|colspec|head'
+
+
 def strip_markup( value ):
     # Tags become a space so adjacent paragraphs don't fuse into one word, then entities are decoded.
     # Text without markup comes back untouched, so records that were already plain index exactly as before.
-    clean = re.sub( r'</?[A-Za-z][^>]*>', ' ', value )
+    clean = re.sub( r'</?(?:' + MARKUP_TAGS + r')(?:\s[^>]*)?/?>', ' ', value )
     clean = re.sub( r'&(?:#x?[0-9A-Fa-f]+|[A-Za-z]+);', lambda m: unescape( m.group(0) ), clean )  # ';' only: "&pound 5" is plain text
     return value if clean == value else re.sub( r'\s+', ' ', clean ).strip()

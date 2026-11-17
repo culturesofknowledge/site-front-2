@@ -25,6 +25,11 @@ class StripMarkup(unittest.TestCase):
         self.assertEqual(strip_markup('<p>one</p><p>two</p>'), 'one two')
         self.assertEqual(strip_markup('a <note><p>b</p></note> <lb/>c'), 'a b c')
 
+    def test_editorial_brackets_are_text(self):
+        for v in ['Hon<our[?]>able', '<Narcissus Luttrell Esqr>', 'see <http://en.wikipedia.org/wiki/X>', 'at his <house> next']:
+            self.assertEqual(strip_markup(v), v)
+        self.assertEqual(strip_markup('<head/><colspec colnum="1"/>x <p>y</p>'), 'x y')
+
     def test_tag_words_not_searchable(self):
         self.assertNotIn('bold', strip_markup('<emph render="bold">word</emph>'))
 

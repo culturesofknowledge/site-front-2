@@ -384,6 +384,8 @@ def FillSolr( indexing, red_temp ):
 
                                 if data != '' :
                                   
+                                    raw_data = data
+
                                     # Convert data if a function present
                                     if csvtordf.converter in translation :
                                         converter = translation[csvtordf.converter]
@@ -397,6 +399,9 @@ def FillSolr( indexing, red_temp ):
                                             transient = translation.get( csvtordf.transient, None )
                                           
                                             add( solr_item, translation[csvtordf.predicate], data, prefix=prefix, transient=transient )
+
+                                            if translation.get( csvtordf.keep_html ) and raw_data != data :
+                                                add_solr( solr_item, translation[csvtordf.predicate] + "_html", raw_data )
                                       
                                         else:  # translation[csvtordf.solr]:
                                             add_solr( solr_item, translation[csvtordf.solr], data )

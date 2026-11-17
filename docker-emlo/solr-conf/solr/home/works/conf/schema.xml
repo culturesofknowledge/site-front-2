@@ -238,6 +238,7 @@
   <field name="mail_origin-indef_uncertain"  type="boolean"  indexed="true"  stored="true"  />
   <field name="dcterms_description"  type="text"  indexed="true"  stored="true"  />
   <field name="dcterms_abstract"  type="text"  indexed="true"  stored="true"  />
+  <field name="dcterms_abstract_html"  type="string"  indexed="false"  stored="true"  />
   <field name="ox_keywords"  type="text"  indexed="true"  stored="true"  />
   <field name="ox_incipit"  type="text"  indexed="true"  stored="true"  />
   <field name="ox_excipit"  type="text"  indexed="true"  stored="true"  />
